@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="style/main.css" />
 </head>
 <body class="duel-container">
+
   <!-- ✅ POPUP PHOTO alignée SOLO -->
   <div id="popup-photo" class="popup hidden" tabindex="-1">
     <div class="popup-inner">
@@ -24,6 +25,7 @@
       </div>
     </div>
   </div>
+
   <!-- ✅ POPUP CHOIX CADRE -->
   <div id="popup-cadre-choix" class="popup hidden">
     <div class="popup-inner">
@@ -34,6 +36,7 @@
       <div id="list-cadres-popup" style="display:flex;flex-wrap:wrap;gap:12px;"></div>
     </div>
   </div>
+
   <!-- ✅ POPUP SIGNALER -->
   <div id="popup-signal-photo" class="popup hidden">
     <div class="popup-inner">
@@ -49,6 +52,7 @@
       </div>
     </div>
   </div>
+
   <!-- ✅ POPUP VALIDER JETON -->
   <div id="popup-jeton-valider" class="popup hidden">
     <div class="popup-inner">
@@ -62,6 +66,7 @@
       </div>
     </div>
   </div>
+
   <!-- ✅ POPUP FIN DUEL -->
   <div id="popup-fin-duel" class="popup hidden">
     <div class="popup-inner">
@@ -78,16 +83,33 @@
       </div>
     </div>
   </div>
+
   <!-- ========== CONTENU PRINCIPAL ========== -->
   <div class="duel-main-container" style="max-width:600px;margin:30px auto 0 auto;padding:20px;">
     <div id="duel-premium-info" style="text-align:center;margin-bottom:15px;color:#c59100;font-weight:bold;"></div>
-    <!-- Affichage dynamique : Saisie défis OU liste des défis -->
-    <div id="zone-defis-premium" style="margin:18px 0;"></div>
-    <!-- Liste des défis (final) -->
+
+    <!-- ✅ ZONES OBLIGATOIRES POUR JS -->
+    <!-- Saisie des défis -->
+    <div id="bloc-defi-saisie" style="display:none;">
+      <div id="text-saisie-defis" style="margin-bottom:10px;font-weight:bold;"></div>
+      <input id="input-defi1" type="text" placeholder="Défi 1..." style="margin-bottom:8px;width:100%;padding:12px 10px;border-radius:10px;border:none;font-size:1.1em;">
+      <input id="input-defi2" type="text" placeholder="Défi 2..." style="margin-bottom:8px;width:100%;padding:12px 10px;border-radius:10px;border:none;font-size:1.1em;">
+      <button id="btn-valider-defis" style="padding:12px 24px;border-radius:10px;font-size:1.09em;background:#ffd966;font-weight:bold;border:none;margin-top:10px;">Valider</button>
+    </div>
+    <!-- Attente adversaire -->
+    <div id="bloc-attente" style="display:none;text-align:center;font-style:italic;color:#b7b7b7;">
+      En attente de l’autre joueur...
+    </div>
+    <!-- Liste défis final -->
+    <div id="bloc-defis-final" style="display:none;">
+      <h3>Liste des défis sélectionnés :</h3>
+      <ul id="liste-defis-final"></ul>
+    </div>
+
+    <!-- Liste des défis (final, utilisée ailleurs) -->
     <ul id="duel-defi-list"></ul>
-    <!-- Le reste (photos, boutons, scores, timer, etc.) : copie identique à duel_random.html -->
+    <!-- Timer / autres infos -->
     <div id="zone-timer"></div>
-    <!-- ... -->
   </div>
   <script type="module" src="js/duel_amis_premium.js"></script>
 </body>
