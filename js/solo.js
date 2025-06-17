@@ -131,7 +131,6 @@ async function init() {
   await startGame();
 }
 
-
 function tousDefisFaits(defis) {
   if (!defis || !defis.length) return false;
   return defis.every(d => d.done);
@@ -357,15 +356,14 @@ window.renderPhotoCadreSolo = async function(defiId) {
   const photoUrl = photoData?.photo || "";
 
   if (photoUrl) {
-container.innerHTML = `
-  <div class="cadre-item cadre-duel-mini">
-    <div class="cadre-preview">
-      <img class="photo-cadre" src="${getCadreUrl(cadreId)}">
-      <img class="photo-user" src="${photoUrl}">
-    </div>
-  </div>
-`;
-
+    container.innerHTML = `
+      <div class="cadre-item cadre-duel-mini">
+        <div class="cadre-preview">
+          <img class="photo-cadre" src="${getCadreUrl(cadreId)}">
+          <img class="photo-user" src="${photoUrl}">
+        </div>
+      </div>
+    `;
     const photoImg = container.querySelector('.photo-user');
     photoImg.oncontextmenu = (e) => { e.preventDefault(); ouvrirPopupChoixCadreSolo(defiId); };
     photoImg.ontouchstart = function() {
@@ -432,7 +430,7 @@ window.agrandirPhoto = async function(dataUrl, defiId) {
   } catch (e) {}
 
   const cadreActuel = photoData?.cadre || (await getCadreSelectionne());
-  cadre.src = `./assets/cadres/${cadreActuel}.webp`;
+  cadre.src = getCadreUrl(cadreActuel);
   photo.src = dataUrl;
 
   const popup = document.getElementById("popup-photo");
@@ -517,7 +515,7 @@ async function validerDefiAvecJeton(index) {
     localStorage.setItem(`photo_defi_${defi.id}`, JSON.stringify({ photo: "assets/img/jetonpp.webp", cadre: "polaroid_01" }));
     localStorage.setItem(SOLO_DEFIS_KEY, JSON.stringify(defis));
     await loadDefis();
- 
+
   }
 }
 
@@ -613,7 +611,7 @@ window.afficherPhotosAimees = async function() {
       el.className = "cadre-item cadre-duel-mini";
       el.innerHTML = `
         <div class="cadre-preview">
-          <img class="photo-cadre" src="./assets/cadres/${cadre}.webp">
+          <img class="photo-cadre" src="${getCadreUrl(cadre)}">
           <img class="photo-user" src="${photoData.photo}">
         </div>
       `;
