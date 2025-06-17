@@ -136,9 +136,24 @@
       pointer-events: none; box-shadow: 0 8px 32px #0003;
     }
     .toast-msg.show { opacity: 1; }
-    @media (max-width: 540px) {
-      .main-buttons { max-width:98vw; border-radius:1em; padding: 1.5rem 0.5rem; }
+    /* POPUP suppression ami */
+    .popup.hidden { display: none; }
+    .popup {
+      position: fixed; top:0; left:0; width:100vw; height:100vh; z-index:9999;
+      background:rgba(40,36,52,0.63); display:flex; align-items:center; justify-content:center;
+      transition: background 0.23s;
     }
+    .popup-inner {
+      background: #23233a;
+      border-radius: 18px;
+      padding: 2em 1.5em 1.7em 1.5em;
+      box-shadow: 0 6px 40px #0005;
+      min-width: 240px;
+      max-width: 90vw;
+      color: #ffe04a;
+      text-align: center;
+    }
+    .popup .main-button { min-width: 120px; margin: 0 0.5em 0 0.5em; }
   </style>
 </head>
 <body style="background:#313142;min-height:100vh;">
@@ -182,6 +197,17 @@
   <footer style="text-align:center;margin-top:2.8em;color:#aaa;">
     <p>&copy; 2025 VFind</p>
   </footer>
+
+  <!-- POPUP suppression ami -->
+  <div id="popup-suppr-ami" class="popup hidden" style="z-index:9999;">
+    <div class="popup-inner">
+      <p>Es-tu sûr de vouloir supprimer <span id="popup-suppr-ami-nom" style="font-weight:bold;"></span> de ta liste d'amis&nbsp;?</p>
+      <div style="text-align:center;margin-top:1em;">
+        <button onclick="window.confirmerSuppressionAmi()" class="main-button" style="margin-right:1em;">Oui, supprimer</button>
+        <button onclick="window.annulerSuppressionAmi()" class="main-button">Annuler</button>
+      </div>
+    </div>
+  </div>
   <script type="module" src="js/amis.js"></script>
   <script type="module" src="js/userData.js"></script>
 </body>

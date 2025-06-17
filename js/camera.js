@@ -2,8 +2,7 @@ import { uploadPhotoDuelWebp, savePhotoDuel } from "./duel.js";
 import { getUserId, getCadreSelectionne } from "./userData.js";
 import { supabase } from './userData.js';
 
-// Plugin Capacitor Camera si on est en natif
-import { Camera } from '@capacitor/camera';
+
 
 // Générer image + cadre concours (inchangé)
 export async function genererImageConcoursAvecCadre(base64Image) {
@@ -69,15 +68,21 @@ async function uploadPhotoConcoursWebp(dataUrl, concoursId, userId) {
 // --------- UNIFIÉ ---------
 export async function ouvrirCameraPour(defiId, mode = "solo", duelId = null, cadreId = null) {
   // SI mobile natif (Capacitor), utilise plugin Camera
-  if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
-    try {
-      const photo = await Camera.getPhoto({
-        quality: 85,
-        allowEditing: false,
-        resultType: 'dataUrl',
-        source: 'CAMERA'
-      });
-      const dataUrl = photo.dataUrl;
+if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+  try {
+    const cameraModule = await import('@capacitor/camera');
+    const Camera = cameraModule.Camera;
+
+    const photo = await Camera.getPhoto({
+      quality: 85,
+      allowEditing: false,
+      resultType: 'dataUrl',
+      source: 'CAMERA'
+    });
+
+    const dataUrl = photo.dataUrl;
+    // ... suite du traitement
+
 
       // Mode duel
       if (mode === "duel") {
