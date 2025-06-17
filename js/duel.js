@@ -210,21 +210,22 @@ export async function findOrCreateRoom() {
   const player1Pseudo = await getCurrentUser();
   const defis = await getDefisDuelFromSupabase(3);
 
-  const roomObj = {
-    player1_id: player1Id,
-    player2_id: null,
-    player1_pseudo: player1Pseudo,
-    player2_pseudo: null,
-    score1: 0,
-    score2: 0,
-    status: 'waiting',
-    createdat: Date.now(),
-    defis: defis,
-    starttime: null,
-    photosa: {},
-    photosb: {},
-    type: 'random'
-  };
+const roomObj = {
+  player1_id: player1Id,           // ✅ ID Supabase de player 1
+  player2_id: null,                // ✅ ID Supabase de player 2 (à venir)
+  player1: player1Pseudo,          // ✅ Pseudo de player 1
+  player2: null,                   // ✅ Pseudo de player 2 (à venir)
+  score1: 0,
+  score2: 0,
+  status: 'waiting',
+  createdat: Date.now(),
+  defis: defis,                    // tableau de défis
+  starttime: null,
+  photosa: {},                     // photos de player 1
+  photosb: {},                     // photos de player 2
+  type: 'random'                   // ou 'amis'
+};
+
 
   const { data, error } = await supabase.from('duels').insert([roomObj]).select();
   if (error) {

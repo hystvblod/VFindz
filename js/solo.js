@@ -1,6 +1,11 @@
 import { getJetons, addJetons, ajouterDefiHistorique, removeJeton, getCadreSelectionne, getCadresPossedes, updateUserData, getUserDataCloud, getDefisFromSupabase, isPremium } from "./userData.js";
 import { ouvrirCameraPour as cameraOuvrirCameraPour } from "./camera.js";
 
+function getCadreUrl(id) {
+  return localStorage.getItem(`cadre_${id}`) ||
+    `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${id}.webp`;
+}
+
 // MIGRATION AUTO : patche les anciennes photos solo non JSON
 (function corrigeAnciennesPhotosSolo() {
   Object.keys(localStorage).forEach(key => {
@@ -352,14 +357,15 @@ window.renderPhotoCadreSolo = async function(defiId) {
   const photoUrl = photoData?.photo || "";
 
   if (photoUrl) {
-    container.innerHTML = `
-      <div class="cadre-item cadre-duel-mini">
-        <div class="cadre-preview">
-          <img class="photo-cadre" src="./assets/cadres/${cadreId}.webp">
-          <img class="photo-user" src="${photoUrl}">
-        </div>
-      </div>
-    `;
+container.innerHTML = `
+  <div class="cadre-item cadre-duel-mini">
+    <div class="cadre-preview">
+      <img class="photo-cadre" src="${getCadreUrl(cadreId)}">
+      <img class="photo-user" src="${photoUrl}">
+    </div>
+  </div>
+`;
+
     const photoImg = container.querySelector('.photo-user');
     photoImg.oncontextmenu = (e) => { e.preventDefault(); ouvrirPopupChoixCadreSolo(defiId); };
     photoImg.ontouchstart = function() {
@@ -391,7 +397,7 @@ window.ouvrirPopupChoixCadreSolo = async function(defiId) {
   list.innerHTML = "";
   cadres.forEach(cadre => {
     let el = document.createElement("img");
-    el.src = "./assets/cadres/" + cadre + ".webp";
+    el.src = getCadreUrl(cadre);
     el.style.width = "72px";
     el.style.cursor = "pointer";
     el.style.borderRadius = "12px";
