@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VFind - Profil</title>
+  <link rel="stylesheet" href="style/main.css"/>
+  <style>
+    .id-user {
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      margin-top: 0.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.09rem;
+      letter-spacing: 0.5px;
+      text-decoration: underline;
+      transition: color 0.15s;
+    }
+    .id-user:hover {
+      color: #ffe04a;
+    }
+    .popChangementID-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(30,30,40,0.44);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      transition: background .16s;
+    }
+    .popChangementID-bg.active {
+      display: flex !important;
+    }
+    .popChangementID {
+      background: #fff;
+      color: #232323;
+      padding: 1.6rem 1.3rem 1.2rem 1.3rem;
+      border-radius: 16px;
+      text-align: center;
+      width: 94vw;
+      max-width: 370px;
+      box-shadow: 0 8px 36px #1115;
+      z-index: 2200;
+      animation: popfade .20s;
+    }
+    @keyframes popfade {
+      from { transform: translateY(22px) scale(.96); opacity:0;}
+      to   { transform: none; opacity:1;}
+    }
+    .popChangementID input {
+      margin-top: 1em;
+      width: 88%;
+      padding: 0.65em;
+      border-radius: 9px;
+      border: 1px solid #c8c8c8;
+      font-size: 1.07em;
+      background: #fafbfd;
+    }
+    .popChangementID button {
+      margin-top: 1.1em;
+      margin-right: 0.4em;
+      padding: 0.53em 1.2em;
+      font-weight: bold;
+      border-radius: 8px;
+      background: #ffe04a;
+      color: #222;
+      border: none;
+      font-size: 1.08em;
+      cursor: pointer;
+      transition: background .13s;
+    }
+    .popChangementID button:last-child {
+      background: #e6e6e6;
+      color: #444;
+    }
+    .popChangementID button:hover {
+      background: #ffd000;
+    }
+    #popIdError {
+      color:#e74646;
+      font-size:0.99em;
+      margin-top:0.55em;
+      min-height:1.2em;
+      display: block;
+    }
+    #popIdError.valid {
+      color: #12b712;
+    }
+    @media (max-width: 490px) {
+      .popChangementID {
+        padding: 1.2rem 0.4rem 1.1rem 0.4rem;
+      }
+      .popChangementID input {
+        width: 95%;
+        font-size: 1em;
+      }
+    }
+  </style>
+</head>
+<body class="vfind-bg">
+
+<header class="header-solo">
+  <div class="header-row">
+    <a href="index.html" class="back-btn" title="Retour">
+      <img src="assets/icons/arrow_back.svg" alt="Retour" />
+    </a>
+    <h1>Mon Profil</h1>
+    <div class="top-buttons">
+      <a href="parametres.html" class="btn-icon">
+        <img src="assets/icons/settings.svg" alt="Paramètres" />
+      </a>
+    </div>
+  </div>
+  <div class="id-user" id="idUserDisplay">(ID...)</div>
+</header>
+
+<div style="text-align:center;margin-bottom:2em;">
+  <button id="showChangeIdBtn" style="background:#ffe04a;padding:7px 16px;border-radius:7px;border:none;font-weight:bold;cursor:pointer;">Changer mon identifiant</button>
+</div>
+
+<!-- Popup changement ID UNIQUE et isolée -->
+<div class="popChangementID-bg" id="popChangementID-bg">
+  <div class="popChangementID">
+    <div id="popIdText" style="font-size:1.11em;margin-bottom:0.2em;">
+      Modifier mon identifiant :
+    </div>
+    <input type="text" id="popNewIdInput" placeholder="Nouveau ID unique" maxlength="18" autocomplete="off" />
+    <div>
+      <button id="popValidateId">Valider</button>
+      <button id="popCancelId" type="button">Annuler</button>
+    </div>
+    <span id="popIdError"></span>
+  </div>
+</div>
+
+<section class="profil-top">
+  <div class="profil-solde-bar">
+    <div class="solde-piece">
+      <img src="assets/img/vcoin.webp" alt="VCoins" class="vcoin-solo" />
+      <span id="vcoins">100</span>
+    </div>
+    <div class="solde-jeton">
+      <img src="assets/img/jeton_p.webp" alt="Jetons" class="jeton-solo" />
+      <span id="jetons">6</span>
+    </div>
+  </div>
+</section>
+
+<main class="profil-container">
+  <section class="profil-sections">
+    <button onclick="location.href='cadres.html'">Mes cadres</button>
+    <button id="btnAmis" onclick="location.href='amis.html'">Mes amis</button>
+    <button onclick="location.href='calendrier.html'">Mon calendrier</button>
+    <button onclick="location.href='photos_aimees.html'">Photos aimées</button>
+    <button onclick="location.href='page_choix.html'">FAQ/Reglement</button>
+  </section>
+</main>
+
+<footer>
+  <p>© 2025 VFindz</p>
+</footer>
+
+<!-- ==== SUPABASE CENTRALISÉ ==== -->
+<script type="module">
+import { loadUserData, getPseudo, getPoints, setPseudo, getUserDataCloud } from './js/userData.js';
+import { supabase } from './js/userData.js';
+
+// Vérifie si un pseudo existe déjà (unicité)
+async function isPseudoTaken(pseudo) {
+  const { data } = await supabase.from('users').select('id').eq('pseudo', pseudo);
+  return data && data.length > 0;
+}
+
+// Change le pseudo dans Supabase (si unique)
+async function changeUserId(newPseudo) {
+  if (await isPseudoTaken(newPseudo)) {
+    throw new Error("Ce pseudo est déjà utilisé.");
+  }
+  await setPseudo(newPseudo);
+}
+
+// Récupère toutes les infos du profil courant
+import { isPremium, renderID } from './js/userData.js';
+async function getProfile() {
+  return await getUserDataCloud();
+}
+
+async function refreshProfilDisplay() {
+  const profil = await getProfile();
+  const pseudo = profil?.pseudo || "???";
+  const premium = profil?.premium || false;
+
+  document.getElementById("idUserDisplay").innerHTML = "ID : " + renderID(pseudo);
+  document.getElementById("vcoins").textContent = profil?.points || 0;
+  document.getElementById("jetons").textContent = profil?.jetons || 0;
+}
+
+// Initialisation du profil utilisateur
+async function setupProfile() {
+  await refreshProfilDisplay();
+
+  document.getElementById("showChangeIdBtn").onclick = () => {
+    document.getElementById("popChangementID-bg").classList.add("active");
+    document.getElementById("popNewIdInput").value = "";
+    document.getElementById("popIdError").textContent = "";
+    document.getElementById("popIdError").classList.remove("valid");
+    setTimeout(()=>document.getElementById("popNewIdInput").focus(), 120);
+  };
+  document.getElementById("popCancelId").onclick = () => {
+    document.getElementById("popChangementID-bg").classList.remove("active");
+  };
+
+  // Validation nouvel ID
+  document.getElementById("popValidateId").onclick = async () => {
+    const newId = document.getElementById("popNewIdInput").value.trim();
+    const err = document.getElementById("popIdError");
+    err.textContent = "";
+    err.classList.remove("valid");
+    if (newId.length < 3) {
+      err.textContent = "ID trop court (min 3 caractères)";
+      return;
+    }
+    if (newId.length > 18) {
+      err.textContent = "ID trop long (max 18 caractères)";
+      return;
+    }
+    if (!/^[a-zA-Z0-9_.-]+$/.test(newId)) {
+      err.textContent = "Caractères autorisés : A-Z 0-9 . _ -";
+      return;
+    }
+    // Vérifie unicité et change dans Supabase
+    try {
+      await changeUserId(newId);
+      err.classList.add("valid");
+      err.textContent = "✅ Ton ID a bien été changé !";
+      setTimeout(() => {
+        document.getElementById("popChangementID-bg").classList.remove("active");
+        refreshProfilDisplay();
+      }, 900);
+    } catch(e) {
+      err.textContent = e.message || "Erreur inconnue";
+    }
+  };
+}
+setupProfile();
+
+
+async function checkPendingFriendRequests() {
+  await loadUserData();
+  const profil = await getUserDataCloud();
+  const btn = document.getElementById("btnAmis");
+  if (profil.demandesRecues && profil.demandesRecues.length > 0) {
+    btn.classList.add("attention");
+  } else {
+    btn.classList.remove("attention");
+  }
+}
+checkPendingFriendRequests();
+
+</script>
+</body>
+</html>

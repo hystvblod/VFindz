@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VFindz - Mes cadres</title>
+  <link rel="stylesheet" href="style/main.css"/>
+</head>
+<body class="page-container">
+
+  <header class="header-solo">
+    <div class="header-row">
+      <a href="profil.html" class="back-btn" title="Retour">
+        <img src="assets/icons/arrow_back.svg" alt="Retour" />
+      </a>
+      <h1>Mes cadres</h1>
+      <div class="top-buttons">
+        <a href="profil.html" class="btn-icon">
+          <img src="assets/icons/user.svg" alt="Profil" />
+        </a>
+        <a href="parametres.html" class="btn-icon">
+          <img src="assets/icons/settings.svg" alt="Paramètres" />
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="cadres-possedes">
+      <div class="grid-cadres" id="cadres-list">
+        <!-- Cadres injectés dynamiquement -->
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 VFindz</p>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import {
+      getCadresPossedes,
+      getCadreSelectionne,
+      setCadreSelectionne
+    } from './js/userData.js';
+
+    function getCadreUrl(id) {
+      return localStorage.getItem(`cadre_${id}`) ||
+             `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${id}.webp`;
+    }
+
+    function zoomCadre(id) {
+      const popup = document.createElement("div");
+      popup.className = "popup show";
+      popup.innerHTML = `
+        <div class="popup-inner">
+          <button id="close-popup" onclick="document.body.removeChild(this.parentNode.parentNode)">✖</button>
+          <div class="cadre-preview cadre-popup">
+            <img class="photo-cadre" src="${getCadreUrl(id)}" />
+            <img class="photo-user" src="./assets/img/exemple.jpg" />
+          </div>
+        </div>
+      `;
+      document.body.appendChild(popup);
+    }
+
+    async function utiliserCadre(id) {
+      await setCadreSelectionne(id);
+      alert("✅ Cadre sélectionné !");
+      await afficherCadres();
+    }
+
+    async function afficherCadres() {
+      const container = document.getElementById("cadres-list");
+      const cadresPossedes = await getCadresPossedes();
+      const cadreActif = await getCadreSelectionne();
+
+      container.innerHTML = "";
+
+      if (!cadresPossedes.length) {
+        container.innerHTML = "<p>Aucun cadre débloqué !</p>";
+        return;
+      }
+
+      cadresPossedes.forEach(cadre => {
+        const div = document.createElement("div");
+        div.className = "cadre-item";
+        div.innerHTML = `
+          <div class="cadre-preview" style="cursor:zoom-in" onclick="window.zoomCadre('${cadre}')">
+            <img class="photo-cadre" src="${getCadreUrl(cadre)}" />
+            <img class="photo-user" src="./assets/img/exemple.jpg" />
+          </div>
+          <button onclick="window.utiliserCadre('${cadre}')" ${cadre === cadreActif ? "disabled" : ""}>
+            ${cadre === cadreActif ? "Utilisé" : "Utiliser"}
+          </button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Initialisation
+    document.addEventListener("DOMContentLoaded", async () => {
+      window.zoomCadre = zoomCadre;
+      window.utiliserCadre = utiliserCadre;
+      await afficherCadres();
+    });
+  </script>
+</body>
+</html>

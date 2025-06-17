@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Choisir le cadre de la photo</title>
+  <link rel="stylesheet" href="style/main.css">
+  <style>
+    body { background: #1a1c24; color: #fff; font-family: 'Inter', Arial, sans-serif; }
+    .cadre-list { display: flex; flex-wrap: wrap; gap: 18px; justify-content: center; margin-top: 38px; }
+    .cadre-item { cursor: pointer; border-radius: 18px; overflow: hidden; box-shadow: 0 2px 14px #0006; transition: transform 0.14s; background: #23243a; }
+    .cadre-item.selected { border: 3px solid #ffd900; transform: scale(1.08); }
+    .cadre-preview { width: 92px; height: 92px; position: relative; background: #111; }
+    .cadre-preview img { position: absolute; width: 100%; height: 100%; object-fit: contain; }
+    .header { text-align: center; margin-top: 24px; font-size: 1.3em; }
+    .btn-retour { margin-top: 28px; padding: 10px 30px; border-radius: 18px; font-weight: bold; border: none; background: #ffd900; color: #23243a; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="header">Choisis un cadre pour cette photo</div>
+  <div id="cadre-list" class="cadre-list"></div>
+  <div style="text-align:center;">
+    <button class="btn-retour" onclick="history.back()">Retour</button>
+  </div>
+  <script>
+    // Chargement des cadres possédés (exemple depuis localStorage, adapte si besoin)
+    function getCadresPossedes() {
+      // Ex : ['polaroid_01', 'polaroid_02', ...] depuis localStorage, sinon à adapter
+      return JSON.parse(localStorage.getItem("cadres_possedes") || '["polaroid_01"]');
+    }
+    // Récupère la photo à modifier
+    const params = new URLSearchParams(window.location.search);
+    const defiId = params.get("defi");
+    const photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`) || '{}');
+    const cadres = getCadresPossedes();
+    // Affichage
+    const cadreList = document.getElementById("cadre-list");
+    cadres.forEach(cadreId => {
+      const item = document.createElement("div");
+      item.className = "cadre-item" + (cadreId === photoData.cadre ? " selected" : "");
+      item.innerHTML = `
+        <div class="cadre-preview">
+          <img src="${photoData.photo || ''}" style="z-index:2;">
+          <img src="./assets/cadres/${cadreId}.webp" style="z-index:3;">
+        </div>
+      `;
+      item.onclick = () => {
+        photoData.cadre = cadreId;
+        localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(photoData));
+        item.classList.add("selected");
+        alert("✅ Nouveau cadre appliqué !");
+        history.back();
+      };
+      cadreList.appendChild(item);
+    });
+  </script>
+</body>
+</html>

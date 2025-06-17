@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Duel Aléatoire - VFindz</title>
+  <link rel="stylesheet" href="style/main.css" />
+  <style>
+    .searching-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 2.5rem 0;
+    }
+.spin-logo {
+  width: 120px;      /* Augmente la taille (mets plus si tu veux) */
+  height: 120px;
+  margin-bottom: 1rem;
+  animation: pulse 1.1s infinite cubic-bezier(.4,0,.6,1);
+  /* SUPPRIME l’aura jaune : */
+  filter: none;
+  border-radius: 50%;
+}
+
+@keyframes pulse {
+  0%   { transform: scale(1);    opacity: 0.9; }
+  40%  { transform: scale(1.13); opacity: 1;   }
+  60%  { transform: scale(1.06); opacity: 1;   }
+  100% { transform: scale(1);    opacity: 0.9; }
+}
+
+
+    .searching-text {
+      font-size: 1.2rem;
+      color: #3682e3;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body class="duel-container">
+
+  <!-- HEADER STYLE SOLO/DUEL -->
+  <header class="header-solo" style="border-bottom: 5px solid #888;">
+    <div class="header-row">
+      <a href="index.html" class="back-btn" title="Retour">
+        <img src="assets/icons/arrow_back.svg" alt="Retour" />
+      </a>
+      <h1>Duel aléatoire</h1>
+      <div class="top-buttons">
+        <a href="profil.html" class="btn-icon">
+          <img src="assets/icons/user.svg" alt="Profil" />
+        </a>
+        <a href="parametres.html" class="btn-icon">
+          <img src="assets/icons/settings.svg" alt="Paramètres" />
+        </a>
+      </div>
+    </div>
+    <div class="solde-container solde-solo" id="solde-container">
+      <div class="solde-item">
+        <div class="solde-ligne">
+          <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" />
+          <span id="points"></span>
+        </div>
+      </div>
+      <div class="solde-item">
+        <div class="solde-ligne">
+          <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" />
+          <span id="jetons"></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="searching-adversary" class="searching-box">
+      <img src="assets/img/logo.png" alt="Logo VFind" class="spin-logo"/>
+      <div class="searching-text">Recherche d’adversaire…</div>
+    </div>
+    <div id="searching-failed" class="searching-box" style="display:none;">
+      <div class="searching-text">
+        ⏳ Aucun adversaire trouvé pour l’instant.<br>Réessaie plus tard !
+      </div>
+    </div>
+    <div class="main-buttons" style="margin-top:2.5rem;"></div>
+    <p style="text-align:center;color:#ccc;">Un adversaire va être sélectionné automatiquement.</p>
+  </main>
+  <footer>
+    <p>&copy; 2025 VFindz</p>
+  </footer>
+  <!-- SUPABASE UNIQUEMENT -->
+  <script type="module" src="js/userData.js"></script>
+  <script type="module" src="js/duel.js"></script>
+</body>
+</html>

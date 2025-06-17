@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VFindz - Calendrier</title>
+  <link rel="stylesheet" href="style/main.css">
+  <style>
+    /* Légende calendrier PROPRE */
+    .legende-calendrier-propre {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.33em;
+      margin: 1.1em 0 1.7em 0;
+      padding-left: 16px;
+    }
+    .legende-calendrier-propre div {
+      display: flex;
+      align-items: center;
+      font-size: 1.09em;
+      margin-bottom: 2px;
+      line-height: 1.24;
+    }
+    .legende-carre {
+      display: inline-block;
+      width: 19px;
+      height: 19px;
+      border-radius: 6px;
+      margin-right: 12px;
+      border: 2px solid #bbb;
+      box-sizing: border-box;
+    }
+    .legende-jaune      { background: #ffe04a; border-color: #ffe04a;}
+    .legende-vert-clair { background: #baffc7; border-color: #baffc7;}
+    .legende-vert-fonce { background: #16b46a; border-color: #16b46a;}
+    .legende-rouge      { background: #ff2c2c; border-color: #ff2c2c;}
+    .legende-gris       { background: #f1f1f1; border-color: #f1f1f1;}
+    .legende-blanc      { background: #fff;    border-color: #e0e0e0;}
+  </style>
+</head>
+<body class="vfind-bg">
+
+<header class="header-solo">
+  <div class="header-row">
+    <a href="profil.html" class="back-btn" title="Retour">
+      <img src="assets/icons/arrow_back.svg" alt="Retour" />
+    </a>
+    <h1>Mon calendrier</h1>
+    <div class="top-buttons">
+      <a href="profil.html" class="btn-icon"></a>
+      <a href="parametres.html" class="btn-icon">
+        <img src="assets/icons/settings.svg" alt="Paramètres" />
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="profil-container">
+  <div style="display:flex;align-items:center;gap:1em;justify-content:center;margin-bottom:0.5em;">
+    <button id="mois-prec" style="font-size:1.3em;padding:0 0.7em;">←</button>
+    <span id="titre-mois" style="font-size:1.1em;font-weight:bold;"></span>
+    <button id="mois-suiv" style="font-size:1.3em;padding:0 0.7em;">→</button>
+  </div>
+  <div id="calendrier-container"></div>
+
+  <!-- LÉGENDE CALENDRIER -->
+<div class="legende-calendrier-propre">
+  <div><span class="legende-carre legende-gris"></span> Avant inscription</div>
+  <div><span class="legende-carre legende-jaune"></span> Jour d'inscription</div>
+  <div><span class="legende-carre legende-vert-clair"></span> 1 ou 2 défis réalisés</div>
+  <div><span class="legende-carre legende-vert-fonce"></span> Une partie terminée</div>
+  <div><span class="legende-carre legende-rouge"></span> Aucun défi (jour passé)</div>
+  <div><span class="legende-carre legende-blanc"></span> Jours à venir</div>
+</div>
+
+  <div id="stats-calendrier" style="margin:1em 0 2em;text-align:center;font-size:1.08em;font-weight:500;"></div>
+</main>
+
+<footer>
+  <p>© 2025 VFindz</p>
+</footer>
+
+<!-- Script principal dédié au calendrier Supabase -->
+<script type="module" src="js/calendrier.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VFind - Amis</title>
+  <link rel="stylesheet" href="style/main.css" />
+  <style>
+    body {
+      background: #313142 !important;
+      color: #f0f0f0;
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+    }
+    .main-buttons {
+      margin: 2.2rem auto;
+      max-width: 430px;
+      background: rgba(44,50,62,0.92);
+      border-radius: 1.5rem;
+      box-shadow: 0 8px 32px #0003, 0 1.5px 0 #24263a;
+      padding: 2.2rem 1.4rem 2rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #fff;
+    }
+    input.main-button, button.main-button {
+      width: 100%;
+      padding: 0.9em 1.2em;
+      margin-bottom: 0.6em;
+      font-size: 1.08em;
+      border-radius: 1.1em;
+      border: none;
+      background: #24263a;
+      color: #fff;
+      font-family: inherit;
+      box-shadow: 0 2px 8px #0002;
+      transition: background 0.2s;
+    }
+    button.main-button {
+      background: #fffef6;
+      color: #3a3a9f;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 1.1em;
+      border: 1.5px solid #3a3a9f2c;
+    }
+    button.main-button:hover {
+      background: #ffe04a;
+      color: #313142;
+    }
+    .txt-empty {
+      color: #babada;
+      font-style: italic;
+      padding: 0.7em 0;
+      text-align:center;
+    }
+    .amis-li {
+      display: flex; align-items: center;
+      gap: 0.8em;
+      margin-bottom: 9px;
+      background: rgba(255,255,255,0.09);
+      border-radius: 14px;
+      box-shadow: 0 1.5px 6px #0002;
+      color: #fff;
+      padding: 0.66em 0.8em;
+    }
+    .ami-avatar {
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      width: 2.2em; height: 2.2em;
+      background: #ffe04a;
+      border-radius: 50%;
+      color: #313142;
+      font-weight: bold;
+      font-size: 1.08em;
+      border: 2.5px solid #fff6;
+      margin-right: 4px;
+      box-shadow: 0 2px 5px #0001;
+      text-align: center;
+    }
+    .ami-nom { flex: 1; font-size: 1.08em; }
+    .btn-small {
+      background: #fff;
+      color: #3a3a9f;
+      border: none;
+      padding: 0.29em 1.1em;
+      border-radius: 1.3em;
+      font-size: 1em;
+      font-weight: 600;
+      margin-left: 0.13em;
+      cursor: pointer;
+      box-shadow: 0 1px 3px #0001;
+      transition: background 0.13s, color 0.13s;
+    }
+    .btn-small:hover {
+      background: #e0e0e0;
+      color: #3a3a9f;
+    }
+    .btn-accept {
+      background: #3a3a9f;
+      color: #fff;
+    }
+    .btn-accept:hover {
+      background: #ffe04a;
+      color: #313142;
+    }
+    .btn-defi {
+      background: #23233a;
+      color: #ffe04a;
+    }
+    .btn-defi:hover {
+      background: #3a3a9f;
+      color: #fff;
+    }
+    .btn-refuse, .btn-suppr {
+      background: #44454e;
+      color: #eee;
+    }
+    .btn-refuse:hover, .btn-suppr:hover {
+      background: #b94b4b;
+      color: #fff;
+    }
+    h3 {
+      margin-top: 2em;
+      margin-bottom: 0.7em;
+      font-size:1.15em;
+      color: #ffe04a;
+      letter-spacing: .5px;
+    }
+    ul { list-style: none; margin: 0; padding: 0;}
+    .toast-msg {
+      position: fixed; left: 50%; bottom: 2.6rem; transform: translateX(-50%);
+      background: #222; color: #fff; padding: 0.8em 1.6em; border-radius: 2em;
+      font-size: 1.02em; opacity: 0; z-index: 20; transition: opacity 0.4s;
+      pointer-events: none; box-shadow: 0 8px 32px #0003;
+    }
+    .toast-msg.show { opacity: 1; }
+    @media (max-width: 540px) {
+      .main-buttons { max-width:98vw; border-radius:1em; padding: 1.5rem 0.5rem; }
+    }
+  </style>
+</head>
+<body style="background:#313142;min-height:100vh;">
+  <header class="header-boutique">
+    <a href="profil.html" class="back-btn" title="Retour">
+      <img src="assets/icons/arrow_back.svg" alt="Retour" />
+    </a>
+    <h1 class="titre-centre">Mes amis</h1>
+    <div class="top-buttons">
+      <a href="parametres.html" class="btn-icon">
+        <img src="assets/icons/settings.svg" alt="Paramètres" />
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="main-buttons">
+
+      <!-- Ajout par pseudo -->
+      <input id="pseudo-ami" type="text" placeholder="Pseudo public de l'ami" class="main-button" autocomplete="off"/>
+      <button class="main-button" id="btn-ajouter-ami">Ajouter un ami</button>
+      
+      <!-- Ajout par lien d'invitation -->
+      <div style="width:100%;margin-top:1.3em;">
+        <button class="main-button" id="btn-lien-invit" style="background:#3a3a9f;color:#fff;">Générer mon lien d’invitation</button>
+        <input id="lien-invit-output" readonly style="width:100%;margin-top:6px;text-align:center;font-size:0.98em;" onclick="this.select();" />
+      </div>
+
+      <hr style="margin:2em 0 1em 0; border: 0; border-top: 1.5px dashed #444;">
+
+      <h3>Mes amis</h3>
+      <ul id="liste-amis"></ul>
+
+      <h3>Demandes d’amis reçues</h3>
+      <ul id="demandes-recue"></ul>
+
+      <h3>Demandes d’amis envoyées</h3>
+      <ul id="demandes-envoyees"></ul>
+    </div>
+  </main>
+  <footer style="text-align:center;margin-top:2.8em;color:#aaa;">
+    <p>&copy; 2025 VFind</p>
+  </footer>
+  <script type="module" src="js/amis.js"></script>
+  <script type="module" src="js/userData.js"></script>
+</body>
+</html>

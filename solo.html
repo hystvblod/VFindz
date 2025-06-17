@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VFind - Mode Solo</title>
+  <link rel="stylesheet" href="style/main.css" />
+</head>
+<body>
+
+<!-- ✅ Popup photo avec cœur et croix alignés sans fond -->
+<div id="popup-photo" class="popup hidden">
+  <div class="popup-inner">
+    <!-- Boutons croix + cœur -->
+    <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
+<button id="btn-aimer-photo" style="background: none; border: none; padding: 0;">
+  <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" />
+</button>
+<button id="close-popup" style="background: none; border: none; padding: 0;">
+  <img src="assets/icons/croix.svg" alt="Fermer" style="width: 32px; height: 32px;margin-top:-5px;" />
+</button>
+
+    </div>
+
+    <!-- Contenu photo -->
+    <div class="cadre-preview cadre-popup boutique-style">
+      <img id="cadre-affiche" class="photo-cadre" src="" />
+      <img id="photo-affichee" class="photo-user" src="" />
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Popup validation de défi -->
+<div id="popup-jeton" class="popup hidden">
+  <div class="popup-inner popup-premium-pro">
+    <div class="premium-badge">VALIDER</div>
+    <div class="popup-premium-title">Valider ce défi</div>
+    <div class="popup-premium-price" style="margin-bottom: 18px;">
+      Veux-tu valider ce défi avec un jeton&nbsp;?
+    </div>
+    <div class="premium-list-pro" style="margin-bottom:18px;">
+      <button class="btn-premium-pro" id="valider-jeton-btn">✅ Valider</button>
+    </div>
+    <button class="btn-annuler-premium-pro" onclick="fermerPopupJeton()">Annuler</button>
+    <div id="solde-jeton" style="margin-top:10px;text-align:center;color:#ffe04a;font-weight:bold;"></div>
+  </div>
+</div>
+
+<!-- ✅ Popup fin de partie -->
+<div id="popup-end" class="popup hidden">
+  <div class="popup-inner popup-premium-pro">
+    <div class="premium-badge">FIN DE PARTIE</div>
+    <div class="popup-premium-title">🎉 Partie terminée !</div>
+    <div class="popup-premium-price" id="end-message" style="margin-bottom: 18px;">
+      Félicitations, tu as terminé cette partie !
+    </div>
+    <ul class="premium-list-pro" style="margin-bottom:18px;">
+      <li id="gain-message"></li>
+    </ul>
+    <div class="btn-boutique-inline" style="margin-top: 16px;">
+      <button id="replayBtnEnd" class="btn-boutique-pill">🔁 Rejouer</button>
+      <button id="returnBtnEnd" class="btn-boutique-pill">🏠 Retour</button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Popup premium photo -->
+<div id="popup-premium-photo" class="popup hidden">
+  <div class="popup-inner popup-premium-pro">
+    <div class="premium-badge">PREMIUM</div>
+    <div class="popup-premium-title">Reprendre la photo</div>
+    <div class="popup-premium-price" style="margin-bottom: 18px;">
+      Cette fonctionnalité est réservée aux abonnés Premium<br>
+      <span style="font-size:0.98em;opacity:0.8;">ou accessible après avoir regardé une publicité.</span>
+    </div>
+    <div class="premium-list-pro" style="margin-bottom:18px;display:flex;gap:0.7em;">
+      <button class="btn-premium-pro" id="btnPubReprise">Regarder la pub</button>
+      <button class="btn-annuler-premium-pro" id="btnAnnulerReprise" style="background:#eee;color:#222;">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<!-- ✅ Header -->
+<header class="header-solo" style="border-bottom: 5px solid #888;">
+  <div class="header-row">
+    <a href="index.html" class="back-btn" title="Retour">
+      <img src="assets/icons/arrow_back.svg" alt="Retour" />
+    </a>
+    <h1>Mode Solo</h1>
+    <div class="top-buttons">
+      <a href="parametres.html" class="btn-icon">
+        <img src="assets/icons/settings.svg" alt="Paramètres" />
+      </a>
+    </div>
+  </div>
+  <div class="solde-container solde-solo" id="solde-container">
+    <div class="solde-item">
+      <div class="solde-ligne">
+        <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" />
+        <span id="points"></span>
+      </div>
+    </div>
+    <div class="solde-item">
+      <div class="solde-ligne">
+        <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" />
+        <span id="jetons"></span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ✅ Contenu principal -->
+<main class="solo-container">
+  <section id="game-section" class="hidden">
+    <div class="timer-box">
+      <img src="assets/icons/clock.svg" alt="Horloge" class="icon-svg" />
+      <span class="timer-text">Temps restant&nbsp;: <span id="timer">--:--:--</span></span>
+    </div>
+    <ul id="defi-list" class="defi-list"></ul>
+  </section>
+
+  <section id="end-section" class="hidden">
+    <h2>🎉 Bravo !</h2>
+    <p id="final-message"></p>
+    <button id="replayBtn" class="main-button">🔁 Rejouer</button>
+  </section>
+</main>
+
+<!-- ✅ Popup sélection de cadre -->
+<div id="popup-cadre-solo" class="popup hidden">
+  <div class="popup-inner">
+    <h3>Choisir un cadre pour cette photo</h3>
+    <div id="list-cadres-popup-solo" style="display:flex; gap:14px; flex-wrap:wrap"></div>
+    <button onclick="fermerPopupCadreSolo()" class="btn-premium-pro" style="margin-top:18px;">Annuler</button>
+  </div>
+</div>
+
+<!-- ✅ Scripts -->
+<script type="module" src="js/userData.js"></script>
+<script type="module" src="js/camera.js"></script>
+<script type="module" src="js/solo.js"></script>
+
+<!-- ✅ Script cœur / favoris -->
+<script type="module">
+  import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@7/+esm';
+
+  const heartBtn = document.getElementById("btn-aimer-photo");
+  const heartImg = document.getElementById("heart-icon");
+  const photoAffichee = document.getElementById("photo-affichee");
+
+  heartBtn.addEventListener("click", async () => {
+    heartImg.src = "assets/icons/coeur_rouge.svg";
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = photoAffichee.naturalWidth;
+      canvas.height = photoAffichee.naturalHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(photoAffichee, 0, 0);
+      const blob = await new Promise(res => canvas.toBlob(res, "image/webp", 0.9));
+      const db = await openDB("photos-aimees", 1, {
+        upgrade(db) {
+          if (!db.objectStoreNames.contains("favoris")) {
+            db.createObjectStore("favoris", { keyPath: "id", autoIncrement: true });
+          }
+        }
+      });
+      const store = db.transaction("favoris", "readwrite").objectStore("favoris");
+      const count = await store.count();
+      if (count >= 30) {
+        alert("Limite de 30 photos atteinte.");
+      } else {
+        await store.add({ blob });
+        alert("Photo ajoutée aux favoris !");
+      }
+    } catch (err) {
+      console.error("Erreur de sauvegarde :", err);
+    }
+  });
+</script>
+
+</body>
+</html>

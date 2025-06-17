@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VFind - Obtenir des pièces</title>
+  <link rel="stylesheet" href="style/main.css" />
+</head>
+<body class="achat-container">
+  <header class="header-solo">
+    <div class="header-row">
+      <a href="boutique.html" class="back-btn" title="Retour">
+        <img src="assets/icons/arrow_back.svg" alt="Retour" />
+      </a>
+      <h1>Obtenir des pièces</h1>
+      <div class="top-buttons">
+        <a href="profil.html" class="btn-icon">
+          <img src="assets/icons/user.svg" alt="Profil" />
+        </a>
+        <a href="parametres.html" class="btn-icon">
+          <img src="assets/icons/settings.svg" alt="Paramètres" />
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="achat-main-buttons">
+    <!-- Ligne 1 : Pub + Parrainage -->
+    <div class="achat-row achat-row-top">
+      <button onclick="watchAdAchat()" class="achat-btn achat-btn-top">
+        🎬<br>Regarder une pub
+        <span class="achat-desc">+100 pièces</span>
+      </button>
+      <button onclick="inviteFriendAchat()" class="achat-btn achat-btn-top">
+        👥<br>Inviter un ami
+        <span class="achat-desc">+300 pièces</span>
+      </button>
+    </div>
+    <!-- Ligne 2 : Achats -->
+    <div class="achat-row achat-row-packs">
+      <button onclick="acheterPack('pack_099')" class="achat-btn achat-btn-pack">
+        <img src="assets/img/vcoin.webp" class="icon-piece" alt="" /> 1 500 pièces
+        <span class="achat-desc">0,99&nbsp;€</span>
+      </button>
+      <button onclick="acheterPack('pack_199')" class="achat-btn achat-btn-pack">
+        <img src="assets/img/vcoin.webp" class="icon-piece" alt="" /> 4 000 pièces
+        <span class="achat-desc">1,99&nbsp;€</span>
+      </button>
+      <button onclick="acheterPack('pack_249')" class="achat-btn achat-btn-pack">
+        <img src="assets/img/vcoin.webp" class="icon-piece" alt="" /> 12 000 pièces
+        <span class="achat-desc">2,49&nbsp;€</span>
+      </button>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 VFind</p>
+  </footer>
+
+  <script type="module" src="js/firebase.js"></script>
+  <script type="module" src="js/userData.js"></script>
+  <script type="module" src="js/achat.js"></script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VFind - Concours</title>
+  <link rel="stylesheet" href="style/main.css" />
+  <style>
+    .grid-photos-concours {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px 18px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 820px) {
+      .grid-photos-concours { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 540px) {
+      .grid-photos-concours { grid-template-columns: 1fr; }
+    }
+    .photo-concours-item {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 2px 10px #0001;
+      padding: 13px 9px 11px 9px;
+      text-align: center;
+      transition: box-shadow .17s;
+    }
+    .photo-concours-item .photo-concours-img {
+      width: 100%;
+      border-radius: 10px;
+      background: #f9f9fa;
+    }
+    .photo-concours-user {
+      font-size: 1.02em;
+      color: #444;
+      margin-top: 7px;
+      font-weight: 500;
+    }
+    /* Amélioration responsive pour le bouton participer */
+    #participerBtn {
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body class="page-container">
+
+  <!-- HEADER -->
+  <header class="header-solo" style="border-bottom: 5px solid #888;">
+    <div class="header-row">
+      <a href="index.html" class="back-btn" title="Retour">
+        <img src="assets/icons/arrow_back.svg" alt="Retour" />
+      </a>
+      <h1>Concours</h1>
+      <div class="top-buttons">
+        <!-- Bouton Profil -->
+        <a href="profil.html" class="btn-icon">
+          <img src="assets/icons/user.svg" alt="Profil" />
+        </a>
+        <a href="parametres.html" class="btn-icon">
+          <img src="assets/icons/settings.svg" alt="Paramètres" />
+        </a>
+      </div>
+    </div>
+    <div class="lot-concours" style="text-align:center;margin:22px 0 10px 0;font-size:1.22em;font-weight:600;color:#ffe04a;">
+      Lot à gagner : <span id="lot-concours">Une carte cadeau Amazon de 50€</span>
+    </div>
+  </header>
+
+  <main class="solo-container">
+    <h2 class="titre-concours" style="margin-top:22px; margin-bottom:16px; text-align:center;">Titre du défi concours ici</h2>
+    
+    <!-- Bouton Participer -->
+    <button id="participerBtn" class="main-button" style="width:90%;margin:0 auto 26px auto;display:flex;align-items:center;justify-content:center;gap:12px;">
+      <img src="assets/icons/photo.svg" alt="Prendre une photo" style="height:28px;width:28px;vertical-align:middle;" />
+      Participer
+    </button>
+
+    <!-- Barre de recherche -->
+    <div style="margin:24px 0 14px 0; text-align:center;">
+      <input id="recherche-pseudo-concours" type="text"
+        placeholder="🔍 Rechercher un pseudo..."
+        style="width:240px; padding:9px 14px; font-size:1em; border-radius:12px; border:1.2px solid #ccc; outline:none;">
+      <span id="resultats-recherche-concours" style="font-size:0.98em;color:#888; margin-left:12px;"></span>
+    </div>
+
+    <!-- Nombre de votes restants (injecté automatiquement par JS) -->
+
+    <!-- Galerie des photos -->
+    <div id="galerie-concours" class="galerie-concours"></div>
+  </main>
+
+  <!-- La popup zoom sera injectée par JS -->
+
+  <!-- SCRIPTS JS (Aucun Storage requis) -->
+  <script type="module" src="js/firebase.js"></script>
+  <script type="module" src="js/userData.js"></script>
+  <script type="module" src="js/camera.js"></script>
+  <script type="module" src="js/concours.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "VFind",
+  "short_name": "VFind",
+  "description": "Relève 3 défis photo chaque jour et gagne des points !",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#2575fc",
+  "theme_color": "#6a11cb",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VFind - Boutique</title>
+  <link rel="stylesheet" href="style/main.css" />
+</head>
+<body class="boutique-container">
+
+  <header class="header-solo">
+    <div class="header-row">
+      <a href="index.html" class="back-btn" title="Retour">
+        <img src="assets/icons/arrow_back.svg" alt="Retour" />
+      </a>
+      <h1>Boutique</h1>
+      <div class="top-buttons">
+        <a href="profil.html" class="btn-icon">
+          <img src="assets/icons/user.svg" alt="Profil" />
+        </a>
+        <a href="parametres.html" class="btn-icon">
+          <img src="assets/icons/settings.svg" alt="Paramètres" />
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- LIGNE 1 : SOLDE GLOBAL -->
+  <div class="solde-ligne-boutique">
+    <div class="solde-item">
+      <img src="assets/img/vcoin.webp" class="icon-boutique-piece" />
+      <span id="points">100</span>
+    </div>
+    <div class="solde-item">
+      <img src="assets/img/jeton_p.webp" class="icon-boutique-jeton" />
+      <span id="jetons">6</span>
+    </div>
+  </div>
+
+  <!-- BOUTON PREMIUM TOUTE LARGEUR CENTRÉ -->
+  <div class="premium-btn-row">
+    <button class="btn-boutique-pill btn-boutique-fullwidth" onclick="activerPremium()">
+      Passer Premium
+    </button>
+  </div>
+
+  <!-- Deux boutons côte à côte -->
+  <div class="btn-boutique-inline">
+    <button class="btn-boutique-pill-jetonpiece" onclick="window.location.href='achat.html'">
+      Obtenir pièces
+    </button>
+    <button class="btn-boutique-pill-jetonpiece" onclick="ouvrirPopupJetonBoutique()">
+      Acheter jetons
+    </button>
+  </div>
+
+  <!-- SECTION BOUTIQUE -->
+  <section class="cadres-list">
+    <div id="boutique-categories"></div>
+    <div id="boutique-container"></div>
+    <!-- Les cadres seront chargés ici par JS -->
+  </section>
+
+  <footer>
+    <p>&copy; 2025 VFind</p>
+  </footer>
+
+<!-- ✅ Popup : acheter des jetons (NOUVEAU STYLE HARMONISÉ) -->
+<div id="popup-achat-jeton" class="hidden">
+  <div class="popup-inner popup-premium-pro">
+    <div class="premium-badge">JETONS</div>
+    <div class="popup-premium-title">Obtenir 3 jetons</div>
+    <div class="popup-premium-price" style="margin-bottom: 18px;">Choisis une méthode</div>
+    <div class="premium-list-pro" style="margin-bottom:18px;">
+      <button class="btn-premium-pro" onclick="acheterJetonsAvecPieces()">💸 Payer 100 pièces</button>
+      <button class="btn-premium-pro" onclick="acheterJetonsAvecPub()">📺 Voir une pub</button>
+    </div>
+   <button class="btn-annuler-premium-pro" onclick="fermerPopupJetonBoutique()">
+      Annuler
+    </button>
+  </div>
+</div>
+
+<!-- Popup Premium (PRO ULTRA) -->
+<div id="popup-premium" class="hidden">
+  <div class="popup-inner popup-premium-pro">
+    <div class="premium-badge">PREMIUM</div>
+    <div class="popup-premium-title">Passe à Premium</div>
+    <div class="popup-premium-price">2,99 €<span class="premium-prix-mini">/mois</span></div>
+    <ul class="premium-list-pro">
+      <li><b>Pièces x2</b> sur chaque défi validé</li>
+      <li><b>Cadres exclusifs</b> réservés</li>
+      <li><b>800 pièces</b> offertes chaque mois</li>
+      <li><b>Impose un défi</b> parmi 10 choix</li>
+      <li><b>ID en or</b> lors des duels</li>
+    </ul>
+    <button class="btn-premium-pro" onclick="acheterPremium()">
+      Devenir Premium
+    </button>
+    <button class="btn-annuler-premium-pro" onclick="fermerPopupPremium()">
+      Annuler
+    </button>
+  </div>
+</div>
+
+  <!-- Scripts -->
+  <!-- Supabase version : plus de firebase.js -->
+  <script type="module" src="js/userData.js"></script>
+  <script type="module" src="js/pub.js"></script>
+  <script type="module" src="js/boutique.js"></script>
+</body>
+</html>
