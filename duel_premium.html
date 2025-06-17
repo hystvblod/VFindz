@@ -8,7 +8,50 @@
 </head>
 <body class="duel-container">
 
-  <!-- ✅ POPUP PHOTO alignée SOLO -->
+  <!-- ✅ HEADER IDENTIQUE -->
+  <header class="header-solo" style="border-bottom: 5px solid #888;">
+    <div class="header-row">
+      <a href="index.html" class="back-btn" title="Retour">
+        <img src="assets/icons/arrow_back.svg" alt="Retour" />
+      </a>
+      <h1>Mode Duel Premium</h1>
+      <div class="top-buttons">
+        <a href="profil.html" class="btn-icon">
+          <img src="assets/icons/user.svg" alt="Profil" />
+        </a>
+        <a href="parametres.html" class="btn-icon">
+          <img src="assets/icons/settings.svg" alt="Paramètres" />
+        </a>
+      </div>
+    </div>
+    <div class="solde-container solde-solo">
+      <div class="solde-item">
+        <div class="solde-ligne">
+          <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" />
+          <span id="points"></span>
+        </div>
+      </div>
+      <div class="solde-item">
+        <div class="solde-ligne">
+          <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" />
+          <span id="jetons"></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ✅ ADVERSAIRE ET TIMER -->
+  <div style="text-align:center; margin-top: 1rem; font-size: 1.2rem;">
+    Contre <strong id="nom-adversaire">...</strong>
+  </div>
+  <div class="timer-box">
+    <img src="assets/icons/clock.svg" alt="Horloge" class="icon-svg" />
+    <span class="timer-text">
+      Temps restant&nbsp;: <span id="timer">--:--:--</span>
+    </span>
+  </div>
+
+  <!-- ✅ POPUPS -->
   <div id="popup-photo" class="popup hidden" tabindex="-1">
     <div class="popup-inner">
       <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
@@ -25,8 +68,6 @@
       </div>
     </div>
   </div>
-
-  <!-- ✅ POPUP CHOIX CADRE -->
   <div id="popup-cadre-choix" class="popup hidden">
     <div class="popup-inner">
       <div style="text-align:right;">
@@ -36,8 +77,6 @@
       <div id="list-cadres-popup" style="display:flex;flex-wrap:wrap;gap:12px;"></div>
     </div>
   </div>
-
-  <!-- ✅ POPUP SIGNALER -->
   <div id="popup-signal-photo" class="popup hidden">
     <div class="popup-inner">
       <div style="text-align:right;">
@@ -52,8 +91,6 @@
       </div>
     </div>
   </div>
-
-  <!-- ✅ POPUP VALIDER JETON -->
   <div id="popup-jeton-valider" class="popup hidden">
     <div class="popup-inner">
       <div style="text-align:right;">
@@ -66,8 +103,6 @@
       </div>
     </div>
   </div>
-
-  <!-- ✅ POPUP FIN DUEL -->
   <div id="popup-fin-duel" class="popup hidden">
     <div class="popup-inner">
       <div style="text-align:right;">
@@ -84,33 +119,35 @@
     </div>
   </div>
 
-  <!-- ========== CONTENU PRINCIPAL ========== -->
-  <div class="duel-main-container" style="max-width:600px;margin:30px auto 0 auto;padding:20px;">
-    <div id="duel-premium-info" style="text-align:center;margin-bottom:15px;color:#c59100;font-weight:bold;"></div>
+  <!-- ✅ CONTENU PRINCIPAL -->
+  <main>
+    <div class="duel-main-container" style="max-width:600px;margin:30px auto 0 auto;padding:20px;">
+      <div id="duel-premium-info" style="text-align:center;margin-bottom:15px;color:#c59100;font-weight:bold;"></div>
 
-    <!-- ✅ ZONES OBLIGATOIRES POUR JS -->
-    <!-- Saisie des défis -->
-    <div id="bloc-defi-saisie" style="display:none;">
-      <div id="text-saisie-defis" style="margin-bottom:10px;font-weight:bold;"></div>
-      <input id="input-defi1" type="text" placeholder="Défi 1..." style="margin-bottom:8px;width:100%;padding:12px 10px;border-radius:10px;border:none;font-size:1.1em;">
-      <input id="input-defi2" type="text" placeholder="Défi 2..." style="margin-bottom:8px;width:100%;padding:12px 10px;border-radius:10px;border:none;font-size:1.1em;">
-      <button id="btn-valider-defis" style="padding:12px 24px;border-radius:10px;font-size:1.09em;background:#ffd966;font-weight:bold;border:none;margin-top:10px;">Valider</button>
+      <!-- Zones JS -->
+      <div id="bloc-defi-saisie" style="display:none;">
+        <div id="text-saisie-defis" style="margin-bottom:10px;font-weight:bold;"></div>
+        <input id="input-defi1" type="text" placeholder="Défi 1..." style="margin-bottom:8px;width:100%;padding:12px 10px;border-radius:10px;border:none;font-size:1.1em;">
+        <input id="input-defi2" type="text" placeholder="Défi 2..." style="margin-bottom:8px;width:100%;padding:12px 10px;border-radius:10px;border:none;font-size:1.1em;">
+        <button id="btn-valider-defis" style="padding:12px 24px;border-radius:10px;font-size:1.09em;background:#ffd966;font-weight:bold;border:none;margin-top:10px;">Valider</button>
+      </div>
+      <div id="bloc-attente" style="display:none;text-align:center;font-style:italic;color:#b7b7b7;">
+        En attente de l’autre joueur...
+      </div>
+      <div id="bloc-defis-final" style="display:none;">
+        <h3>Liste des défis sélectionnés :</h3>
+        <ul id="liste-defis-final"></ul>
+      </div>
+      <ul id="duel-defi-list"></ul>
+      <div id="zone-timer"></div>
     </div>
-    <!-- Attente adversaire -->
-    <div id="bloc-attente" style="display:none;text-align:center;font-style:italic;color:#b7b7b7;">
-      En attente de l’autre joueur...
-    </div>
-    <!-- Liste défis final -->
-    <div id="bloc-defis-final" style="display:none;">
-      <h3>Liste des défis sélectionnés :</h3>
-      <ul id="liste-defis-final"></ul>
-    </div>
+  </main>
 
-    <!-- Liste des défis (final, utilisée ailleurs) -->
-    <ul id="duel-defi-list"></ul>
-    <!-- Timer / autres infos -->
-    <div id="zone-timer"></div>
-  </div>
+  <footer>
+    <p>&copy; 2025 VFindz</p>
+  </footer>
+
+  <!-- ✅ JS FINAL -->
   <script type="module" src="js/duel_amis_premium.js"></script>
 </body>
 </html>

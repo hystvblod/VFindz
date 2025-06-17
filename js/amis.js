@@ -3,6 +3,7 @@ import { supabase, getPseudo, loadUserData, getUserDataCloud, incrementFriendsIn
 let userPseudo = null;
 let userProfile = null;
 let lastAmiRequest = 0; // Anti-spam
+let amiASupprimer = null; // Pour la pop-up de confirmation
 
 function toast(msg, color = "#222") {
   let t = document.createElement("div");
@@ -62,7 +63,7 @@ async function afficherListesAmis(data) {
         <span class="ami-avatar">${pseudo.slice(0,2).toUpperCase()}</span>
         <span class="ami-nom">${pseudo}</span>
         <button class="btn-small btn-defi" onclick="window.defierAmi('${pseudo}')">Défier</button>
-        <button class="btn-small btn-suppr" onclick="window.supprimerAmi('${pseudo}')">❌</button>
+        <button class="btn-small btn-suppr" onclick="window.demanderSuppressionAmi('${pseudo}')">❌</button>
       </li>`).join("")
     : "<li class='txt-empty'>Tu n'as pas encore d'amis.</li>";
 
@@ -166,7 +167,18 @@ window.refuserDemande = async function(pseudoAmi) {
   await rechargerAffichage();
 };
 
-window.supprimerAmi = async function(pseudoAmi) {
+// Nouvelle fonction pour demander confirmation
+window.demanderSuppressionAmi = function(pseudoAmi) {
+  amiASupprimer = pseudoAmi;
+  document.getElementById('popup-suppr-ami-nom').textContent = pseudoAmi;
+  document.getElementById('popup-suppr-ami').classList.remove('hidden');
+};
+// Confirmation réelle
+window.confirmerSuppressionAmi = async function() {
+  if (!amiASupprimer) return;
+  const pseudoAmi = amiASupprimer;
+  amiASupprimer = null;
+
   const { data: ami } = await supabase
     .from("users")
     .select("id, amis")
@@ -186,7 +198,13 @@ window.supprimerAmi = async function(pseudoAmi) {
   }).eq("id", ami.id);
 
   toast("Ami supprimé.");
+  document.getElementById('popup-suppr-ami').classList.add('hidden');
   await rechargerAffichage();
+};
+// Annulation
+window.annulerSuppressionAmi = function() {
+  amiASupprimer = null;
+  document.getElementById('popup-suppr-ami').classList.add('hidden');
 };
 
 window.defierAmi = function(pseudoAmi) {
@@ -204,4 +222,3 @@ function detecterInvitationParLien() {
     }
   }
 }
-
