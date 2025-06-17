@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Duel Amis Premium</title>
+  <link rel="stylesheet" href="style/main.css" />
+</head>
+<body class="duel-container">
+  <!-- ✅ POPUP PHOTO alignée SOLO -->
+  <div id="popup-photo" class="popup hidden" tabindex="-1">
+    <div class="popup-inner">
+      <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
+        <button id="btn-aimer-photo" style="background: none; border: none; padding: 0;">
+          <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" />
+        </button>
+        <button id="close-popup" style="background: none; border: none; padding: 0;">
+          <img src="assets/icons/croix.svg" alt="Fermer" style="width: 32px; height: 32px;" />
+        </button>
+      </div>
+      <div class="cadre-preview cadre-popup" style="margin-top: 44px;">
+        <img id="cadre-affiche" src="" alt="Cadre" style="width:220px;height:220px;position:absolute;left:0;right:0;margin:auto;top:0;bottom:0;z-index:0;">
+        <img id="photo-affichee" src="" alt="Photo" style="width:210px;height:210px;object-fit:cover;position:relative;z-index:2;">
+      </div>
+    </div>
+  </div>
+  <!-- ✅ POPUP CHOIX CADRE -->
+  <div id="popup-cadre-choix" class="popup hidden">
+    <div class="popup-inner">
+      <div style="text-align:right;">
+        <button class="close-btn" style="background:none;border:none;cursor:pointer;"><img src="assets/icons/croix.svg" style="width:32px;" /></button>
+      </div>
+      <h3>Choisis ton cadre :</h3>
+      <div id="list-cadres-popup" style="display:flex;flex-wrap:wrap;gap:12px;"></div>
+    </div>
+  </div>
+  <!-- ✅ POPUP SIGNALER -->
+  <div id="popup-signal-photo" class="popup hidden">
+    <div class="popup-inner">
+      <div style="text-align:right;">
+        <button class="close-btn" style="background:none;border:none;cursor:pointer;"><img src="assets/icons/croix.svg" style="width:32px;" /></button>
+      </div>
+      <h3>Signaler la photo</h3>
+      <div id="signalement-types" style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-signal-type" data-type="hors_sujet">Hors sujet</button>
+        <button class="btn-signal-type" data-type="offensive">Offensive</button>
+        <button class="btn-signal-type" data-type="spam">Spam</button>
+        <button class="btn-signal-type" data-type="autre">Autre</button>
+      </div>
+    </div>
+  </div>
+  <!-- ✅ POPUP VALIDER JETON -->
+  <div id="popup-jeton-valider" class="popup hidden">
+    <div class="popup-inner">
+      <div style="text-align:right;">
+        <button class="close-btn" style="background:none;border:none;cursor:pointer;"><img src="assets/icons/croix.svg" style="width:32px;" /></button>
+      </div>
+      <h3>Valider ce défi avec 1 jeton ?</h3>
+      <div style="text-align:center;">
+        <button id="btn-confirm-jeton">Valider</button>
+        <button id="btn-cancel-jeton">Annuler</button>
+      </div>
+    </div>
+  </div>
+  <!-- ✅ POPUP FIN DUEL -->
+  <div id="popup-fin-duel" class="popup hidden">
+    <div class="popup-inner">
+      <div style="text-align:right;">
+        <button id="close-popup-fin" class="close-btn" style="background:none;border:none;cursor:pointer;"><img src="assets/icons/croix.svg" style="width:32px;" /></button>
+      </div>
+      <h2 id="fin-titre"></h2>
+      <div id="fin-faceaface"></div>
+      <div id="fin-details"></div>
+      <div id="fin-gain" style="margin:12px 0;"></div>
+      <div style="text-align:center;">
+        <button id="fin-btn-replay">Rejouer</button>
+        <button id="fin-btn-retour">Retour accueil</button>
+      </div>
+    </div>
+  </div>
+  <!-- ========== CONTENU PRINCIPAL ========== -->
+  <div class="duel-main-container" style="max-width:600px;margin:30px auto 0 auto;padding:20px;">
+    <div id="duel-premium-info" style="text-align:center;margin-bottom:15px;color:#c59100;font-weight:bold;"></div>
+    <!-- Affichage dynamique : Saisie défis OU liste des défis -->
+    <div id="zone-defis-premium" style="margin:18px 0;"></div>
+    <!-- Liste des défis (final) -->
+    <ul id="duel-defi-list"></ul>
+    <!-- Le reste (photos, boutons, scores, timer, etc.) : copie identique à duel_random.html -->
+    <div id="zone-timer"></div>
+    <!-- ... -->
+  </div>
+  <script type="module" src="js/duel_amis_premium.js"></script>
+</body>
+</html>
