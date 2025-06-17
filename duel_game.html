@@ -29,7 +29,6 @@
   </div>
 </div>
 
-
   <!-- ✅ Popup validation de défi (Jeton) -->
   <div id="popup-jeton" class="popup hidden">
     <div class="popup-inner popup-premium-pro">
@@ -168,82 +167,21 @@
   <script type="module" src="js/userData.js"></script>
   <script type="module" src="js/duel.js"></script>
   <script type="module" src="js/camera.js"></script>
-  <script type="module">
-    import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@7/+esm';
 
-    const heartBtn = document.getElementById("btn-aimer-photo");
-    const heartImg = document.getElementById("heart-icon");
-    const photoAffichee = document.getElementById("photo-affichee");
-    const downloadBtn = document.getElementById("download-photo");
-
-    heartBtn.addEventListener("click", async () => {
-      heartImg.src = "assets/icons/coeur_rouge.svg";
-      try {
-        const canvas = document.createElement("canvas");
-        canvas.width = photoAffichee.naturalWidth;
-        canvas.height = photoAffichee.naturalHeight;
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(photoAffichee, 0, 0);
-        const blob = await new Promise(res => canvas.toBlob(res, "image/webp", 0.9));
-        const db = await openDB("photos-aimees", 1, {
-          upgrade(db) {
-            if (!db.objectStoreNames.contains("favoris")) {
-              db.createObjectStore("favoris", { keyPath: "id", autoIncrement: true });
-            }
+  <!-- Gestion de la croix dans le bouton cœur/croix (popup photo) -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Clique sur la croix du bouton principal popup photo
+      document.querySelectorAll('#btn-aimer-photo img[src*="croix"], #close-popup').forEach(btn => {
+        btn.onclick = function() {
+          let popup = btn.closest('.popup');
+          if (popup) {
+            popup.classList.add('hidden');
+            popup.classList.remove('show');
           }
-        });
-        const store = db.transaction("favoris", "readwrite").objectStore("favoris");
-        const count = await store.count();
-        if (count >= 30) {
-          alert("Limite de 30 photos atteinte.");
-        } else {
-          await store.add({ blob });
-          alert("Photo ajoutée aux favoris !");
-        }
-      } catch (err) {
-        console.error("Erreur de sauvegarde :", err);
-      }
+        };
+      });
     });
-
-    downloadBtn.addEventListener("click", async () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = photoAffichee.naturalWidth;
-      canvas.height = photoAffichee.naturalHeight;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(photoAffichee, 0, 0);
-      const blob = await new Promise(res => canvas.toBlob(res, "image/webp", 0.9));
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "photo_aimee.webp";
-      a.click();
-    });
-
-    // --- Logique ouverture/fermeture popup signalement (version minimaliste)
-    document.body.addEventListener("click", function(e) {
-      const btn = e.target.closest(".btn-signal-photo");
-      if (!btn) return;
-      // Trouve la photo à signaler
-      const idxStr = btn.dataset.idx;
-      const photoImg = btn.closest('.cadre-item').querySelector('.photo-user');
-      if (!photoImg) return;
-      const photoUrl = photoImg.src;
-
-      // Ouvre la popup et stocke l’info
-      const popup = document.getElementById("popup-signal-photo");
-      popup.classList.remove("hidden");
-      popup.dataset.url = photoUrl;
-      popup.dataset.idx = idxStr;
-    });
-
-    // FERMETURE popup signalement (solution 100% module !)
-    document.getElementById("fermer-popup-signal-btn")?.addEventListener("click", () => {
-      document.getElementById("popup-signal-photo").classList.add("hidden");
-      document.getElementById("popup-signal-photo").dataset.url = "";
-      document.getElementById("popup-signal-photo").dataset.idx = "";
-    });
-
-    // --- Gestion du signalement Supabase à compléter dans duel.js ---
-    // document.querySelectorAll(".btn-signal-type").forEach(...);
   </script>
 </body>
 </html>

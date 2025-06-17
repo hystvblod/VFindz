@@ -184,12 +184,13 @@ export async function findOrCreateRoom() {
       .from('duels')
       .select('*')
       .eq('status', 'waiting')
-      .neq('player1', pseudo);
+      .neq('player1_pseudo', pseudo);
 
     if (rooms && rooms.length > 0) {
       const room = rooms[0];
       await supabase.from('duels').update({
-        player2: pseudo,
+        player2_id: await getUserId(),
+        player2_pseudo: pseudo,
         status: 'playing',
         starttime: Date.now()
       }).eq('id', room.id);
@@ -204,10 +205,16 @@ export async function findOrCreateRoom() {
     await new Promise(r => setTimeout(r, 1200));
   }
 
+  // **C’est ici la création de la room random !**
+  const player1Id = await getUserId();
+  const player1Pseudo = await getCurrentUser();
   const defis = await getDefisDuelFromSupabase(3);
+
   const roomObj = {
-    player1: pseudo,
-    player2: null,
+    player1_id: player1Id,
+    player2_id: null,
+    player1_pseudo: player1Pseudo,
+    player2_pseudo: null,
     score1: 0,
     score2: 0,
     status: 'waiting',
@@ -215,7 +222,8 @@ export async function findOrCreateRoom() {
     defis: defis,
     starttime: null,
     photosa: {},
-    photosb: {}
+    photosb: {},
+    type: 'random'
   };
 
   const { data, error } = await supabase.from('duels').insert([roomObj]).select();
@@ -229,6 +237,7 @@ export async function findOrCreateRoom() {
     waitRoom(data[0].id);
   }, 200);
 }
+
 
 function waitRoom(roomId) {
   const poll = async () => {
