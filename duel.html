@@ -5,40 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>VFindz - Choix Duel</title>
   <link rel="stylesheet" href="style/main.css" />
-  <style>
-    /* Style des boutons façon index (repris de .main-buttons a) */
-    .main-style-btn {
-      display: block;
-      width: 100%;
-      max-width: 400px;
-      margin: 0.8rem auto;
-      text-decoration: none;
-      font-size: 1.4rem;
-      font-weight: bold;
-      padding: 1rem 2.5rem;
-      border-radius: 15px;
-      background-color: #22539f; /* couleur actuelle, modifie si besoin */
-      color: white;
-      text-align: center;
-      backdrop-filter: blur(5px);
-      box-shadow: 0 2px 16px #0012;
-      transition: all 0.22s cubic-bezier(.6,.4,0,1);
-      border: none;
-    }
-    .main-style-btn:hover {
-      background-color: #2f6bd9;
-      color: #fff;
-      transform: translateY(-3px) scale(1.025);
-      box-shadow: 0 8px 28px #0015;
-    }
-    /* Responsive */
-    @media (max-width: 600px) {
-      .main-style-btn {
-        font-size: 1.12rem;
-        padding: 0.9rem 1.3rem;
-      }
-    }
-  </style>
 </head>
 <body class="duel-container">
 
@@ -75,10 +41,10 @@
   </header>
 
   <main>
-    <div class="duel-choice-box" style="margin-top: 3.2rem;">
-      <a href="duel_random.html" class="duel-choice-btn main-style-btn">Jouer contre un adversaire aléatoire</a>
-      <a href="duel_amis.html" class="duel-choice-btn main-style-btn">Jouer contre un ami</a>
-      <a href="duel_premium.html" class="duel-choice-btn main-style-btn">Duel Premium</a>
+    <div class="duel-choice-box">
+      <a href="duel_random.html" class="duel-choice-btn">Jouer contre un adversaire aléatoire</a>
+      <a href="duel_amis.html" class="duel-choice-btn">Jouer contre un ami</a>
+      <a href="duel_premium.html" class="duel-choice-btn">Duel Premium</a>
     </div>
   </main>
   <footer>
