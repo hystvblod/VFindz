@@ -2510,3 +2510,11 @@ overflow-y: auto;
   background: #ffab00;
 }
 
+.duel-choice-btn {
+  height: 64px;
+  min-height: 64px;
+  max-height: 120px;
+  padding: 0 1.7em;
+  overflow: hidden;
+  line-height: 1.2;
+}
