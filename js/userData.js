@@ -640,3 +640,9 @@ export function renderID(pseudo) {
     : (isPremiumCached() ? "gold" : "white");
   return `<span style="color:${color};font-weight:bold;">${pseudo}</span>`;
 }
+// ========== GET CADRE URL SUPABASE ==========
+// Retourne l’URL du cadre (Supabase) OU le cache local si déjà téléchargé
+export function getCadreUrl(id) {
+  return localStorage.getItem(`cadre_${id}`) ||
+    `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${id}.webp`;
+}
