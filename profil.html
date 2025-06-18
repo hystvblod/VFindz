@@ -89,6 +89,23 @@
     #popIdError.valid {
       color: #12b712;
     }
+    /* ----- POPUP COULEUR ----- */
+    #popChangeColor-bg .popChangementID {
+      padding: 1.3rem 1.3rem 1.2rem 1.3rem;
+      max-width: 350px;
+    }
+    #list-color-popup {
+      display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-bottom:1.2em;
+    }
+    #list-color-popup .color-choix {
+      width:44px;height:44px;border-radius:12px;border:2px solid #ccc;cursor:pointer;box-shadow:0 2px 7px #1114;transition:all .15s;
+      outline: none;
+      display:inline-block;
+    }
+    #list-color-popup .color-choix.selected {
+      border:3px solid #FFD700;
+      outline: 3px solid #222;
+    }
     @media (max-width: 490px) {
       .popChangementID {
         padding: 1.2rem 0.4rem 1.1rem 0.4rem;
@@ -136,6 +153,17 @@
   </div>
 </div>
 
+<!-- Popup sélection couleur ID -->
+<div class="popChangementID-bg" id="popChangeColor-bg" style="z-index:2100;">
+  <div class="popChangementID">
+    <div style="font-size:1.11em;margin-bottom:0.5em;">Choisis la couleur de ton identifiant</div>
+    <div id="list-color-popup"></div>
+    <button id="popValidateColor">Valider</button>
+    <button id="popCancelColor" type="button" style="background:#e6e6e6;color:#444;margin-left:0.6em;">Annuler</button>
+    <span id="popColorError"></span>
+  </div>
+</div>
+
 <section class="profil-top">
   <div class="profil-solde-bar">
     <div class="solde-piece">
@@ -165,7 +193,7 @@
 
 <!-- ==== SUPABASE CENTRALISÉ ==== -->
 <script type="module">
-import { loadUserData, getPseudo, getPoints, setPseudo, getUserDataCloud } from './js/userData.js';
+import { loadUserData, getPseudo, getPoints, setPseudo, getUserDataCloud, isPremium, renderID, setIdColor, getIdColor } from './js/userData.js';
 import { supabase } from './js/userData.js';
 
 // Vérifie si un pseudo existe déjà (unicité)
@@ -183,7 +211,6 @@ async function changeUserId(newPseudo) {
 }
 
 // Récupère toutes les infos du profil courant
-import { isPremium, renderID } from './js/userData.js';
 async function getProfile() {
   return await getUserDataCloud();
 }
@@ -191,14 +218,11 @@ async function getProfile() {
 async function refreshProfilDisplay() {
   const profil = await getProfile();
   const pseudo = profil?.pseudo || "???";
-  const premium = profil?.premium || false;
-
   document.getElementById("idUserDisplay").innerHTML = "ID : " + renderID(pseudo);
   document.getElementById("vcoins").textContent = profil?.points || 0;
   document.getElementById("jetons").textContent = profil?.jetons || 0;
 }
 
-// Initialisation du profil utilisateur
 async function setupProfile() {
   await refreshProfilDisplay();
 
@@ -244,9 +268,86 @@ async function setupProfile() {
       err.textContent = e.message || "Erreur inconnue";
     }
   };
+
+  // --- Gestion sélection couleur ID Premium ---
+  const colorOptions = [
+    "#FFD700", // Or
+    "#FFFFFF", // Blanc
+    "#111111", // Noir
+    "#F76C6C", // Rouge pastel
+    "#56E39F", // Vert pastel
+    "#5F6FFF", // Bleu vif
+    "#FF8CFF", // Rose flashy
+    "#FFBB54", // Jaune
+    "#F5C6AA", // Saumon
+    "#A7C7E7", // Bleu pastel
+  ];
+  let selectedColor = null;
+
+  // Popup couleur : long clic/tap sur l'ID
+  let mouseDownTimer = null;
+  document.getElementById("idUserDisplay").addEventListener("mousedown", async (e) => {
+    const profil = await getProfile();
+    if (profil?.premium) {
+      mouseDownTimer = setTimeout(() => {
+        document.getElementById("popChangeColor-bg").classList.add("active");
+        renderColorPicker();
+      }, 300); // 300ms = "appui long"
+    }
+  });
+  document.getElementById("idUserDisplay").addEventListener("mouseup", () => {
+    clearTimeout(mouseDownTimer);
+  });
+  document.getElementById("idUserDisplay").addEventListener("mouseleave", () => {
+    clearTimeout(mouseDownTimer);
+  });
+  // Pour mobile (touch)
+  document.getElementById("idUserDisplay").addEventListener("touchstart", async (e) => {
+    const profil = await getProfile();
+    if (profil?.premium) {
+      mouseDownTimer = setTimeout(() => {
+        document.getElementById("popChangeColor-bg").classList.add("active");
+        renderColorPicker();
+      }, 300);
+    }
+  });
+  document.getElementById("idUserDisplay").addEventListener("touchend", () => {
+    clearTimeout(mouseDownTimer);
+  });
+
+  document.getElementById("popCancelColor").onclick = () => {
+    document.getElementById("popChangeColor-bg").classList.remove("active");
+  };
+  document.getElementById("popValidateColor").onclick = async () => {
+    if (!selectedColor) {
+      document.getElementById("popColorError").textContent = "Choisis une couleur";
+      return;
+    }
+    await setIdColor(selectedColor);
+    document.getElementById("popChangeColor-bg").classList.remove("active");
+    refreshProfilDisplay();
+  };
+  function renderColorPicker() {
+    const list = document.getElementById("list-color-popup");
+    list.innerHTML = "";
+    getIdColor().then((currentColor) => {
+      colorOptions.forEach((col) => {
+        const item = document.createElement("div");
+        item.className = "color-choix";
+        item.style.background = col;
+        if ((selectedColor && selectedColor === col) || (!selectedColor && currentColor === col)) {
+          item.classList.add("selected");
+        }
+        item.onclick = () => {
+          selectedColor = col;
+          renderColorPicker();
+        };
+        list.appendChild(item);
+      });
+    });
+  }
 }
 setupProfile();
-
 
 async function checkPendingFriendRequests() {
   await loadUserData();
@@ -259,7 +360,6 @@ async function checkPendingFriendRequests() {
   }
 }
 checkPendingFriendRequests();
-
 </script>
 </body>
 </html>
