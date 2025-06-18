@@ -2,7 +2,6 @@ import { supabase, getJetons, getPoints, getPseudo as getCurrentUser, getUserId,
 
 // ========== IndexedDB cache ==========
 async function setColTitlePremium(element, pseudo) {
-  // Vérifie premium dans Supabase par pseudo
   if (!pseudo) { element.classList.remove('premium'); return; }
   const { data } = await supabase.from('users').select('premium').eq('pseudo', pseudo).single();
   if (data && data.premium) {
@@ -103,7 +102,7 @@ export async function uploadPhotoDuelWebp(dataUrl, duelId, idx, cadreId) {
   const { data: room, error: roomError } = await supabase.from('duels').select('*').eq('id', duelId).single();
   if (roomError || !room) throw new Error("Room introuvable");
   const pseudo = await getCurrentUser();
-  const champ = (room.player1 === pseudo) ? 'photosa' : 'photosb';
+  const champ = (room.player1_pseudo === pseudo) ? 'photosa' : 'photosb';
   let photos = room[champ] || {};
   photos[idx] = { url, cadre: cadreId };
   await supabase.from('duels').update({ [champ]: photos }).eq('id', duelId);
@@ -178,9 +177,9 @@ async function checkAlreadyInDuel() {
   const pseudo = await getCurrentUser();
   const { data: duelsEnCours, error } = await supabase
     .from('duels')
-    .select('id, status, player1, player2')
+    .select('id, status, player1_pseudo, player2_pseudo')
     .in('status', ['waiting', 'playing'])
-    .or(`player1.eq.${pseudo},player2.eq.${pseudo}`);
+    .or(`player1_pseudo.eq.${pseudo},player2_pseudo.eq.${pseudo}`);
   if (error) return false;
   if (duelsEnCours && duelsEnCours.length > 0) {
     // On trouve une room en cours, on y renvoie direct
@@ -230,26 +229,24 @@ export async function findOrCreateRoom() {
   }
 
   // **C’est ici la création de la room random !**
-const player1Id = await getUserId();
-const player1Pseudo = await getCurrentUser();
-console.log("[DEBUG FIND/CREATE ROOM] player1Id:", player1Id, "| player1Pseudo:", player1Pseudo);
-const defis = await getDefisDuelFromSupabase(3);
-
+  const player1Id = await getUserId();
+  const player1Pseudo = await getCurrentUser();
+  const defis = await getDefisDuelFromSupabase(3);
 
   const roomObj = {
-    player1_id: player1Id,           // ✅ ID Supabase de player 1
-    player2_id: null,                // ✅ ID Supabase de player 2 (à venir)
-    player1: player1Pseudo,          // ✅ Pseudo de player 1
-    player2: null,                   // ✅ Pseudo de player 2 (à venir)
+    player1_id: player1Id,
+    player2_id: null,
+    player1_pseudo: player1Pseudo,
+    player2_pseudo: null,
     score1: 0,
     score2: 0,
     status: 'waiting',
     createdat: Date.now(),
-    defis: defis,                    // tableau de défis
+    defis: defis,
     starttime: null,
-    photosa: {},                     // photos de player 1
-    photosb: {},                     // photos de player 2
-    type: 'random'                   // ou 'amis'
+    photosa: {},
+    photosb: {},
+    type: 'random'
   };
 
   const { data, error } = await supabase.from('duels').insert([roomObj]).select();
@@ -296,7 +293,7 @@ export async function initDuelGame() {
 
   const pseudo = await getCurrentUser();
   const room = await getRoom(roomId);
-  isPlayer1 = (room.player1 === pseudo);
+  isPlayer1 = (room.player1_pseudo === pseudo);
 
   subscribeRoom(roomId, (data) => {
     roomData = data;
@@ -325,8 +322,8 @@ export async function initDuelGame() {
     if (!roomData) return;
     const pseudo = await getCurrentUser();
 
-    let advID = isPlayer1 ? roomData.player2 : roomData.player1;
-    let myID = isPlayer1 ? roomData.player1 : roomData.player2;
+    let advID = isPlayer1 ? roomData.player2_pseudo : roomData.player1_pseudo;
+    let myID = isPlayer1 ? roomData.player1_pseudo : roomData.player2_pseudo;
     let headerLabel = advID ? advID : "Adversaire";
 
     if ($("nom-adversaire")) $("nom-adversaire").textContent = headerLabel;
@@ -352,6 +349,7 @@ export async function initDuelGame() {
     }, 1000);
   }
 
+  // ... (le reste du code, inchangé)
 // ===========================
 // !!!!! CORRECTION RENDU ICI
 // ===========================
