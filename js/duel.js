@@ -165,15 +165,16 @@ export async function validerDefiAvecJeton(idx) {
   await afficherSolde();
 }
 
-export async function validerDefiAvecJeton(idx) {
+export async function gagnerJeton() {
   // 🔒 Fonction SQL sécurisée
-  const { error } = await supabase.rpc('secure_remove_jeton', { nb: 1 });
+  const { error } = await supabase.rpc('secure_add_jetons', { nb: 1 });
   if (error) {
-    alert("Erreur lors du retrait du jeton : " + error.message);
+    alert("Erreur lors de l'ajout du jeton : " + error.message);
     return;
   }
   await afficherSolde();
 }
+
 
 export async function retirerPoints(montant) {
   // 🔒 Fonction SQL sécurisée
