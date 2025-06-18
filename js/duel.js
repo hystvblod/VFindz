@@ -173,8 +173,32 @@ if (path.includes("duel_random.html")) {
   }
 }
 
+// ==================== PATCH ANTI-MULTI =====================
+async function checkAlreadyInDuel() {
+  const pseudo = await getCurrentUser();
+  const { data: duelsEnCours, error } = await supabase
+    .from('duels')
+    .select('id, status, player1, player2')
+    .in('status', ['waiting', 'playing'])
+    .or(`player1.eq.${pseudo},player2.eq.${pseudo}`);
+  if (error) return false;
+  if (duelsEnCours && duelsEnCours.length > 0) {
+    // On trouve une room en cours, on y renvoie direct
+    const room = duelsEnCours[0];
+    setTimeout(() => {
+      window.location.href = `duel_game.html?room=${room.id}`;
+    }, 200);
+    return true;
+  }
+  return false;
+}
+// ================= FIN PATCH ANTI-MULTI ===================
+
 // DUEL RANDOM MATCHMAKING PATCH
 export async function findOrCreateRoom() {
+  // PATCH ANTI-MULTI : bloque si déjà dans une room
+  if (await checkAlreadyInDuel()) return;
+
   localStorage.removeItem("duel_random_room");
   localStorage.removeItem("duel_is_player1");
   const pseudo = await getCurrentUser();
@@ -210,22 +234,21 @@ export async function findOrCreateRoom() {
   const player1Pseudo = await getCurrentUser();
   const defis = await getDefisDuelFromSupabase(3);
 
-const roomObj = {
-  player1_id: player1Id,           // ✅ ID Supabase de player 1
-  player2_id: null,                // ✅ ID Supabase de player 2 (à venir)
-  player1: player1Pseudo,          // ✅ Pseudo de player 1
-  player2: null,                   // ✅ Pseudo de player 2 (à venir)
-  score1: 0,
-  score2: 0,
-  status: 'waiting',
-  createdat: Date.now(),
-  defis: defis,                    // tableau de défis
-  starttime: null,
-  photosa: {},                     // photos de player 1
-  photosb: {},                     // photos de player 2
-  type: 'random'                   // ou 'amis'
-};
-
+  const roomObj = {
+    player1_id: player1Id,           // ✅ ID Supabase de player 1
+    player2_id: null,                // ✅ ID Supabase de player 2 (à venir)
+    player1: player1Pseudo,          // ✅ Pseudo de player 1
+    player2: null,                   // ✅ Pseudo de player 2 (à venir)
+    score1: 0,
+    score2: 0,
+    status: 'waiting',
+    createdat: Date.now(),
+    defis: defis,                    // tableau de défis
+    starttime: null,
+    photosa: {},                     // photos de player 1
+    photosb: {},                     // photos de player 2
+    type: 'random'                   // ou 'amis'
+  };
 
   const { data, error } = await supabase.from('duels').insert([roomObj]).select();
   if (error) {
@@ -238,7 +261,6 @@ const roomObj = {
     waitRoom(data[0].id);
   }, 200);
 }
-
 
 function waitRoom(roomId) {
   const poll = async () => {
@@ -432,45 +454,44 @@ async function renderDefis({ myID, advID }) {
     }
 
     // ========== BOUTON PHOTO UNIQUEMENT ==========
-const btnRow = document.createElement('div');
-btnRow.className = "duel-btnrow-joueur";
-btnRow.style.display = "flex";
-btnRow.style.justifyContent = "center";
-btnRow.style.marginTop = "10px";
+    const btnRow = document.createElement('div');
+    btnRow.className = "duel-btnrow-joueur";
+    btnRow.style.display = "flex";
+    btnRow.style.justifyContent = "center";
+    btnRow.style.marginTop = "10px";
 
-// --- PHOTO (dans un <button>)
-const btnPhoto = document.createElement('button');
-btnPhoto.className = "btn-photo";
-btnPhoto.title = myPhoto ? "Reprendre la photo" : "Prendre une photo";
-btnPhoto.style.background = "none";
-btnPhoto.style.border = "none";
-btnPhoto.style.padding = "0";
-btnPhoto.style.cursor = "pointer";
-btnPhoto.style.display = "flex";
-btnPhoto.style.alignItems = "center";
+    // --- PHOTO (dans un <button>)
+    const btnPhoto = document.createElement('button');
+    btnPhoto.className = "btn-photo";
+    btnPhoto.title = myPhoto ? "Reprendre la photo" : "Prendre une photo";
+    btnPhoto.style.background = "none";
+    btnPhoto.style.border = "none";
+    btnPhoto.style.padding = "0";
+    btnPhoto.style.cursor = "pointer";
+    btnPhoto.style.display = "flex";
+    btnPhoto.style.alignItems = "center";
 
-// Image de l'appareil photo dans le bouton
-const imgPhoto = document.createElement('img');
-imgPhoto.src = "assets/icons/photo.svg";
-imgPhoto.alt = "Prendre une photo";
-imgPhoto.style.width = "2.8em";
-imgPhoto.style.display = "block";
-imgPhoto.style.margin = "0 auto";
+    // Image de l'appareil photo dans le bouton
+    const imgPhoto = document.createElement('img');
+    imgPhoto.src = "assets/icons/photo.svg";
+    imgPhoto.alt = "Prendre une photo";
+    imgPhoto.style.width = "2.8em";
+    imgPhoto.style.display = "block";
+    imgPhoto.style.margin = "0 auto";
 
-btnPhoto.appendChild(imgPhoto);
+    btnPhoto.appendChild(imgPhoto);
 
-btnPhoto.onclick = () => gererPrisePhotoDuel(idxStr, myCadre);
-// Appui long/clic droit → popup jeton
-btnPhoto.oncontextmenu = (e) => { e.preventDefault(); ouvrirPopupValiderJeton(idxStr); };
-btnPhoto.ontouchstart = function(e) {
-  this._touchTimer = setTimeout(() => { ouvrirPopupValiderJeton(idxStr); }, 500);
-};
-btnPhoto.ontouchend = function() { clearTimeout(this._touchTimer); };
+    btnPhoto.onclick = () => gererPrisePhotoDuel(idxStr, myCadre);
+    // Appui long/clic droit → popup jeton
+    btnPhoto.oncontextmenu = (e) => { e.preventDefault(); ouvrirPopupValiderJeton(idxStr); };
+    btnPhoto.ontouchstart = function(e) {
+      this._touchTimer = setTimeout(() => { ouvrirPopupValiderJeton(idxStr); }, 500);
+    };
+    btnPhoto.ontouchend = function() { clearTimeout(this._touchTimer); };
 
-btnRow.appendChild(btnPhoto);
+    btnRow.appendChild(btnPhoto);
 
-colJoueur.appendChild(btnRow);
-
+    colJoueur.appendChild(btnRow);
 
     // --- Colonne Adversaire (droite) ---
     const colAdv = document.createElement('div');
@@ -501,55 +522,55 @@ colJoueur.appendChild(btnRow);
     const advPhoto = advPhotoObj ? advPhotoObj.url : null;
     const advCadre = advPhotoObj && advPhotoObj.cadre ? advPhotoObj.cadre : "polaroid_01";
 
-   if (advPhoto) {
-  const cadreDiv = document.createElement("div");
-  cadreDiv.className = "cadre-item cadre-duel-mini";
+    if (advPhoto) {
+      const cadreDiv = document.createElement("div");
+      cadreDiv.className = "cadre-item cadre-duel-mini";
 
-  const preview = document.createElement("div");
-  preview.className = "cadre-preview";
+      const preview = document.createElement("div");
+      preview.className = "cadre-preview";
 
-  const cadreImg = document.createElement("img");
-  cadreImg.className = "photo-cadre";
-  cadreImg.src = "./assets/cadres/" + advCadre + ".webp";
+      const cadreImg = document.createElement("img");
+      cadreImg.className = "photo-cadre";
+      cadreImg.src = "./assets/cadres/" + advCadre + ".webp";
 
-  const photoImg = document.createElement("img");
-  photoImg.className = "photo-user";
-  photoImg.src = advPhoto;
-  photoImg.onclick = () => agrandirPhoto(advPhoto, advCadre);
+      const photoImg = document.createElement("img");
+      photoImg.className = "photo-user";
+      photoImg.src = advPhoto;
+      photoImg.onclick = () => agrandirPhoto(advPhoto, advCadre);
 
-  preview.appendChild(cadreImg);
-  preview.appendChild(photoImg);
-  cadreDiv.appendChild(preview);
+      preview.appendChild(cadreImg);
+      preview.appendChild(photoImg);
+      cadreDiv.appendChild(preview);
 
-  // --- BOUTON SIGNALER SOUS LA PHOTO ---
-  const signalDiv = document.createElement("div");
-  signalDiv.style.display = "flex";
-  signalDiv.style.justifyContent = "center";
-  signalDiv.style.marginTop = "8px";
+      // --- BOUTON SIGNALER SOUS LA PHOTO ---
+      const signalDiv = document.createElement("div");
+      signalDiv.style.display = "flex";
+      signalDiv.style.justifyContent = "center";
+      signalDiv.style.marginTop = "8px";
 
-  const signalBtn = document.createElement("button");
-  signalBtn.className = "btn-signal-photo";
-  signalBtn.title = "Signaler cette photo";
-  signalBtn.style.background = "none";
-  signalBtn.style.border = "none";
-  signalBtn.style.cursor = "pointer";
+      const signalBtn = document.createElement("button");
+      signalBtn.className = "btn-signal-photo";
+      signalBtn.title = "Signaler cette photo";
+      signalBtn.style.background = "none";
+      signalBtn.style.border = "none";
+      signalBtn.style.cursor = "pointer";
 
-  const signalImg = document.createElement("img");
-  signalImg.src = "assets/icons/alert.svg";
-  signalImg.alt = "Signaler";
-  signalImg.style.width = "2.8em";
+      const signalImg = document.createElement("img");
+      signalImg.src = "assets/icons/alert.svg";
+      signalImg.alt = "Signaler";
+      signalImg.style.width = "2.8em";
 
-  signalBtn.appendChild(signalImg);
-  signalBtn.dataset.idx = idxStr;
-  signalBtn.onclick = function() {
-    ouvrirPopupSignal(advPhoto, idxStr);
-  };
-  signalDiv.appendChild(signalBtn);
+      signalBtn.appendChild(signalImg);
+      signalBtn.dataset.idx = idxStr;
+      signalBtn.onclick = function() {
+        ouvrirPopupSignal(advPhoto, idxStr);
+      };
+      signalDiv.appendChild(signalBtn);
 
-  colAdv.appendChild(cadreDiv);    // ✅ cadre seul
-  colAdv.appendChild(signalDiv);   // ✅ bouton en-dessous
+      colAdv.appendChild(cadreDiv);    // ✅ cadre seul
+      colAdv.appendChild(signalDiv);   // ✅ bouton en-dessous
 
-}
+    }
 
     row.appendChild(colJoueur);
     row.appendChild(colAdv);
