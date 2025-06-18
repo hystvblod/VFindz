@@ -104,11 +104,17 @@ function showFeedback(text) {
 
 // --- Acheter cadre depuis boutique (cloud & local) ---
 async function acheterCadreBoutique(id, prix) {
-  if (!(await removePoints(prix))) {
-    alert("❌ Pas assez de pièces !");
+  // Utilise un RPC sécurisé pour retirer les points côté serveur
+  const { data, error } = await supabase.rpc('secure_remove_points', { nb: prix });
+
+  if (error || !data || data.success !== true) {
+    alert("❌ Pas assez de pièces ou erreur !");
     return;
   }
-  await acheterCadre(id);
+
+  await acheterCadre(id); // <--- Ici, débloque vraiment le cadre après paiement validé côté serveur
+}
+
 
   // On charge l’image en base64 et la stocke dans le localStorage, SANS DUPLICATA de fetch
   const url = `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${id}.webp`;
@@ -139,7 +145,7 @@ async function acheterCadreBoutique(id, prix) {
   await updatePointsDisplay();
   alert("✅ Cadre acheté !");
   await renderBoutique(currentCategory);
-}
+
 
 // --- Popups et pub ---
 function closePopup() {
@@ -170,7 +176,7 @@ function showUnlockPopup(nom, message) {
 
 // Gagne des pièces via pub simulée
 async function watchAd() {
-  await addPoints(100);
+  await supabase.rpc('secure_add_points', { nb: 100 }); // 🔒 Sécurisé côté serveur
   await updatePointsDisplay();
   showFeedback("+100 💰");
   closePopup();
@@ -199,25 +205,31 @@ function fermerPopupJetonBoutique() {
 }
 
 async function acheterJetonsAvecPieces() {
-  if (await removePoints(100)) {
-    await addJetons(3);
-    alert("✅ 3 jetons ajoutés !");
-    await updatePointsDisplay();
-    await updateJetonsDisplay();
-    fermerPopupJetonBoutique();
-  } else {
+  // Appel RPC sécurisé pour retirer les points côté serveur
+  const { data, error } = await supabase.rpc('secure_remove_points', { nb: 100 });
+  if (error || !data || data.success !== true) {
     alert("❌ Pas assez de pièces.");
+    return;
   }
+  // Ajoute les jetons via un RPC sécurisé aussi (optionnel mais conseillé)
+  await supabase.rpc('secure_add_jetons', { nb: 3 }); // Crée aussi cette fonction RPC côté Supabase !
+  alert("✅ 3 jetons ajoutés !");
+  await updatePointsDisplay();
+  await updateJetonsDisplay();
+  fermerPopupJetonBoutique();
 }
 async function acheterJetonsAvecPub() {
+  // (Ici tu mets ta vraie pub, ou la simulation)
   alert("📺 Simulation de pub regardée !");
   setTimeout(async () => {
-    await addJetons(3);
+    // Ajoute les jetons via le RPC sécurisé
+    await supabase.rpc('secure_add_jetons', { nb: 3 });
     alert("✅ 3 jetons ajoutés !");
     await updateJetonsDisplay();
     fermerPopupJetonBoutique();
   }, 3000);
 }
+
 
 // --- Affichage points/jetons ---
 async function updatePointsDisplay() {
@@ -459,15 +471,43 @@ function fermerPopupPremium() {
   const popup = document.getElementById("popup-premium");
   if (popup) popup.classList.add("hidden");
 }
+// Ex. dans premium.js ou boutique.js
+
+// Tu auras besoin d'un ID unique pour ton produit (défini sur le Play Store, ex : "premium_upgrade")
+const PREMIUM_PRODUCT_ID = "premium_upgrade"; // change ça avec ton vrai ID
+
+// Charge la liste des produits disponibles
+async function chargerProduits() {
+  return new Promise((resolve, reject) => {
+    if (!window.Cordova || !window.Cordova.plugins || !window.Cordova.plugins.purchase) {
+      alert("Achat non supporté sur ce device.");
+      return reject("Plugin non dispo");
+    }
+    window.Cordova.plugins.purchase.getProducts([PREMIUM_PRODUCT_ID], function(products) {
+      resolve(products);
+    }, function(err) {
+      reject(err);
+    });
+  });
+}
+
+// Déclenche l’achat du premium
 async function acheterPremium() {
-  if (await removePoints(3500)) {
-    await updateUserData({ premium: true });
-    alert("✨ Bravo, tu es maintenant Premium !");
-    window.location.reload(); // Recharge pour activer premium partout
-  } else {
-    alert("❌ Pas assez de pièces pour passer Premium (3500 nécessaires).");
+  try {
+    await chargerProduits();
+    window.Cordova.plugins.purchase.buy(PREMIUM_PRODUCT_ID, 1, function (data) {
+      // Le paiement a réussi, tu peux activer premium côté utilisateur
+      updateUserData({ premium: true });
+      alert("✨ Bravo, tu es maintenant Premium !");
+      window.location.reload();
+    }, function (err) {
+      alert("Erreur achat Premium : " + JSON.stringify(err));
+    });
+  } catch (e) {
+    alert("Achat non disponible : " + e);
   }
 }
+
 
 // === EXPOSE TO WINDOW POUR ACCÈS HTML INLINE ===
 window.activerPremium = activerPremium;
@@ -493,16 +533,3 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 
-// 🎯 Bouton pub → 100 pièces
-document.getElementById("btnPubPieces")?.addEventListener("click", async () => {
-  await showAd("reward_pieces");
-  await addPoints(100);
-  alert("Tu as gagné 100 pièces !");
-});
-
-// 🎯 Bouton pub → 3 jetons
-document.getElementById("btnPubJetons")?.addEventListener("click", async () => {
-  await showAd("reward_jetons");
-  await addJetons(3);
-  alert("Tu as gagné 3 jetons !");
-});

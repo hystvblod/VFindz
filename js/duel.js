@@ -1,21 +1,23 @@
-import { 
+// ===== IMPORTS =====
+import {
   supabase, getJetons, getPoints, getPseudo as getCurrentUser, getUserId,
-  getCadreSelectionne, ajouterDefiHistorique, addJetons, removeJeton, addPoints, removePoints, isPremium, 
-  getCadresPossedes, getCadreUrl 
+  getCadreSelectionne, ajouterDefiHistorique, addJetons, removeJeton, addPoints, removePoints, isPremium,
+  getCadresPossedes, getCadreUrl
 } from './userData.js';
 import { showAd } from './pub.js';
 
-// ========== IndexedDB cache ==========
-async function setColTitlePremium(element, pseudo) {
-  if (!pseudo) { element.classList.remove('premium'); return; }
-  const { data } = await supabase.from('users').select('premium').eq('pseudo', pseudo).single();
-  if (data && data.premium) {
-    element.classList.add('premium');
-  } else {
-    element.classList.remove('premium');
-  }
-}
+// ======= PARAMS =======
+const params = new URLSearchParams(window.location.search);
+const roomId = params.get("room");
+const path = window.location.pathname;
 
+// ======= VARIABLES GLOBALES =======
+export let currentRoomId = null;
+export let isPlayer1 = false;
+export let roomData = null;
+let timerInterval = null;
+
+// ========== IndexedDB cache ==========
 const VFindDuelDB = {
   db: null,
   async init() {
@@ -68,7 +70,7 @@ const VFindDuelDB = {
   }
 };
 
-// Cadre spécifique pour chaque photo (stocké en localStorage : duel_cadres_specifiques)
+// ====== Cadres par photo (localStorage) ======
 function getCadreDuel(duelId, idx) {
   const data = JSON.parse(localStorage.getItem("duel_cadres_specifiques") || "{}");
   if (data[duelId] && data[duelId][idx]) return data[duelId][idx];
@@ -81,58 +83,18 @@ function setCadreDuel(duelId, idx, cadreId) {
   localStorage.setItem("duel_cadres_specifiques", JSON.stringify(data));
 }
 
-// ========= UPLOAD PRO : PHOTO → SUPABASE STORAGE + URL+CADRE DANS LA TABLE =========
-export async function uploadPhotoDuelWebp(dataUrl, duelId, idx, cadreId) {
-  function dataURLtoBlob(dataurl) {
-    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-      bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-    while(n--) u8arr[n] = bstr.charCodeAt(n);
-    return new Blob([u8arr], {type:mime});
+// ===== Premium display pour le titre colonne =====
+async function setColTitlePremium(element, pseudo) {
+  if (!pseudo) { element.classList.remove('premium'); return; }
+  const { data } = await supabase.from('users').select('premium').eq('pseudo', pseudo).single();
+  if (data && data.premium) {
+    element.classList.add('premium');
+  } else {
+    element.classList.remove('premium');
   }
-  const userId = getUserId ? getUserId() : (await getCurrentUser());
-  const blob = dataURLtoBlob(dataUrl);
-  const filePath = `duel_photos/${duelId}_${idx}_${userId}_${Date.now()}.webp`;
-
-  // Upload photo dans le storage
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from('photosduel')
-    .upload(filePath, blob, { upsert: true, contentType: "image/webp" });
-  if (uploadError) throw new Error("Erreur upload storage : " + uploadError.message);
-
-  // Génère l’URL publique
-  const { data: urlData } = supabase.storage.from('photosduel').getPublicUrl(filePath);
-  const url = urlData.publicUrl;
-
-  // Mets l’URL et le cadre dans la table duels
-console.log("📡 Lecture de la room avant update photo...");
-const { data: room, error: roomError } = await supabase.from('duels').select('*').eq('id', duelId).single();
-
-if (roomError) {
-  console.error("❌ Erreur lecture room :", roomError);
-}
-if (!room) {
-  console.error("❌ Room null !");
-  throw new Error("Room introuvable");
-}
-console.log("✅ Room récupérée :", room);
-
-
-  const pseudo = await getCurrentUser();
-  const champ = (room.player1_pseudo === pseudo) ? 'photosa' : 'photosb';
-  let photos = room[champ] || {};
-  photos[idx] = { url, cadre: cadreId };
-  await supabase.from('duels').update({ [champ]: photos }).eq('id', duelId);
-
-  // Mets l’URL+cadre dans le cache local
-  await VFindDuelDB.set(`${duelId}_${champ}_${idx}`, { url, cadre: cadreId });
-
-  // Mets le cadre en localStorage spécifique
-  setCadreDuel(duelId, idx, cadreId);
-
-  return url;
 }
 
-// --------- Fonctions COEURS LOCAUX (photos aimées DUEL) ---------
+// ======== PHOTOS AIMÉES (coeur duel) ========
 export function getPhotosAimeesDuel() {
   return JSON.parse(localStorage.getItem("photos_aimees_duel") || "[]");
 }
@@ -149,46 +111,151 @@ export function retirerPhotoAimeeDuel(defiId) {
   localStorage.setItem("photos_aimees_duel", JSON.stringify(aimes));
 }
 
-// --------- Variables globales ---------
-export let currentRoomId = null;
-export let isPlayer1 = false;
-export let roomData = null;
-let timerInterval = null;
-
-// --------- Utilitaires ---------
-function $(id) { return document.getElementById(id); }
-
-// --------- Matchmaking Duel ---------
-const params = new URLSearchParams(window.location.search);
-const roomId = params.get("room");
-const path = window.location.pathname;
-
-// PATCH : REPRISE DE PARTIE EN COURS SI EXISTE
-if (path.includes("duel_random.html")) {
-  const existingRoomId = localStorage.getItem("duel_random_room");
-  if (existingRoomId) {
-    supabase
-      .from('duels')
-      .select('id, status')
-      .eq('id', existingRoomId)
-      .single()
-      .then(({ data }) => {
-        if (data && data.status && data.status !== 'finished') {
-          setTimeout(() => {
-            window.location.href = `duel_game.html?room=${existingRoomId}`;
-          }, 200);
-        } else {
-          localStorage.removeItem("duel_random_room");
-          localStorage.removeItem("duel_is_player1");
-          findOrCreateRoom();
-        }
-      });
-  } else {
-    findOrCreateRoom();
+// ======== UPLOAD PHOTO (webp, storage, DB, cache) ========
+export async function uploadPhotoDuelWebp(dataUrl, duelId, idx, cadreId) {
+  function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--) u8arr[n] = bstr.charCodeAt(n);
+    return new Blob([u8arr], {type:mime});
   }
+  const userId = getUserId ? getUserId() : (await getCurrentUser());
+  const blob = dataURLtoBlob(dataUrl);
+  const filePath = `duel_photos/${duelId}_${idx}_${userId}_${Date.now()}.webp`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('photosduel')
+    .upload(filePath, blob, { upsert: true, contentType: "image/webp" });
+  if (uploadError) throw new Error("Erreur upload storage : " + uploadError.message);
+
+  const { data: urlData } = supabase.storage.from('photosduel').getPublicUrl(filePath);
+  const url = urlData.publicUrl;
+
+  const pseudo = await getCurrentUser();
+  const { data: room, error: roomError } = await supabase.from('duels').select('*').eq('id', duelId).single();
+  if (!room) throw new Error("Room introuvable");
+
+  const champ = (room.player1_pseudo === pseudo) ? 'photosa' : 'photosb';
+  let photos = room[champ] || {};
+  photos[idx] = { url, cadre: cadreId };
+  await supabase.from('duels').update({ [champ]: photos }).eq('id', duelId);
+
+  await VFindDuelDB.set(`${duelId}_${champ}_${idx}`, { url, cadre: cadreId });
+  setCadreDuel(duelId, idx, cadreId);
+
+  return url;
 }
 
-// ==================== PATCH ANTI-MULTI =====================
+// ======= HANDLERS DE SOLDE / POINTS / JETONS =======
+export async function afficherSolde() {
+  const points = await getPoints();
+  const jetons = await getJetons();
+  const pointsSpan = document.getElementById('points');
+  const jetonsSpan = document.getElementById('jetons');
+  if (pointsSpan) pointsSpan.textContent = points ?? 0;
+  if (jetonsSpan) jetonsSpan.textContent = jetons ?? 0;
+}
+export async function validerDefiAvecJeton(idx) {
+  // 🔒 Fonction SQL sécurisée
+  const { error } = await supabase.rpc('secure_remove_jeton', { nb: 1 });
+  if (error) {
+    alert("Erreur lors du retrait du jeton : " + error.message);
+    return;
+  }
+  await afficherSolde();
+}
+
+export async function validerDefiAvecJeton(idx) {
+  // 🔒 Fonction SQL sécurisée
+  const { error } = await supabase.rpc('secure_remove_jeton', { nb: 1 });
+  if (error) {
+    alert("Erreur lors du retrait du jeton : " + error.message);
+    return;
+  }
+  await afficherSolde();
+}
+
+export async function retirerPoints(montant) {
+  // 🔒 Fonction SQL sécurisée
+  const { error } = await supabase.rpc('secure_remove_points', { nb: montant });
+  if (error) {
+    alert("Erreur lors du retrait des points : " + error.message);
+    return;
+  }
+  await afficherSolde();
+}
+
+export async function gagnerPoints(montant) {
+  // Appel sécurisé côté serveur
+  const { error } = await supabase.rpc('secure_add_points', { nb: montant });
+  if (error) {
+    alert("Erreur lors de l'ajout des points : " + error.message);
+    return;
+  }
+  await afficherSolde();
+}
+
+
+
+// ======= FONCTIONS DUEL (MATCHMAKING, INIT, GAME...) =======
+
+export async function findOrCreateRoom() {
+  // PATCH ANTI-MULTI
+  if (await checkAlreadyInDuel()) return;
+  localStorage.removeItem("duel_random_room");
+  localStorage.removeItem("duel_is_player1");
+  const pseudo = await getCurrentUser();
+
+  for (let i = 0; i < 5; i++) {
+    let { data: rooms } = await supabase
+      .from('duels')
+      .select('*')
+      .eq('status', 'waiting')
+      .neq('player1_pseudo', pseudo);
+    if (rooms && rooms.length > 0) {
+      const room = rooms[0];
+      const player2_id = await getUserId();
+      await supabase.from('duels').update({
+        player2_id,
+        player2_pseudo: pseudo,
+        status: 'playing',
+        starttime: Date.now()
+      }).eq('id', room.id);
+      localStorage.setItem("duel_random_room", room.id);
+      localStorage.setItem("duel_is_player1", "0");
+      setTimeout(() => {
+        window.location.href = `duel_game.html?room=${room.id}`;
+      }, 200);
+      return;
+    }
+    await new Promise(r => setTimeout(r, 1200));
+  }
+  // Nouvelle room
+  const player1Id = await getUserId();
+  const player1Pseudo = await getCurrentUser();
+  const defis = await getDefisDuelFromSupabase(3);
+
+  const roomObj = {
+    player1_id: player1Id,
+    player2_id: null,
+    player1_pseudo: player1Pseudo,
+    player2_pseudo: null,
+    score1: 0, score2: 0, status: 'waiting',
+    createdat: Date.now(), defis, starttime: null, photosa: {}, photosb: {}, type: 'random'
+  };
+
+  const { data, error } = await supabase.from('duels').insert([roomObj]).select();
+  if (error) {
+    alert("Erreur création duel : " + error.message);
+    return;
+  }
+  localStorage.setItem("duel_random_room", data[0].id);
+  localStorage.setItem("duel_is_player1", "1");
+  setTimeout(() => {
+    waitRoom(data[0].id);
+  }, 200);
+}
+
 async function checkAlreadyInDuel() {
   const pseudo = await getCurrentUser();
   const { data: duelsEnCours, error } = await supabase
@@ -205,83 +272,6 @@ async function checkAlreadyInDuel() {
     return true;
   }
   return false;
-}
-
-// ================= FIN PATCH ANTI-MULTI ===================
-
-export async function findOrCreateRoom() {
-  if (await checkAlreadyInDuel()) return;
-  localStorage.removeItem("duel_random_room");
-  localStorage.removeItem("duel_is_player1");
-  const pseudo = await getCurrentUser();
-
-  for (let i = 0; i < 5; i++) {
-    let { data: rooms } = await supabase
-      .from('duels')
-      .select('*')
-      .eq('status', 'waiting')
-      .neq('player1_pseudo', pseudo);
-
-    if (rooms && rooms.length > 0) {
-      const room = rooms[0];
-      const player2_id = await getUserId();
-const pseudo = await getCurrentUser();
-console.log("Tentative d'update room:", room.id, pseudo, player2_id);
-
-const { error: updError } = await supabase.from('duels').update({
-  player2_id: player2_id,
-  player2_pseudo: pseudo,
-  status: 'playing',
-  starttime: Date.now()
-}).eq('id', room.id);
-
-if (updError) {
-  console.error("⚠️ Erreur lors de l'update du joueur 2 :", updError.message);
-} else {
-  console.log("✅ Update joueur 2 OK pour room:", room.id);
-}
-
-
-      localStorage.setItem("duel_random_room", room.id);
-      localStorage.setItem("duel_is_player1", "0");
-      setTimeout(() => {
-        window.location.href = `duel_game.html?room=${room.id}`;
-      }, 200);
-      return;
-    }
-    await new Promise(r => setTimeout(r, 1200));
-  }
-
-  const player1Id = await getUserId();
-  const player1Pseudo = await getCurrentUser();
-  const defis = await getDefisDuelFromSupabase(3);
-
-  const roomObj = {
-    player1_id: player1Id,
-    player2_id: null,
-    player1_pseudo: player1Pseudo,
-    player2_pseudo: null,
-    score1: 0,
-    score2: 0,
-    status: 'waiting',
-    createdat: Date.now(),
-    defis: defis,
-    starttime: null,
-    photosa: {},
-    photosb: {},
-    type: 'random'
-  };
-
-  const { data, error } = await supabase.from('duels').insert([roomObj]).select();
-  if (error) {
-    alert("Erreur création duel : " + error.message);
-    return;
-  }
-  localStorage.setItem("duel_random_room", data[0].id);
-  localStorage.setItem("duel_is_player1", "1");
-  setTimeout(() => {
-    waitRoom(data[0].id);
-  }, 200);
 }
 
 function waitRoom(roomId) {
@@ -308,12 +298,157 @@ function waitRoom(roomId) {
   poll();
 }
 
-// =============== GAME DUEL INITIALISATION (APPELER DEPUIS LA PAGE) ==============
+// =============== GAME DUEL PREMIUM AMIS (Défis personnalisés) ===============
+async function mainPremiumDuelDefis() {
+  if (!roomId) return;
+  const pseudo = await getCurrentUser();
+  const userId = await getUserId();
+
+  // Récupère la room
+  let { data: room } = await supabase.from('duels').select('*').eq('id', roomId).single();
+  if (!room) {
+    document.getElementById("info-premium").innerHTML = "Room introuvable.";
+    return;
+  }
+  roomData = room;
+  isPlayer1 = (room.player1_id === userId);
+
+  // Vérifie Premium
+  const premium = await isPremium();
+
+  // Affiche la bonne UI
+  if (room.type !== "amis_premium") {
+    document.getElementById("info-premium").innerHTML = "Accès réservé au mode Premium.";
+    return;
+  }
+
+  // Saisie des défis
+  async function handleValiderDefis() {
+    let d1 = document.getElementById("input-defi1").value.trim();
+    let d2 = document.getElementById("input-defi2").value.trim();
+
+    // Cas : on écrit le 3e défi
+    let d1Filled = d1.length > 0, d2Filled = d2.length > 0;
+    let champ = isPlayer1 ? "defis_player1" : "defis_player2";
+    let existing = roomData[champ] ? JSON.parse(roomData[champ]) : [];
+    // Si déjà 2 défis => il ne doit remplir que le 3e
+    if (existing.length === 2) {
+      if (!d2Filled) { alert("Merci d’entrer le 3e défi."); return; }
+      let updateArr = [existing[0], existing[1], d2];
+      let updateObj = {}; updateObj[champ] = JSON.stringify(updateArr);
+      await supabase.from('duels').update(updateObj).eq('id', roomId);
+      showAttente();
+      return;
+    }
+    // Normal : 2 défis à écrire
+    if (!d1Filled || !d2Filled) { alert("Merci de remplir 2 défis."); return; }
+    let updateObj = {};
+    updateObj[champ] = JSON.stringify([d1, d2]);
+    await supabase.from('duels').update(updateObj).eq('id', roomId);
+    showAttente();
+  }
+
+  // Synchro temps réel
+  supabase
+    .channel('duel_room_' + roomId)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'duels', filter: `id=eq.${roomId}` }, payload => {
+      roomData = payload.new;
+      majUI();
+    })
+    .subscribe();
+
+  // UI helpers
+  let blocSaisie = document.getElementById("bloc-defi-saisie");
+  let blocFinal = document.getElementById("bloc-defis-final");
+  let blocAttente = document.getElementById("bloc-attente");
+
+  function showAttente() {
+    blocSaisie.style.display = "none";
+    blocAttente.style.display = "block";
+    blocFinal.style.display = "none";
+  }
+  function showDefisFinal(defis) {
+    blocSaisie.style.display = "none";
+    blocAttente.style.display = "none";
+    blocFinal.style.display = "block";
+    document.getElementById("liste-defis-final").innerHTML = defis.map(d => `<li>${d}</li>`).join('');
+  }
+  function majUI() {
+    let d1 = roomData.defis_player1 ? JSON.parse(roomData.defis_player1) : [];
+    let d2 = roomData.defis_player2 ? JSON.parse(roomData.defis_player2) : [];
+    let final = roomData.defis_final ? JSON.parse(roomData.defis_final) : [];
+    if (final.length === 3) { showDefisFinal(final); return; }
+    // Deux premiums
+    if (roomData.premium1 && roomData.premium2) {
+      if ((isPlayer1 && d1.length < 2) || (!isPlayer1 && d2.length < 2)) {
+        // Saisie défis (2 à remplir)
+        blocSaisie.style.display = "block";
+        document.getElementById("text-saisie-defis").textContent = "Propose 2 défis originaux pour ce duel :";
+        document.getElementById("input-defi1").style.display = "";
+        document.getElementById("input-defi2").style.display = "";
+        document.getElementById("input-defi1").value = "";
+        document.getElementById("input-defi2").value = "";
+        blocAttente.style.display = "none";
+        blocFinal.style.display = "none";
+      } else if (d1.length === 2 && d2.length === 2 && final.length < 3) {
+        // Les 2 ont proposé, on tire au sort pour tous
+        if (isPlayer1) {
+          let all = d1.concat(d2);
+          shuffle(all);
+          let choisis = [all[0], all[1]];
+          let restant = all.filter((x, i) => i > 1);
+          choisis.push(restant[Math.floor(Math.random() * restant.length)]);
+          supabase.from('duels').update({ defis_final: JSON.stringify(choisis) }).eq('id', roomId);
+        }
+        showAttente();
+      } else {
+        showAttente();
+      }
+    } else {
+      // 1 seul premium : il écrit les 3 défis (il fait 2 champs puis 1 champ)
+      if (premium && ((isPlayer1 && d1.length < 2) || (!isPlayer1 && d2.length < 2))) {
+        blocSaisie.style.display = "block";
+        document.getElementById("text-saisie-defis").textContent = "Écris 2 défis (tu auras un 3e champ après) :";
+        document.getElementById("input-defi1").style.display = "";
+        document.getElementById("input-defi2").style.display = "";
+        document.getElementById("input-defi1").value = "";
+        document.getElementById("input-defi2").value = "";
+        blocAttente.style.display = "none";
+        blocFinal.style.display = "none";
+      } else if ((isPlayer1 && d1.length === 2) || (!isPlayer1 && d2.length === 2)) {
+        blocSaisie.style.display = "block";
+        document.getElementById("text-saisie-defis").textContent = "Écris un 3e défi pour ce duel :";
+        document.getElementById("input-defi1").style.display = "none";
+        document.getElementById("input-defi2").placeholder = "Défi 3...";
+        document.getElementById("input-defi2").value = "";
+        blocAttente.style.display = "none";
+        blocFinal.style.display = "none";
+      } else if ((d1.length === 3 || d2.length === 3) && final.length < 3) {
+        let choisis = isPlayer1 ? d1 : d2;
+        supabase.from('duels').update({ defis_final: JSON.stringify(choisis) }).eq('id', roomId);
+        showAttente();
+      } else {
+        showAttente();
+      }
+    }
+  }
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  document.getElementById("btn-valider-defis").onclick = handleValiderDefis;
+  majUI();
+}
+if (path.includes("duel_amis_premium.html")) mainPremiumDuelDefis();
+
+// =============== GAME DUEL RANDOM (avec défis automatiques) ===============
 export async function initDuelGame() {
   if (!(path.includes("duel_game.html") && roomId)) return;
   currentRoomId = roomId;
   window.currentRoomId = currentRoomId;
-
   const pseudo = await getCurrentUser();
   const room = await getRoom(roomId);
   isPlayer1 = (room.player1_pseudo === pseudo);
@@ -327,6 +462,7 @@ export async function initDuelGame() {
   updateDuelUI();
   await checkFinDuel();
 
+  // --------- Sous-fonctions ---------
   function subscribeRoom(roomId, callback) {
     supabase
       .channel('duel_room_' + roomId)
@@ -340,7 +476,6 @@ export async function initDuelGame() {
       })
       .subscribe();
   }
-
   async function updateDuelUI() {
     if (!roomData) return;
     const pseudo = await getCurrentUser();
@@ -357,7 +492,6 @@ export async function initDuelGame() {
 
     renderDefis({ myID, advID });
   }
-
   function startGlobalTimer(startTime) {
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
@@ -373,157 +507,49 @@ export async function initDuelGame() {
   }
 }
 
-// Fonction pour ouvrir la popup de signalement
-function ouvrirPopupSignal(photoUrl, idxStr) {
-  const popup = document.getElementById("popup-signal-photo");
-  if (!popup) {
-    alert("Erreur : popup de signalement introuvable !");
-    return;
+// ======= UTILS / HELPERS =======
+function $(id) { return document.getElementById(id); }
+async function getDefisDuelFromSupabase(count = 3) {
+  let { data, error } = await supabase
+    .from('defis')
+    .select('intitule')
+    .order('random()', { ascending: false })
+    .limit(count);
+  if (error || !data || data.length < count) {
+    const backup = [
+      "Un escargot ",
+      "Photo d'un animal",
+      "Photo d'une ombre"
+    ];
+    return backup.sort(() => 0.5 - Math.random()).slice(0, count);
   }
-  popup.dataset.url = photoUrl;
-  popup.dataset.idx = idxStr;
-  popup.classList.remove("hidden");
-  popup.classList.add("show");
+  return data.map(x => x.intitule);
 }
-window.ouvrirPopupSignal = ouvrirPopupSignal;
-
-async function renderDefis({ myID, advID }) {
-  const ul = $("duel-defi-list");
-  if (!ul || !roomData || !roomData.defis || roomData.defis.length === 0) {
-    if (ul) ul.innerHTML = `<li>Aucun défi.</li>`;
-    return;
+async function getRoom(roomId) {
+  const { data } = await supabase.from('duels').select('*').eq('id', roomId).single();
+  return data;
+}
+async function getPhotoDuel(roomId, champ, idx) {
+  const cacheKey = `${roomId}_${champ}_${idx}`;
+  let obj = await VFindDuelDB.get(cacheKey);
+  if (obj && obj.url) return obj;
+  const room = await getRoom(roomId);
+  let url, cadre;
+  if (room && room[champ] && room[champ][idx]) {
+    if (typeof room[champ][idx] === "object") {
+      url = room[champ][idx].url;
+      cadre = room[champ][idx].cadre;
+    } else {
+      url = room[champ][idx];
+      cadre = "polaroid_01";
+    }
   }
-
-  const myChamp = isPlayer1 ? 'photosa' : 'photosb';
-  const advChamp = isPlayer1 ? 'photosb' : 'photosa';
-  const photosAimees = getPhotosAimeesDuel();
-
-  ul.innerHTML = '';
-  for (let idx = 0; idx < roomData.defis.length; idx++) {
-    const defi = roomData.defis[idx];
-    const idxStr = String(idx);
-    const li = document.createElement('li');
-    li.className = 'defi-item';
-
-    const cartouche = document.createElement('div');
-    cartouche.className = 'defi-cartouche-center';
-    cartouche.textContent = defi;
-    li.appendChild(cartouche);
-
-    const row = document.createElement('div');
-    row.className = 'duel-defi-row';
-
-    const colJoueur = document.createElement('div');
-    colJoueur.className = 'joueur-col';
-
-    const titreJoueur = document.createElement('div');
-    titreJoueur.className = 'col-title';
-    titreJoueur.textContent = myID ? myID : "Moi";
-    colJoueur.appendChild(titreJoueur);
-    setColTitlePremium(titreJoueur, myID);
-
-    const myPhotoObj = await getPhotoDuel(roomId, myChamp, idxStr);
-    const myPhoto = myPhotoObj ? myPhotoObj.url : null;
-    const myCadre = myPhotoObj && myPhotoObj.cadre ? myPhotoObj.cadre : getCadreDuel(roomId, idxStr);
-
-    if (myPhoto) {
-      const cadreDiv = document.createElement("div");
-      cadreDiv.className = "cadre-item cadre-duel-mini";
-      const preview = document.createElement("div");
-      preview.className = "cadre-preview";
-      const cadreImg = document.createElement("img");
-      cadreImg.className = "photo-cadre";
-      cadreImg.src = getCadreUrl(myCadre);
-      const photoImg = document.createElement("img");
-      photoImg.className = "photo-user";
-      photoImg.src = myPhoto;
-      photoImg.onclick = () => agrandirPhoto(myPhoto, myCadre);
-      photoImg.oncontextmenu = (e) => { e.preventDefault(); ouvrirPopupChoixCadre(roomId, idxStr, myChamp); };
-      photoImg.ontouchstart = function(e) {
-        this._touchTimer = setTimeout(() => { ouvrirPopupChoixCadre(roomId, idxStr, myChamp); }, 500);
-      };
-      photoImg.ontouchend = function() { clearTimeout(this._touchTimer); };
-
-      preview.appendChild(cadreImg);
-      preview.appendChild(photoImg);
-
-      const coeurBtn = document.createElement("img");
-      coeurBtn.src = photosAimees.includes(`${roomId}_${myChamp}_${idxStr}`) ? "assets/icons/coeur_plein.svg" : "assets/icons/coeur.svg";
-      coeurBtn.alt = "Aimer";
-      coeurBtn.style.width = "2em";
-      coeurBtn.style.cursor = "pointer";
-      coeurBtn.style.marginLeft = "0.6em";
-      coeurBtn.title = photosAimees.includes(`${roomId}_${myChamp}_${idxStr}`) ? "Retirer des photos aimées" : "Ajouter aux photos aimées";
-      coeurBtn.onclick = () => {
-        if (photosAimees.includes(`${roomId}_${myChamp}_${idxStr}`)) {
-          retirerPhotoAimeeDuel(`${roomId}_${myChamp}_${idxStr}`);
-        } else {
-          aimerPhotoDuel(`${roomId}_${myChamp}_${idxStr}`);
-        }
-        renderDefis({ myID, advID });
-      };
-      preview.appendChild(coeurBtn);
-      cadreDiv.appendChild(preview);
-      colJoueur.appendChild(cadreDiv);
-    }
-
-    const btnRow = document.createElement('div');
-    btnRow.className = "duel-btnrow-joueur";
-    btnRow.style.display = "flex";
-    btnRow.style.justifyContent = "center";
-    btnRow.style.marginTop = "10px";
-
-    const btnPhoto = document.createElement('button');
-    btnPhoto.className = "btn-photo";
-    btnPhoto.title = myPhoto ? "Reprendre la photo" : "Prendre une photo";
-    btnPhoto.style.background = "none";
-    btnPhoto.style.border = "none";
-    btnPhoto.style.padding = "0";
-    btnPhoto.style.cursor = "pointer";
-    btnPhoto.style.display = "flex";
-    btnPhoto.style.alignItems = "center";
-
-    const imgPhoto = document.createElement('img');
-    imgPhoto.src = "assets/icons/photo.svg";
-    imgPhoto.alt = "Prendre une photo";
-    imgPhoto.style.width = "2.8em";
-    imgPhoto.style.display = "block";
-    imgPhoto.style.margin = "0 auto";
-
-    btnPhoto.appendChild(imgPhoto);
-
-    btnPhoto.onclick = () => gererPrisePhotoDuel(idxStr, myCadre);
-    btnPhoto.oncontextmenu = (e) => { e.preventDefault(); ouvrirPopupValiderJeton(idxStr); };
-    btnPhoto.ontouchstart = function(e) {
-      this._touchTimer = setTimeout(() => { ouvrirPopupValiderJeton(idxStr); }, 500);
-    };
-    btnPhoto.ontouchend = function() { clearTimeout(this._touchTimer); };
-
-    btnRow.appendChild(btnPhoto);
-
-    colJoueur.appendChild(btnRow);
-
-    const colAdv = document.createElement('div');
-    colAdv.className = 'adversaire-col';
-    const titreAdv = document.createElement('div');
-    titreAdv.className = 'col-title';
-    titreAdv.textContent = advID ? advID : "Adversaire";
-    colAdv.appendChild(titreAdv);
-    setColTitlePremium(titreAdv, advID);
-
-    const advPhotoObj = await getPhotoDuel(roomId, advChamp, idxStr);
-    if (roomData && roomData[advChamp] && roomData[advChamp][idxStr]) {
-      let obj = roomData[advChamp][idxStr];
-      let url, cadre;
-      if (typeof obj === "object") {
-        url = obj.url;
-        cadre = obj.cadre;
-      } else {
-        url = obj;
-        cadre = "polaroid_01";
-      }
-      await VFindDuelDB.set(`${roomId}_${advChamp}_${idxStr}`, { url, cadre });
-    }
+  if (url) {
+    await VFindDuelDB.set(cacheKey, { url, cadre });
+    return { url, cadre };
+  }
+  return null;
+}
 
     const advPhoto = advPhotoObj ? advPhotoObj.url : null;
     const advCadre = advPhotoObj && advPhotoObj.cadre ? advPhotoObj.cadre : "polaroid_01";
@@ -579,9 +605,6 @@ async function renderDefis({ myID, advID }) {
 
     li.appendChild(row);
     ul.appendChild(li);
-  }
-}
-
 // ===========================
 // FIN correction
 // ===========================
@@ -622,11 +645,17 @@ async function afficherPopupFinDuel(room) {
   let gain = nbFaits * 10;
   if (nbFaits === nbDefis) gain += 10;
 
-  let gainFlag = "gain_duel_" + room.id + "_" + myID;
-  if (!localStorage.getItem(gainFlag)) {
-    await addPoints(gain);
+let gainFlag = "gain_duel_" + room.id + "_" + myID;
+if (!localStorage.getItem(gainFlag)) {
+  // 🔒 Gain sécurisé côté serveur via fonction Supabase
+  const { error } = await supabase.rpc('secure_add_points', { nb: gain });
+  if (error) {
+    alert("Erreur lors de l'ajout des points : " + error.message);
+  } else {
     localStorage.setItem(gainFlag, "1");
   }
+}
+
 
   $("fin-gain").innerHTML =
     `+${gain} pièces (${nbFaits} défi${nbFaits > 1 ? "s" : ""} x10${nbFaits === 3 ? " +10 bonus" : ""})`;
@@ -757,21 +786,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // HANDLER : Quand tu retires un jeton (ex : valider défi)
 export async function validerDefiAvecJeton(idx) {
-  await removeJeton();
+  // Sécurisé : retire le jeton via RPC côté serveur
+  const { error } = await supabase.rpc('secure_remove_jeton');
+  if (error) {
+    alert("Erreur lors du retrait du jeton : " + error.message);
+    return;
+  }
   await afficherSolde();
 }
 
-// HANDLER : Ajoute un jeton (récompense/pub)
+// HANDLER : Ajoute un jeton (récompense/pub)
 export async function gagnerJeton() {
-  await addJetons(1);
+  // Sécurisé : ajoute un jeton via RPC côté serveur
+  const { error } = await supabase.rpc('secure_add_jetons', { nb: 1 });
+  if (error) {
+    alert("Erreur lors de l'ajout du jeton : " + error.message);
+    return;
+  }
   await afficherSolde();
 }
+
+// HANDLER : Retire des points
 export async function retirerPoints(montant) {
-  await removePoints(montant);
+  // Sécurisé : retire des points via RPC côté serveur
+  const { error } = await supabase.rpc('secure_remove_points', { nb: montant });
+  if (error) {
+    alert("Erreur lors du retrait des points : " + error.message);
+    return;
+  }
   await afficherSolde();
 }
+
+// HANDLER : Ajoute des points (gain récompense, pub, duel...)
 export async function gagnerPoints(montant) {
-  await addPoints(montant);
+  // Sécurisé : ajoute des points via RPC côté serveur
+  const { error } = await supabase.rpc('secure_add_points', { nb: montant });
+  if (error) {
+    alert("Erreur lors de l'ajout des points : " + error.message);
+    return;
+  }
   await afficherSolde();
 }
 
@@ -1003,3 +1056,11 @@ document.body.addEventListener("click", async function(e) {
   }
 });
 
+// ========== INIT AUTO PAGE ==============
+if (window.location.pathname.includes("duel_game.html")) {
+  initDuelGame();
+}
+if (window.location.pathname.includes("duel_amis_premium.html")) {
+  mainPremiumDuelDefis();
+}
+document.addEventListener("DOMContentLoaded", afficherSolde);
