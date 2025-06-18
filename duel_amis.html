@@ -5,6 +5,130 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Duel privé - VFindz</title>
   <link rel="stylesheet" href="style/main.css" />
+  <style>
+    .duel-main {
+      max-width: 420px;
+      margin: 2.4rem auto 0 auto;
+      background: rgba(38,41,56,0.93);
+      border-radius: 1.3rem;
+      box-shadow: 0 8px 32px #0003, 0 2px 0 #232435;
+      padding: 2.2rem 1.4rem 1.6rem 1.4rem;
+    }
+    .amis-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+      margin-bottom: 2.2rem;
+    }
+    .ami-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #2e3047;
+      border-radius: 0.9rem;
+      padding: 0.9em 1.2em;
+      box-shadow: 0 3px 12px #0002;
+      min-height: 52px;
+    }
+    .ami-nom {
+      font-weight: 600;
+      font-size: 1.14em;
+      color: #ffe04a;
+      letter-spacing: .2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 180px;
+    }
+    .btn-duel-ami {
+      background: #ffe04a;
+      color: #2b2b2b;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      padding: 7px 16px;
+      font-size: 1.03em;
+      box-shadow: 0 2px 8px #0002;
+      cursor: pointer;
+      transition: background .14s;
+      margin-left: 14px;
+    }
+    .btn-duel-ami:active { background: #ffd900; }
+    .section-titre {
+      color: #e8eaf6;
+      font-size: 1.15em;
+      font-weight: 600;
+      margin: 1.7em 0 0.7em 0;
+      letter-spacing: .2px;
+      text-align: center;
+    }
+    .duel-demandes-list {
+      background: #24263b;
+      border-radius: 0.9rem;
+      padding: 1em 1em 0.6em 1em;
+      min-height: 45px;
+      margin-bottom: 1.1rem;
+      box-shadow: 0 2px 8px #0001;
+    }
+    .demande-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.6em;
+      gap: 0.6em;
+    }
+    .demande-nom {
+      font-weight: 500;
+      color: #ffe04a;
+      font-size: 1.03em;
+      max-width: 160px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .badge-nouveau {
+      background: #ffe04a;
+      color: #2a2a23;
+      font-size: 0.97em;
+      border-radius: 6px;
+      padding: 1px 7px;
+      margin-left: 5px;
+      font-weight: bold;
+      letter-spacing: .4px;
+      box-shadow: 0 1px 4px #0001;
+    }
+    .btn-accepter, .btn-refuser {
+      border: none;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-weight: bold;
+      font-size: 0.97em;
+      margin-left: 5px;
+      cursor: pointer;
+      transition: background .13s;
+    }
+    .btn-accepter {
+      background: #65e965;
+      color: #253a25;
+    }
+    .btn-refuser {
+      background: #f36d6d;
+      color: #232323;
+    }
+    .btn-accepter:active { background: #32d132; }
+    .btn-refuser:active { background: #de3a3a; }
+    .aucune-demande {
+      color: #bdbdc8;
+      text-align: center;
+      font-size: 1.01em;
+      margin: 0.3em 0 0.8em 0;
+    }
+    @media (max-width: 600px) {
+      .duel-main { max-width: 98vw; padding: 1.1em 0.5em; }
+      .ami-nom { max-width: 110px; }
+      .demande-nom { max-width: 90px; }
+    }
+  </style>
 </head>
 <body class="duel-container">
 
@@ -24,38 +148,25 @@
         </a>
       </div>
     </div>
-    <div class="solde-container solde-solo" id="solde-container">
-      <div class="solde-item">
-        <div class="solde-ligne">
-          <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" />
-          <span id="points"></span>
-        </div>
-      </div>
-      <div class="solde-item">
-        <div class="solde-ligne">
-          <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" />
-          <span id="jetons"></span>
-        </div>
-      </div>
-    </div>
   </header>
 
   <main>
-    <div style="text-align:center;margin-top:2rem;">
-      <h3>Mes amis</h3>
-      <ul id="liste-amis"></ul>
-      <h3>Demandes de duel reçues</h3>
-      <ul id="demandes-recue"></ul>
-      <h3>Demandes de duel envoyées</h3>
-      <ul id="demandes-envoyees"></ul>
-      <button class="main-button" id="btn-inviter-duel" style="margin-top:2rem;">Inviter un ami à un duel</button>
+    <div class="duel-main">
+      <div class="section-titre">Mes amis</div>
+      <div id="liste-amis" class="amis-list"></div>
+
+      <div class="section-titre" style="margin-top:2.4em;">Demandes de duel reçues</div>
+      <div id="demandes-recue" class="duel-demandes-list"></div>
+
+      <div class="section-titre" style="margin-top:2.4em;">Demandes de duel envoyées</div>
+      <div id="demandes-envoyees" class="duel-demandes-list"></div>
     </div>
   </main>
   <footer>
     <p>&copy; 2025 VFindz</p>
   </footer>
 
-  <!-- Le script ci-dessous doit être ADAPTÉ si jamais la structure change dans userData.js -->
+  <!-- Script pro mis à jour (logique + rendu moderne, ZÉRO bouton global) -->
   <script type="module">
     import { supabase, getPseudo, loadUserData, updateUserData } from "./js/userData.js";
 
@@ -77,22 +188,62 @@
       afficherDemandesDuel();
     });
 
+    // RENDU MODERNE – Amis = cards + bouton duel intégré
     async function afficherAmis() {
       const amis = profil.amis || [];
       const ul = document.getElementById("liste-amis");
       ul.innerHTML = "";
       if (!amis.length) {
-        ul.innerHTML = "<li>Aucun ami enregistré.</li>";
+        ul.innerHTML = "<div class='aucune-demande'>Aucun ami enregistré.</div>";
         return;
       }
       amis.forEach(ami => {
-        const li = document.createElement("li");
-        li.textContent = ami;
-        const btn = document.createElement("button");
-        btn.textContent = "Inviter en duel";
-        btn.onclick = () => inviterDuel(ami);
-        li.appendChild(btn);
-        ul.appendChild(li);
+        const card = document.createElement("div");
+        card.className = "ami-card";
+        card.innerHTML = `
+          <span class="ami-nom">${ami}</span>
+          <button class="btn-duel-ami" data-ami="${ami}">Duel ⚡</button>
+        `;
+        card.querySelector(".btn-duel-ami").onclick = () => inviterDuel(ami);
+        ul.appendChild(card);
+      });
+    }
+
+    // RENDU MODERNE – Demandes reçues & envoyées
+    async function afficherDemandesDuel() {
+      // ----- DemandES RECUES -----
+      const ulRecue = document.getElementById("demandes-recue");
+      ulRecue.innerHTML = "";
+      const recues = profil.demandesDuelRecues || [];
+      if (!recues.length) ulRecue.innerHTML = "<div class='aucune-demande'>Aucune demande reçue.</div>";
+      recues.forEach(ami => {
+        const card = document.createElement("div");
+        card.className = "demande-card";
+        card.innerHTML = `
+          <span class="demande-nom">${ami}<span class="badge-nouveau">Nouveau</span></span>
+          <div>
+            <button class="btn-accepter" data-ami="${ami}">Accepter</button>
+            <button class="btn-refuser" data-ami="${ami}">Refuser</button>
+          </div>
+        `;
+        card.querySelector(".btn-accepter").onclick = () => accepterDuel(ami);
+        card.querySelector(".btn-refuser").onclick = () => refuserDuel(ami);
+        ulRecue.appendChild(card);
+      });
+
+      // ----- DemandES ENVOYÉES -----
+      const ulEnv = document.getElementById("demandes-envoyees");
+      ulEnv.innerHTML = "";
+      const envoyees = profil.demandesDuelEnvoyees || [];
+      if (!envoyees.length) ulEnv.innerHTML = "<div class='aucune-demande'>Aucune demande envoyée.</div>";
+      envoyees.forEach(ami => {
+        const card = document.createElement("div");
+        card.className = "demande-card";
+        card.innerHTML = `
+          <span class="demande-nom">${ami}</span>
+          <span class="badge-nouveau" style="background:#b3e2ff;color:#20435a;">En attente</span>
+        `;
+        ulEnv.appendChild(card);
       });
     }
 
@@ -114,38 +265,10 @@
         demandesDuelEnvoyees: Array.from(demandesEnvoyees)
       }).eq("pseudo", pseudoPublic);
 
-      alert("Invitation envoyée !");
+      // Feedback UI immédiat (optionnel : toast/pro)
       await loadProfil();
+      afficherAmis();
       afficherDemandesDuel();
-    }
-
-    async function afficherDemandesDuel() {
-      const ulRecue = document.getElementById("demandes-recue");
-      ulRecue.innerHTML = "";
-      const recues = profil.demandesDuelRecues || [];
-      if (!recues.length) ulRecue.innerHTML = "<li>Aucune demande.</li>";
-      for (const ami of recues) {
-        const li = document.createElement("li");
-        li.textContent = ami + " ";
-        const btnAcc = document.createElement("button");
-        btnAcc.textContent = "Accepter";
-        btnAcc.onclick = () => accepterDuel(ami);
-        li.appendChild(btnAcc);
-        const btnRef = document.createElement("button");
-        btnRef.textContent = "Refuser";
-        btnRef.onclick = () => refuserDuel(ami);
-        li.appendChild(btnRef);
-        ulRecue.appendChild(li);
-      }
-      const ulEnv = document.getElementById("demandes-envoyees");
-      ulEnv.innerHTML = "";
-      const envoyees = profil.demandesDuelEnvoyees || [];
-      if (!envoyees.length) ulEnv.innerHTML = "<li>Aucune demande.</li>";
-      envoyees.forEach(ami => {
-        const li = document.createElement("li");
-        li.textContent = ami;
-        ulEnv.appendChild(li);
-      });
     }
 
     async function accepterDuel(amiPseudo) {
@@ -193,16 +316,7 @@
       afficherDemandesDuel();
     }
 
-    document.getElementById("btn-inviter-duel").onclick = async () => {
-      const idAmi = prompt("Pseudo public de ton ami à inviter :");
-      if (!idAmi || idAmi === pseudoPublic) return;
-      if (!(profil.amis || []).includes(idAmi)) {
-        alert("Cet utilisateur n'est pas dans ta liste d'amis.");
-        return;
-      }
-      inviterDuel(idAmi);
-    };
-
+    // Récupérer aléatoirement 3 défis (logique inchangée)
     async function getRandomDefis(count = 3) {
       const { data, error } = await supabase
         .from('defis')
