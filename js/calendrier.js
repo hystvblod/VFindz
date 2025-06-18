@@ -1,6 +1,45 @@
 import { supabase, getUserId, loadUserData } from './userData.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // STYLE CALENDRIER PLACÉ AVANT TOUTE GÉNÉRATION
+  const style = document.createElement('style');
+  style.textContent = `
+    .calendrier {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
+      margin: 1.2em auto 1.5em;
+      max-width: 420px;
+    }
+    .jour, .sem {
+      aspect-ratio: 1 / 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.09rem;
+      border-radius: 9px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.13);
+      transition: background .16s;
+      cursor: default;
+    }
+    .sem {
+      background: none;
+      color: #aaa;
+      box-shadow: none;
+      font-size: 0.97em;
+      font-weight: 600;
+    }
+    .jour.vide {
+      background: none;
+      box-shadow: none;
+    }
+    .jour-grise { opacity: 0 }
+    .jour-inscription { border:2.5px solid #ffe04a; box-shadow:0 0 6px #ffe04a77; }
+    .jour-futur { opacity:0 }
+  `;
+  document.head.appendChild(style);
+
   let dateCourante = new Date();
   let moisAffiche = dateCourante.getMonth();
   let anneeAffichee = dateCourante.getFullYear();
@@ -139,44 +178,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (moisAffiche > 11) { moisAffiche = 0; anneeAffichee++; }
     afficherCalendrier();
   };
-
-  const style = document.createElement('style');
-  style.textContent = `
-    .calendrier {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 7px;
-      margin: 1.2em auto 1.5em;
-      max-width: 420px;
-    }
-    .jour, .sem {
-      aspect-ratio: 1 / 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 1.09rem;
-      border-radius: 9px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.13);
-      transition: background .16s;
-      cursor: default;
-    }
-    .sem {
-      background: none;
-      color: #aaa;
-      box-shadow: none;
-      font-size: 0.97em;
-      font-weight: 600;
-    }
-    .jour.vide {
-      background: none;
-      box-shadow: none;
-    }
-    .jour-grise { opacity: 0 }
-    .jour-inscription { border:2.5px solid #ffe04a; box-shadow:0 0 6px #ffe04a77; }
-    .jour-futur { opacity:0 }
-  `;
-  document.head.appendChild(style);
 
   await chargerHistoriqueEtInscription();
 });

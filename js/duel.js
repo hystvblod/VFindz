@@ -1,4 +1,8 @@
-import { supabase, getJetons, getPoints, getPseudo as getCurrentUser, getUserId, getCadreSelectionne, ajouterDefiHistorique, addJetons, removeJeton, addPoints, removePoints, isPremium } from './userData.js';
+import { 
+  supabase, getJetons, getPoints, getPseudo as getCurrentUser, getUserId,
+  getCadreSelectionne, ajouterDefiHistorique, addJetons, removeJeton, addPoints, removePoints, isPremium, 
+  getCadresPossedes, getCadreUrl 
+} from './userData.js';
 
 // ========== IndexedDB cache ==========
 async function setColTitlePremium(element, pseudo) {
@@ -182,7 +186,6 @@ async function checkAlreadyInDuel() {
     .or(`player1_pseudo.eq.${pseudo},player2_pseudo.eq.${pseudo}`);
   if (error) return false;
   if (duelsEnCours && duelsEnCours.length > 0) {
-    // On trouve une room en cours, on y renvoie direct
     const room = duelsEnCours[0];
     setTimeout(() => {
       window.location.href = `duel_game.html?room=${room.id}`;
@@ -191,13 +194,11 @@ async function checkAlreadyInDuel() {
   }
   return false;
 }
+
 // ================= FIN PATCH ANTI-MULTI ===================
 
-// DUEL RANDOM MATCHMAKING PATCH
 export async function findOrCreateRoom() {
-  // PATCH ANTI-MULTI : bloque si déjà dans une room
   if (await checkAlreadyInDuel()) return;
-
   localStorage.removeItem("duel_random_room");
   localStorage.removeItem("duel_is_player1");
   const pseudo = await getCurrentUser();
@@ -228,7 +229,6 @@ export async function findOrCreateRoom() {
     await new Promise(r => setTimeout(r, 1200));
   }
 
-  // **C’est ici la création de la room random !**
   const player1Id = await getUserId();
   const player1Pseudo = await getCurrentUser();
   const defis = await getDefisDuelFromSupabase(3);
@@ -348,11 +348,8 @@ export async function initDuelGame() {
       if (diff <= 0) clearInterval(timerInterval);
     }, 1000);
   }
+}
 
-  // ... (le reste du code, inchangé)
-// ===========================
-// !!!!! CORRECTION RENDU ICI
-// ===========================
 // Fonction pour ouvrir la popup de signalement
 function ouvrirPopupSignal(photoUrl, idxStr) {
   const popup = document.getElementById("popup-signal-photo");
@@ -365,7 +362,7 @@ function ouvrirPopupSignal(photoUrl, idxStr) {
   popup.classList.remove("hidden");
   popup.classList.add("show");
 }
-window.ouvrirPopupSignal = ouvrirPopupSignal; // optionnel, mais utile pour accès global
+window.ouvrirPopupSignal = ouvrirPopupSignal;
 
 async function renderDefis({ myID, advID }) {
   const ul = $("duel-defi-list");
@@ -385,17 +382,14 @@ async function renderDefis({ myID, advID }) {
     const li = document.createElement('li');
     li.className = 'defi-item';
 
-    // Cartouche défi
     const cartouche = document.createElement('div');
     cartouche.className = 'defi-cartouche-center';
     cartouche.textContent = defi;
     li.appendChild(cartouche);
 
-    // Ligne deux colonnes
     const row = document.createElement('div');
     row.className = 'duel-defi-row';
 
-    // --- Colonne Joueur (gauche) ---
     const colJoueur = document.createElement('div');
     colJoueur.className = 'joueur-col';
 
@@ -405,7 +399,6 @@ async function renderDefis({ myID, advID }) {
     colJoueur.appendChild(titreJoueur);
     setColTitlePremium(titreJoueur, myID);
 
-    // Photo joueur (cache optimisé)
     const myPhotoObj = await getPhotoDuel(roomId, myChamp, idxStr);
     const myPhoto = myPhotoObj ? myPhotoObj.url : null;
     const myCadre = myPhotoObj && myPhotoObj.cadre ? myPhotoObj.cadre : getCadreDuel(roomId, idxStr);
@@ -417,12 +410,11 @@ async function renderDefis({ myID, advID }) {
       preview.className = "cadre-preview";
       const cadreImg = document.createElement("img");
       cadreImg.className = "photo-cadre";
-      cadreImg.src = "./assets/cadres/" + myCadre + ".webp";
+      cadreImg.src = getCadreUrl(myCadre);
       const photoImg = document.createElement("img");
       photoImg.className = "photo-user";
       photoImg.src = myPhoto;
       photoImg.onclick = () => agrandirPhoto(myPhoto, myCadre);
-      // --- Appui long/chgt cadre ---
       photoImg.oncontextmenu = (e) => { e.preventDefault(); ouvrirPopupChoixCadre(roomId, idxStr, myChamp); };
       photoImg.ontouchstart = function(e) {
         this._touchTimer = setTimeout(() => { ouvrirPopupChoixCadre(roomId, idxStr, myChamp); }, 500);
@@ -432,7 +424,6 @@ async function renderDefis({ myID, advID }) {
       preview.appendChild(cadreImg);
       preview.appendChild(photoImg);
 
-      // --- Bouton coeur pour aimer la photo ---
       const coeurBtn = document.createElement("img");
       coeurBtn.src = photosAimees.includes(`${roomId}_${myChamp}_${idxStr}`) ? "assets/icons/coeur_plein.svg" : "assets/icons/coeur.svg";
       coeurBtn.alt = "Aimer";
@@ -453,14 +444,12 @@ async function renderDefis({ myID, advID }) {
       colJoueur.appendChild(cadreDiv);
     }
 
-    // ========== BOUTON PHOTO UNIQUEMENT ==========
     const btnRow = document.createElement('div');
     btnRow.className = "duel-btnrow-joueur";
     btnRow.style.display = "flex";
     btnRow.style.justifyContent = "center";
     btnRow.style.marginTop = "10px";
 
-    // --- PHOTO (dans un <button>)
     const btnPhoto = document.createElement('button');
     btnPhoto.className = "btn-photo";
     btnPhoto.title = myPhoto ? "Reprendre la photo" : "Prendre une photo";
@@ -471,7 +460,6 @@ async function renderDefis({ myID, advID }) {
     btnPhoto.style.display = "flex";
     btnPhoto.style.alignItems = "center";
 
-    // Image de l'appareil photo dans le bouton
     const imgPhoto = document.createElement('img');
     imgPhoto.src = "assets/icons/photo.svg";
     imgPhoto.alt = "Prendre une photo";
@@ -482,7 +470,6 @@ async function renderDefis({ myID, advID }) {
     btnPhoto.appendChild(imgPhoto);
 
     btnPhoto.onclick = () => gererPrisePhotoDuel(idxStr, myCadre);
-    // Appui long/clic droit → popup jeton
     btnPhoto.oncontextmenu = (e) => { e.preventDefault(); ouvrirPopupValiderJeton(idxStr); };
     btnPhoto.ontouchstart = function(e) {
       this._touchTimer = setTimeout(() => { ouvrirPopupValiderJeton(idxStr); }, 500);
@@ -493,7 +480,6 @@ async function renderDefis({ myID, advID }) {
 
     colJoueur.appendChild(btnRow);
 
-    // --- Colonne Adversaire (droite) ---
     const colAdv = document.createElement('div');
     colAdv.className = 'adversaire-col';
     const titreAdv = document.createElement('div');
@@ -502,9 +488,7 @@ async function renderDefis({ myID, advID }) {
     colAdv.appendChild(titreAdv);
     setColTitlePremium(titreAdv, advID);
 
-    // Photo adversaire (cache optimisé)
     const advPhotoObj = await getPhotoDuel(roomId, advChamp, idxStr);
-    // On force la mise à jour du cache si cadre changé côté serveur
     if (roomData && roomData[advChamp] && roomData[advChamp][idxStr]) {
       let obj = roomData[advChamp][idxStr];
       let url, cadre;
@@ -515,7 +499,6 @@ async function renderDefis({ myID, advID }) {
         url = obj;
         cadre = "polaroid_01";
       }
-      // On rafraîchit l'entrée cache même si déjà présente
       await VFindDuelDB.set(`${roomId}_${advChamp}_${idxStr}`, { url, cadre });
     }
 
@@ -525,13 +508,11 @@ async function renderDefis({ myID, advID }) {
     if (advPhoto) {
       const cadreDiv = document.createElement("div");
       cadreDiv.className = "cadre-item cadre-duel-mini";
-
       const preview = document.createElement("div");
       preview.className = "cadre-preview";
-
       const cadreImg = document.createElement("img");
       cadreImg.className = "photo-cadre";
-      cadreImg.src = "./assets/cadres/" + advCadre + ".webp";
+      cadreImg.src = getCadreUrl(advCadre);
 
       const photoImg = document.createElement("img");
       photoImg.className = "photo-user";
@@ -542,7 +523,6 @@ async function renderDefis({ myID, advID }) {
       preview.appendChild(photoImg);
       cadreDiv.appendChild(preview);
 
-      // --- BOUTON SIGNALER SOUS LA PHOTO ---
       const signalDiv = document.createElement("div");
       signalDiv.style.display = "flex";
       signalDiv.style.justifyContent = "center";
@@ -567,9 +547,8 @@ async function renderDefis({ myID, advID }) {
       };
       signalDiv.appendChild(signalBtn);
 
-      colAdv.appendChild(cadreDiv);    // ✅ cadre seul
-      colAdv.appendChild(signalDiv);   // ✅ bouton en-dessous
-
+      colAdv.appendChild(cadreDiv);
+      colAdv.appendChild(signalDiv);
     }
 
     row.appendChild(colJoueur);
@@ -579,11 +558,11 @@ async function renderDefis({ myID, advID }) {
     ul.appendChild(li);
   }
 }
+
 // ===========================
 // FIN correction
 // ===========================
 
-}
 
 // =================== POPUP FIN DE DUEL ===================
 async function afficherPopupFinDuel(room) {
