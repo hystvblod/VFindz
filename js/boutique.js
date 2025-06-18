@@ -491,8 +491,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await updatePointsDisplay();
   await updateJetonsDisplay();
 });
-import { addPoints, addJetons } from './userData.js';
-import { showAd } from './pub.js';
+
 
 // 🎯 Bouton pub → 100 pièces
 document.getElementById("btnPubPieces")?.addEventListener("click", async () => {
