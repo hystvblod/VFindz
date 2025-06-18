@@ -103,8 +103,19 @@ export async function uploadPhotoDuelWebp(dataUrl, duelId, idx, cadreId) {
   const url = urlData.publicUrl;
 
   // Mets l’URL et le cadre dans la table duels
-  const { data: room, error: roomError } = await supabase.from('duels').select('*').eq('id', duelId).single();
-  if (roomError || !room) throw new Error("Room introuvable");
+console.log("📡 Lecture de la room avant update photo...");
+const { data: room, error: roomError } = await supabase.from('duels').select('*').eq('id', duelId).single();
+
+if (roomError) {
+  console.error("❌ Erreur lecture room :", roomError);
+}
+if (!room) {
+  console.error("❌ Room null !");
+  throw new Error("Room introuvable");
+}
+console.log("✅ Room récupérée :", room);
+
+
   const pseudo = await getCurrentUser();
   const champ = (room.player1_pseudo === pseudo) ? 'photosa' : 'photosb';
   let photos = room[champ] || {};
