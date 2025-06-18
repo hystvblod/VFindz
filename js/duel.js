@@ -3,6 +3,7 @@ import {
   getCadreSelectionne, ajouterDefiHistorique, addJetons, removeJeton, addPoints, removePoints, isPremium, 
   getCadresPossedes, getCadreUrl 
 } from './userData.js';
+import { showAd } from './pub.js';
 
 // ========== IndexedDB cache ==========
 async function setColTitlePremium(element, pseudo) {
@@ -1001,8 +1002,8 @@ document.body.addEventListener("click", async function(e) {
     alert("Erreur lors de l'envoi : " + err.message);
   }
 });
-import { showAd } from './pub.js';
-import { prendrePhoto } from './camera.js';
+
+
 
 // 📌 Bouton principal pour tenter de reprendre une photo
 document.getElementById("btn-reprendre-photo").addEventListener("click", async () => {
