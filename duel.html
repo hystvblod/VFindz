@@ -50,6 +50,34 @@
   <footer>
     <p>&copy; 2025 VFindz</p>
   </footer>
+
+  <!-- ===================== POPUPS À GARDER DANS CHAQUE PAGE DUEL ===================== -->
+
+  <!-- ✅ POPUP SIGNALER PHOTO -->
+  <div id="popup-signal-photo" class="popup hidden" tabindex="-1">
+    <div class="popup-inner">
+      <h2>Signaler cette photo</h2>
+      <p>Quel est le problème ?</p>
+      <div class="signal-motifs">
+        <button class="btn-signal-type" data-type="triche">Triche / Hors-sujet</button>
+        <button class="btn-signal-type" data-type="nudite">Nudité / Contenu choquant</button>
+        <button class="btn-signal-type" data-type="autre">Autre motif</button>
+      </div>
+      <button id="close-popup" class="close-btn">Fermer</button>
+    </div>
+  </div>
+
+  <!-- ✅ POPUP JETON VALIDER -->
+  <div id="popup-jeton-valider" class="popup hidden" tabindex="-1">
+    <div class="popup-inner">
+      <h2>Valider avec 1 jeton ?</h2>
+      <button id="btn-confirm-jeton">Valider</button>
+      <button id="btn-cancel-jeton">Annuler</button>
+    </div>
+  </div>
+
+  <!-- ===================== SCRIPTS ===================== -->
   <script type="module" src="js/userData.js"></script>
+  <script type="module" src="js/duel.js"></script>
 </body>
 </html>

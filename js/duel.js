@@ -230,9 +230,11 @@ export async function findOrCreateRoom() {
   }
 
   // **C’est ici la création de la room random !**
-  const player1Id = await getUserId();
-  const player1Pseudo = await getCurrentUser();
-  const defis = await getDefisDuelFromSupabase(3);
+const player1Id = await getUserId();
+const player1Pseudo = await getCurrentUser();
+console.log("[DEBUG FIND/CREATE ROOM] player1Id:", player1Id, "| player1Pseudo:", player1Pseudo);
+const defis = await getDefisDuelFromSupabase(3);
+
 
   const roomObj = {
     player1_id: player1Id,           // ✅ ID Supabase de player 1

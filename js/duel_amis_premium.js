@@ -30,18 +30,27 @@ async function main() {
     return;
   }
 
-  // 1. Cas : 1 seul premium → il écrit les 3 défis
-  // 2. Cas : 2 premium → chaque joueur écrit 2, puis validation comme expliqué
-  let blocSaisie = document.getElementById("bloc-defi-saisie");
-  let blocFinal = document.getElementById("bloc-defis-final");
-  let blocAttente = document.getElementById("bloc-attente");
-
   // Saisie des défis
   async function handleValiderDefis() {
     let d1 = document.getElementById("input-defi1").value.trim();
     let d2 = document.getElementById("input-defi2").value.trim();
-    if (!d1 || !d2) { alert("Merci de remplir 2 défis."); return; }
+
+    // Cas : on écrit le 3e défi
+    let d1Filled = d1.length > 0, d2Filled = d2.length > 0;
     let champ = isPlayer1 ? "defis_player1" : "defis_player2";
+    let existing = roomData[champ] ? JSON.parse(roomData[champ]) : [];
+    // Si déjà 2 défis => il ne doit remplir que le 3e
+    if (existing.length === 2) {
+      if (!d2Filled) { alert("Merci d’entrer le 3e défi."); return; }
+      let updateArr = [existing[0], existing[1], d2];
+      let updateObj = {};
+      updateObj[champ] = JSON.stringify(updateArr);
+      await supabase.from('duels').update(updateObj).eq('id', roomId);
+      showAttente();
+      return;
+    }
+    // Normal : 2 défis à écrire
+    if (!d1Filled || !d2Filled) { alert("Merci de remplir 2 défis."); return; }
     let updateObj = {};
     updateObj[champ] = JSON.stringify([d1, d2]);
     await supabase.from('duels').update(updateObj).eq('id', roomId);
@@ -56,6 +65,11 @@ async function main() {
       majUI();
     })
     .subscribe();
+
+  // UI helpers
+  let blocSaisie = document.getElementById("bloc-defi-saisie");
+  let blocFinal = document.getElementById("bloc-defis-final");
+  let blocAttente = document.getElementById("bloc-attente");
 
   function showAttente() {
     blocSaisie.style.display = "none";
@@ -80,22 +94,25 @@ async function main() {
       showDefisFinal(final);
       return;
     }
-    // 2 premiums
+    // Deux premiums
     if (roomData.premium1 && roomData.premium2) {
       if ((isPlayer1 && d1.length < 2) || (!isPlayer1 && d2.length < 2)) {
         // Saisie défis (2 à remplir)
         blocSaisie.style.display = "block";
         document.getElementById("text-saisie-defis").textContent = "Propose 2 défis originaux pour ce duel :";
+        // Champs visibles
+        document.getElementById("input-defi1").style.display = "";
+        document.getElementById("input-defi2").style.display = "";
+        document.getElementById("input-defi1").value = "";
+        document.getElementById("input-defi2").value = "";
         blocAttente.style.display = "none";
         blocFinal.style.display = "none";
       } else if (d1.length === 2 && d2.length === 2 && final.length < 3) {
-        // Les 2 ont proposé, on tire au sort
-        // Logique pour le premier qui passe ici :
+        // Les 2 ont proposé, on tire au sort pour tous
         if (isPlayer1) {
           let all = d1.concat(d2);
           shuffle(all);
           let choisis = [all[0], all[1]];
-          // 3e au hasard parmi les 2 restants
           let restant = all.filter((x, i) => i > 1);
           choisis.push(restant[Math.floor(Math.random() * restant.length)]);
           supabase.from('duels').update({ defis_final: JSON.stringify(choisis) }).eq('id', roomId);
@@ -105,21 +122,25 @@ async function main() {
         showAttente();
       }
     } else {
-      // 1 seul premium : c’est lui qui écrit les 3 défis (sur les 2 champs ou tu laisses 3 zones)
+      // 1 seul premium : il écrit les 3 défis (il fait 2 champs puis 1 champ)
       if (premium && ((isPlayer1 && d1.length < 2) || (!isPlayer1 && d2.length < 2))) {
         blocSaisie.style.display = "block";
         document.getElementById("text-saisie-defis").textContent = "Écris 2 défis (tu auras un 3e champ après) :";
+        document.getElementById("input-defi1").style.display = "";
+        document.getElementById("input-defi2").style.display = "";
+        document.getElementById("input-defi1").value = "";
+        document.getElementById("input-defi2").value = "";
         blocAttente.style.display = "none";
         blocFinal.style.display = "none";
       } else if ((isPlayer1 && d1.length === 2) || (!isPlayer1 && d2.length === 2)) {
         // Demande le 3e défi
         blocSaisie.style.display = "block";
         document.getElementById("text-saisie-defis").textContent = "Écris un 3e défi pour ce duel :";
-        blocAttente.style.display = "none";
-        blocFinal.style.display = "none";
-        // Affiche qu’un seul champ texte
         document.getElementById("input-defi1").style.display = "none";
         document.getElementById("input-defi2").placeholder = "Défi 3...";
+        document.getElementById("input-defi2").value = "";
+        blocAttente.style.display = "none";
+        blocFinal.style.display = "none";
       } else if ((d1.length === 3 || d2.length === 3) && final.length < 3) {
         let choisis = isPlayer1 ? d1 : d2;
         supabase.from('duels').update({ defis_final: JSON.stringify(choisis) }).eq('id', roomId);
@@ -131,7 +152,13 @@ async function main() {
   }
 
   // Shuffle simple
-  function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
 
   // Bouton validation
   document.getElementById("btn-valider-defis").onclick = handleValiderDefis;

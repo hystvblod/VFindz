@@ -115,6 +115,16 @@ async function loadUserData(force = false) {
   setCachedOwnedFrames(userDataCache.cadres || []);
   return userDataCache;
 }
+// ----- Couleur personnalisée de l'ID -----
+export async function setIdColor(color) {
+  await loadUserData();
+  userDataCache.id_color = color;
+  await supabase.from('users').update({ id_color: color }).eq('id', userIdCache);
+}
+export async function getIdColor() {
+  await loadUserData();
+  return userDataCache?.id_color ?? null;
+}
 
 // --------- FONCTIONS LECTURE ÉCLAIR (accès cache) ----------
 function getPseudoCached()        { return userDataCache?.pseudo ?? "Toi"; }
