@@ -46,3 +46,15 @@ export async function updatePointsDisplay() {
   const pointsSpan = document.getElementById("points");
   if (pointsSpan) pointsSpan.textContent = await getPoints();
 }
+export async function showAd(type = "reward") {
+  const premium = await isPremium();
+  if (premium) return;
+
+  try {
+    await Capacitor.Plugins.AppLovinPlugin.showRewardedAd();
+
+    // Rien ici : les effets (ajout points/jetons) sont faits **dans les boutons** (pas dans pub.js)
+  } catch (error) {
+    console.warn("Erreur pub reward :", error);
+  }
+}

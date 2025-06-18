@@ -491,3 +491,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   await updatePointsDisplay();
   await updateJetonsDisplay();
 });
+import { addPoints, addJetons } from './userData.js';
+import { showAd } from './pub.js';
+
+// 🎯 Bouton pub → 100 pièces
+document.getElementById("btnPubPieces")?.addEventListener("click", async () => {
+  await showAd("reward_pieces");
+  await addPoints(100);
+  alert("Tu as gagné 100 pièces !");
+});
+
+// 🎯 Bouton pub → 3 jetons
+document.getElementById("btnPubJetons")?.addEventListener("click", async () => {
+  await showAd("reward_jetons");
+  await addJetons(3);
+  alert("Tu as gagné 3 jetons !");
+});
