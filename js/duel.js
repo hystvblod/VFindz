@@ -212,12 +212,23 @@ export async function findOrCreateRoom() {
 
     if (rooms && rooms.length > 0) {
       const room = rooms[0];
-      await supabase.from('duels').update({
-        player2_id: await getUserId(),
-        player2_pseudo: pseudo,
-        status: 'playing',
-        starttime: Date.now()
-      }).eq('id', room.id);
+      const player2_id = await getUserId();
+const pseudo = await getCurrentUser();
+console.log("Tentative d'update room:", room.id, pseudo, player2_id);
+
+const { error: updError } = await supabase.from('duels').update({
+  player2_id: player2_id,
+  player2_pseudo: pseudo,
+  status: 'playing',
+  starttime: Date.now()
+}).eq('id', room.id);
+
+if (updError) {
+  console.error("⚠️ Erreur lors de l'update du joueur 2 :", updError.message);
+} else {
+  console.log("✅ Update joueur 2 OK pour room:", room.id);
+}
+
 
       localStorage.setItem("duel_random_room", room.id);
       localStorage.setItem("duel_is_player1", "0");
