@@ -785,49 +785,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 });
 
-// HANDLER : Quand tu retires un jeton (ex : valider défi)
-export async function validerDefiAvecJeton(idx) {
-  // Sécurisé : retire le jeton via RPC côté serveur
-  const { error } = await supabase.rpc('secure_remove_jeton');
-  if (error) {
-    alert("Erreur lors du retrait du jeton : " + error.message);
-    return;
-  }
-  await afficherSolde();
-}
 
-// HANDLER : Ajoute un jeton (récompense/pub)
-export async function gagnerJeton() {
-  // Sécurisé : ajoute un jeton via RPC côté serveur
-  const { error } = await supabase.rpc('secure_add_jetons', { nb: 1 });
-  if (error) {
-    alert("Erreur lors de l'ajout du jeton : " + error.message);
-    return;
-  }
-  await afficherSolde();
-}
-
-// HANDLER : Retire des points
-export async function retirerPoints(montant) {
-  // Sécurisé : retire des points via RPC côté serveur
-  const { error } = await supabase.rpc('secure_remove_points', { nb: montant });
-  if (error) {
-    alert("Erreur lors du retrait des points : " + error.message);
-    return;
-  }
-  await afficherSolde();
-}
-
-// HANDLER : Ajoute des points (gain récompense, pub, duel...)
-export async function gagnerPoints(montant) {
-  // Sécurisé : ajoute des points via RPC côté serveur
-  const { error } = await supabase.rpc('secure_add_points', { nb: montant });
-  if (error) {
-    alert("Erreur lors de l'ajout des points : " + error.message);
-    return;
-  }
-  await afficherSolde();
-}
 
 // Changement de cadre après la photo (popup choix)
 window.ouvrirPopupChoixCadre = async function(duelId, idx, champ) {
