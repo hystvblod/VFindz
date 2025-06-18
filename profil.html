@@ -138,7 +138,7 @@
   <button id="showChangeIdBtn" style="background:#ffe04a;padding:7px 16px;border-radius:7px;border:none;font-weight:bold;cursor:pointer;">Changer mon identifiant</button>
 </div>
 
-<!-- Popup changement ID UNIQUE et isolée -->
+<!-- Popup changement ID -->
 <div class="popChangementID-bg" id="popChangementID-bg">
   <div class="popChangementID">
     <div id="popIdText" style="font-size:1.11em;margin-bottom:0.2em;">
@@ -196,29 +196,22 @@
 import { loadUserData, getPseudo, getPoints, setPseudo, getUserDataCloud, isPremium, renderID, setIdColor, getIdColor } from './js/userData.js';
 import { supabase } from './js/userData.js';
 
-// Vérifie si un pseudo existe déjà (unicité)
 async function isPseudoTaken(pseudo) {
   const { data } = await supabase.from('users').select('id').eq('pseudo', pseudo);
   return data && data.length > 0;
 }
-
-// Change le pseudo dans Supabase (si unique)
 async function changeUserId(newPseudo) {
-  if (await isPseudoTaken(newPseudo)) {
-    throw new Error("Ce pseudo est déjà utilisé.");
-  }
+  if (await isPseudoTaken(newPseudo)) throw new Error("Ce pseudo est déjà utilisé.");
   await setPseudo(newPseudo);
 }
-
-// Récupère toutes les infos du profil courant
 async function getProfile() {
   return await getUserDataCloud();
 }
-
 async function refreshProfilDisplay() {
   const profil = await getProfile();
   const pseudo = profil?.pseudo || "???";
-  document.getElementById("idUserDisplay").innerHTML = "ID : " + renderID(pseudo);
+  // Affiche le pseudo avec la couleur
+  document.getElementById("idUserDisplay").innerHTML = "ID : " + renderID(pseudo, profil?.id_color, profil?.premium);
   document.getElementById("vcoins").textContent = profil?.points || 0;
   document.getElementById("jetons").textContent = profil?.jetons || 0;
 }
@@ -236,26 +229,14 @@ async function setupProfile() {
   document.getElementById("popCancelId").onclick = () => {
     document.getElementById("popChangementID-bg").classList.remove("active");
   };
-
-  // Validation nouvel ID
   document.getElementById("popValidateId").onclick = async () => {
     const newId = document.getElementById("popNewIdInput").value.trim();
     const err = document.getElementById("popIdError");
     err.textContent = "";
     err.classList.remove("valid");
-    if (newId.length < 3) {
-      err.textContent = "ID trop court (min 3 caractères)";
-      return;
-    }
-    if (newId.length > 18) {
-      err.textContent = "ID trop long (max 18 caractères)";
-      return;
-    }
-    if (!/^[a-zA-Z0-9_.-]+$/.test(newId)) {
-      err.textContent = "Caractères autorisés : A-Z 0-9 . _ -";
-      return;
-    }
-    // Vérifie unicité et change dans Supabase
+    if (newId.length < 3) { err.textContent = "ID trop court (min 3 caractères)"; return; }
+    if (newId.length > 18) { err.textContent = "ID trop long (max 18 caractères)"; return; }
+    if (!/^[a-zA-Z0-9_.-]+$/.test(newId)) { err.textContent = "Caractères autorisés : A-Z 0-9 . _ -"; return; }
     try {
       await changeUserId(newId);
       err.classList.add("valid");
@@ -269,7 +250,7 @@ async function setupProfile() {
     }
   };
 
-  // --- Gestion sélection couleur ID Premium ---
+  // --- Gestion couleur ID premium ---
   const colorOptions = [
     "#FFD700", // Or
     "#FFFFFF", // Blanc
@@ -283,26 +264,9 @@ async function setupProfile() {
     "#A7C7E7", // Bleu pastel
   ];
   let selectedColor = null;
-
-  // Popup couleur : long clic/tap sur l'ID
   let mouseDownTimer = null;
-  document.getElementById("idUserDisplay").addEventListener("mousedown", async (e) => {
-    const profil = await getProfile();
-    if (profil?.premium) {
-      mouseDownTimer = setTimeout(() => {
-        document.getElementById("popChangeColor-bg").classList.add("active");
-        renderColorPicker();
-      }, 300); // 300ms = "appui long"
-    }
-  });
-  document.getElementById("idUserDisplay").addEventListener("mouseup", () => {
-    clearTimeout(mouseDownTimer);
-  });
-  document.getElementById("idUserDisplay").addEventListener("mouseleave", () => {
-    clearTimeout(mouseDownTimer);
-  });
-  // Pour mobile (touch)
-  document.getElementById("idUserDisplay").addEventListener("touchstart", async (e) => {
+  const idEl = document.getElementById("idUserDisplay");
+  idEl.addEventListener("mousedown", async (e) => {
     const profil = await getProfile();
     if (profil?.premium) {
       mouseDownTimer = setTimeout(() => {
@@ -311,10 +275,18 @@ async function setupProfile() {
       }, 300);
     }
   });
-  document.getElementById("idUserDisplay").addEventListener("touchend", () => {
-    clearTimeout(mouseDownTimer);
+  idEl.addEventListener("mouseup", () => { clearTimeout(mouseDownTimer); });
+  idEl.addEventListener("mouseleave", () => { clearTimeout(mouseDownTimer); });
+  idEl.addEventListener("touchstart", async (e) => {
+    const profil = await getProfile();
+    if (profil?.premium) {
+      mouseDownTimer = setTimeout(() => {
+        document.getElementById("popChangeColor-bg").classList.add("active");
+        renderColorPicker();
+      }, 300);
+    }
   });
-
+  idEl.addEventListener("touchend", () => { clearTimeout(mouseDownTimer); });
   document.getElementById("popCancelColor").onclick = () => {
     document.getElementById("popChangeColor-bg").classList.remove("active");
   };
