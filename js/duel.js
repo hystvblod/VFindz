@@ -1001,7 +1001,7 @@ document.body.addEventListener("click", async function(e) {
     alert("Erreur lors de l'envoi : " + err.message);
   }
 });
-import { showAd } from './appLovin.js';
+import { showAd } from './pub.js';
 import { prendrePhoto } from './camera.js';
 
 // 📌 Bouton principal pour tenter de reprendre une photo
