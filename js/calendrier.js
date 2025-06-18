@@ -34,9 +34,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       background: none;
       box-shadow: none;
     }
-    .jour-grise { opacity: 0 }
+    .jour-grise { opacity: 1 }
     .jour-inscription { border:2.5px solid #ffe04a; box-shadow:0 0 6px #ffe04a77; }
-    .jour-futur { opacity:0 }
+    .jour-futur { opacity:1 }
   `;
   document.head.appendChild(style);
 
