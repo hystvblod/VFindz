@@ -829,9 +829,10 @@ export async function deleteDuelPhotosFromSupabase(roomId) {
 async function getDefisDuelFromSupabase(count = 3) {
   let { data, error } = await supabase
     .from('defis')
-    .select('intitule')
-    .order('random()')
-    .limit(count);
+.select('intitule')
+.order('random()', { ascending: false })
+.limit(count);
+
 
   if (error || !data || data.length < count) {
     const backup = [
