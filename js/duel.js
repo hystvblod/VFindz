@@ -1002,7 +1002,6 @@ document.body.addEventListener("click", async function(e) {
   }
 });
 import { showAd } from './appLovin.js';
-import { isPremium } from './userData.js';
 import { prendrePhoto } from './camera.js';
 
 // 📌 Bouton principal pour tenter de reprendre une photo
