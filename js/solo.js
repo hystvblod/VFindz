@@ -621,3 +621,25 @@ window.afficherPhotosAimees = async function() {
     }
   }
 };
+import { showAd } from './pub.js';
+
+const btnPubRepriseSolo = document.getElementById("btnReprisePubSolo");
+const btnAnnulerRepriseSolo = document.getElementById("btnAnnulerRepriseSolo");
+const btnPremiumSolo = document.getElementById("btnReprisePremiumSolo");
+const popupRepriseSolo = document.getElementById("popup-reprise-photo-solo");
+
+if (btnPubRepriseSolo && btnAnnulerRepriseSolo && btnPremiumSolo && popupRepriseSolo) {
+  btnPubRepriseSolo.addEventListener("click", async () => {
+    await showAd("rewarded");
+    popupRepriseSolo.classList.add("hidden");
+    // Ici tu peux rappeler la caméra si besoin
+  });
+
+  btnAnnulerRepriseSolo.addEventListener("click", () => {
+    popupRepriseSolo.classList.add("hidden");
+  });
+
+  btnPremiumSolo.addEventListener("click", () => {
+    window.location.href = "premium.html";
+  });
+}
