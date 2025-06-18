@@ -5,7 +5,6 @@ import {
   updateUserData, getCadreSelectionne,
   getJoursDefisRealises, getNbAmisInvites, getConcoursParticipationStatus,
   hasDownloadedVZone // (si besoin, à implémenter)
-  
 } from './userData.js';
 
 // === IndexedDB cache boutique/cadres.json ===
@@ -44,7 +43,6 @@ async function setBoutiqueCache(data) {
 // ================== CONDITIONS CADRES UNIVERSAL ===================
 async function checkCadreUnlock(cadre) {
   if (!cadre.condition) return { unlocked: true };
-
   switch (cadre.condition.type) {
     case "premium":
       return { unlocked: await isPremium(), texte: cadre.condition.texte || "Compte premium requis" };
@@ -113,8 +111,6 @@ async function acheterCadreBoutique(id, prix) {
   }
 
   await acheterCadre(id); // <--- Ici, débloque vraiment le cadre après paiement validé côté serveur
-}
-
 
   // On charge l’image en base64 et la stocke dans le localStorage, SANS DUPLICATA de fetch
   const url = `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${id}.webp`;
@@ -141,11 +137,11 @@ async function acheterCadreBoutique(id, prix) {
   // Force update possession (cloud)
   await getOwnedFrames(true);
 
-  // Ici SEULEMENT tu affiches “Acheté !” ou tu fais le render.
+  // Ici SEULEMENT tu affiches “Acheté !” ou tu fais le render.
   await updatePointsDisplay();
   alert("✅ Cadre acheté !");
   await renderBoutique(currentCategory);
-
+}
 
 // --- Popups et pub ---
 function closePopup() {
@@ -229,7 +225,6 @@ async function acheterJetonsAvecPub() {
     fermerPopupJetonBoutique();
   }, 3000);
 }
-
 
 // --- Affichage points/jetons ---
 async function updatePointsDisplay() {
@@ -318,14 +313,12 @@ async function fetchCadres(force = false) {
       return;
     }
   }
-
   // Requête Supabase
   const { data, error } = await supabase.from('cadres').select('*');
   if (error || !data) {
     console.error("Erreur chargement Supabase :", error);
     return;
   }
-
   CADRES_DATA = data;
   await setBoutiqueCache(data);
 }
@@ -367,26 +360,24 @@ async function renderBoutique(categoryKey) {
       item.classList.add("cadre-item");
 
       const wrapper = document.createElement("div");
-wrapper.classList.add("cadre-preview");
-wrapper.style.width = "80px";
-wrapper.style.height = "100px";
-wrapper.style.position = "relative";
-wrapper.style.margin = "0 auto 10px";
+      wrapper.classList.add("cadre-preview");
+      wrapper.style.width = "80px";
+      wrapper.style.height = "100px";
+      wrapper.style.position = "relative";
+      wrapper.style.margin = "0 auto 10px";
 
-const cadreEl = document.createElement("img");
-cadreEl.src = `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadre.id}.webp`;
-cadreEl.className = "photo-cadre";
-cadreEl.style.width = "100%";
-cadreEl.style.height = "100%";
+      const cadreEl = document.createElement("img");
+      cadreEl.src = `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadre.id}.webp`;
+      cadreEl.className = "photo-cadre";
+      cadreEl.style.width = "100%";
+      cadreEl.style.height = "100%";
 
+      const photo = document.createElement("img");
+      photo.src = "assets/img/exemple.jpg";
+      photo.className = "photo-user";
 
-const photo = document.createElement("img");
-photo.src = "assets/img/exemple.jpg";
-photo.className = "photo-user";
-
-wrapper.appendChild(cadreEl);
-wrapper.appendChild(photo);
-
+      wrapper.appendChild(cadreEl);
+      wrapper.appendChild(photo);
 
       wrapper.addEventListener("click", () => {
         const popup = document.createElement("div");
@@ -411,46 +402,46 @@ wrapper.appendChild(photo);
 
       const button = document.createElement("button");
 
-if (cadre.condition) {
-  const unlockInfo = await checkCadreUnlock(cadre);
-  if (unlockInfo.unlocked) {
-    if (!ownedFrames.includes(cadre.id)) {
-      // Si le cadre est à débloquer gratuitement via une condition, on l’ajoute direct
-      if (!cadre.prix) {
-        await acheterCadre(cadre.id);
-        ownedFrames = await getOwnedFrames(true);
-        showFeedback("🎉 Cadre débloqué !");
-      }
-      button.textContent = cadre.prix ? "Acheter" : "Débloqué !";
-      button.disabled = !!cadre.prix ? false : true;
-      if (cadre.prix) {
-        button.addEventListener("click", () => acheterCadreBoutique(cadre.id, cadre.prix));
+      if (cadre.condition) {
+        const unlockInfo = await checkCadreUnlock(cadre);
+        if (unlockInfo.unlocked) {
+          if (!ownedFrames.includes(cadre.id)) {
+            // Si le cadre est à débloquer gratuitement via une condition, on l’ajoute direct
+            if (!cadre.prix) {
+              await acheterCadre(cadre.id);
+              ownedFrames = await getOwnedFrames(true);
+              showFeedback("🎉 Cadre débloqué !");
+            }
+            button.textContent = cadre.prix ? "Acheter" : "Débloqué !";
+            button.disabled = !!cadre.prix ? false : true;
+            if (cadre.prix) {
+              button.addEventListener("click", () => acheterCadreBoutique(cadre.id, cadre.prix));
+            } else {
+              button.classList.add("btn-success");
+            }
+          } else {
+            button.textContent = "Débloqué !";
+            button.disabled = true;
+            button.classList.add("btn-success");
+          }
+        } else {
+          button.textContent = "Infos";
+          button.disabled = false;
+          button.classList.add("btn-info");
+          button.onclick = () => showUnlockPopup(cadre.nom, unlockInfo.texte);
+        }
+      } else if (categoryKey === "premium" && !(await isPremium())) {
+        button.textContent = "Premium requis";
+        button.disabled = true;
+        button.classList.add("disabled-premium");
+        button.title = "Ce cadre nécessite un compte premium";
+      } else if (ownedFrames.includes(cadre.id)) {
+        button.textContent = "Acheté";
+        button.disabled = true;
       } else {
-        button.classList.add("btn-success");
+        button.textContent = "Acheter";
+        button.addEventListener("click", () => acheterCadreBoutique(cadre.id, cadre.prix));
       }
-    } else {
-      button.textContent = "Débloqué !";
-      button.disabled = true;
-      button.classList.add("btn-success");
-    }
-  } else {
-    button.textContent = "Infos";
-    button.disabled = false;
-    button.classList.add("btn-info");
-    button.onclick = () => showUnlockPopup(cadre.nom, unlockInfo.texte);
-  }
-} else if (categoryKey === "premium" && !(await isPremium())) {
-  button.textContent = "Premium requis";
-  button.disabled = true;
-  button.classList.add("disabled-premium");
-  button.title = "Ce cadre nécessite un compte premium";
-} else if (ownedFrames.includes(cadre.id)) {
-  button.textContent = "Acheté";
-  button.disabled = true;
-} else {
-  button.textContent = "Acheter";
-  button.addEventListener("click", () => acheterCadreBoutique(cadre.id, cadre.prix));
-}
 
       item.appendChild(wrapper);
       item.appendChild(title);
@@ -471,7 +462,6 @@ function fermerPopupPremium() {
   const popup = document.getElementById("popup-premium");
   if (popup) popup.classList.add("hidden");
 }
-// Ex. dans premium.js ou boutique.js
 
 // Tu auras besoin d'un ID unique pour ton produit (défini sur le Play Store, ex : "premium_upgrade")
 const PREMIUM_PRODUCT_ID = "premium_upgrade"; // change ça avec ton vrai ID
@@ -508,7 +498,6 @@ async function acheterPremium() {
   }
 }
 
-
 // === EXPOSE TO WINDOW POUR ACCÈS HTML INLINE ===
 window.activerPremium = activerPremium;
 window.fermerPopupPremium = fermerPopupPremium;
@@ -531,5 +520,3 @@ document.addEventListener('DOMContentLoaded', async () => {
   await updatePointsDisplay();
   await updateJetonsDisplay();
 });
-
-
