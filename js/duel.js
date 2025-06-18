@@ -1003,30 +1003,3 @@ document.body.addEventListener("click", async function(e) {
   }
 });
 
-
-
-// 📌 Bouton principal pour tenter de reprendre une photo
-document.getElementById("btn-reprendre-photo").addEventListener("click", async () => {
-  const premium = await isPremium();
-  if (premium) {
-    prendrePhoto();
-  } else {
-    document.getElementById("popup-reprendre").classList.remove("hidden");
-  }
-});
-
-// 📌 Bouton "Regarder une pub" dans la popup
-document.getElementById("btn-regarder-pub").addEventListener("click", async () => {
-  try {
-    await showAd("rewarded"); // ✅ Affiche la pub reward
-    document.getElementById("popup-reprendre").classList.add("hidden");
-    prendrePhoto(); // ↪️ Autorise la reprise photo
-  } catch (e) {
-    alert("Pub non dispo ou annulée.");
-  }
-});
-
-// 📌 Optionnel : bouton pour fermer la popup
-document.getElementById("popup-fermer").addEventListener("click", () => {
-  document.getElementById("popup-reprendre").classList.add("hidden");
-});
