@@ -15,14 +15,13 @@ export async function checkAndShowPopup(userId) {
     .eq('userId', userId)
     .eq('vue', false);
 
-if (data && data.length > 0) {
-  popupCustom(data[0].message);  // Affiche le popup custom stylé
-  await supabase
-    .from('messages_popup')
-    .update({ vue: true })
-    .eq('id', data[0].id);
-}
-
+  if (data && data.length > 0) {
+    popupCustom(data[0].message);  // Affiche le popup custom stylé
+    await supabase
+      .from('messages_popup')
+      .update({ vue: true })
+      .eq('id', data[0].id);
+  }
 }
 
 // ---------- AUTH ANONYME AUTOMATIQUE SUPABASE ----------
@@ -85,7 +84,8 @@ async function loadUserData(force = false) {
       amis: [],
       demandesRecues: [],
       demandesEnvoyees: [],
-      dateinscription: new Date().toISOString()
+      dateinscription: new Date().toISOString(),
+      id_color: null // <--- AJOUT ICI
     };
     const { error: insertError } = await supabase.from('users').insert([userDataCache]);
     if (insertError) {
@@ -115,6 +115,7 @@ async function loadUserData(force = false) {
   setCachedOwnedFrames(userDataCache.cadres || []);
   return userDataCache;
 }
+
 // ----- Couleur personnalisée de l'ID -----
 export async function setIdColor(color) {
   await loadUserData();
@@ -184,7 +185,6 @@ async function setPseudo(pseudo) {
 
   return true;
 }
-
 
 async function getJetons() { await loadUserData(); return getJetonsCached(); }
 async function addJetons(n) {
@@ -473,7 +473,8 @@ async function resetUserData() {
     amis: [],
     demandesRecues: [],
     dateinscription: new Date().toISOString(),
-    demandesEnvoyees: []
+    demandesEnvoyees: [],
+    id_color: null
   };
 
   await supabase.from('users').upsert([userDataCache]);
@@ -515,13 +516,6 @@ function getUserId() {
 }
 
 // ========== AJOUT DEFIS DANS HISTORIQUE ==========
-/**
- * Ajoute un défi à l'historique (solo, duel_random, duel_amis)
- * @param {Object} param0 
- * @param {string} param0.defi     Le nom ou identifiant du défi
- * @param {string} param0.type     Le type de défi: solo, duel_random, duel_amis
- * @param {string} [param0.date]   Date (YYYY-MM-DD), défaut = aujourd'hui
- */
 export async function ajouterDefiHistorique({ defi, type = 'solo', date = null }) {
   await loadUserData();
   const userId = getUserId();
@@ -561,11 +555,11 @@ export async function ajouterDefiHistorique({ defi, type = 'solo', date = null }
 
   if (updateError) throw updateError;
 }
+
 async function getPoints() {
   await loadUserData();
   return getPointsCached();
 }
-// (ajoute dans ton fichier, vers la zone des fonctions points)
 async function addPoints(n) {
   await loadUserData();
   userDataCache.points += n;
@@ -573,12 +567,11 @@ async function addPoints(n) {
 }
 async function removePoints(n) {
   await loadUserData();
-  if (userDataCache.points < n) return false; // Pas assez de pièces !
+  if (userDataCache.points < n) return false;
   userDataCache.points -= n;
   await supabase.from('users').update({ points: userDataCache.points }).eq('id', userIdCache);
   return true;
 }
-
 
 // Fonctions EXPORTÉES
 export {
@@ -638,8 +631,12 @@ export async function checkBlocageUtilisateur(userId) {
 
   return false;
 }
+
+// --------- ID RENDER AVEC COULEUR ---------
 export function renderID(pseudo) {
-  return isPremiumCached()
-    ? `<span style="color:gold;font-weight:bold;">${pseudo}</span>`
-    : `<span style="color:white;font-weight:bold;">${pseudo}</span>`;
+  // Utilise la couleur personnalisée si premium, sinon or/blanc
+  const color = userDataCache?.id_color
+    ? userDataCache.id_color
+    : (isPremiumCached() ? "gold" : "white");
+  return `<span style="color:${color};font-weight:bold;">${pseudo}</span>`;
 }
