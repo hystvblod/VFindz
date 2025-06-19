@@ -428,10 +428,12 @@ async function initDuelGame() {
 
   subscribeRoom(roomId, (data) => {
     roomData = data;
+     console.log("roomData reçu via subscribe:", roomData);
     updateDuelUI();
     checkFinDuel();
   });
   roomData = await getRoom(roomId);
+  console.log("roomData après getRoom:", roomData);
   updateDuelUI();
   await checkFinDuel();
 
@@ -513,6 +515,7 @@ window.subscribeRoom = subscribeRoom;
 // ========== UTILS GET ROOM, PHOTO DUEL, SAVE PHOTO ==========
 async function getRoom(roomId) {
   const { data } = await window.supabase.from('duels').select('*').eq('id', roomId).single();
+    console.log('getRoom data:', data);
   return data;
 }
 window.getRoom = getRoom;
