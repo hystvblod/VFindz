@@ -194,7 +194,10 @@ async function acheterJetonsAvecPub() {
 // --- Affichage points/jetons ---
 async function updatePointsDisplay() {
   const pointsDisplay = document.getElementById("points");
-  if (pointsDisplay) pointsDisplay.textContent = await window.getPoints();
+  if (pointsDisplay) {
+    const profil = await window.getUserDataCloud();
+    pointsDisplay.textContent = profil.points || 0;
+  }
 }
 async function updateJetonsDisplay() {
   const jetonsSpan = document.getElementById("jetons");
