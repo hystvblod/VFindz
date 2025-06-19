@@ -1,4 +1,7 @@
-import { getUserId, loadUserData } from './userData.js';
+// getUserId() et loadUserData() sont déjà sur window, donc tu peux faire :
+await window.loadUserData();
+const userId = window.getUserId();
+
 
 // Si tu as un objet PIECE_PACKS dans un autre fichier, importe-le aussi
 
