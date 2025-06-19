@@ -1,9 +1,12 @@
-import { supabase, getPseudo, loadUserData, getUserDataCloud, incrementFriendsInvited } from './userData.js';
-
+<!-- 1. Supabase global UMD -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<!-- 2. userData global (doit setter sur window toutes les fonctions) -->
+<script src="js/userData.js"></script>
+<script>
 let userPseudo = null;
 let userProfile = null;
-let lastAmiRequest = 0; // Anti-spam
-let amiASupprimer = null; // Pour la pop-up de confirmation
+let lastAmiRequest = 0;
+let amiASupprimer = null;
 
 function toast(msg, color = "#222") {
   let t = document.createElement("div");
@@ -16,22 +19,21 @@ function toast(msg, color = "#222") {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  userPseudo = await getPseudo();
-  await loadUserData();
+  userPseudo = await window.getPseudo();
+  await window.loadUserData();
   await rechargerAffichage();
 
   const btnAjouter = document.getElementById("btn-ajouter-ami");
   btnAjouter?.addEventListener("click", async () => {
     const pseudoAmi = document.getElementById("pseudo-ami").value.trim();
     if (!pseudoAmi) return;
-    // --- Loader + Anti-spam (1 demande toutes les 3s)
     const now = Date.now();
     if (now - lastAmiRequest < 3000) return toast("Patiente un peu avant de refaire une demande.", "#b93f3f");
     lastAmiRequest = now;
     btnAjouter.disabled = true;
     btnAjouter.textContent = "Ajout en cours...";
     try {
-      await envoyerDemandeAmi(pseudoAmi);
+      await window.envoyerDemandeAmi(pseudoAmi);
     } finally {
       btnAjouter.disabled = false;
       btnAjouter.textContent = "Ajouter un ami";
@@ -48,15 +50,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   detecterInvitationParLien();
 });
-
 async function rechargerAffichage() {
-  userProfile = await getUserDataCloud();
+  userProfile = await window.getUserDataCloud();
   await afficherListesAmis(userProfile);
 }
 
 async function afficherListesAmis(data) {
   const ulAmis = document.getElementById("liste-amis");
-  ulAmis.innerHTML = ""; // 🔁 nettoyage avant réinjection
   ulAmis.innerHTML = data.amis?.length
     ? data.amis.map(pseudo => `
       <li class="amis-li">
@@ -87,20 +87,17 @@ async function afficherListesAmis(data) {
       </li>`).join("")
     : "<li class='txt-empty'>Aucune demande envoyée.</li>";
 }
-
 window.envoyerDemandeAmi = async function(pseudoAmi) {
   if (!userPseudo || !pseudoAmi || pseudoAmi === userPseudo)
     return toast("Tu ne peux pas t'ajouter toi-même !", "#b93f3f");
-
-  const { data: ami, error } = await supabase
+  const { data: ami, error } = await window.supabase
     .from("users")
     .select("id, demandesRecues, amis, demandesEnvoyees")
     .ilike("pseudo", pseudoAmi)
     .maybeSingle();
-
   if (error || !ami) return toast("Aucun utilisateur trouvé.", "#b93f3f");
 
-  userProfile = await getUserDataCloud();
+  userProfile = await window.getUserDataCloud();
 
   if (userProfile.amis?.includes(pseudoAmi)) return toast("Vous êtes déjà amis !");
   if (userProfile.demandesEnvoyees?.includes(pseudoAmi)) return toast("Demande déjà envoyée.");
@@ -109,15 +106,15 @@ window.envoyerDemandeAmi = async function(pseudoAmi) {
   const newEnv = [...(userProfile.demandesEnvoyees || []), pseudoAmi];
   const newRec = [...(ami.demandesRecues || []), userPseudo];
 
-  await supabase.from("users").update({ demandesEnvoyees: newEnv }).ilike("pseudo", userPseudo);
-  await supabase.from("users").update({ demandesRecues: newRec }).eq("id", ami.id);
+  await window.supabase.from("users").update({ demandesEnvoyees: newEnv }).ilike("pseudo", userPseudo);
+  await window.supabase.from("users").update({ demandesRecues: newRec }).eq("id", ami.id);
 
   toast("Demande envoyée à " + pseudoAmi + " !");
   await rechargerAffichage();
 };
 
 window.accepterDemande = async function(pseudoAmi) {
-  const { data: ami } = await supabase
+  const { data: ami } = await window.supabase
     .from("users")
     .select("id, amis, demandesEnvoyees")
     .ilike("pseudo", pseudoAmi)
@@ -125,41 +122,39 @@ window.accepterDemande = async function(pseudoAmi) {
 
   if (!ami) return;
 
-  userProfile = await getUserDataCloud();
+  userProfile = await window.getUserDataCloud();
   const newAmis = [...(userProfile.amis || []), pseudoAmi];
   const newDemandes = (userProfile.demandesRecues || []).filter(p => p !== pseudoAmi);
 
-  await supabase.from("users").update({
+  await window.supabase.from("users").update({
     amis: newAmis,
     demandesRecues: newDemandes
   }).ilike("pseudo", userPseudo);
 
-  await supabase.from("users").update({
+  await window.supabase.from("users").update({
     amis: [...(ami.amis || []), userPseudo],
     demandesEnvoyees: (ami.demandesEnvoyees || []).filter(p => p !== userPseudo)
   }).eq("id", ami.id);
 
-  await incrementFriendsInvited();
+  if (window.incrementFriendsInvited) await window.incrementFriendsInvited();
   toast("Vous êtes maintenant amis !");
   await rechargerAffichage();
 };
 
 window.refuserDemande = async function(pseudoAmi) {
-  const { data: ami } = await supabase
+  const { data: ami } = await window.supabase
     .from("users")
     .select("id, demandesEnvoyees")
     .ilike("pseudo", pseudoAmi)
     .maybeSingle();
-
   if (!ami) return;
+  userProfile = await window.getUserDataCloud();
 
-  userProfile = await getUserDataCloud();
-
-  await supabase.from("users").update({
+  await window.supabase.from("users").update({
     demandesRecues: (userProfile.demandesRecues || []).filter(p => p !== pseudoAmi)
   }).ilike("pseudo", userPseudo);
 
-  await supabase.from("users").update({
+  await window.supabase.from("users").update({
     demandesEnvoyees: (ami.demandesEnvoyees || []).filter(p => p !== userPseudo)
   }).eq("id", ami.id);
 
@@ -167,33 +162,27 @@ window.refuserDemande = async function(pseudoAmi) {
   await rechargerAffichage();
 };
 
-// Nouvelle fonction pour demander confirmation
+// --- Suppression Ami popup + action
 window.demanderSuppressionAmi = function(pseudoAmi) {
   amiASupprimer = pseudoAmi;
   document.getElementById('popup-suppr-ami-nom').textContent = pseudoAmi;
   document.getElementById('popup-suppr-ami').classList.remove('hidden');
 };
-// Confirmation réelle
 window.confirmerSuppressionAmi = async function() {
   if (!amiASupprimer) return;
   const pseudoAmi = amiASupprimer;
   amiASupprimer = null;
-
-  const { data: ami } = await supabase
+  const { data: ami } = await window.supabase
     .from("users")
     .select("id, amis")
     .ilike("pseudo", pseudoAmi)
     .maybeSingle();
-
   if (!ami) return;
-
-  userProfile = await getUserDataCloud();
-
-  await supabase.from("users").update({
+  userProfile = await window.getUserDataCloud();
+  await window.supabase.from("users").update({
     amis: (userProfile.amis || []).filter(p => p !== pseudoAmi)
   }).ilike("pseudo", userPseudo);
-
-  await supabase.from("users").update({
+  await window.supabase.from("users").update({
     amis: (ami.amis || []).filter(p => p !== userPseudo)
   }).eq("id", ami.id);
 
@@ -201,12 +190,10 @@ window.confirmerSuppressionAmi = async function() {
   document.getElementById('popup-suppr-ami').classList.add('hidden');
   await rechargerAffichage();
 };
-// Annulation
 window.annulerSuppressionAmi = function() {
   amiASupprimer = null;
   document.getElementById('popup-suppr-ami').classList.add('hidden');
 };
-
 window.defierAmi = function(pseudoAmi) {
   window.location.href = `duel.html?ami=${pseudoAmi}`;
 };
@@ -217,8 +204,9 @@ function detecterInvitationParLien() {
   if (toAdd) {
     document.getElementById("pseudo-ami").value = toAdd;
     if (confirm(`Ajouter ${toAdd} comme ami ?`)) {
-      envoyerDemandeAmi(toAdd);
+      window.envoyerDemandeAmi(toAdd);
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }
 }
+</script>
