@@ -235,21 +235,18 @@ async function getDefisDuelFromSupabase(count = 3) {
 }
 window.getDefisDuelFromSupabase = getDefisDuelFromSupabase;
 
-// ========== FIND OR CREATE ROOM ==========
-// ... (reste inchangé) ...
-
-// ... (tout le reste de ton fichier reste identique)
-
-
-
-// ========== FIND OR CREATE ROOM ==========
+// ========== FIND OR CREATE ROOM ALÉATOIRE ==========
 async function findOrCreateRoom() {
   if (await checkAlreadyInDuel()) return;
   localStorage.removeItem("duel_random_room");
   localStorage.removeItem("duel_is_player1");
   const pseudo = await window.getPseudo();
 
-  for (let i = 0; i < 5; i++) {
+  const start = Date.now();
+  let foundRoom = false;
+
+  // On essaie de trouver une room existante pendant 30 secondes maximum
+  while (Date.now() - start < 30000) {
     let { data: rooms } = await window.supabase
       .from('duels')
       .select('*')
@@ -269,19 +266,47 @@ async function findOrCreateRoom() {
       setTimeout(() => {
         window.location.href = `duel_game.html?room=${room.id}`;
       }, 200);
-      return;
+      foundRoom = true;
+      break;
     }
-    await new Promise(r => setTimeout(r, 1200));
+    // Délai randomisé entre 800 et 1300 ms
+    const delay = 800 + Math.floor(Math.random() * 500);
+    await new Promise(r => setTimeout(r, delay));
   }
-  // Nouvelle room
+
+  if (foundRoom) return;
+
+  // SÉCURITÉ finale : on vérifie une dernière fois avant de créer
+  let { data: rooms } = await window.supabase
+    .from('duels')
+    .select('*')
+    .eq('status', 'waiting')
+    .neq('player1_pseudo', pseudo);
+  if (rooms && rooms.length > 0) {
+    const room = rooms[0];
+    const player2_id = await window.getUserId();
+    await window.supabase.from('duels').update({
+      player2_id,
+      player2_pseudo: pseudo,
+      status: 'playing',
+      starttime: Date.now()
+    }).eq('id', room.id);
+    localStorage.setItem("duel_random_room", room.id);
+    localStorage.setItem("duel_is_player1", "0");
+    setTimeout(() => {
+      window.location.href = `duel_game.html?room=${room.id}`;
+    }, 200);
+    return;
+  }
+
+  // Toujours aucune room, on crée la nôtre
   const player1Id = await window.getUserId();
-  const player1Pseudo = await window.getPseudo();
   const defis = await getDefisDuelFromSupabase(3);
 
   const roomObj = {
     player1_id: player1Id,
     player2_id: null,
-    player1_pseudo: player1Pseudo,
+    player1_pseudo: pseudo,
     player2_pseudo: null,
     score1: 0, score2: 0, status: 'waiting',
     createdat: Date.now(), defis, starttime: null, photosa: {}, photosb: {}, type: 'random'
@@ -300,6 +325,54 @@ async function findOrCreateRoom() {
 }
 window.findOrCreateRoom = findOrCreateRoom;
 
+// ========== FONCTION CREATION DUEL PRIVE/PREMIUM ==========
+// Appelle cette fonction pour créer un duel privé
+window.creerDuelPrive = async function(amiPseudo) {
+  const monPseudo = await window.getPseudo();
+  const defis = await getDefisDuelFromSupabase(3);
+  const roomObj = {
+    player1_pseudo: monPseudo,
+    player2_pseudo: amiPseudo,
+    score1: 0, score2: 0,
+    status: 'playing',
+    createdat: Date.now(),
+    defis,
+    starttime: Date.now(),
+    photosa: {}, photosb: {},
+    type: 'prive'
+  };
+  const { data, error } = await window.supabase.from('duels').insert([roomObj]).select();
+  if (error) {
+    alert("Erreur création duel privé : " + error.message);
+    return;
+  }
+  window.location.href = `duel_game.html?room=${data[0].id}`;
+}
+
+// Pour le premium, même logique (type: 'premium')
+window.creerDuelPremium = async function(amiPseudo) {
+  const monPseudo = await window.getPseudo();
+  const defis = await getDefisDuelFromSupabase(3);
+  const roomObj = {
+    player1_pseudo: monPseudo,
+    player2_pseudo: amiPseudo,
+    score1: 0, score2: 0,
+    status: 'playing',
+    createdat: Date.now(),
+    defis,
+    starttime: Date.now(),
+    photosa: {}, photosb: {},
+    type: 'premium'
+  };
+  const { data, error } = await window.supabase.from('duels').insert([roomObj]).select();
+  if (error) {
+    alert("Erreur création duel premium : " + error.message);
+    return;
+  }
+  window.location.href = `duel_game.html?room=${data[0].id}`;
+}
+
+// ========== GESTION ROOM & DUEL ==========
 async function checkAlreadyInDuel() {
   const pseudo = await window.getPseudo();
   const { data: duelsEnCours, error } = await window.supabase
@@ -343,6 +416,9 @@ function waitRoom(roomId) {
   poll();
 }
 window.waitRoom = waitRoom;
+
+// ... (le reste inchangé : initDuelGame, savePhotoDuel, etc.)
+
 // ========== LOGIQUE DU JEU : INIT, SYNC, RENDER ==========
 async function initDuelGame() {
   if (!(path.includes("duel_game.html") && roomId)) return;
@@ -798,3 +874,11 @@ window.afficherPhotoDuel = async function(idx) {
   }
   window.agrandirPhoto(photo.url, photo.cadre || "polaroid_01");
 };
+
+// ... (tout le reste inchangé : popup, gestion jeton, choix cadre, etc.)
+
+// ========== INIT AUTO DES PAGES ==========
+if (window.location.pathname.includes("duel_game.html")) {
+  initDuelGame();
+}
+document.addEventListener("DOMContentLoaded", afficherSolde);
