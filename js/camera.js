@@ -47,12 +47,20 @@ window.uploadPhotoConcoursWebp = async function(dataUrl, concoursId, userId) {
   const blob = new Blob([u8arr], { type: mime });
   const fileName = `${userId}_${Date.now()}.webp`;
 
+  // === AJOUTE CE LOG JUSTE ICI ===
+  console.log("Tentative d'upload dans photoconcours : fileName =", fileName, "blob size =", blob.size);
+
   const { data: uploadData, error: uploadError } = await window.supabase
     .storage
     .from('photoconcours')
     .upload(fileName, blob, { contentType: 'image/webp' });
 
-  if (uploadError) throw uploadError;
+  // === ET CE LOG ICI ===
+  if (uploadError) {
+    console.error("Erreur Supabase upload:", uploadError);
+    throw uploadError;
+  }
+
 
   const { data: publicUrlData } = window.supabase
     .storage
