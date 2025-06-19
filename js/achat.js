@@ -1,57 +1,87 @@
 import { getUserId, loadUserData } from './userData.js';
-import { Purchases } from 'capacitor-plugin-purchases';
+
+// Si tu as un objet PIECE_PACKS dans un autre fichier, importe-le aussi
 
 const API_URL = 'https://vfindez-api.vercel.app/api/validate-receipt';
 
-export async function validerAchat(achat) {
-  await loadUserData();
-  const userId = getUserId();
-  if (!userId) {
-    alert("Utilisateur non connecté.");
+// Appelle cette fonction APRES que deviceready a été déclenché !
+function initAchats() {
+  if (!window.store) {
+    alert("Le plugin achat n'est pas chargé !");
     return;
   }
 
-  let quantite = 0;
-  if (achat.startsWith("pack_")) {
-    const pack = PIECE_PACKS[achat];
-    if (pack) quantite = pack.base + pack.bonus;
-  }
+  // Déclare tous tes produits ici
+  const PRODUCTS = [
+    { id: "premium", type: window.store.NON_CONSUMABLE },
+    // { id: "pack_500", type: window.store.CONSUMABLE }, // ex pour des pièces
+    // { id: "pack_2000", type: window.store.CONSUMABLE },
+  ];
 
-  try {
-    const { purchaseToken, receiptData, productIdentifier } = await Purchases.purchaseProduct({
-      productIdentifier: achat === "premium" ? "premium" : achat
+  PRODUCTS.forEach(prod => window.store.register(prod));
+
+  // Callback général pour chaque produit approuvé
+  PRODUCTS.forEach(prod => {
+    window.store.when(prod.id).approved(async function(order) {
+      await loadUserData();
+      const userId = getUserId();
+      let quantite = 0;
+      if (prod.id.startsWith("pack_") && typeof PIECE_PACKS !== 'undefined') {
+        const pack = PIECE_PACKS[prod.id];
+        if (pack) quantite = pack.base + pack.bonus;
+      }
+
+      // Prépare reçu selon la plateforme
+      let receipt = order ? order.transaction && order.transaction.id ? order.transaction.id : "" : "";
+      let plateforme = window.device && window.device.platform && window.device.platform.toLowerCase().includes('android') ? "android" : "ios";
+
+      // Envoi au backend
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId,
+            achat: prod.id,
+            quantite,
+            receipt,
+            plateforme
+          })
+        });
+        const result = await res.json();
+        if (result.success) {
+          alert(result.message || "Achat validé !");
+        } else {
+          alert("Erreur : " + (result.error || "inconnue"));
+        }
+      } catch (err) {
+        alert("Erreur lors de la validation serveur : " + (err.message || err));
+      }
+
+      order.finish();
     });
+  });
 
-    // ⬇️ Format du reçu + détection plateforme
-    let receipt = "";
-    let plateforme = "";
+  // Gestion erreur achat
+  window.store.error(function(err) {
+    alert("Erreur achat : " + err.message);
+  });
 
-    if (purchaseToken) {
-      receipt = `${purchaseToken}||${productIdentifier}`;
-      plateforme = "android";
-    } else if (receiptData) {
-      receipt = receiptData;
-      plateforme = "ios";
-    } else {
-      alert("Aucun reçu détecté.");
+  window.store.refresh();
+
+  // Fonction globale à appeler selon le produit voulu
+  window.validerAchat = function(achat) {
+    // Vérifie d'abord si le produit existe
+    const prod = PRODUCTS.find(p => p.id === achat);
+    if (!prod) {
+      alert("Produit inconnu : " + achat);
       return;
     }
-
-    // ✅ Envoi à l'API
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, achat, quantite, receipt, plateforme })
-    });
-
-    const result = await res.json();
-    if (result.success) {
-      alert(result.message || "Achat validé !");
-    } else {
-      alert("Erreur : " + (result.error || "inconnue"));
-    }
-
-  } catch (err) {
-    alert("Erreur pendant l'achat : " + (err.message || err));
-  }
+    window.store.order(achat);
+  };
 }
+
+// Démarre le setup achats APRES deviceready !
+document.addEventListener('deviceready', function() {
+  initAchats();
+});

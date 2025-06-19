@@ -39,7 +39,7 @@
 
   <!-- BOUTON PREMIUM TOUTE LARGEUR CENTRÉ -->
   <div class="premium-btn-row">
-    <button class="btn-boutique-pill btn-boutique-fullwidth" onclick="activerPremium()">
+    <button class="btn-boutique-pill btn-boutique-fullwidth" onclick="validerAchat('premium')">
       Passer Premium
     </button>
   </div>
@@ -65,48 +65,48 @@
     <p>&copy; 2025 VFind</p>
   </footer>
 
-<!-- ✅ Popup : acheter des jetons (NOUVEAU STYLE HARMONISÉ) -->
-<div id="popup-achat-jeton" class="hidden">
-  <div class="popup-inner popup-premium-pro">
-    <div class="premium-badge">JETONS</div>
-    <div class="popup-premium-title">Obtenir 3 jetons</div>
-    <div class="popup-premium-price" style="margin-bottom: 18px;">Choisis une méthode</div>
-    <div class="premium-list-pro" style="margin-bottom:18px;">
-      <button class="btn-premium-pro" onclick="acheterJetonsAvecPieces()">💸 Payer 100 pièces</button>
-      <button class="btn-premium-pro" onclick="acheterJetonsAvecPub()">📺 Voir une pub</button>
+  <!-- ✅ Popup : acheter des jetons (NOUVEAU STYLE HARMONISÉ) -->
+  <div id="popup-achat-jeton" class="hidden">
+    <div class="popup-inner popup-premium-pro">
+      <div class="premium-badge">JETONS</div>
+      <div class="popup-premium-title">Obtenir 3 jetons</div>
+      <div class="popup-premium-price" style="margin-bottom: 18px;">Choisis une méthode</div>
+      <div class="premium-list-pro" style="margin-bottom:18px;">
+        <button class="btn-premium-pro" onclick="acheterJetonsAvecPieces()">💸 Payer 100 pièces</button>
+        <button class="btn-premium-pro" onclick="acheterJetonsAvecPub()">📺 Voir une pub</button>
+      </div>
+      <button class="btn-annuler-premium-pro" onclick="fermerPopupJetonBoutique()">
+        Annuler
+      </button>
     </div>
-   <button class="btn-annuler-premium-pro" onclick="fermerPopupJetonBoutique()">
-      Annuler
-    </button>
   </div>
-</div>
 
-<!-- Popup Premium (PRO ULTRA) -->
-<div id="popup-premium" class="hidden">
-  <div class="popup-inner popup-premium-pro">
-    <div class="premium-badge">PREMIUM</div>
-    <div class="popup-premium-title">Passe à Premium</div>
-    <div class="popup-premium-price">2,99 €<span class="premium-prix-mini">/mois</span></div>
-    <ul class="premium-list-pro">
-      <li><b>Pièces x2</b> sur chaque défi validé</li>
-      <li><b>Cadres exclusifs</b> réservés</li>
-      <li><b>800 pièces</b> offertes chaque mois</li>
-      <li><b>Impose un défi</b> parmi 10 choix</li>
-      <li><b>ID en or</b> lors des duels</li>
-    </ul>
-    <button class="btn-premium-pro" onclick="acheterPremium()">
-      Devenir Premium
-    </button>
-    <button class="btn-annuler-premium-pro" onclick="fermerPopupPremium()">
-      Annuler
-    </button>
+  <!-- Popup Premium (PRO ULTRA) -->
+  <div id="popup-premium" class="hidden">
+    <div class="popup-inner popup-premium-pro">
+      <div class="premium-badge">PREMIUM</div>
+      <div class="popup-premium-title">Passe à Premium</div>
+      <div class="popup-premium-price">2,99 €<span class="premium-prix-mini">/mois</span></div>
+      <ul class="premium-list-pro">
+        <li><b>Pièces x2</b> sur chaque défi validé</li>
+        <li><b>Cadres exclusifs</b> réservés</li>
+        <li><b>800 pièces</b> offertes chaque mois</li>
+        <li><b>Impose un défi</b> parmi 10 choix</li>
+        <li><b>ID en or</b> lors des duels</li>
+      </ul>
+      <button class="btn-premium-pro" onclick="validerAchat('premium')">
+        Devenir Premium
+      </button>
+      <button class="btn-annuler-premium-pro" onclick="fermerPopupPremium()">
+        Annuler
+      </button>
+    </div>
   </div>
-</div>
 
   <!-- Scripts -->
-  <!-- Supabase version : plus de firebase.js -->
   <script type="module" src="js/userData.js"></script>
   <script type="module" src="js/pub.js"></script>
   <script type="module" src="js/boutique.js"></script>
+  <script src="js/achat.js"></script>
 </body>
 </html>

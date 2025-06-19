@@ -646,3 +646,13 @@ export function getCadreUrl(id) {
   return localStorage.getItem(`cadre_${id}`) ||
     `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${id}.webp`;
 }
+// Permet d'obtenir la couleur personnalisée de n'importe quel pseudo
+export async function getUserByPseudo(pseudo) {
+  if (!pseudo) return null;
+  const { data, error } = await supabase
+    .from('users')
+    .select('pseudo, premium, id_color')
+    .eq('pseudo', pseudo)
+    .single();
+  return data || null;
+}

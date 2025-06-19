@@ -477,6 +477,7 @@ export async function initDuelGame() {
       })
       .subscribe();
   }
+
   async function updateDuelUI() {
     if (!roomData) return;
     const pseudo = await getCurrentUser();
@@ -487,12 +488,27 @@ export async function initDuelGame() {
 
     if ($("nom-adversaire")) $("nom-adversaire").textContent = headerLabel;
     if ($("pseudo-moi")) $("pseudo-moi").textContent = myID ? myID : "Moi";
-    if ($("pseudo-adv")) $("pseudo-adv").textContent = advID ? advID : "Adversaire";
+
+    // Couleur personnalisée SEULEMENT
+    if ($("pseudo-adv")) {
+      if (advID) {
+        const { data: advUser } = await supabase
+          .from('users')
+          .select('id_color')
+          .eq('pseudo', advID)
+          .single();
+        let color = (advUser && advUser.id_color) ? advUser.id_color : "white";
+        $("pseudo-adv").innerHTML = `<span style="color:${color};font-weight:bold;">${advID}</span>`;
+      } else {
+        $("pseudo-adv").textContent = "Adversaire";
+      }
+    }
     if (roomData.starttime && $("timer")) startGlobalTimer(roomData.starttime);
     else if ($("timer")) $("timer").textContent = "--:--:--";
 
     renderDefis({ myID, advID });
   }
+
   function startGlobalTimer(startTime) {
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
