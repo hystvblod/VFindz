@@ -1,10 +1,7 @@
-// getUserId() et loadUserData() sont déjà sur window, donc tu peux faire :
-await window.loadUserData();
-const userId = window.getUserId();
-
+// --- AUCUN await global ici ! ---
+// getUserId() et loadUserData() sont déjà sur window via userData.js
 
 // Si tu as un objet PIECE_PACKS dans un autre fichier, importe-le aussi
-
 const API_URL = 'https://vfindez-api.vercel.app/api/validate-receipt';
 
 // Appelle cette fonction APRES que deviceready a été déclenché !
@@ -26,8 +23,9 @@ function initAchats() {
   // Callback général pour chaque produit approuvé
   PRODUCTS.forEach(prod => {
     window.store.when(prod.id).approved(async function(order) {
-      await loadUserData();
-      const userId = getUserId();
+      // Utilise window.loadUserData et window.getUserId pour être certain d'utiliser le cache correct
+      await window.loadUserData();
+      const userId = window.getUserId();
       let quantite = 0;
       if (prod.id.startsWith("pack_") && typeof PIECE_PACKS !== 'undefined') {
         const pack = PIECE_PACKS[prod.id];
@@ -35,8 +33,8 @@ function initAchats() {
       }
 
       // Prépare reçu selon la plateforme
-      let receipt = order ? order.transaction && order.transaction.id ? order.transaction.id : "" : "";
-      let plateforme = window.device && window.device.platform && window.device.platform.toLowerCase().includes('android') ? "android" : "ios";
+      let receipt = order?.transaction?.id || "";
+      let plateforme = (window.device?.platform || "").toLowerCase().includes('android') ? "android" : "ios";
 
       // Envoi au backend
       try {

@@ -37,20 +37,23 @@
     <p>© 2025 VFindz</p>
   </footer>
 
-  <!-- Scripts -->
-  <script type="module">
-    import {
-      getCadresPossedes,
-      getCadreSelectionne,
-      setCadreSelectionne
-    } from './js/userData.js';
+  <!-- 1. Charge Supabase (AVANT tout !) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <!-- 2. Charge toutes tes fonctions utilisateurs, met tout sur window (AUCUN import/export dans userData.js !) -->
+  <script src="js/userData.js"></script>
 
+  <!-- 3. Script principal (plus aucun import, tout via window) -->
+  <script>
+    // Récupère l'URL du cadre (utilise la fonction globale window.getCadreUrl)
     function getCadreUrl(id) {
+      if (typeof window.getCadreUrl === "function") return window.getCadreUrl(id);
+      // fallback au cas où
       return localStorage.getItem(`cadre_${id}`) ||
              `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${id}.webp`;
     }
 
-    function zoomCadre(id) {
+    // Pop-up zoom sur le cadre
+    window.zoomCadre = function(id) {
       const popup = document.createElement("div");
       popup.className = "popup show";
       popup.innerHTML = `
@@ -63,16 +66,33 @@
         </div>
       `;
       document.body.appendChild(popup);
-    }
+    };
 
-    async function utiliserCadre(id) {
-      await setCadreSelectionne(id);
-      alert("✅ Cadre sélectionné !");
-      await afficherCadres();
-    }
+    // Sélectionner un cadre
+    window.utiliserCadre = async function(id) {
+      if (typeof window.setCadreSelectionne === "function") {
+        await window.setCadreSelectionne(id);
+        alert("✅ Cadre sélectionné !");
+        await afficherCadres();
+      } else {
+        alert("Erreur : setCadreSelectionne non chargé !");
+      }
+    };
 
+    // Afficher tous les cadres possédés
     async function afficherCadres() {
       const container = document.getElementById("cadres-list");
+      if (!container) return;
+
+      // Utilise les fonctions globales (chargées dans userData.js)
+      const getCadresPossedes = window.getCadresPossedes;
+      const getCadreSelectionne = window.getCadreSelectionne;
+
+      if (!getCadresPossedes || !getCadreSelectionne) {
+        container.innerHTML = "<p>Erreur : fonctions non chargées.</p>";
+        return;
+      }
+
       const cadresPossedes = await getCadresPossedes();
       const cadreActif = await getCadreSelectionne();
 
@@ -99,18 +119,16 @@
       });
     }
 
-    // Initialisation
+    // Initialisation : s'assurer que userData.js est bien chargé
     document.addEventListener("DOMContentLoaded", async () => {
-      window.zoomCadre = zoomCadre;
-      window.utiliserCadre = utiliserCadre;
+      // attendre que les fonctions globales soient là
+      let tries = 0;
+      while ((!window.getCadresPossedes || !window.getCadreSelectionne) && tries < 50) {
+        await new Promise(res => setTimeout(res, 100));
+        tries++;
+      }
       await afficherCadres();
     });
   </script>
-  <!-- 1. Charge Supabase -->
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-<!-- 2. Charge ton init.js (où tu fais createClient et window.supabaseClient) -->
-<script src="js/userData.js"></script>
-
 </body>
 </html>
