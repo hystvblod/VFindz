@@ -97,6 +97,7 @@ function showFeedback(text) {
 async function acheterCadreBoutique(id, prix) {
   await window.loadUserData(true); // force reload données utilisateur !
   const { data, error } = await window.supabase.rpc('secure_remove_points', { nb: prix });
+  console.log("DEBUG ACHAT", { data, error });
   if (error || !data || data.success !== true) {
     alert("❌ Pas assez de pièces ou erreur !");
     return;
