@@ -12,24 +12,20 @@
       align-items: center;
       margin: 2.5rem 0;
     }
-.spin-logo {
-  width: 120px;      /* Augmente la taille (mets plus si tu veux) */
-  height: 120px;
-  margin-bottom: 1rem;
-  animation: pulse 1.1s infinite cubic-bezier(.4,0,.6,1);
-  /* SUPPRIME l’aura jaune : */
-  filter: none;
-  border-radius: 50%;
-}
-
-@keyframes pulse {
-  0%   { transform: scale(1);    opacity: 0.9; }
-  40%  { transform: scale(1.13); opacity: 1;   }
-  60%  { transform: scale(1.06); opacity: 1;   }
-  100% { transform: scale(1);    opacity: 0.9; }
-}
-
-
+    .spin-logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 1rem;
+      animation: pulse 1.1s infinite cubic-bezier(.4,0,.6,1);
+      filter: none;
+      border-radius: 50%;
+    }
+    @keyframes pulse {
+      0%   { transform: scale(1);    opacity: 0.9; }
+      40%  { transform: scale(1.13); opacity: 1;   }
+      60%  { transform: scale(1.06); opacity: 1;   }
+      100% { transform: scale(1);    opacity: 0.9; }
+    }
     .searching-text {
       font-size: 1.2rem;
       color: #3682e3;
@@ -88,8 +84,10 @@
   <footer>
     <p>&copy; 2025 VFindz</p>
   </footer>
-  <!-- SUPABASE UNIQUEMENT -->
-  <script type="module" src="js/userData.js"></script>
-  <script type="module" src="js/duel.js"></script>
+
+  <!-- SCRIPTS GLOBAUX : PAS de /+esm, PAS de type="module" -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="js/userData.js"></script>
+  <script src="js/duel.js"></script>
 </body>
 </html>

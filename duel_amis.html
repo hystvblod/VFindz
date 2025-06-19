@@ -166,19 +166,28 @@
     <p>&copy; 2025 VFindz</p>
   </footer>
 
-  <!-- Script pro mis à jour (logique + rendu moderne, ZÉRO bouton global) -->
-  <script type="module">
-    import { supabase, getPseudo, loadUserData, updateUserData } from "./js/userData.js";
+  <!-- 1. Supabase global (PAS de +esm, PAS de type="module") -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <!-- 2. Fonctions utilisateurs (tout doit mettre sur window, ex: window.getPseudo) -->
+  <script src="js/userData.js"></script>
+  <!-- 3. Script logique DUEL PRIVE, version globale -->
+  <script>
+    // INIT Supabase si pas déjà fait dans userData.js
+    if (!window.supabase) {
+      window.supabase = supabase.createClient(
+        'https://swmdepiukfginzhbeccz.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI' // << METS TA CLÉ PUBLIC ICI !!!
+      );
+    }
 
     let pseudoPublic = null;
     let profil = null;
 
-    // Charge le profil utilisateur
+    // -- Charge le profil utilisateur
     async function loadProfil() {
-      await loadUserData();
-      pseudoPublic = await getPseudo();
-      // Récupère l'utilisateur depuis Supabase
-      const { data, error } = await supabase.from('users').select('*').eq('pseudo', pseudoPublic).single();
+      await window.loadUserData();
+      pseudoPublic = await window.getPseudo();
+      const { data, error } = await window.supabase.from('users').select('*').eq('pseudo', pseudoPublic).single();
       profil = data;
     }
 
@@ -188,9 +197,8 @@
       afficherDemandesDuel();
     });
 
-    // RENDU MODERNE – Amis = cards + bouton duel intégré
     async function afficherAmis() {
-      const amis = profil.amis || [];
+      const amis = profil && profil.amis ? profil.amis : [];
       const ul = document.getElementById("liste-amis");
       ul.innerHTML = "";
       if (!amis.length) {
@@ -209,12 +217,11 @@
       });
     }
 
-    // RENDU MODERNE – Demandes reçues & envoyées
     async function afficherDemandesDuel() {
-      // ----- DemandES RECUES -----
+      // DemandES RECUES
       const ulRecue = document.getElementById("demandes-recue");
       ulRecue.innerHTML = "";
-      const recues = profil.demandesDuelRecues || [];
+      const recues = (profil && profil.demandesDuelRecues) ? profil.demandesDuelRecues : [];
       if (!recues.length) ulRecue.innerHTML = "<div class='aucune-demande'>Aucune demande reçue.</div>";
       recues.forEach(ami => {
         const card = document.createElement("div");
@@ -231,10 +238,10 @@
         ulRecue.appendChild(card);
       });
 
-      // ----- DemandES ENVOYÉES -----
+      // DemandES ENVOYÉES
       const ulEnv = document.getElementById("demandes-envoyees");
       ulEnv.innerHTML = "";
-      const envoyees = profil.demandesDuelEnvoyees || [];
+      const envoyees = (profil && profil.demandesDuelEnvoyees) ? profil.demandesDuelEnvoyees : [];
       if (!envoyees.length) ulEnv.innerHTML = "<div class='aucune-demande'>Aucune demande envoyée.</div>";
       envoyees.forEach(ami => {
         const card = document.createElement("div");
@@ -248,24 +255,21 @@
     }
 
     async function inviterDuel(amiPseudo) {
-      const { data: ami } = await supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
+      const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
       if (!ami) {
         alert("Ami introuvable.");
         return;
       }
-      // Ajoute pseudo à la liste des demandes reçues de l'ami
       const demandesRecues = new Set([...(ami.demandesDuelRecues || []), pseudoPublic]);
-      await supabase.from("users").update({
+      await window.supabase.from("users").update({
         demandesDuelRecues: Array.from(demandesRecues)
       }).eq("pseudo", amiPseudo);
 
-      // Ajoute l'ami à la liste des demandes envoyées de l'utilisateur
       const demandesEnvoyees = new Set([...(profil.demandesDuelEnvoyees || []), amiPseudo]);
-      await supabase.from("users").update({
+      await window.supabase.from("users").update({
         demandesDuelEnvoyees: Array.from(demandesEnvoyees)
       }).eq("pseudo", pseudoPublic);
 
-      // Feedback UI immédiat (optionnel : toast/pro)
       await loadProfil();
       afficherAmis();
       afficherDemandesDuel();
@@ -273,7 +277,7 @@
 
     async function accepterDuel(amiPseudo) {
       const defis = await getRandomDefis();
-      const { data, error } = await supabase.from('duels').insert([{
+      const { data, error } = await window.supabase.from('duels').insert([{
         player1: amiPseudo,
         player2: pseudoPublic,
         status: 'playing',
@@ -284,13 +288,12 @@
         photosB: {}
       }]).select();
 
-      // Retire la demande des deux côtés
-      await supabase.from("users").update({
+      await window.supabase.from("users").update({
         demandesDuelRecues: (profil.demandesDuelRecues || []).filter(p => p !== amiPseudo)
       }).eq("pseudo", pseudoPublic);
 
-      const { data: ami } = await supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
-      await supabase.from("users").update({
+      const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
+      await window.supabase.from("users").update({
         demandesDuelEnvoyees: (ami.demandesDuelEnvoyees || []).filter(p => p !== pseudoPublic)
       }).eq("pseudo", amiPseudo);
 
@@ -303,12 +306,12 @@
     }
 
     async function refuserDuel(amiPseudo) {
-      await supabase.from("users").update({
+      await window.supabase.from("users").update({
         demandesDuelRecues: (profil.demandesDuelRecues || []).filter(p => p !== amiPseudo)
       }).eq("pseudo", pseudoPublic);
 
-      const { data: ami } = await supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
-      await supabase.from("users").update({
+      const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
+      await window.supabase.from("users").update({
         demandesDuelEnvoyees: (ami.demandesDuelEnvoyees || []).filter(p => p !== pseudoPublic)
       }).eq("pseudo", amiPseudo);
 
@@ -316,9 +319,8 @@
       afficherDemandesDuel();
     }
 
-    // Récupérer aléatoirement 3 défis (logique inchangée)
     async function getRandomDefis(count = 3) {
-      const { data, error } = await supabase
+      const { data, error } = await window.supabase
         .from('defis')
         .select('intitule')
         .eq('actif', true);

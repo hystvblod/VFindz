@@ -1,5 +1,6 @@
 // onboardingSlides.js
-export function initOnboardingSlides() {
+
+window.initOnboardingSlides = function() {
   if (!localStorage.getItem("onboardingSeen")) {
     document.getElementById("onboarding-modal").style.display = "flex";
     let slides = document.querySelectorAll(".onboarding-slide");
@@ -25,11 +26,11 @@ export function initOnboardingSlides() {
       localStorage.setItem("onboardingSeen", "yes");
     };
 
-    // (optionnel) clic sur les dots pour naviguer
+    // clic sur les dots pour naviguer
     dots.forEach((dot, i) => {
       dot.onclick = () => { curr = i; showSlide(curr); };
     });
 
     showSlide(curr);
   }
-}
+};

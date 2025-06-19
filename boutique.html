@@ -39,7 +39,7 @@
 
   <!-- BOUTON PREMIUM TOUTE LARGEUR CENTRÉ -->
   <div class="premium-btn-row">
-    <button class="btn-boutique-pill btn-boutique-fullwidth" onclick="validerAchat('premium')">
+    <button class="btn-boutique-pill btn-boutique-fullwidth" onclick="activerPremium()">
       Passer Premium
     </button>
   </div>
@@ -94,7 +94,7 @@
         <li><b>Impose un défi</b> parmi 10 choix</li>
         <li><b>ID en or</b> lors des duels</li>
       </ul>
-      <button class="btn-premium-pro" onclick="validerAchat('premium')">
+      <button class="btn-premium-pro" onclick="acheterPremium()">
         Devenir Premium
       </button>
       <button class="btn-annuler-premium-pro" onclick="fermerPopupPremium()">
@@ -103,10 +103,11 @@
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script type="module" src="js/userData.js"></script>
-  <script type="module" src="js/pub.js"></script>
-  <script type="module" src="js/boutique.js"></script>
+  <!-- Scripts : Charger DANS CET ORDRE ! -->
+  <script src="js/userData.js"></script>
+  <script src="js/pub.js"></script>
+  <script src="js/boutique.js"></script>
   <script src="js/achat.js"></script>
+
 </body>
 </html>

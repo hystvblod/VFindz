@@ -1,5 +1,6 @@
-import { supabase } from './userData.js';
-import { ouvrirCameraPour } from "./camera.js";
+// concours.js
+
+// Nécessite que userData.js et camera.js soient chargés avant ce fichier !
 
 const URL_CONCOURS = "https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/concours//concours.json";
 const PAGE_SIZE = 30;
@@ -15,7 +16,7 @@ function getTop6CacheKey() {
 // ----------- TOP 6 STOCKAGE LOCAL -----------
 async function fetchAndCacheTop6() {
   const concoursId = getConcoursId();
-  const { data, error } = await supabase
+  const { data, error } = await window.supabase
     .from('photosconcours')
     .select('id, votes_total')
     .eq('concours_id', concoursId);
@@ -43,7 +44,7 @@ async function getVotesConcoursFromCacheOrDB(concoursId, force = false) {
   if (!force && cacheData && cacheTime && now - cacheTime < VOTES_CONCOURS_CACHE_DURATION) {
     return JSON.parse(cacheData);
   }
-  const { data, error } = await supabase
+  const { data, error } = await window.supabase
     .from('photosconcours')
     .select('id, votes_total')
     .eq('concours_id', concoursId);
@@ -134,14 +135,14 @@ function getConcoursId() {
 // ----------- PHOTOS CONCOURS, TRI ET PAGINATION -----------
 async function getPhotosAPaginer() {
   const concoursId = getConcoursId();
-  const { data: allPhotos } = await supabase
+  const { data: allPhotos } = await window.supabase
     .from('photosconcours')
     .select('*')
     .eq('concours_id', concoursId);
 
   const top6Ids = getCachedTop6();
 
-  const user = await supabase.auth.getUser();
+  const user = await window.supabase.auth.getUser();
   const userName = user.data?.user?.user_metadata?.pseudo || user.data?.user?.id;
   const photoJoueur = allPhotos.find(p => p.user === userName);
 
@@ -186,7 +187,7 @@ function filtrerPhotosParPseudo(photos, search) {
 
 let currentPage = 1;
 
-export async function afficherGalerieConcours() {
+window.afficherGalerieConcours = async function() {
   const galerie = document.getElementById("galerie-concours");
   galerie.innerHTML = "<div style='text-align:center;color:#888;'>Chargement...</div>";
 
@@ -247,9 +248,9 @@ export async function afficherGalerieConcours() {
 
   // Pagination events
   if (document.getElementById('btn-prev'))
-    document.getElementById('btn-prev').onclick = () => { currentPage--; afficherGalerieConcours(); }
+    document.getElementById('btn-prev').onclick = () => { currentPage--; window.afficherGalerieConcours(); }
   if (document.getElementById('btn-next'))
-    document.getElementById('btn-next').onclick = () => { currentPage++; afficherGalerieConcours(); }
+    document.getElementById('btn-next').onclick = () => { currentPage++; window.afficherGalerieConcours(); }
 
   // Events cœur et zoom
   Array.from(document.querySelectorAll('.btn-coeur-concours')).forEach(btn => {
@@ -266,7 +267,7 @@ export async function afficherGalerieConcours() {
       if (photo) ouvrirPopupZoom(photo);
     };
   });
-}
+};
 
 // ----------- GÉNÈRE UNE CARTE HTML (top6 ou autre) -----------
 function creerCartePhotoHTML(photo, isTop, nbVotes) {
@@ -293,14 +294,14 @@ function creerCartePhotoHTML(photo, isTop, nbVotes) {
 async function votePourPhoto(photoId) {
   const dejaVotees = getVotedPhotoIdsToday();
   if (dejaVotees.includes(photoId)) return;
-  const { data, error } = await supabase
+  const { data, error } = await window.supabase
     .from('photosconcours')
     .select('votes_total')
     .eq('id', photoId)
     .single();
   if (!data) return;
   let votesTotal = (data.votes_total || 0) + 1;
-  let { error: errUpdate } = await supabase
+  let { error: errUpdate } = await window.supabase
     .from('photosconcours')
     .update({ votes_total: votesTotal })
     .eq('id', photoId);
@@ -310,7 +311,7 @@ async function votePourPhoto(photoId) {
   // ➡️ On force le rechargement des votes (refresh cache)
   await getVotesConcoursFromCacheOrDB(getConcoursId(), true);
 
-  afficherGalerieConcours();
+  window.afficherGalerieConcours();
 }
 
 // ----------- POPUP ZOOM -----------
@@ -340,17 +341,17 @@ function ouvrirPopupZoom(photo) {
 }
 
 // ----------- PARTICIPATION PHOTO -----------
-export async function ajouterPhotoConcours() {
+window.ajouterPhotoConcours = async function() {
   const concoursId = getConcoursId();
-  const user = await supabase.auth.getUser();
+  const user = await window.supabase.auth.getUser();
   const userId = user.data?.user?.id || "Inconnu";
   const userName = user.data?.user?.user_metadata?.pseudo || userId;
 
   // Ouvre la caméra et upload automatiquement avec le bon mode
-  const photo_url = await ouvrirCameraPour(concoursId, "concours");
+  const photo_url = await window.ouvrirCameraPour(concoursId, "concours");
   if (!photo_url) return;
   try {
-    let { error } = await supabase
+    let { error } = await window.supabase
       .from('photosconcours')
       .insert([
         {
@@ -385,8 +386,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const participerBtn = document.getElementById("participerBtn");
   if (participerBtn) {
     participerBtn.addEventListener("click", async () => {
-      await ajouterPhotoConcours();
-      afficherGalerieConcours();
+      await window.ajouterPhotoConcours();
+      window.afficherGalerieConcours();
     });
   }
 
@@ -395,9 +396,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (inputSearch) {
     inputSearch.addEventListener('input', () => {
       currentPage = 1;
-      afficherGalerieConcours();
+      window.afficherGalerieConcours();
     });
   }
 
-  await afficherGalerieConcours();
+  await window.afficherGalerieConcours();
 });

@@ -1,48 +1,57 @@
-import { isPremium, addPoints, getPoints } from './userData.js';
+// pub.js
 
 const SDK_KEY = "TA_CLÉ_APPLOVIN_SDK_ICI"; // 👉 à remplacer par ta vraie clé dans le dashboard AppLovin
 const AD_UNIT_REWARDED = "ID_REWARDED_ICI"; // 👉 à remplacer par ton ad unit rewarded
 const AD_UNIT_INTERSTITIAL = "ID_INTERSTITIAL_ICI"; // 👉 à remplacer par ton ad unit interstitielle
 
-// Initialisation AppLovin au lancement de l'app
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    await Capacitor.Plugins.AppLovinPlugin.initialize({ sdkKey: SDK_KEY });
-    await Capacitor.Plugins.AppLovinPlugin.loadRewardedAd(AD_UNIT_REWARDED);
-    await Capacitor.Plugins.AppLovinPlugin.loadInterstitialAd(AD_UNIT_INTERSTITIAL);
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AppLovinPlugin) {
+      await window.Capacitor.Plugins.AppLovinPlugin.initialize({ sdkKey: SDK_KEY });
+      await window.Capacitor.Plugins.AppLovinPlugin.loadRewardedAd(AD_UNIT_REWARDED);
+      await window.Capacitor.Plugins.AppLovinPlugin.loadInterstitialAd(AD_UNIT_INTERSTITIAL);
+    }
   } catch (error) {
     console.warn("Erreur initialisation AppLovin :", error);
   }
 });
 
-// Fonction principale pour afficher une pub selon le type demandé
-export async function showAd(type = "rewarded") {
-  const premium = await isPremium();
+// -------- Fonctions utilitaires pour l'app --------
+// (userData.js doit être chargé avant ce fichier !)
+
+window.showAd = async function(type = "rewarded") {
+  // On récupère la fonction premium/points globales
+  const premium = await window.isPremium();
   if (premium) {
-    if (type === "rewarded") await addPoints(10);
-    await updatePointsDisplay();
+    if (type === "rewarded") await window.addPoints(10);
+    await window.updatePointsDisplay?.();
     return;
   }
 
-  // RGPD : on vérifie si l'utilisateur a accepté les pubs
+  // RGPD/Consentement
   const consent = window.userConsent || localStorage.getItem("rgpdConsent");
   if (consent !== "accept") return;
 
   try {
-    if (type === "rewarded") {
-      await Capacitor.Plugins.AppLovinPlugin.showRewardedAd(AD_UNIT_REWARDED);
-    } else if (type === "interstitial") {
-      await Capacitor.Plugins.AppLovinPlugin.showInterstitialAd(AD_UNIT_INTERSTITIAL);
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AppLovinPlugin) {
+      if (type === "rewarded") {
+        await window.Capacitor.Plugins.AppLovinPlugin.showRewardedAd(AD_UNIT_REWARDED);
+      } else if (type === "interstitial") {
+        await window.Capacitor.Plugins.AppLovinPlugin.showInterstitialAd(AD_UNIT_INTERSTITIAL);
+      }
+    } else {
+      // En mode navigateur : simule une pub pour dev/test
+      alert("[SIMULATION PUB] Regarde une pub " + type);
+      if (type === "rewarded") await window.addPoints(10);
     }
   } catch (e) {
     console.warn("Erreur pub :", e);
   }
 
-  await updatePointsDisplay();
-}
+  await window.updatePointsDisplay?.();
+};
 
-// Met à jour l'affichage du score (optionnel)
-export async function updatePointsDisplay() {
+window.updatePointsDisplay = async function() {
   const pointsSpan = document.getElementById("points");
-  if (pointsSpan) pointsSpan.textContent = await getPoints();
-}
+  if (pointsSpan && window.getPoints) pointsSpan.textContent = await window.getPoints();
+};

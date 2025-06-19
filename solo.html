@@ -13,15 +13,13 @@
   <div class="popup-inner">
     <!-- Boutons croix + cœur -->
     <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
-<button id="btn-aimer-photo" style="background: none; border: none; padding: 0;">
-  <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" />
-</button>
-<button id="close-popup" style="background: none; border: none; padding: 0;">
-  <img src="assets/icons/croix.svg" alt="Fermer" style="width: 32px; height: 32px;margin-top:-5px;" />
-</button>
-
+      <button id="btn-aimer-photo" style="background: none; border: none; padding: 0;">
+        <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" />
+      </button>
+      <button id="close-popup" style="background: none; border: none; padding: 0;">
+        <img src="assets/icons/croix.svg" alt="Fermer" style="width: 32px; height: 32px;margin-top:-5px;" />
+      </button>
     </div>
-
     <!-- Contenu photo -->
     <div class="cadre-preview cadre-popup boutique-style">
       <img id="cadre-affiche" class="photo-cadre" src="" />
@@ -136,46 +134,33 @@
 </div>
 
 <!-- ✅ Scripts -->
-<script type="module" src="js/userData.js"></script>
-<script type="module" src="js/camera.js"></script>
-<script type="module" src="js/pub.js"></script>
-<script type="module" src="js/solo.js"></script>
+<script src="js/userData.js"></script>
+<script src="js/camera.js"></script>
+<script src="js/pub.js"></script>
+<script src="js/solo.js"></script>
 
-<!-- ✅ Script cœur / favoris -->
-<script type="module">
-  import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@7/+esm';
+<!-- ✅ Script cœur / favoris en JS vanilla (PAS EN MODULE) -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const heartBtn = document.getElementById("btn-aimer-photo");
+    const photoAffichee = document.getElementById("photo-affichee");
+    if (!heartBtn || !photoAffichee) return;
 
-  const heartBtn = document.getElementById("btn-aimer-photo");
-  const heartImg = document.getElementById("heart-icon");
-  const photoAffichee = document.getElementById("photo-affichee");
-
-  heartBtn.addEventListener("click", async () => {
-    heartImg.src = "assets/icons/coeur_rouge.svg";
-    try {
-      const canvas = document.createElement("canvas");
-      canvas.width = photoAffichee.naturalWidth;
-      canvas.height = photoAffichee.naturalHeight;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(photoAffichee, 0, 0);
-      const blob = await new Promise(res => canvas.toBlob(res, "image/webp", 0.9));
-      const db = await openDB("photos-aimees", 1, {
-        upgrade(db) {
-          if (!db.objectStoreNames.contains("favoris")) {
-            db.createObjectStore("favoris", { keyPath: "id", autoIncrement: true });
-          }
-        }
-      });
-      const store = db.transaction("favoris", "readwrite").objectStore("favoris");
-      const count = await store.count();
-      if (count >= 30) {
+    heartBtn.addEventListener("click", () => {
+      heartBtn.querySelector('img').src = "assets/icons/coeur_rouge.svg";
+      let favoris = JSON.parse(localStorage.getItem("photos_favoris") || "[]");
+      if (favoris.length >= 30) {
         alert("Limite de 30 photos atteinte.");
       } else {
-        await store.add({ blob });
-        alert("Photo ajoutée aux favoris !");
+        if (!favoris.includes(photoAffichee.src)) {
+          favoris.push(photoAffichee.src);
+          localStorage.setItem("photos_favoris", JSON.stringify(favoris));
+          alert("Photo ajoutée aux favoris !");
+        } else {
+          alert("Photo déjà ajoutée aux favoris.");
+        }
       }
-    } catch (err) {
-      console.error("Erreur de sauvegarde :", err);
-    }
+    });
   });
 </script>
 

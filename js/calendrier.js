@@ -1,4 +1,5 @@
-import { supabase, getUserId, loadUserData } from './userData.js';
+// ========== CALENDRIER.JS 100% COMPATIBLE ==========
+// Nécessite que userData.js ait déjà ajouté toutes ses fonctions sur window (window.supabase, window.getUserId, window.loadUserData...)
 
 document.addEventListener("DOMContentLoaded", async () => {
   // STYLE CALENDRIER PLACÉ AVANT TOUTE GÉNÉRATION
@@ -61,11 +62,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function chargerHistoriqueEtInscription() {
-    await loadUserData();
-    const userId = getUserId();
+    await window.loadUserData();
+    const userId = window.getUserId();
     if (!userId) return;
 
-    const { data } = await supabase
+    const { data } = await window.supabase
       .from('users')
       .select('historique, dateinscription')
       .eq('id', userId)
@@ -77,7 +78,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       date: e.date, // timestamp ISO (lancement du défi !)
       defis: e.defis || e.defi || [],
       type: e.type || "solo",
-      // Optionnel : peut-être un flag "termine" dans ta base :
       termine: e.termine || false
     }));
 
@@ -103,7 +103,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     today.setHours(0, 0, 0, 0);
     const inscriptionYMD = dateInscription ? formatYMD(dateInscription) : null;
 
-    // Compteurs globaux
     historique.forEach(entree => {
       totalDefisTous += (entree.defis || []).length;
     });
@@ -116,25 +115,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       let color = "#fff";
       let textColor = "#222";
 
-      // 1. Dates avant inscription
       if (inscriptionYMD && dstr < inscriptionYMD) {
         classes.push("jour-grise");
         color = "#f1f1f1";
       }
-      // 2. Jour d'inscription
       else if (dstr === inscriptionYMD) {
         classes.push("jour-inscription");
         color = "#ffe04a";
         textColor = "#fff";
       }
-      // 3. Jours futurs
       else if (dstr > formatYMD(today)) {
         classes.push("jour-futur");
         color = "#fff";
       }
-      // 4. "Scan" de tous les défis qui recouvrent ce jour dans leur fenêtre 24h :
       else {
-        // Pour chaque défi de l'historique : est-ce que ce jour "d" tombe DANS la fenêtre ?
         let statuses = [];
         historique.forEach(entree => {
           if (!entree.date) return;
@@ -142,25 +136,21 @@ document.addEventListener("DOMContentLoaded", async () => {
           const fin = new Date(debut.getTime() + 24 * 60 * 60 * 1000); // +24h
           if (d >= debut && d < fin) {
             if (Array.isArray(entree.defis) && entree.defis.length === 3) {
-              statuses.push("vert-fonce"); // 3 défis faits => vert foncé
+              statuses.push("vert-fonce");
             } else if (Array.isArray(entree.defis) && entree.defis.length > 0) {
-              statuses.push("vert-clair"); // au moins 1 défi fait
+              statuses.push("vert-clair");
             } else {
-              statuses.push("rouge");      // aucun défi fait
+              statuses.push("rouge");
             }
           }
         });
-        // Définir la couleur prioritaire
         const { color: c, textColor: t } = couleurMax(statuses.length ? statuses : ["rouge"]);
         color = c;
         textColor = t;
-
         if (statuses.length && color !== "#fff" && d <= today) totalDefisMois += 1;
       }
-
       html += `<div class="${classes.join(' ')}" style="background:${color}; color:${textColor}">${j}</div>`;
     }
-
     html += '</div>';
     document.getElementById('calendrier-container').innerHTML = html;
     document.getElementById('stats-calendrier').innerHTML =

@@ -1,11 +1,8 @@
-import { uploadPhotoDuelWebp, savePhotoDuel } from "./duel.js";
-import { getUserId, getCadreSelectionne } from "./userData.js";
-import { supabase } from './userData.js';
-
-
+// ========== camera.js ==========
+// Prérequis : charger duel.js, userData.js, supabase (via window.supabase) AVANT ce fichier !
 
 // Générer image + cadre concours (inchangé)
-export async function genererImageConcoursAvecCadre(base64Image) {
+window.genererImageConcoursAvecCadre = async function(base64Image) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
@@ -37,10 +34,10 @@ export async function genererImageConcoursAvecCadre(base64Image) {
     img.onerror = () => reject("Erreur chargement photo !");
     img.src = base64Image;
   });
-}
+};
 
 // Upload dans le bucket concours (inchangé)
-async function uploadPhotoConcoursWebp(dataUrl, concoursId, userId) {
+window.uploadPhotoConcoursWebp = async function(dataUrl, concoursId, userId) {
   const arr = dataUrl.split(',');
   const mime = arr[0].match(/:(.*?);/)[1];
   const bstr = atob(arr[1].split(',')[1] || arr[1]);
@@ -50,49 +47,48 @@ async function uploadPhotoConcoursWebp(dataUrl, concoursId, userId) {
   const blob = new Blob([u8arr], { type: mime });
   const fileName = `${userId}_${Date.now()}.webp`;
 
-  const { data: uploadData, error: uploadError } = await supabase
+  const { data: uploadData, error: uploadError } = await window.supabase
     .storage
     .from('photoconcours')
     .upload(fileName, blob, { contentType: 'image/webp' });
 
   if (uploadError) throw uploadError;
 
-  const { data: publicUrlData } = supabase
+  const { data: publicUrlData } = window.supabase
     .storage
     .from('photoconcours')
     .getPublicUrl(fileName);
 
   return publicUrlData.publicUrl;
-}
+};
 
 // --------- UNIFIÉ ---------
-export async function ouvrirCameraPour(defiId, mode = "solo", duelId = null, cadreId = null) {
+window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, cadreId = null) {
   // SI mobile natif (Capacitor), utilise plugin Camera
-if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
-  try {
-    const cameraModule = await import('@capacitor/camera');
-    const Camera = cameraModule.Camera;
+  if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+    try {
+      // @capacitor/camera doit être intégré dans le projet
+      const cameraModule = await import('@capacitor/camera');
+      const Camera = cameraModule.Camera;
 
-    const photo = await Camera.getPhoto({
-      quality: 85,
-      allowEditing: false,
-      resultType: 'dataUrl',
-      source: 'CAMERA'
-    });
+      const photo = await Camera.getPhoto({
+        quality: 85,
+        allowEditing: false,
+        resultType: 'dataUrl',
+        source: 'CAMERA'
+      });
 
-    const dataUrl = photo.dataUrl;
-    // ... suite du traitement
-
+      const dataUrl = photo.dataUrl;
 
       // Mode duel
       if (mode === "duel") {
         if (!duelId) return alert("Erreur interne : duelId manquant.");
         if (!cadreId) cadreId = "polaroid_01";
         try {
-          const urlPhoto = await uploadPhotoDuelWebp(dataUrl, duelId, defiId, cadreId);
-          const userId = await getUserId();
+          const urlPhoto = await window.uploadPhotoDuelWebp(dataUrl, duelId, defiId, cadreId);
+          const userId = await window.getUserId();
           localStorage.setItem(`photo_duel_${duelId}_${userId}`, urlPhoto);
-          await savePhotoDuel(defiId, urlPhoto, cadreId);
+          await window.savePhotoDuel(defiId, urlPhoto, cadreId);
           const champ = (window.isPlayer1) ? 'photosa' : 'photosb';
           if (window.VFindDuelDB && window.currentRoomId) {
             await window.VFindDuelDB.set(`${duelId}_${champ}_${defiId}`, { url: urlPhoto, cadre: cadreId });
@@ -106,7 +102,7 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
       }
       // Mode solo
       else if (mode === "solo") {
-        const cadre = (await getCadreSelectionne?.()) || "polaroid_01";
+        const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
         const obj = { photo: dataUrl, cadre };
         localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(obj));
         if (window.afficherPhotoDansCadreSolo) {
@@ -117,9 +113,9 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
       // Mode concours
       else if (mode === "concours") {
         try {
-          const userId = await getUserId();
-          const finalDataUrl = await genererImageConcoursAvecCadre(dataUrl);
-          const urlPhoto = await uploadPhotoConcoursWebp(finalDataUrl, defiId, userId);
+          const userId = await window.getUserId();
+          const finalDataUrl = await window.genererImageConcoursAvecCadre(dataUrl);
+          const urlPhoto = await window.uploadPhotoConcoursWebp(finalDataUrl, defiId, userId);
           return urlPhoto;
         } catch (err) {
           alert("Erreur upload concours : " + (err.message || err));
@@ -133,6 +129,8 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
     return;
   }
 
+  // ----- Sinon version navigateur web -----
+  // ... (suite bloc 2, trop long pour une seule réponse)
   // ----- Sinon version navigateur web -----
   return new Promise((resolve, reject) => {
     const container = document.createElement("div");
@@ -356,10 +354,10 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
           if (mode === "duel") {
             if (!duelId) return alert("Erreur interne : duelId manquant.");
             if (!cadreId) cadreId = "polaroid_01";
-            const urlPhoto = await uploadPhotoDuelWebp(dataUrl, duelId, defiId, cadreId);
-            const userId = await getUserId();
+            const urlPhoto = await window.uploadPhotoDuelWebp(dataUrl, duelId, defiId, cadreId);
+            const userId = await window.getUserId();
             localStorage.setItem(`photo_duel_${duelId}_${userId}`, urlPhoto);
-            await savePhotoDuel(defiId, urlPhoto, cadreId);
+            await window.savePhotoDuel(defiId, urlPhoto, cadreId);
             const champ = (window.isPlayer1) ? 'photosa' : 'photosb';
             if (window.VFindDuelDB && window.currentRoomId) {
               await window.VFindDuelDB.set(`${duelId}_${champ}_${defiId}`, { url: urlPhoto, cadre: cadreId });
@@ -369,7 +367,7 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
           }
           // Mode solo
           else if (mode === "solo") {
-            const cadre = (await getCadreSelectionne?.()) || "polaroid_01";
+            const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
             const obj = { photo: dataUrl, cadre };
             localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(obj));
             if (window.afficherPhotoDansCadreSolo) {
@@ -379,9 +377,9 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
           }
           // Mode concours
           else if (mode === "concours") {
-            const userId = await getUserId();
-            const finalDataUrl = await genererImageConcoursAvecCadre(dataUrl);
-            const urlPhoto = await uploadPhotoConcoursWebp(finalDataUrl, defiId, userId);
+            const userId = await window.getUserId();
+            const finalDataUrl = await window.genererImageConcoursAvecCadre(dataUrl);
+            const urlPhoto = await window.uploadPhotoConcoursWebp(finalDataUrl, defiId, userId);
             result = urlPhoto;
           }
         } catch (err) {
@@ -408,12 +406,13 @@ if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.is
 
     startCamera();
   });
-}
+};
 
-window.ouvrirCameraPour = ouvrirCameraPour;
+// ==== Exports/accès global ====
 window.cameraOuvrirCameraPourDuel = (idx, duelId, cadreId) => {
-  ouvrirCameraPour(idx, "duel", duelId, cadreId);
+  window.ouvrirCameraPour(idx, "duel", duelId, cadreId);
 };
 window.cameraOuvrirCameraPourConcours = (concoursId) => {
-  ouvrirCameraPour(concoursId, "concours");
+  window.ouvrirCameraPour(concoursId, "concours");
 };
+// ==============================

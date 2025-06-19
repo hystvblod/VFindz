@@ -11,7 +11,6 @@
  <!-- ✅ POPUP PHOTO alignée SOLO -->
 <div id="popup-photo" class="popup hidden">
   <div class="popup-inner">
-    <!-- Boutons croix + cœur -->
     <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
       <button id="btn-aimer-photo" style="background: none; border: none; padding: 0;">
         <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" />
@@ -25,11 +24,9 @@
       <img id="cadre-affiche" class="photo-cadre" src="" />
       <img id="photo-affichee" class="photo-user" src="" />
     </div>
-    <!-- Le bouton de téléchargement a été supprimé -->
   </div>
 </div>
 
-  <!-- ✅ Popup validation de défi (Jeton) -->
   <div id="popup-jeton" class="popup hidden">
     <div class="popup-inner popup-premium-pro">
       <div class="premium-badge">VALIDER</div>
@@ -47,7 +44,6 @@
     </div>
   </div>
 
-  <!-- ✅ Popup FIN DU DUEL -->
   <div id="popup-fin-duel" class="popup hidden">
     <div class="popup-inner">
       <button id="close-popup-fin" class="close-btn">❌</button>
@@ -115,7 +111,6 @@
     <p>&copy; 2025 VFindz</p>
   </footer>
 
-  <!-- ✅ POPUPS SUPPLÉMENTAIRES -->
   <div id="popup-cadre-choix" class="popup hidden">
     <div class="popup-inner">
       <h3>Choisir un cadre pour cette photo</h3>
@@ -147,7 +142,6 @@
     </div>
   </div>
 
-  <!-- ✅ POPUP SIGNALER PHOTO ADVERSAIRE -->
   <div id="popup-signal-photo" class="popup hidden">
     <div class="popup-inner" style="max-width:350px;text-align:center;">
       <img src="assets/icons/alert.svg" alt="Alerte" width="50" style="margin-bottom:12px;" />
@@ -163,17 +157,18 @@
     </div>
   </div>
 
-  <!-- ✅ SCRIPTS -->
-  <script type="module" src="js/userData.js"></script>
-  <script type="module" src="js/duel.js"></script>
-  <script type="module" src="js/camera.js"></script>
-  <script type="module" src="js/pub.js"></script>
+  <!-- ✅ SCRIPTS EN MODE GLOBAL (PAS type="module") -->
+  <!-- 1. Supabase global -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <!-- 2. Toutes tes fonctions utilisateur/camera/pub en mode window (PAS de import/export ici) -->
+  <script src="js/userData.js"></script>
+  <script src="js/duel.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/pub.js"></script>
 
-
-  <!-- Gestion de la croix dans le bouton cœur/croix (popup photo) -->
   <script>
+    // Gestion de la croix dans le bouton cœur/croix (popup photo)
     document.addEventListener("DOMContentLoaded", () => {
-      // Clique sur la croix du bouton principal popup photo
       document.querySelectorAll('#btn-aimer-photo img[src*="croix"], #close-popup').forEach(btn => {
         btn.onclick = function() {
           let popup = btn.closest('.popup');

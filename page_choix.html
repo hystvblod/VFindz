@@ -26,19 +26,30 @@
     </div>
   </header>
 
-<main>
-  <div class="duel-choice-box">
-    <a href="faq.html" class="duel-choice-btn">
-      FAQ
-    </a>
-    <a href="reglement.html" class="duel-choice-btn">
-      Règlement
-    </a>
-  </div>
-</main>
+  <main>
+    <div class="duel-choice-box">
+      <a href="faq.html" class="duel-choice-btn">FAQ</a>
+      <a href="reglement.html" class="duel-choice-btn">Règlement</a>
+    </div>
+  </main>
 
   <footer>
     <p>&copy; 2025 VFindz</p>
   </footer>
+
+  <!-- ======= SCRIPTS GLOBAUX pour compatibilité universelle ======= -->
+  <!-- 1. Charge Supabase en global -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <!-- 2. Charge ta logique utilisateur -->
+  <script src="js/userData.js"></script>
+  <script>
+    // Tu pourras ici initialiser Supabase/userData si besoin plus tard (popup RGPD, stats, etc)
+    // Exemple :
+    window.addEventListener("DOMContentLoaded", async () => {
+      if (window.loadUserData && typeof window.loadUserData === "function") {
+        await window.loadUserData(true);
+      }
+    });
+  </script>
 </body>
 </html>

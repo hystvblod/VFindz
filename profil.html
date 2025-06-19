@@ -18,102 +18,46 @@
       text-decoration: underline;
       transition: color 0.15s;
     }
-    .id-user:hover {
-      color: #ffe04a;
-    }
+    .id-user:hover { color: #ffe04a; }
     .popChangementID-bg {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(30,30,40,0.44);
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-      transition: background .16s;
+      display: none; position: fixed; inset: 0; background: rgba(30,30,40,0.44);
+      justify-content: center; align-items: center; z-index: 2000; transition: background .16s;
     }
-    .popChangementID-bg.active {
-      display: flex !important;
-    }
+    .popChangementID-bg.active { display: flex !important; }
     .popChangementID {
-      background: #fff;
-      color: #232323;
+      background: #fff; color: #232323;
       padding: 1.6rem 1.3rem 1.2rem 1.3rem;
       border-radius: 16px;
       text-align: center;
-      width: 94vw;
-      max-width: 370px;
+      width: 94vw; max-width: 370px;
       box-shadow: 0 8px 36px #1115;
-      z-index: 2200;
-      animation: popfade .20s;
+      z-index: 2200; animation: popfade .20s;
     }
-    @keyframes popfade {
-      from { transform: translateY(22px) scale(.96); opacity:0;}
-      to   { transform: none; opacity:1;}
-    }
+    @keyframes popfade { from { transform: translateY(22px) scale(.96); opacity:0;} to { transform: none; opacity:1;} }
     .popChangementID input {
-      margin-top: 1em;
-      width: 88%;
-      padding: 0.65em;
-      border-radius: 9px;
-      border: 1px solid #c8c8c8;
-      font-size: 1.07em;
-      background: #fafbfd;
+      margin-top: 1em; width: 88%; padding: 0.65em; border-radius: 9px; border: 1px solid #c8c8c8;
+      font-size: 1.07em; background: #fafbfd;
     }
     .popChangementID button {
-      margin-top: 1.1em;
-      margin-right: 0.4em;
-      padding: 0.53em 1.2em;
-      font-weight: bold;
-      border-radius: 8px;
-      background: #ffe04a;
-      color: #222;
-      border: none;
-      font-size: 1.08em;
-      cursor: pointer;
+      margin-top: 1.1em; margin-right: 0.4em; padding: 0.53em 1.2em; font-weight: bold;
+      border-radius: 8px; background: #ffe04a; color: #222; border: none; font-size: 1.08em; cursor: pointer;
       transition: background .13s;
     }
-    .popChangementID button:last-child {
-      background: #e6e6e6;
-      color: #444;
-    }
-    .popChangementID button:hover {
-      background: #ffd000;
-    }
-    #popIdError {
-      color:#e74646;
-      font-size:0.99em;
-      margin-top:0.55em;
-      min-height:1.2em;
-      display: block;
-    }
-    #popIdError.valid {
-      color: #12b712;
-    }
+    .popChangementID button:last-child { background: #e6e6e6; color: #444; }
+    .popChangementID button:hover { background: #ffd000; }
+    #popIdError { color:#e74646; font-size:0.99em; margin-top:0.55em; min-height:1.2em; display: block; }
+    #popIdError.valid { color: #12b712; }
     /* ----- POPUP COULEUR ----- */
-    #popChangeColor-bg .popChangementID {
-      padding: 1.3rem 1.3rem 1.2rem 1.3rem;
-      max-width: 350px;
-    }
-    #list-color-popup {
-      display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-bottom:1.2em;
-    }
+    #popChangeColor-bg .popChangementID { padding: 1.3rem 1.3rem 1.2rem 1.3rem; max-width: 350px; }
+    #list-color-popup { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-bottom:1.2em; }
     #list-color-popup .color-choix {
-      width:44px;height:44px;border-radius:12px;border:2px solid #ccc;cursor:pointer;box-shadow:0 2px 7px #1114;transition:all .15s;
-      outline: none;
-      display:inline-block;
+      width:44px;height:44px;border-radius:12px;border:2px solid #ccc;cursor:pointer;
+      box-shadow:0 2px 7px #1114;transition:all .15s;outline: none;display:inline-block;
     }
-    #list-color-popup .color-choix.selected {
-      border:3px solid #FFD700;
-      outline: 3px solid #222;
-    }
+    #list-color-popup .color-choix.selected { border:3px solid #FFD700; outline: 3px solid #222; }
     @media (max-width: 490px) {
-      .popChangementID {
-        padding: 1.2rem 0.4rem 1.1rem 0.4rem;
-      }
-      .popChangementID input {
-        width: 95%;
-        font-size: 1em;
-      }
+      .popChangementID { padding: 1.2rem 0.4rem 1.1rem 0.4rem; }
+      .popChangementID input { width: 95%; font-size: 1em; }
     }
   </style>
 </head>
@@ -141,9 +85,7 @@
 <!-- Popup changement ID -->
 <div class="popChangementID-bg" id="popChangementID-bg">
   <div class="popChangementID">
-    <div id="popIdText" style="font-size:1.11em;margin-bottom:0.2em;">
-      Modifier mon identifiant :
-    </div>
+    <div id="popIdText" style="font-size:1.11em;margin-bottom:0.2em;">Modifier mon identifiant :</div>
     <input type="text" id="popNewIdInput" placeholder="Nouveau ID unique" maxlength="18" autocomplete="off" />
     <div>
       <button id="popValidateId">Valider</button>
@@ -190,28 +132,25 @@
 <footer>
   <p>© 2025 VFindz</p>
 </footer>
-
-<!-- ==== SUPABASE CENTRALISÉ ==== -->
-<script type="module">
-import { loadUserData, getPseudo, getPoints, setPseudo, getUserDataCloud, isPremium, renderID, setIdColor, getIdColor } from './js/userData.js';
-import { supabase } from './js/userData.js';
-
+<!-- ===== SUPABASE/USERDATA GLOBAL (compat everywhere) ===== -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="js/userData.js"></script>
+<script>
 async function isPseudoTaken(pseudo) {
-  const { data } = await supabase.from('users').select('id').eq('pseudo', pseudo);
+  const { data } = await window.supabase.from('users').select('id').eq('pseudo', pseudo);
   return data && data.length > 0;
 }
 async function changeUserId(newPseudo) {
   if (await isPseudoTaken(newPseudo)) throw new Error("Ce pseudo est déjà utilisé.");
-  await setPseudo(newPseudo);
+  await window.setPseudo(newPseudo);
 }
 async function getProfile() {
-  return await getUserDataCloud();
+  return await window.getUserDataCloud();
 }
 async function refreshProfilDisplay() {
   const profil = await getProfile();
   const pseudo = profil?.pseudo || "???";
-  // Affiche le pseudo avec la couleur
-  document.getElementById("idUserDisplay").innerHTML = "ID : " + renderID(pseudo, profil?.id_color, profil?.premium);
+  document.getElementById("idUserDisplay").innerHTML = "ID : " + window.renderID(pseudo, profil?.id_color, profil?.premium);
   document.getElementById("vcoins").textContent = profil?.points || 0;
   document.getElementById("jetons").textContent = profil?.jetons || 0;
 }
@@ -252,16 +191,8 @@ async function setupProfile() {
 
   // --- Gestion couleur ID premium ---
   const colorOptions = [
-    "#FFD700", // Or
-    "#FFFFFF", // Blanc
-    "#111111", // Noir
-    "#F76C6C", // Rouge pastel
-    "#56E39F", // Vert pastel
-    "#5F6FFF", // Bleu vif
-    "#FF8CFF", // Rose flashy
-    "#FFBB54", // Jaune
-    "#F5C6AA", // Saumon
-    "#A7C7E7", // Bleu pastel
+    "#FFD700", "#FFFFFF", "#111111", "#F76C6C", "#56E39F",
+    "#5F6FFF", "#FF8CFF", "#FFBB54", "#F5C6AA", "#A7C7E7",
   ];
   let selectedColor = null;
   let mouseDownTimer = null;
@@ -295,14 +226,14 @@ async function setupProfile() {
       document.getElementById("popColorError").textContent = "Choisis une couleur";
       return;
     }
-    await setIdColor(selectedColor);
+    await window.setIdColor(selectedColor);
     document.getElementById("popChangeColor-bg").classList.remove("active");
     refreshProfilDisplay();
   };
   function renderColorPicker() {
     const list = document.getElementById("list-color-popup");
     list.innerHTML = "";
-    getIdColor().then((currentColor) => {
+    window.getIdColor().then((currentColor) => {
       colorOptions.forEach((col) => {
         const item = document.createElement("div");
         item.className = "color-choix";
@@ -322,8 +253,8 @@ async function setupProfile() {
 setupProfile();
 
 async function checkPendingFriendRequests() {
-  await loadUserData();
-  const profil = await getUserDataCloud();
+  await window.loadUserData();
+  const profil = await window.getUserDataCloud();
   const btn = document.getElementById("btnAmis");
   if (profil.demandesRecues && profil.demandesRecues.length > 0) {
     btn.classList.add("attention");

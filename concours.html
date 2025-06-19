@@ -93,9 +93,13 @@
   <!-- La popup zoom sera injectée par JS -->
 
   <!-- SCRIPTS JS (Aucun Storage requis) -->
-  <script type="module" src="js/firebase.js"></script>
-  <script type="module" src="js/userData.js"></script>
-  <script type="module" src="js/camera.js"></script>
-  <script type="module" src="js/concours.js"></script>
+   <!-- 1. Charge Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
+
+<!-- 2. Charge ton init.js (où tu fais createClient et window.supabaseClient) -->
+<script src="js/init.js"></script>
+  <script src="js/userData.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/concours.js"></script>
 </body>
 </html>

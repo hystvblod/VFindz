@@ -57,8 +57,13 @@
     <p>&copy; 2025 VFind</p>
   </footer>
 
-  <script type="module" src="js/firebase.js"></script>
-  <script type="module" src="js/userData.js"></script>
-  <script type="module" src="js/achat.js"></script>
+<!-- 1. Charge Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
+
+<!-- 2. Charge ton init.js (où tu fais createClient et window.supabaseClient) -->
+<script src="js/init.js"></script>
+
+  <script src="js/userData.js"></script>
+  <script src="js/achat.js"></script>
 </body>
 </html>

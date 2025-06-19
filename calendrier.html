@@ -82,7 +82,13 @@
 </footer>
 
 <!-- Script principal dédié au calendrier Supabase -->
-<script type="module" src="js/calendrier.js"></script>
+ <!-- 1. Charge Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
+
+<!-- 2. Charge ton init.js (où tu fais createClient et window.supabaseClient) -->
+<script src="js/init.js"></script>
+
+<script  src="js/calendrier.js"></script>
 
 </body>
 </html>

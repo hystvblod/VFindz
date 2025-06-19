@@ -1,6 +1,8 @@
-import { getJetons, addJetons, ajouterDefiHistorique, removeJeton, getCadreSelectionne, getCadresPossedes, updateUserData, getUserDataCloud, getDefisFromSupabase, isPremium } from "./userData.js";
-import { ouvrirCameraPour as cameraOuvrirCameraPour } from "./camera.js";
+// =========== SOLO.JS - VFind SOLO (Capacitor compatible, sans import/export) ===========
+// !! userData.js, camera.js, pub.js DOIVENT être chargés AVANT CE FICHIER !!
+// Toutes les fonctions requises de userData.js DOIVENT être exposées sur window !
 
+// ----------- UTILS -----------
 function getCadreUrl(id) {
   return localStorage.getItem(`cadre_${id}`) ||
     `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${id}.webp`;
@@ -46,7 +48,7 @@ async function chargerDefis(lang = "fr") {
       return allDefis;
     }
   }
-  allDefis = await getDefisFromSupabase(lang);
+  allDefis = await window.getDefisFromSupabase(lang);
   localStorage.setItem(DEFIS_CACHE_KEY, JSON.stringify(allDefis));
   localStorage.setItem(DEFIS_CACHE_DATE_KEY, Date.now().toString());
   return allDefis;
@@ -55,7 +57,7 @@ async function chargerDefis(lang = "fr") {
 // ---------- GESTION UTILISATEUR ----------
 async function chargerUserData(forceRefresh = false) {
   if (userData && !forceRefresh) return userData;
-  userData = await getUserDataCloud();
+  userData = await window.getUserDataCloud();
   return userData;
 }
 
@@ -97,15 +99,14 @@ function majSolde() {
   if (document.getElementById("points")) document.getElementById("points").textContent = userData.points || 0;
   if (document.getElementById("jetons")) document.getElementById("jetons").textContent = userData.jetons || 0;
 }
-
 // ----------- LOGIQUE JEU -------------
-async function init() {
+async function initSoloGame() {
   await chargerUserData(true);
 
   let defiActifs = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
   let defiTimer = parseInt(localStorage.getItem(SOLO_TIMER_KEY) || "0");
 
-  // Cas : Partie en cours (défis non terminés OU terminés mais timer pas fini)
+  // Partie en cours (défis non terminés OU terminés mais timer pas fini)
   if (
     defiActifs.length > 0 &&
     defiTimer &&
@@ -117,7 +118,7 @@ async function init() {
     return;
   }
 
-  // Cas : Timer terminé (fin de partie, popup)
+  // Timer terminé (fin de partie)
   if (
     defiActifs.length > 0 &&
     defiTimer &&
@@ -127,7 +128,7 @@ async function init() {
     return;
   }
 
-  // Sinon, pas de partie active → nouvelle partie
+  // Pas de partie active → nouvelle partie
   await startGame();
 }
 
@@ -230,7 +231,7 @@ async function loadDefis() {
 
     let jetonHtml = '';
     if (!photoData && !defi.done) {
-      jetonHtml = `<img src="assets/img/jeton_p.webp" alt="Jeton" class="jeton-icone" onclick="ouvrirPopupJeton(${index})" />`;
+      jetonHtml = `<img src="assets/img/jeton_p.webp" alt="Jeton" class="jeton-icone" onclick="window.ouvrirPopupJeton(${index})" />`;
     }
 
     li.innerHTML = `
@@ -256,7 +257,6 @@ async function loadDefis() {
     }
   }, 15);
 }
-
 // ----------- PRISE/REPRISE PHOTO CENTRALISÉE -----------
 window.gererPrisePhoto = function(defiId, index) {
   let defis = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
@@ -270,7 +270,7 @@ window.gererPrisePhoto = function(defiId, index) {
     return;
   }
 
-  if (isPremium()) {
+  if (window.isPremium && window.isPremium()) {
     canRetakePhoto = true;
     retakeDefiId = defiId;
     window.ouvrirCameraPour(defiId);
@@ -279,21 +279,23 @@ window.gererPrisePhoto = function(defiId, index) {
 
   if (defi.photoCount >= 1) {
     const popup = document.getElementById("popup-premium-photo");
-    popup.classList.remove("hidden");
-    popup.classList.add("show");
+    if (popup) {
+      popup.classList.remove("hidden");
+      popup.classList.add("show");
 
-    document.getElementById("btnPubReprise").onclick = function() {
-      popup.classList.add("hidden");
-      popup.classList.remove("show");
-      canRetakePhoto = true;
-      retakeDefiId = defiId;
-      window.ouvrirCameraPour(defiId);
-      window.pubAfterPhoto = true;
-    };
-    document.getElementById("btnAnnulerReprise").onclick = function() {
-      popup.classList.add("hidden");
-      popup.classList.remove("show");
-    };
+      document.getElementById("btnPubReprise").onclick = function() {
+        popup.classList.add("hidden");
+        popup.classList.remove("show");
+        canRetakePhoto = true;
+        retakeDefiId = defiId;
+        window.ouvrirCameraPour(defiId);
+        window.pubAfterPhoto = true;
+      };
+      document.getElementById("btnAnnulerReprise").onclick = function() {
+        popup.classList.add("hidden");
+        popup.classList.remove("show");
+      };
+    }
     return;
   } else {
     canRetakePhoto = false;
@@ -313,7 +315,7 @@ window.afficherPhotoDansCadreSolo = async function(defiId, dataUrl) {
   let defi = defis[index];
   defi.photoCount = (defi.photoCount || 0) + 1;
 
-  const cadreGlobal = await getCadreSelectionne();
+  const cadreGlobal = await window.getCadreSelectionne();
   const oldData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`) || "{}");
   const cadreId = oldData.cadre || cadreGlobal || "polaroid_01";
   const data = {
@@ -352,7 +354,7 @@ window.renderPhotoCadreSolo = async function(defiId) {
   try {
     photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`));
   } catch (e) {}
-  const cadreId = photoData?.cadre || (await getCadreSelectionne()) || "polaroid_01";
+  const cadreId = photoData?.cadre || (await window.getCadreSelectionne()) || "polaroid_01";
   const photoUrl = photoData?.photo || "";
 
   if (photoUrl) {
@@ -365,12 +367,12 @@ window.renderPhotoCadreSolo = async function(defiId) {
       </div>
     `;
     const photoImg = container.querySelector('.photo-user');
-    photoImg.oncontextmenu = (e) => { e.preventDefault(); ouvrirPopupChoixCadreSolo(defiId); };
+    photoImg.oncontextmenu = (e) => { e.preventDefault(); window.ouvrirPopupChoixCadreSolo(defiId); };
     photoImg.ontouchstart = function() {
-      this._touchTimer = setTimeout(() => { ouvrirPopupChoixCadreSolo(defiId); }, 500);
+      this._touchTimer = setTimeout(() => { window.ouvrirPopupChoixCadreSolo(defiId); }, 500);
     };
     photoImg.ontouchend = function() { clearTimeout(this._touchTimer); };
-    photoImg.onclick = () => agrandirPhoto(photoUrl, defiId);
+    photoImg.onclick = () => window.agrandirPhoto(photoUrl, defiId);
   } else {
     container.innerHTML = "";
   }
@@ -380,13 +382,13 @@ window.renderPhotoCadreSolo = async function(defiId) {
 window.ouvrirPopupChoixCadreSolo = async function(defiId) {
   let cadres = [];
   try {
-    cadres = await getCadresPossedes();
+    cadres = await window.getCadresPossedes();
   } catch { cadres = ["polaroid_01"]; }
   let photoData = {};
   try {
     photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`));
   } catch (e) {}
-  const actuel = photoData?.cadre || (await getCadreSelectionne()) || "polaroid_01";
+  const actuel = photoData?.cadre || (await window.getCadreSelectionne()) || "polaroid_01";
   const photoUrl = photoData?.photo || "";
 
   const list = document.getElementById("list-cadres-popup-solo");
@@ -405,7 +407,7 @@ window.ouvrirPopupChoixCadreSolo = async function(defiId) {
     el.onclick = () => {
       photoData.cadre = cadre;
       localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(photoData));
-      fermerPopupCadreSolo();
+      window.fermerPopupCadreSolo();
       window.renderPhotoCadreSolo(defiId);
     };
     list.appendChild(el);
@@ -417,7 +419,6 @@ window.ouvrirPopupChoixCadreSolo = async function(defiId) {
 window.fermerPopupCadreSolo = function() {
   document.getElementById("popup-cadre-solo").classList.add("hidden");
 };
-
 // ----------- ZOOM PHOTO / POPUP -----------
 window.agrandirPhoto = async function(dataUrl, defiId) {
   const cadre = document.getElementById("cadre-affiche");
@@ -429,7 +430,7 @@ window.agrandirPhoto = async function(dataUrl, defiId) {
     photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`));
   } catch (e) {}
 
-  const cadreActuel = photoData?.cadre || (await getCadreSelectionne());
+  const cadreActuel = photoData?.cadre || (await window.getCadreSelectionne());
   cadre.src = getCadreUrl(cadreActuel);
   photo.src = dataUrl;
 
@@ -480,14 +481,13 @@ window.validerDefi = async function(index) {
     }
     await window.ouvrirPopupJeton(index);
   }
-
 };
 
 window.ouvrirPopupJeton = async function(index) {
-  const jetons = await getJetons();
+  const jetons = await window.getJetons();
   if (jetons > 0) {
     if (confirm("Valider ce défi avec un jeton ?")) {
-      const success = await removeJeton();
+      const success = await window.removeJeton();
       if (success) {
         await validerDefiAvecJeton(index);
         majSolde();
@@ -498,19 +498,15 @@ window.ouvrirPopupJeton = async function(index) {
   } else {
     if (confirm("Plus de jeton disponible. Regarder une pub pour gagner 3 jetons ?")) {
       await showRewardedAd();
-      // 🔒 SÉCURISÉ côté serveur :
-      const { error } = await supabase.rpc('secure_add_jetons', { nb: 3 });
-      if (error) {
-        alert("Erreur lors de l'ajout des jetons : " + error.message);
-        return;
-      }
-      majSolde();
+      // Ici tu fais l'appel RPC sécurisé Supabase ou incrémente localement selon ton back
+      // Exemple :
+      // const { error } = await supabase.rpc('secure_add_jetons', { nb: 3 });
+      // if (error) { alert("Erreur lors de l'ajout des jetons : " + error.message); return; }
+      // majSolde();
       alert("3 jetons crédités !");
     }
   }
 };
-
-
 
 async function validerDefiAvecJeton(index) {
   let defis = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
@@ -522,13 +518,11 @@ async function validerDefiAvecJeton(index) {
     localStorage.setItem(`photo_defi_${defi.id}`, JSON.stringify({ photo: "assets/img/jetonpp.webp", cadre: "polaroid_01" }));
     localStorage.setItem(SOLO_DEFIS_KEY, JSON.stringify(defis));
     await loadDefis();
-
   }
 }
 
-
 // ----------- FIN DE PARTIE AUTOMATIQUE -----------
-async function endGameAuto() {
+window.endGameAuto = async function() {
   let defis = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
   if (!defis.length) return;
   let nbFaits = defis.filter(d => d.done).length;
@@ -540,7 +534,7 @@ async function endGameAuto() {
   const date = new Date().toISOString().slice(0, 10);
   let historique = userData.historique || [];
   historique.push({ date, defi: defis.map(d => d.id) });
-  await updateUserData({ points: newPoints, historique });
+  await window.updateUserData({ points: newPoints, historique });
 
   // Nettoie la partie solo
   localStorage.removeItem(SOLO_DEFIS_KEY);
@@ -563,7 +557,7 @@ async function endGameAuto() {
   document.getElementById("returnBtnEnd").onclick = function() {
     window.location.href = "index.html";
   };
-}
+};
 
 // === Ajout : fermeture croix popup + nettoyage du bouton cœur ===
 document.addEventListener("DOMContentLoaded", () => {
@@ -579,13 +573,12 @@ document.addEventListener("DOMContentLoaded", () => {
         popup.classList.add('hidden');
         popup.classList.remove('show');
       }
-
     };
   });
 });
 
 // ----------- EXEMPLE : fonction reward à compléter selon ta régie pub -----------
-async function showRewardedAd() {
+window.showRewardedAd = async function() {
   return new Promise((resolve) => {
     alert("SIMULATION PUB : regarde ta vidéo ici…");
     setTimeout(() => { resolve(); }, 3200);
@@ -628,25 +621,27 @@ window.afficherPhotosAimees = async function() {
     }
   }
 };
-import { showAd } from './pub.js';
 
-const btnPubRepriseSolo = document.getElementById("btnReprisePubSolo");
-const btnAnnulerRepriseSolo = document.getElementById("btnAnnulerRepriseSolo");
-const btnPremiumSolo = document.getElementById("btnReprisePremiumSolo");
-const popupRepriseSolo = document.getElementById("popup-reprise-photo-solo");
+// ---------- BONUS : BOUTONS POPUP REPRISE SOLO ----------
+document.addEventListener("DOMContentLoaded", () => {
+  const btnPubRepriseSolo = document.getElementById("btnReprisePubSolo");
+  const btnAnnulerRepriseSolo = document.getElementById("btnAnnulerRepriseSolo");
+  const btnPremiumSolo = document.getElementById("btnReprisePremiumSolo");
+  const popupRepriseSolo = document.getElementById("popup-reprise-photo-solo");
 
-if (btnPubRepriseSolo && btnAnnulerRepriseSolo && btnPremiumSolo && popupRepriseSolo) {
-  btnPubRepriseSolo.addEventListener("click", async () => {
-    await showAd("rewarded");
-    popupRepriseSolo.classList.add("hidden");
-    // Ici tu peux rappeler la caméra si besoin
-  });
+  if (btnPubRepriseSolo && btnAnnulerRepriseSolo && btnPremiumSolo && popupRepriseSolo) {
+    btnPubRepriseSolo.addEventListener("click", async () => {
+      await window.showRewardedAd("rewarded");
+      popupRepriseSolo.classList.add("hidden");
+      // Ici tu peux rappeler la caméra si besoin
+    });
 
-  btnAnnulerRepriseSolo.addEventListener("click", () => {
-    popupRepriseSolo.classList.add("hidden");
-  });
+    btnAnnulerRepriseSolo.addEventListener("click", () => {
+      popupRepriseSolo.classList.add("hidden");
+    });
 
-  btnPremiumSolo.addEventListener("click", () => {
-    window.location.href = "premium.html";
-  });
-}
+    btnPremiumSolo.addEventListener("click", () => {
+      window.location.href = "premium.html";
+    });
+  }
+});

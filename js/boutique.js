@@ -1,15 +1,8 @@
-import {
-  supabase, // <-- Ne jamais retirer cette ligne !
-  getPoints, addPoints, removePoints, getJetons, addJetons,
-  possedeCadre, acheterCadre, getOwnedFrames, isPremium,
-  updateUserData, getCadreSelectionne,
-  getJoursDefisRealises, getNbAmisInvites, getConcoursParticipationStatus,
-  hasDownloadedVZone // (si besoin, à implémenter)
-} from './userData.js';
+// === Dépendances : userData.js doit être chargé AVANT ce fichier ===
 
-// === IndexedDB cache boutique/cadres.json ===
 const BOUTIQUE_DB_NAME = 'VFindBoutiqueCache';
 const BOUTIQUE_STORE = 'boutiqueData';
+
 async function openBoutiqueDB() {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(BOUTIQUE_DB_NAME, 1);
@@ -45,10 +38,10 @@ async function checkCadreUnlock(cadre) {
   if (!cadre.condition) return { unlocked: true };
   switch (cadre.condition.type) {
     case "premium":
-      return { unlocked: await isPremium(), texte: cadre.condition.texte || "Compte premium requis" };
+      return { unlocked: await window.isPremium(), texte: cadre.condition.texte || "Compte premium requis" };
     case "jours_defis":
-      if (typeof getJoursDefisRealises === "function") {
-        const nb = await getJoursDefisRealises();
+      if (typeof window.getJoursDefisRealises === "function") {
+        const nb = await window.getJoursDefisRealises();
         return {
           unlocked: nb >= (cadre.condition.nombre || 0),
           texte: cadre.unlock || `Fais ${cadre.condition.nombre} jours de défis pour débloquer`
@@ -56,8 +49,8 @@ async function checkCadreUnlock(cadre) {
       }
       return { unlocked: false, texte: "Fonction de check non dispo" };
     case "inviter_amis":
-      if (typeof getNbAmisInvites === "function") {
-        const nb = await getNbAmisInvites();
+      if (typeof window.getNbAmisInvites === "function") {
+        const nb = await window.getNbAmisInvites();
         return {
           unlocked: nb >= (cadre.condition.nombre || 0),
           texte: cadre.unlock || `Invite ${cadre.condition.nombre} amis`
@@ -65,8 +58,8 @@ async function checkCadreUnlock(cadre) {
       }
       return { unlocked: false, texte: "Fonction de check non dispo" };
     case "participation_concours":
-      if (typeof getConcoursParticipationStatus === "function") {
-        const ok = await getConcoursParticipationStatus();
+      if (typeof window.getConcoursParticipationStatus === "function") {
+        const ok = await window.getConcoursParticipationStatus();
         return {
           unlocked: ok,
           texte: cadre.unlock || "Participe à un concours et vote au moins 3 jours"
@@ -74,8 +67,8 @@ async function checkCadreUnlock(cadre) {
       }
       return { unlocked: false, texte: "Fonction de check non dispo" };
     case "telechargement_vzone":
-      if (typeof hasDownloadedVZone === "function") {
-        const ok = await hasDownloadedVZone();
+      if (typeof window.hasDownloadedVZone === "function") {
+        const ok = await window.hasDownloadedVZone();
         return {
           unlocked: ok,
           texte: cadre.unlock || "Télécharge le jeu VZone pour débloquer ce cadre."
@@ -102,17 +95,12 @@ function showFeedback(text) {
 
 // --- Acheter cadre depuis boutique (cloud & local) ---
 async function acheterCadreBoutique(id, prix) {
-  // Utilise un RPC sécurisé pour retirer les points côté serveur
-  const { data, error } = await supabase.rpc('secure_remove_points', { nb: prix });
-
+  const { data, error } = await window.supabase.rpc('secure_remove_points', { nb: prix });
   if (error || !data || data.success !== true) {
     alert("❌ Pas assez de pièces ou erreur !");
     return;
   }
-
-  await acheterCadre(id); // <--- Ici, débloque vraiment le cadre après paiement validé côté serveur
-
-  // On charge l’image en base64 et la stocke dans le localStorage, SANS DUPLICATA de fetch
+  await window.acheterCadre(id);
   const url = `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${id}.webp`;
   try {
     const res = await fetch(url, { cache: "reload" });
@@ -130,14 +118,8 @@ async function acheterCadreBoutique(id, prix) {
     alert("Erreur lors de l'enregistrement du cadre. Vérifie ta connexion.");
     return;
   }
-
-  // Marque le moment de la dernière update pour forcer la synchro sur Mes Cadres
   localStorage.setItem('lastCadresUpdate', Date.now().toString());
-
-  // Force update possession (cloud)
-  await getOwnedFrames(true);
-
-  // Ici SEULEMENT tu affiches “Acheté !” ou tu fais le render.
+  await window.getOwnedFrames(true);
   await updatePointsDisplay();
   alert("✅ Cadre acheté !");
   await renderBoutique(currentCategory);
@@ -172,22 +154,10 @@ function showUnlockPopup(nom, message) {
 
 // Gagne des pièces via pub simulée
 async function watchAd() {
-  await supabase.rpc('secure_add_points', { nb: 100 }); // 🔒 Sécurisé côté serveur
+  await window.supabase.rpc('secure_add_points', { nb: 100 });
   await updatePointsDisplay();
   showFeedback("+100 💰");
   closePopup();
-}
-
-// === Parrainage code (génère lien d’invitation ===
-async function inviteFriend() {
-  let userId = null;
-  try { userId = (await import('./userData.js')).getUserId(); } catch {}
-  if (!userId) {
-    alert('Connecte-toi pour inviter !');
-    return;
-  }
-  const lien = window.location.origin + "/profil.html?parrain=" + userId;
-  prompt("Partage ce lien à ton ami pour qu’il s’inscrive et que tu gagnes 300 pièces :\n\n" + lien + "\n\n(Ton ami doit cliquer sur ce lien AVANT sa première connexion)");
 }
 
 // --- Popup achat jetons ---
@@ -199,27 +169,22 @@ function fermerPopupJetonBoutique() {
   const popup = document.getElementById("popup-achat-jeton");
   if (popup) popup.classList.add("hidden");
 }
-
 async function acheterJetonsAvecPieces() {
-  // Appel RPC sécurisé pour retirer les points côté serveur
-  const { data, error } = await supabase.rpc('secure_remove_points', { nb: 100 });
+  const { data, error } = await window.supabase.rpc('secure_remove_points', { nb: 100 });
   if (error || !data || data.success !== true) {
     alert("❌ Pas assez de pièces.");
     return;
   }
-  // Ajoute les jetons via un RPC sécurisé aussi (optionnel mais conseillé)
-  await supabase.rpc('secure_add_jetons', { nb: 3 }); // Crée aussi cette fonction RPC côté Supabase !
+  await window.supabase.rpc('secure_add_jetons', { nb: 3 });
   alert("✅ 3 jetons ajoutés !");
   await updatePointsDisplay();
   await updateJetonsDisplay();
   fermerPopupJetonBoutique();
 }
 async function acheterJetonsAvecPub() {
-  // (Ici tu mets ta vraie pub, ou la simulation)
   alert("📺 Simulation de pub regardée !");
   setTimeout(async () => {
-    // Ajoute les jetons via le RPC sécurisé
-    await supabase.rpc('secure_add_jetons', { nb: 3 });
+    await window.supabase.rpc('secure_add_jetons', { nb: 3 });
     alert("✅ 3 jetons ajoutés !");
     await updateJetonsDisplay();
     fermerPopupJetonBoutique();
@@ -229,11 +194,11 @@ async function acheterJetonsAvecPub() {
 // --- Affichage points/jetons ---
 async function updatePointsDisplay() {
   const pointsDisplay = document.getElementById("points");
-  if (pointsDisplay) pointsDisplay.textContent = await getPoints();
+  if (pointsDisplay) pointsDisplay.textContent = await window.getPoints();
 }
 async function updateJetonsDisplay() {
   const jetonsSpan = document.getElementById("jetons");
-  if (jetonsSpan) jetonsSpan.textContent = await getJetons();
+  if (jetonsSpan) jetonsSpan.textContent = await window.getJetons();
 }
 
 // Patch scroll & overflow
@@ -242,7 +207,6 @@ setTimeout(() => {
   document.documentElement.scrollTop = 0;
   document.body.style.overflowX = "hidden";
 }, 100);
-
 // Gestion click global pour feedback
 document.addEventListener("click", function (e) {
   const popupGain = document.getElementById("gain-feedback");
@@ -270,7 +234,7 @@ function getCategorie(id) {
 
 // ---- PATCH MINIATURES DEFI (fixes 100% le centrage et l'affichage)
 async function afficherPhotosSauvegardees(photosMap) {
-  const cadreActuel = await getCadreSelectionne();
+  const cadreActuel = await window.getCadreSelectionne();
   document.querySelectorAll(".defi-item").forEach(defiEl => {
     const id = defiEl.getAttribute("data-defi-id");
     const dataUrl = photosMap[id];
@@ -291,7 +255,7 @@ async function afficherPhotosSauvegardees(photosMap) {
       const photo = document.createElement("img");
       photo.className = "photo-user";
       photo.src = dataUrl;
-      photo.onclick = () => agrandirPhoto(dataUrl, id);
+      photo.onclick = () => window.agrandirPhoto(dataUrl, id);
 
       preview.appendChild(fond);
       preview.appendChild(photo);
@@ -313,8 +277,7 @@ async function fetchCadres(force = false) {
       return;
     }
   }
-  // Requête Supabase
-  const { data, error } = await supabase.from('cadres').select('*');
+  const { data, error } = await window.supabase.from('cadres').select('*');
   if (error || !data) {
     console.error("Erreur chargement Supabase :", error);
     return;
@@ -348,7 +311,7 @@ async function renderBoutique(categoryKey) {
   grid.className = "grid-cadres";
 
   const cadresCat = CADRES_DATA.filter(cadre => getCategorie(cadre.id) === categoryKey);
-  let ownedFrames = await getOwnedFrames();
+  let ownedFrames = await window.getOwnedFrames();
 
   if (!cadresCat.length) {
     const empty = document.createElement("p");
@@ -406,10 +369,9 @@ async function renderBoutique(categoryKey) {
         const unlockInfo = await checkCadreUnlock(cadre);
         if (unlockInfo.unlocked) {
           if (!ownedFrames.includes(cadre.id)) {
-            // Si le cadre est à débloquer gratuitement via une condition, on l’ajoute direct
             if (!cadre.prix) {
-              await acheterCadre(cadre.id);
-              ownedFrames = await getOwnedFrames(true);
+              await window.acheterCadre(cadre.id);
+              ownedFrames = await window.getOwnedFrames(true);
               showFeedback("🎉 Cadre débloqué !");
             }
             button.textContent = cadre.prix ? "Acheter" : "Débloqué !";
@@ -430,7 +392,7 @@ async function renderBoutique(categoryKey) {
           button.classList.add("btn-info");
           button.onclick = () => showUnlockPopup(cadre.nom, unlockInfo.texte);
         }
-      } else if (categoryKey === "premium" && !(await isPremium())) {
+      } else if (categoryKey === "premium" && !(await window.isPremium())) {
         button.textContent = "Premium requis";
         button.disabled = true;
         button.classList.add("disabled-premium");
@@ -463,10 +425,8 @@ function fermerPopupPremium() {
   if (popup) popup.classList.add("hidden");
 }
 
-// Tu auras besoin d'un ID unique pour ton produit (défini sur le Play Store, ex : "premium_upgrade")
-const PREMIUM_PRODUCT_ID = "premium_upgrade"; // change ça avec ton vrai ID
+const PREMIUM_PRODUCT_ID = "premium_upgrade";
 
-// Charge la liste des produits disponibles
 async function chargerProduits() {
   return new Promise((resolve, reject) => {
     if (!window.Cordova || !window.Cordova.plugins || !window.Cordova.plugins.purchase) {
@@ -481,13 +441,11 @@ async function chargerProduits() {
   });
 }
 
-// Déclenche l’achat du premium
 async function acheterPremium() {
   try {
     await chargerProduits();
     window.Cordova.plugins.purchase.buy(PREMIUM_PRODUCT_ID, 1, function (data) {
-      // Le paiement a réussi, tu peux activer premium côté utilisateur
-      updateUserData({ premium: true });
+      window.updateUserData({ premium: true });
       alert("✨ Bravo, tu es maintenant Premium !");
       window.location.reload();
     }, function (err) {
@@ -499,21 +457,26 @@ async function acheterPremium() {
 }
 
 // === EXPOSE TO WINDOW POUR ACCÈS HTML INLINE ===
-window.activerPremium = activerPremium;
-window.fermerPopupPremium = fermerPopupPremium;
-window.acheterPremium = acheterPremium;
-window.removePoints = removePoints;
-window.updateUserData = updateUserData;
+window.checkCadreUnlock = checkCadreUnlock;
+window.showFeedback = showFeedback;
+window.acheterCadreBoutique = acheterCadreBoutique;
 window.closePopup = closePopup;
 window.showUnlockPopup = showUnlockPopup;
+window.watchAd = watchAd;
 window.ouvrirPopupJetonBoutique = ouvrirPopupJetonBoutique;
 window.fermerPopupJetonBoutique = fermerPopupJetonBoutique;
 window.acheterJetonsAvecPieces = acheterJetonsAvecPieces;
 window.acheterJetonsAvecPub = acheterJetonsAvecPub;
-window.watchAd = watchAd;
-window.inviteFriend = inviteFriend;
+window.updatePointsDisplay = updatePointsDisplay;
+window.updateJetonsDisplay = updateJetonsDisplay;
 window.afficherPhotosSauvegardees = afficherPhotosSauvegardees;
+window.fetchCadres = fetchCadres;
+window.renderBoutique = renderBoutique;
+window.activerPremium = activerPremium;
+window.fermerPopupPremium = fermerPopupPremium;
+window.acheterPremium = acheterPremium;
 
+// INIT
 document.addEventListener('DOMContentLoaded', async () => {
   await fetchCadres();
   await renderBoutique('classique');

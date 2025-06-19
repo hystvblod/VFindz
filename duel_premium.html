@@ -123,8 +123,6 @@
   <main>
     <div class="duel-main-container" style="max-width:600px;margin:30px auto 0 auto;padding:20px;">
       <div id="duel-premium-info" style="text-align:center;margin-bottom:15px;color:#c59100;font-weight:bold;"></div>
-
-      <!-- Zones JS -->
       <div id="bloc-defi-saisie" style="display:none;">
         <div id="text-saisie-defis" style="margin-bottom:10px;font-weight:bold;"></div>
         <input id="input-defi1" type="text" placeholder="Défi 1..." style="margin-bottom:8px;width:100%;padding:12px 10px;border-radius:10px;border:none;font-size:1.1em;">
@@ -147,7 +145,28 @@
     <p>&copy; 2025 VFindz</p>
   </footer>
 
-  <!-- ✅ JS FINAL -->
- <script type="module" src="js/duel.js"></script>
+  <!-- ✅ SCRIPTS FINAUX GLOBAUX -->
+  <!-- 1. Supabase global (PAS de /+esm) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <!-- 2. Fichiers JS : tout en mode global, pas de module ! -->
+  <script src="js/init.js"></script>
+  <script src="js/duel.js"></script>
+  <script src="js/camera.js"></script>
+  <script src="js/pub.js"></script>
+
+  <script>
+    // Gestion de la croix popup cœur/croix/close
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll('#btn-aimer-photo img[src*="croix"], #close-popup, .close-btn').forEach(btn => {
+        btn.onclick = function() {
+          let popup = btn.closest('.popup');
+          if (popup) {
+            popup.classList.add('hidden');
+            popup.classList.remove('show');
+          }
+        };
+      });
+    });
+  </script>
 </body>
 </html>

@@ -1,8 +1,5 @@
-import {
-  getCadresPossedes,
-  getCadreSelectionne,
-  setCadreSelectionne
-} from './js/userData.js';
+// ========== cadres.js 100% compatible Capacitor (no import/export) ==========
+// userData.js doit être chargé AVANT pour exposer toutes ses fonctions sur window (window.getCadresPossedes, etc.)
 
 // Liste des IDs de cadres dynamiques (draw/canvas)
 const DRAW_IDS = [
@@ -19,17 +16,18 @@ function getCadreUrl(id) {
 // Crée dynamiquement l'élément cadre : <canvas> pour draw, <img> sinon
 function createCadreElement(id, taille = {w:80, h:100}) {
   if (DRAW_IDS.includes(id)) {
-    // Canvas dynamique
     const c = document.createElement("canvas");
     c.width = taille.w;
     c.height = taille.h;
     c.className = "photo-cadre";
-    import('./js/cadres_draw.js').then(mod => {
-      mod.previewCadre(c.getContext("2d"), id);
-    });
+    // Lazy load du script de preview (doit être déjà dispo côté build Capacitor)
+    if (window.previewCadre) {
+      window.previewCadre(c.getContext("2d"), id);
+    } else if (window.cadres_draw && window.cadres_draw.previewCadre) {
+      window.cadres_draw.previewCadre(c.getContext("2d"), id);
+    }
     return c;
   } else {
-    // Image classique
     const img = document.createElement("img");
     img.className = "photo-cadre";
     img.src = getCadreUrl(id);
@@ -43,7 +41,6 @@ function createCadreElement(id, taille = {w:80, h:100}) {
 function zoomCadre(id) {
   const popup = document.createElement("div");
   popup.className = "popup show";
-  // On affiche un canvas si cadre "draw", sinon img
   const cadreEl = createCadreElement(id, {w: 180, h: 220});
   const photo = document.createElement("img");
   photo.className = "photo-user";
@@ -65,7 +62,7 @@ function zoomCadre(id) {
 
 // Sélectionner un cadre
 async function utiliserCadre(id) {
-  await setCadreSelectionne(id);
+  await window.setCadreSelectionne(id);
   alert("✅ Cadre sélectionné !");
   await afficherCadres();
 }
@@ -73,8 +70,8 @@ async function utiliserCadre(id) {
 // Affiche tous les cadres possédés
 async function afficherCadres() {
   const container = document.getElementById("cadres-list");
-  const cadresPossedes = await getCadresPossedes();
-  const cadreActif = await getCadreSelectionne();
+  const cadresPossedes = await window.getCadresPossedes();
+  const cadreActif = await window.getCadreSelectionne();
 
   container.innerHTML = "";
 
@@ -87,7 +84,7 @@ async function afficherCadres() {
     const div = document.createElement("div");
     div.className = "cadre-item";
 
-    // Aperçu du cadre : canvas ou img
+    // Aperçu du cadre : canvas ou img
     const preview = document.createElement("div");
     preview.className = "cadre-preview";
     preview.style.cursor = "zoom-in";
@@ -122,7 +119,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // force la resynchro cloud une fois (juste après un achat)
   const lastUpdate = parseInt(localStorage.getItem('lastCadresUpdate') || "0");
   if (Date.now() - lastUpdate < 5000) {
-    await getCadresPossedes(true);
+    await window.getCadresPossedes(true);
     localStorage.removeItem('lastCadresUpdate');
   }
 

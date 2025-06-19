@@ -77,7 +77,10 @@
   </div>
 
   <!-- ===================== SCRIPTS ===================== -->
-  <script type="module" src="js/userData.js"></script>
-  <script type="module" src="js/duel.js"></script>
+  <!-- 1. Charge Supabase (version globale, PAS de +esm) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <!-- 2. Charge userData (doit faire le createClient une seule fois dedans si possible) -->
+  <script src="js/userData.js"></script>
+  <script src="js/duel.js"></script>
 </body>
 </html>
