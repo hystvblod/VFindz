@@ -2520,3 +2520,9 @@ overflow-y: auto;
   border: 3px solid #FFD700;
   transform: scale(1.10);
 }
+.popup-premium-pro {
+  max-height: 80vh;        /* ou 82vh selon la place souhaitée */
+  overflow-y: auto;        /* active le scroll interne si contenu trop long */
+  padding-bottom: 56px;    /* ajoute un peu de marge en bas pour le bouton */
+  /* le reste de ton style (background, radius...) ne change PAS */
+}
