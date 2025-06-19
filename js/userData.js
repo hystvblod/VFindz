@@ -597,3 +597,5 @@ window.checkBlocageUtilisateur = checkBlocageUtilisateur;
 window.renderID = renderID;
 window.getCadreUrl = getCadreUrl;
 window.getUserByPseudo = getUserByPseudo;
+window.getJetons = getJetonsCloud;
+
