@@ -99,6 +99,7 @@ function majSolde() {
   if (document.getElementById("points")) document.getElementById("points").textContent = userData.points || 0;
   if (document.getElementById("jetons")) document.getElementById("jetons").textContent = userData.jetons || 0;
 }
+
 // ----------- LOGIQUE JEU -------------
 async function initSoloGame() {
   await chargerUserData(true);
@@ -257,6 +258,20 @@ async function loadDefis() {
     }
   }, 15);
 }
+
+// ----------- FONCTION CLE SOLO : VALIDATION AVEC JETON (adapté DUEL) -----------
+async function validerDefiAvecJeton(index) {
+  let defis = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
+  let defi = defis[index];
+  if (!defi) return;
+  defi.done = true;
+  defis[index] = defi;
+  localStorage.setItem(SOLO_DEFIS_KEY, JSON.stringify(defis));
+  await loadDefis?.();
+  if (typeof majSolde === "function") majSolde();
+}
+window.validerDefiAvecJeton = validerDefiAvecJeton;
+
 // ----------- PRISE/REPRISE PHOTO CENTRALISÉE -----------
 window.gererPrisePhoto = function(defiId, index) {
   let defis = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
@@ -303,6 +318,10 @@ window.gererPrisePhoto = function(defiId, index) {
     window.ouvrirCameraPour(defiId);
   }
 };
+
+// ... [reste du fichier inchangé, à partir de window.afficherPhotoDansCadreSolo, etc.]
+
+
 
 // ----------- PHOTO DANS CADRE & LOGIQUE PUB/PREMIUM -----------
 window.afficherPhotoDansCadreSolo = async function(defiId, dataUrl) {
