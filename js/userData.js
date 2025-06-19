@@ -1,8 +1,6 @@
-
 const SUPABASE_URL = 'https://swmdepiukfginzhbeccz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI';
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
 
 let userDataCache = null;
 let userIdCache = null;
@@ -122,8 +120,6 @@ async function getIdColor() {
 
 // CACHE RAPIDE
 function getPseudoCached()        { return userDataCache?.pseudo ?? "Toi"; }
-function getPointsCached()        { return userDataCache?.points ?? 0; }
-function getJetonsCached()        { return userDataCache?.jetons ?? 0; }
 function getCadresPossedesCached(){ return userDataCache?.cadres ?? []; }
 function getCadreSelectionneCached() { return userDataCache?.cadreActif ?? "polaroid_01"; }
 function isPremiumCached()        { return !!userDataCache?.premium; }
@@ -134,7 +130,9 @@ function getVotesConcoursCached(){ return userDataCache?.votesConcours ?? {}; }
 function hasDownloadedVZoneCached() { return userDataCache?.hasDownloadedVZone ?? false; }
 function hasDownloadedVBlocksCached() { return userDataCache?.hasDownloadedVBlocks ?? false; }
 function getFriendsInvitedCached() { return userDataCache?.friendsInvited ?? 0; }
+
 // --------- FONCTIONS CLOUD ----------
+
 async function getPseudo() { await loadUserData(); return getPseudoCached(); }
 
 async function setPseudo(pseudo) {
@@ -146,37 +144,39 @@ async function setPseudo(pseudo) {
   const premium = isPremiumCached();
   const nbChangements = userDataCache.nbChangementsPseudo;
   if (nbChangements >= 1 && !premium) {
-    if (userDataCache.points < 300) {
+    // Appel RPC pour enlever 300 points
+    const points = await getPointsCloud();
+    if (points < 300) {
       alert("Changer d'identifiant coûte 300 pièces. Tu n’en as pas assez.");
       return false;
     }
-    userDataCache.points -= 300;
+    const { data, error } = await supabase.rpc('secure_remove_points', { nb: 300 });
+    if (error || !data || data.success !== true) {
+      alert("Erreur lors du retrait des points.");
+      return false;
+    }
   }
   userDataCache.pseudo = pseudo;
   userDataCache.nbChangementsPseudo = nbChangements + 1;
   await supabase.from('users').update({
     pseudo,
-    nbChangementsPseudo: userDataCache.nbChangementsPseudo,
-    points: userDataCache.points
+    nbChangementsPseudo: userDataCache.nbChangementsPseudo
   }).eq('id', userIdCache);
   return true;
 }
 
-async function getJetons() { await loadUserData(); return getJetonsCached(); }
-async function addJetons(n) {
-  await loadUserData();
-  userDataCache.jetons += n;
-  await supabase.from('users').update({ jetons: userDataCache.jetons }).eq('id', userIdCache);
+// --- POINTS/JETONS 100% SÉCURISÉS ---
+
+async function getPointsCloud() {
+  const profil = await getUserDataCloud();
+  return profil.points || 0;
 }
-async function removeJeton() {
-  await loadUserData();
-  if (userDataCache.jetons <= 0) return false;
-  userDataCache.jetons -= 1;
-  await supabase.from('users').update({ jetons: userDataCache.jetons }).eq('id', userIdCache);
-  return true;
+async function getJetonsCloud() {
+  const profil = await getUserDataCloud();
+  return profil.jetons || 0;
 }
 
-// CADRES
+// --- CADRES ---
 function formatCadreId(id) {
   const num = id.replace(/[^\d]/g, "");
   const padded = num.padStart(2, "0");
@@ -213,7 +213,6 @@ async function setCadreSelectionne(id) {
   userDataCache.cadreActif = idClean;
   await supabase.from('users').update({ cadreActif: idClean }).eq('id', userIdCache);
 }
-
 // HISTORIQUE PHOTOS
 async function sauvegarderPhoto(base64, defi, type = "solo") {
   await loadUserData();
@@ -497,6 +496,7 @@ async function ajouterDefiHistorique({ defi, type = 'solo', date = null }) {
   }
   await supabase.from('users').update({ historique }).eq('id', userId);
 }
+
 // ========== CHECK BLOCAGE UTILISATEUR ==========
 async function checkBlocageUtilisateur(userId) {
   const now = new Date().toISOString();
@@ -510,7 +510,6 @@ async function checkBlocageUtilisateur(userId) {
     console.error("Erreur blocage utilisateur :", error.message);
     return false;
   }
-
   if (data && data.banni) {
     if (
       data.ban_date_debut &&
@@ -552,12 +551,13 @@ async function getUserByPseudo(pseudo) {
 }
 
 // ========== GLOBALISATION DES FONCTIONS ==========
-// (À coller ABSOLUMENT à la fin du fichier !)
 window.supabase = supabase;
 window.loadUserData = loadUserData;
 window.ensureAuth = ensureAuth;
 window.getPseudo = getPseudo;
 window.setPseudo = setPseudo;
+window.getPointsCloud = getPointsCloud;
+window.getJetonsCloud = getJetonsCloud;
 window.getCadresPossedes = getCadresPossedes;
 window.acheterCadre = acheterCadre;
 window.possedeCadre = possedeCadre;
