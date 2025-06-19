@@ -2521,8 +2521,29 @@ overflow-y: auto;
   transform: scale(1.10);
 }
 .popup-premium-pro {
-  max-height: 80vh;        /* ou 82vh selon la place souhaitée */
-  overflow-y: auto;        /* active le scroll interne si contenu trop long */
-  padding-bottom: 56px;    /* ajoute un peu de marge en bas pour le bouton */
-  /* le reste de ton style (background, radius...) ne change PAS */
+  background: linear-gradient(135deg, #292949 0%, #4f59b0 70%, #2e3f7c 100%);
+  border-radius: 20px;
+  box-shadow: 0 8px 44px #181c3a88, 0 1.5px 0 #fff3;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  padding: 40px 18px 22px 18px;
+  max-width: 370px;
+  width: 92vw;
+  margin: 32px auto;
+  text-align: center;
+  position: relative;
+  overflow: visible;
+  box-sizing: border-box;
+}
+
+@media (max-width: 500px) {
+  .popup-premium-pro {
+    max-width: 96vw;
+    padding: 20px 5vw 18px 5vw;
+    margin: 12px auto;
+    font-size: 0.99em;
+  }
+  .premium-list-pro {
+    font-size: 1em;
+  }
 }

@@ -44,14 +44,6 @@
 
   <!-- 3. Script principal (plus aucun import, tout via window) -->
   <script>
-    // Récupère l'URL du cadre (utilise la fonction globale window.getCadreUrl)
-    function getCadreUrl(id) {
-      if (typeof window.getCadreUrl === "function") return window.getCadreUrl(id);
-      // fallback au cas où
-      return localStorage.getItem(`cadre_${id}`) ||
-             `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${id}.webp`;
-    }
-
     // Pop-up zoom sur le cadre
     window.zoomCadre = function(id) {
       const popup = document.createElement("div");
@@ -60,7 +52,7 @@
         <div class="popup-inner">
           <button id="close-popup" onclick="document.body.removeChild(this.parentNode.parentNode)">✖</button>
           <div class="cadre-preview cadre-popup">
-            <img class="photo-cadre" src="${getCadreUrl(id)}" />
+            <img class="photo-cadre" src="${window.getCadreUrl(id)}" />
             <img class="photo-user" src="./assets/img/exemple.jpg" />
           </div>
         </div>
@@ -108,7 +100,7 @@
         div.className = "cadre-item";
         div.innerHTML = `
           <div class="cadre-preview" style="cursor:zoom-in" onclick="window.zoomCadre('${cadre}')">
-            <img class="photo-cadre" src="${getCadreUrl(cadre)}" />
+            <img class="photo-cadre" src="${window.getCadreUrl(cadre)}" />
             <img class="photo-user" src="./assets/img/exemple.jpg" />
           </div>
           <button onclick="window.utiliserCadre('${cadre}')" ${cadre === cadreActif ? "disabled" : ""}>

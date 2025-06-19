@@ -95,6 +95,7 @@ function showFeedback(text) {
 
 // --- Acheter cadre depuis boutique (cloud & local) ---
 async function acheterCadreBoutique(id, prix) {
+  await window.loadUserData(true); // force reload données utilisateur !
   const { data, error } = await window.supabase.rpc('secure_remove_points', { nb: prix });
   if (error || !data || data.success !== true) {
     alert("❌ Pas assez de pièces ou erreur !");
@@ -121,6 +122,7 @@ async function acheterCadreBoutique(id, prix) {
   localStorage.setItem('lastCadresUpdate', Date.now().toString());
   await window.getOwnedFrames(true);
   await updatePointsDisplay();
+  await updateJetonsDisplay(); // <-- Ajouté si jamais jetons impactés
   alert("✅ Cadre acheté !");
   await renderBoutique(currentCategory);
 }
@@ -170,6 +172,7 @@ function fermerPopupJetonBoutique() {
   if (popup) popup.classList.add("hidden");
 }
 async function acheterJetonsAvecPieces() {
+  await window.loadUserData(true); // Sécurité anti-cache
   const { data, error } = await window.supabase.rpc('secure_remove_points', { nb: 100 });
   if (error || !data || data.success !== true) {
     alert("❌ Pas assez de pièces.");
@@ -192,7 +195,9 @@ async function acheterJetonsAvecPub() {
 }
 
 // --- Affichage points/jetons ---
+// 🔥 PATCH : Toujours reload les données à jour depuis Supabase !
 async function updatePointsDisplay() {
+  await window.loadUserData(true); // FORCE reload à chaque update affichage
   const pointsDisplay = document.getElementById("points");
   if (pointsDisplay) {
     const profil = await window.getUserDataCloud();
@@ -200,8 +205,12 @@ async function updatePointsDisplay() {
   }
 }
 async function updateJetonsDisplay() {
+  await window.loadUserData(true); // FORCE reload à chaque update affichage
   const jetonsSpan = document.getElementById("jetons");
-  if (jetonsSpan) jetonsSpan.textContent = await window.getJetons();
+  if (jetonsSpan) {
+    const profil = await window.getUserDataCloud();
+    jetonsSpan.textContent = profil.jetons || 0;
+  }
 }
 
 // Patch scroll & overflow

@@ -487,13 +487,14 @@ window.ouvrirPopupJeton = async function(index) {
   const jetons = await window.getJetons();
   if (jetons > 0) {
     if (confirm("Valider ce défi avec un jeton ?")) {
-      const success = await window.removeJeton();
-      if (success) {
-        await validerDefiAvecJeton(index);
-        majSolde();
-      } else {
-        alert("Erreur lors de la soustraction du jeton.");
+      // Appelle la fonction sécurisée Supabase
+      const { data, error } = await window.supabase.rpc('secure_remove_jeton', { nb: 1 });
+      if (error || !data || data.success !== true) {
+        alert("Erreur lors de la soustraction du jeton ou plus de jetons dispo !");
+        return;
       }
+      await validerDefiAvecJeton(index);
+      majSolde?.(); // Optionnel : maj affichage jetons/pièces
     }
   } else {
     if (confirm("Plus de jeton disponible. Regarder une pub pour gagner 3 jetons ?")) {
@@ -507,19 +508,6 @@ window.ouvrirPopupJeton = async function(index) {
     }
   }
 };
-
-async function validerDefiAvecJeton(index) {
-  let defis = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
-  let defi = defis[index];
-  if (!defi.done) {
-    defi.done = true;
-    defi.byJeton = true;
-    defis[index] = defi;
-    localStorage.setItem(`photo_defi_${defi.id}`, JSON.stringify({ photo: "assets/img/jetonpp.webp", cadre: "polaroid_01" }));
-    localStorage.setItem(SOLO_DEFIS_KEY, JSON.stringify(defis));
-    await loadDefis();
-  }
-}
 
 // ----------- FIN DE PARTIE AUTOMATIQUE -----------
 window.endGameAuto = async function() {
