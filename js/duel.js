@@ -402,6 +402,7 @@ async function initDuelGame() {
     }
     if (roomData.starttime && $("timer")) startGlobalTimer(roomData.starttime);
     else if ($("timer")) $("timer").textContent = "--:--:--";
+    window.renderDefis();
 
     // Ici tu peux faire renderDefis() si tu as la fonction pour afficher les défis et photos, sinon tu ajoutes ton render ici.
   }
@@ -764,3 +765,36 @@ if (window.location.pathname.includes("duel_amis_premium.html")) {
   // Ta logique premium si tu veux (non recopiée ici)
 }
 document.addEventListener("DOMContentLoaded", afficherSolde);
+window.renderDefis = function () {
+  if (!window.roomData || !roomData.defis) return;
+
+  const liste = document.getElementById("duel-defi-list");
+  if (!liste) return;
+  liste.innerHTML = "";
+
+  roomData.defis.forEach((defi, idx) => {
+    const li = document.createElement("li");
+    li.className = "defi-item";
+
+    li.innerHTML = `
+      <div class="defi-col defi-titre">${defi}</div>
+      <div class="defi-col">
+        <button onclick="window.gererPrisePhotoDuel(${idx})">📷</button>
+      </div>
+      <div class="defi-col">
+        <button onclick="window.afficherPhotoDuel(${idx})">👁️</button>
+      </div>
+    `;
+
+    liste.appendChild(li);
+  });
+};
+window.afficherPhotoDuel = async function(idx) {
+  const champ = window.isPlayer1 ? 'photosa' : 'photosb';
+  const photo = await window.getPhotoDuel(window.currentRoomId, champ, idx);
+  if (!photo || !photo.url) {
+    alert("Aucune photo trouvée pour ce défi.");
+    return;
+  }
+  window.agrandirPhoto(photo.url, photo.cadre || "polaroid_01");
+};

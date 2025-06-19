@@ -148,6 +148,21 @@
         </a>
       </div>
     </div>
+    <!-- AFFICHAGE SOLDE DANS LE HEADER -->
+    <div class="solde-container solde-solo" id="solde-container">
+      <div class="solde-item">
+        <div class="solde-ligne">
+          <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" />
+          <span id="points"></span>
+        </div>
+      </div>
+      <div class="solde-item">
+        <div class="solde-ligne">
+          <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" />
+          <span id="jetons"></span>
+        </div>
+      </div>
+    </div>
   </header>
 
   <main>
@@ -166,32 +181,32 @@
     <p>&copy; 2025 VFindz</p>
   </footer>
 
-  <!-- 1. Supabase global (PAS de +esm, PAS de type="module") -->
+  <!-- 1. Supabase global -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <!-- 2. Fonctions utilisateurs (tout doit mettre sur window, ex: window.getPseudo) -->
+  <!-- 2. Fonctions utilisateurs -->
   <script src="js/userData.js"></script>
   <!-- 3. Script logique DUEL PRIVE, version globale -->
   <script>
-    // INIT Supabase si pas déjà fait dans userData.js
     if (!window.supabase) {
       window.supabase = supabase.createClient(
         'https://swmdepiukfginzhbeccz.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI' // << METS TA CLÉ PUBLIC ICI !!!
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI'
       );
     }
-
     let pseudoPublic = null;
     let profil = null;
 
-    // -- Charge le profil utilisateur
+    // Charge le profil utilisateur + points/jetons
     async function loadProfil() {
       await window.loadUserData();
       pseudoPublic = await window.getPseudo();
-      const { data, error } = await window.supabase.from('users').select('*').eq('pseudo', pseudoPublic).single();
+      const { data } = await window.supabase.from('users').select('*').eq('pseudo', pseudoPublic).single();
       profil = data;
     }
 
     document.addEventListener("DOMContentLoaded", async () => {
+      // MAJ du solde points/jetons si la fonction est dispo
+      if (typeof window.afficherSolde === "function") await window.afficherSolde();
       await loadProfil();
       afficherAmis();
       afficherDemandesDuel();
@@ -218,7 +233,7 @@
     }
 
     async function afficherDemandesDuel() {
-      // DemandES RECUES
+      // RECUES
       const ulRecue = document.getElementById("demandes-recue");
       ulRecue.innerHTML = "";
       const recues = (profil && profil.demandesDuelRecues) ? profil.demandesDuelRecues : [];
@@ -238,7 +253,7 @@
         ulRecue.appendChild(card);
       });
 
-      // DemandES ENVOYÉES
+      // ENVOYÉES
       const ulEnv = document.getElementById("demandes-envoyees");
       ulEnv.innerHTML = "";
       const envoyees = (profil && profil.demandesDuelEnvoyees) ? profil.demandesDuelEnvoyees : [];
@@ -277,15 +292,15 @@
 
     async function accepterDuel(amiPseudo) {
       const defis = await getRandomDefis();
-      const { data, error } = await window.supabase.from('duels').insert([{
-        player1: amiPseudo,
-        player2: pseudoPublic,
+      const { data } = await window.supabase.from('duels').insert([{
+        player1_pseudo: amiPseudo, // ADAPTE le nom de colonne si besoin
+        player2_pseudo: pseudoPublic,
         status: 'playing',
-        createdAt: Date.now(),
+        createdat: Date.now(),
         defis,
-        startTime: Date.now(),
-        photosA: {},
-        photosB: {}
+        starttime: Date.now(),
+        photosa: {},
+        photosb: {}
       }]).select();
 
       await window.supabase.from("users").update({
@@ -320,7 +335,7 @@
     }
 
     async function getRandomDefis(count = 3) {
-      const { data, error } = await window.supabase
+      const { data } = await window.supabase
         .from('defis')
         .select('intitule')
         .eq('actif', true);
