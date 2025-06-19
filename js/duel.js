@@ -866,25 +866,6 @@ export async function deleteDuelPhotosFromSupabase(roomId) {
   }
 }
 
-async function getDefisDuelFromSupabase(count = 3) {
-  let { data, error } = await supabase
-    .from('defis')
-.select('intitule')
-.order('random()', { ascending: false })
-.limit(count);
-
-
-  if (error || !data || data.length < count) {
-    const backup = [
-      "Un escagot ",
-      "Photo d'un animal",
-      "Photo d'une ombre"
-    ];
-    return backup.sort(() => 0.5 - Math.random()).slice(0, count);
-  }
-  return data.map(x => x.intitule);
-
-}
 
 async function getRoom(roomId) {
   const { data } = await supabase.from('duels').select('*').eq('id', roomId).single();
