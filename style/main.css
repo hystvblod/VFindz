@@ -1944,7 +1944,7 @@ overflow-y: auto;
 /* --- STYLE PRO POUR POPUP PREMIUM --- */
 .popup-premium-pro {
   background: linear-gradient(135deg, #292949 0%, #4f59b0 70%, #2e3f7c 100%);
-  border-radius: 28px;
+  border-radius: 22px;
   box-shadow: 0 8px 44px #181c3a88, 0 1.5px 0 #fff3;
   color: #fff;
   font-family: 'Poppins', sans-serif;
