@@ -1,8 +1,3 @@
-<!-- 1. Supabase global UMD -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<!-- 2. userData global (doit setter sur window toutes les fonctions) -->
-<script src="js/userData.js"></script>
-<script>
 let userPseudo = null;
 let userProfile = null;
 let lastAmiRequest = 0;
@@ -50,6 +45,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   detecterInvitationParLien();
 });
+
 async function rechargerAffichage() {
   userProfile = await window.getUserDataCloud();
   await afficherListesAmis(userProfile);
@@ -87,6 +83,8 @@ async function afficherListesAmis(data) {
       </li>`).join("")
     : "<li class='txt-empty'>Aucune demande envoyée.</li>";
 }
+
+// Demande d'ajout d'ami
 window.envoyerDemandeAmi = async function(pseudoAmi) {
   if (!userPseudo || !pseudoAmi || pseudoAmi === userPseudo)
     return toast("Tu ne peux pas t'ajouter toi-même !", "#b93f3f");
@@ -113,6 +111,7 @@ window.envoyerDemandeAmi = async function(pseudoAmi) {
   await rechargerAffichage();
 };
 
+// Accepter une demande d'ami
 window.accepterDemande = async function(pseudoAmi) {
   const { data: ami } = await window.supabase
     .from("users")
@@ -141,6 +140,7 @@ window.accepterDemande = async function(pseudoAmi) {
   await rechargerAffichage();
 };
 
+// Refuser une demande
 window.refuserDemande = async function(pseudoAmi) {
   const { data: ami } = await window.supabase
     .from("users")
@@ -162,7 +162,7 @@ window.refuserDemande = async function(pseudoAmi) {
   await rechargerAffichage();
 };
 
-// --- Suppression Ami popup + action
+// Suppression d'ami : popup
 window.demanderSuppressionAmi = function(pseudoAmi) {
   amiASupprimer = pseudoAmi;
   document.getElementById('popup-suppr-ami-nom').textContent = pseudoAmi;
@@ -198,6 +198,7 @@ window.defierAmi = function(pseudoAmi) {
   window.location.href = `duel.html?ami=${pseudoAmi}`;
 };
 
+// Invitation par lien
 function detecterInvitationParLien() {
   const params = new URLSearchParams(window.location.search);
   const toAdd = params.get("add");
@@ -209,4 +210,3 @@ function detecterInvitationParLien() {
     }
   }
 }
-</script>
