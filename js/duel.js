@@ -9,6 +9,10 @@ let isPlayer1 = false;
 let roomData = null;
 let timerInterval = null;
 
+// ========== CHANNEL GLOBAL ==========
+window._duelRoomChannel = null;
+window._duelRoomChannelId = null;
+
 // ========== Helpers cloud points/jetons ==========
 window.getPointsCloud = async function() {
   const profil = await window.getUserDataCloud();
@@ -211,8 +215,6 @@ async function gagnerPoints(montant) {
 window.gagnerPoints = gagnerPoints;
 
 // ========== HELPERS ==========
-
-// Petit helper DOM
 function $(id) { return document.getElementById(id); }
 window.$ = $;
 
@@ -326,7 +328,6 @@ async function findOrCreateRoom() {
 window.findOrCreateRoom = findOrCreateRoom;
 
 // ========== FONCTION CREATION DUEL PRIVE/PREMIUM ==========
-// Appelle cette fonction pour créer un duel privé
 window.creerDuelPrive = async function(amiPseudo) {
   const monPseudo = await window.getPseudo();
   const defis = await getDefisDuelFromSupabase(3);
@@ -349,7 +350,6 @@ window.creerDuelPrive = async function(amiPseudo) {
   window.location.href = `duel_game.html?room=${data[0].id}`;
 }
 
-// Pour le premium, même logique (type: 'premium')
 window.creerDuelPremium = async function(amiPseudo) {
   const monPseudo = await window.getPseudo();
   const defis = await getDefisDuelFromSupabase(3);
@@ -417,8 +417,6 @@ function waitRoom(roomId) {
 }
 window.waitRoom = waitRoom;
 
-// ... (le reste inchangé : initDuelGame, savePhotoDuel, etc.)
-
 // ========== LOGIQUE DU JEU : INIT, SYNC, RENDER ==========
 async function initDuelGame() {
   if (!(path.includes("duel_game.html") && roomId)) return;
@@ -437,20 +435,6 @@ async function initDuelGame() {
   updateDuelUI();
   await checkFinDuel();
 
-  function subscribeRoom(roomId, callback) {
-    window.supabase
-      .channel('duel_room_' + roomId)
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'duels',
-        filter: `id=eq.${roomId}`
-      }, payload => {
-        callback(payload.new);
-      })
-      .subscribe();
-  }
-
   async function updateDuelUI() {
     if (!roomData) return;
     const pseudo = await window.getPseudo();
@@ -462,7 +446,6 @@ async function initDuelGame() {
     if ($("nom-adversaire")) $("nom-adversaire").textContent = headerLabel;
     if ($("pseudo-moi")) $("pseudo-moi").textContent = myID ? myID : "Moi";
 
-    // Couleur personnalisée SEULEMENT
     if ($("pseudo-adv")) {
       if (advID) {
         const { data: advUser } = await window.supabase
@@ -479,8 +462,6 @@ async function initDuelGame() {
     if (roomData.starttime && $("timer")) startGlobalTimer(roomData.starttime);
     else if ($("timer")) $("timer").textContent = "--:--:--";
     window.renderDefis();
-
-    // Ici tu peux faire renderDefis() si tu as la fonction pour afficher les défis et photos, sinon tu ajoutes ton render ici.
   }
 
   function startGlobalTimer(startTime) {
@@ -498,6 +479,36 @@ async function initDuelGame() {
   }
 }
 window.initDuelGame = initDuelGame;
+
+// ========== PATCH : GESTION ABONNEMENT CANAL SUPABASE ==========
+function subscribeRoom(roomId, callback) {
+  // Si déjà abonné à cette room, ne rien faire
+  if (window._duelRoomChannel && window._duelRoomChannelId === roomId) return;
+
+  // Si abonné à une autre room, clean l'ancien abonnement
+  if (window._duelRoomChannel && window._duelRoomChannelId !== roomId) {
+    window._duelRoomChannel.unsubscribe();
+    window._duelRoomChannel = null;
+    window._duelRoomChannelId = null;
+  }
+
+  // Nouveau subscribe
+  const channel = window.supabase
+    .channel('duel_room_' + roomId)
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'duels',
+      filter: `id=eq.${roomId}`
+    }, payload => {
+      callback(payload.new);
+    })
+    .subscribe();
+
+  window._duelRoomChannel = channel;
+  window._duelRoomChannelId = roomId;
+}
+window.subscribeRoom = subscribeRoom;
 
 // ========== UTILS GET ROOM, PHOTO DUEL, SAVE PHOTO ==========
 async function getRoom(roomId) {
@@ -556,7 +567,6 @@ async function cleanupDuelPhotos() {
 window.cleanupDuelPhotos = cleanupDuelPhotos;
 
 // ========== LOGIQUE FIN DE DUEL + POPUP ==========
-
 async function checkFinDuel() {
   if (!roomData) return;
   const start = roomData.starttime;
@@ -643,6 +653,7 @@ async function afficherPopupFinDuel(room) {
   };
 }
 window.afficherPopupFinDuel = afficherPopupFinDuel;
+
 // ========== POPUP PUB/PREMIUM ==========
 function ouvrirPopupRepriseDuel(onPub) {
   const popup = document.getElementById("popup-reprise-photo-duel");
@@ -874,6 +885,16 @@ window.afficherPhotoDuel = async function(idx) {
   }
   window.agrandirPhoto(photo.url, photo.cadre || "polaroid_01");
 };
+
+// ... (tout le reste inchangé : popup, gestion jeton, choix cadre, etc.)
+
+// ========== INIT AUTO DES PAGES ==========
+if (window.location.pathname.includes("duel_game.html")) {
+  initDuelGame();
+}
+document.addEventListener("DOMContentLoaded", afficherSolde);
+
+
 
 // ... (tout le reste inchangé : popup, gestion jeton, choix cadre, etc.)
 

@@ -21,9 +21,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 window.showAd = async function(type = "rewarded") {
   // On récupère la fonction premium/points globales
-  const premium = await window.isPremium();
+  const premium = await window.isPremium?.();
   if (premium) {
-    if (type === "rewarded") await window.addPoints(10);
+    if (type === "rewarded") await window.addPoints?.(10);
     await window.updatePointsDisplay?.();
     return;
   }
@@ -42,7 +42,7 @@ window.showAd = async function(type = "rewarded") {
     } else {
       // En mode navigateur : simule une pub pour dev/test
       alert("[SIMULATION PUB] Regarde une pub " + type);
-      if (type === "rewarded") await window.addPoints(10);
+      if (type === "rewarded") await window.addPoints?.(10);
     }
   } catch (e) {
     console.warn("Erreur pub :", e);
@@ -51,7 +51,21 @@ window.showAd = async function(type = "rewarded") {
   await window.updatePointsDisplay?.();
 };
 
+// -- MAJ points affichés
 window.updatePointsDisplay = async function() {
   const pointsSpan = document.getElementById("points");
   if (pointsSpan && window.getPoints) pointsSpan.textContent = await window.getPoints();
+};
+
+// ========== Fonction pour la popup BOUTIQUE : PUB → Jetons ==========
+window.acheterJetonsAvecPub = async function() {
+  // Affiche une pub rewarded, attend la fin
+  await window.showAd('rewarded');
+  // Ajoute 3 jetons à l'utilisateur
+  await window.supabase.rpc('secure_add_jetons', { nb: 3 });
+  // Mets à jour l'affichage
+  if (window.afficherSolde) await window.afficherSolde();
+  // Ferme la popup si dispo
+  if (window.fermerPopupJetonBoutique) window.fermerPopupJetonBoutique();
+  alert("+3 jetons ajoutés !");
 };
