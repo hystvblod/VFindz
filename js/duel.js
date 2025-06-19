@@ -853,6 +853,7 @@ if (window.location.pathname.includes("duel_amis_premium.html")) {
 }
 document.addEventListener("DOMContentLoaded", afficherSolde);
 window.renderDefis = function () {
+  console.log('renderDefis', window.roomData); // Ajout pour debug
   if (!window.roomData || !roomData.defis) return;
 
   const liste = document.getElementById("duel-defi-list");
