@@ -564,7 +564,7 @@ document.addEventListener("DOMContentLoaded", () => {
   nettoyerPhotosDefis();
   chargerUserData(true).then(majSolde);
   // Lancement direct sans pré-game
-  init();
+ initSoloGame();
 
   document.querySelectorAll('.close-btn, #close-popup').forEach(btn => {
     btn.onclick = function() {
