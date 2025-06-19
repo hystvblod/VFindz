@@ -9,6 +9,16 @@ let isPlayer1 = false;
 let roomData = null;
 let timerInterval = null;
 
+// ========== Helpers cloud points/jetons ==========
+window.getPointsCloud = async function() {
+  const profil = await window.getUserDataCloud();
+  return profil.points || 0;
+};
+window.getJetons = async function() {
+  const profil = await window.getUserDataCloud();
+  return profil.jetons || 0;
+};
+
 // ========== IndexedDB cache ==========
 const VFindDuelDB = {
   db: null,
@@ -112,6 +122,7 @@ function retirerPhotoAimeeDuel(defiId) {
   localStorage.setItem("photos_aimees_duel", JSON.stringify(aimes));
 }
 window.retirerPhotoAimeeDuel = retirerPhotoAimeeDuel;
+
 // ========== UPLOAD PHOTO (webp, storage, DB, cache) ==========
 async function uploadPhotoDuelWebp(dataUrl, duelId, idx, cadreId) {
   function dataURLtoBlob(dataurl) {
@@ -150,7 +161,7 @@ window.uploadPhotoDuelWebp = uploadPhotoDuelWebp;
 
 // ========== HANDLERS SOLDE/POINTS/JETONS ==========
 async function afficherSolde() {
-  const points = await window.getPoints();
+  const points = await window.getPointsCloud();
   const jetons = await window.getJetons();
   const pointsSpan = document.getElementById('points');
   const jetonsSpan = document.getElementById('jetons');
@@ -204,6 +215,7 @@ window.gagnerPoints = gagnerPoints;
 // Petit helper DOM
 function $(id) { return document.getElementById(id); }
 window.$ = $;
+
 // ========== GET DEFIS (depuis Supabase, fallback local si erreur) ==========
 async function getDefisDuelFromSupabase(count = 3) {
   let { data, error } = await window.supabase
@@ -222,6 +234,13 @@ async function getDefisDuelFromSupabase(count = 3) {
   return data.map(x => x.intitule);
 }
 window.getDefisDuelFromSupabase = getDefisDuelFromSupabase;
+
+// ========== FIND OR CREATE ROOM ==========
+// ... (reste inchangé) ...
+
+// ... (tout le reste de ton fichier reste identique)
+
+
 
 // ========== FIND OR CREATE ROOM ==========
 async function findOrCreateRoom() {
