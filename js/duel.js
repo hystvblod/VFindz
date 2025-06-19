@@ -1,27 +1,11 @@
-// ========== PARAMS ==========
+// ========== PARAMS / GLOBALS ==========
 const params = new URLSearchParams(window.location.search);
 const roomId = params.get("room");
 const path = window.location.pathname;
-
-// ========== VARIABLES GLOBALES ==========
 let currentRoomId = null;
 let isPlayer1 = false;
 let roomData = null;
 let timerInterval = null;
-
-// ========== CHANNEL GLOBAL ==========
-window._duelRoomChannel = null;
-window._duelRoomChannelId = null;
-
-// ========== Helpers cloud points/jetons ==========
-window.getPointsCloud = async function() {
-  const profil = await window.getUserDataCloud();
-  return profil.points || 0;
-};
-window.getJetons = async function() {
-  const profil = await window.getUserDataCloud();
-  return profil.jetons || 0;
-};
 
 // ========== IndexedDB cache ==========
 const VFindDuelDB = {
@@ -29,13 +13,8 @@ const VFindDuelDB = {
   async init() {
     return new Promise((resolve, reject) => {
       const open = indexedDB.open('VFindDuelPhotos', 1);
-      open.onupgradeneeded = () => {
-        open.result.createObjectStore('photos', { keyPath: 'key' });
-      };
-      open.onsuccess = () => {
-        VFindDuelDB.db = open.result;
-        resolve();
-      };
+      open.onupgradeneeded = () => open.result.createObjectStore('photos', { keyPath: 'key' });
+      open.onsuccess = () => { VFindDuelDB.db = open.result; resolve(); };
       open.onerror = reject;
     });
   },
@@ -93,286 +72,75 @@ function setCadreDuel(duelId, idx, cadreId) {
 }
 window.setCadreDuel = setCadreDuel;
 
-// ========== Premium colonne titre ==========
-async function setColTitlePremium(element, pseudo) {
-  if (!pseudo) { element.classList.remove('premium'); return; }
-  const { data } = await window.supabase.from('users').select('premium').eq('pseudo', pseudo).single();
-  if (data && data.premium) {
-    element.classList.add('premium');
-  } else {
-    element.classList.remove('premium');
-  }
-}
-window.setColTitlePremium = setColTitlePremium;
+// ========== Solde Points/Jetons ==========
+window.afficherSolde = async function() {
+  const points = await window.getPoints();
+  const jetons = await window.getJetons();
+  const pointsSpan = document.getElementById('points');
+  const jetonsSpan = document.getElementById('jetons');
+  if (pointsSpan) pointsSpan.textContent = points ?? 0;
+  if (jetonsSpan) jetonsSpan.textContent = jetons ?? 0;
+};
+document.addEventListener("DOMContentLoaded", () => {
+  window.afficherSolde && window.afficherSolde();
+});
 
-// ========== PHOTOS AIMÉES ==========
-function getPhotosAimeesDuel() {
+// ========= Fonctions coeurs locaux (photos aimées DUEL) =========
+window.getPhotosAimeesDuel = function() {
   return JSON.parse(localStorage.getItem("photos_aimees_duel") || "[]");
-}
-window.getPhotosAimeesDuel = getPhotosAimeesDuel;
-
-function aimerPhotoDuel(defiId) {
-  let aimes = getPhotosAimeesDuel();
+};
+window.aimerPhotoDuel = function(defiId) {
+  let aimes = window.getPhotosAimeesDuel();
   if (!aimes.includes(defiId)) {
     aimes.push(defiId);
     localStorage.setItem("photos_aimees_duel", JSON.stringify(aimes));
   }
-}
-window.aimerPhotoDuel = aimerPhotoDuel;
-
-function retirerPhotoAimeeDuel(defiId) {
-  let aimes = getPhotosAimeesDuel();
+};
+window.retirerPhotoAimeeDuel = function(defiId) {
+  let aimes = window.getPhotosAimeesDuel();
   aimes = aimes.filter(id => id !== defiId);
   localStorage.setItem("photos_aimees_duel", JSON.stringify(aimes));
-}
-window.retirerPhotoAimeeDuel = retirerPhotoAimeeDuel;
+};
 
-// ========== UPLOAD PHOTO (webp, storage, DB, cache) ==========
-async function uploadPhotoDuelWebp(dataUrl, duelId, idx, cadreId) {
+// ========== Fonctions d'upload photo + update DB ==========
+window.uploadPhotoDuelWebp = async function(dataUrl, duelId, idx, cadreId) {
   function dataURLtoBlob(dataurl) {
     var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
       bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
     while(n--) u8arr[n] = bstr.charCodeAt(n);
     return new Blob([u8arr], {type:mime});
   }
-  const userId = window.getUserId ? window.getUserId() : (await window.getPseudo());
+  const userId = window.getUserId ? await window.getUserId() : (await window.getPseudo());
   const blob = dataURLtoBlob(dataUrl);
   const filePath = `duel_photos/${duelId}_${idx}_${userId}_${Date.now()}.webp`;
 
+  // Upload photo dans le storage
   const { error: uploadError } = await window.supabase.storage
     .from('photosduel')
     .upload(filePath, blob, { upsert: true, contentType: "image/webp" });
   if (uploadError) throw new Error("Erreur upload storage : " + uploadError.message);
 
+  // Génère l’URL publique
   const { data: urlData } = window.supabase.storage.from('photosduel').getPublicUrl(filePath);
   const url = urlData.publicUrl;
 
+  // Mets l’URL et le cadre dans la table duels
   const pseudo = await window.getPseudo();
-  const { data: room, error: roomError } = await window.supabase.from('duels').select('*').eq('id', duelId).single();
-  if (!room) throw new Error("Room introuvable");
-
+  const { data: room } = await window.supabase.from('duels').select('*').eq('id', duelId).single();
   const champ = (room.player1_pseudo === pseudo) ? 'photosa' : 'photosb';
   let photos = room[champ] || {};
   photos[idx] = { url, cadre: cadreId };
   await window.supabase.from('duels').update({ [champ]: photos }).eq('id', duelId);
 
+  // Mets l’URL+cadre dans le cache local
   await VFindDuelDB.set(`${duelId}_${champ}_${idx}`, { url, cadre: cadreId });
+
+  // Mets le cadre en localStorage spécifique
   setCadreDuel(duelId, idx, cadreId);
 
   return url;
-}
-window.uploadPhotoDuelWebp = uploadPhotoDuelWebp;
-
-// ========== HANDLERS SOLDE/POINTS/JETONS ==========
-async function afficherSolde() {
-  const points = await window.getPointsCloud();
-  const jetons = await window.getJetons();
-  const pointsSpan = document.getElementById('points');
-  const jetonsSpan = document.getElementById('jetons');
-  if (pointsSpan) pointsSpan.textContent = points ?? 0;
-  if (jetonsSpan) jetonsSpan.textContent = jetons ?? 0;
-}
-window.afficherSolde = afficherSolde;
-
-async function validerDefiAvecJeton(idx) {
-  const { error } = await window.supabase.rpc('secure_remove_jeton', { nb: 1 });
-  if (error) {
-    alert("Erreur lors du retrait du jeton : " + error.message);
-    return;
-  }
-  await afficherSolde();
-}
-window.validerDefiAvecJeton = validerDefiAvecJeton;
-
-async function gagnerJeton() {
-  const { error } = await window.supabase.rpc('secure_add_jetons', { nb: 1 });
-  if (error) {
-    alert("Erreur lors de l'ajout du jeton : " + error.message);
-    return;
-  }
-  await afficherSolde();
-}
-window.gagnerJeton = gagnerJeton;
-
-async function retirerPoints(montant) {
-  const { error } = await window.supabase.rpc('secure_remove_points', { nb: montant });
-  if (error) {
-    alert("Erreur lors du retrait des points : " + error.message);
-    return;
-  }
-  await afficherSolde();
-}
-window.retirerPoints = retirerPoints;
-
-async function gagnerPoints(montant) {
-  const { error } = await window.supabase.rpc('secure_add_points', { nb: montant });
-  if (error) {
-    alert("Erreur lors de l'ajout des points : " + error.message);
-    return;
-  }
-  await afficherSolde();
-}
-window.gagnerPoints = gagnerPoints;
-
-// ========== HELPERS ==========
-function $(id) { return document.getElementById(id); }
-window.$ = $;
-
-// ========== GET DEFIS (depuis Supabase, fallback local si erreur) ==========
-async function getDefisDuelFromSupabase(count = 3) {
-  let { data, error } = await window.supabase
-    .from('defis')
-    .select('intitule')
-    .order('random()', { ascending: false })
-    .limit(count);
-  if (error || !data || data.length < count) {
-    const backup = [
-      "Un escargot",
-      "Photo d'un animal",
-      "Photo d'une ombre"
-    ];
-    return backup.sort(() => 0.5 - Math.random()).slice(0, count);
-  }
-  return data.map(x => x.intitule);
-}
-window.getDefisDuelFromSupabase = getDefisDuelFromSupabase;
-
-// ========== FIND OR CREATE ROOM ALÉATOIRE ==========
-async function findOrCreateRoom() {
-  if (await checkAlreadyInDuel()) return;
-  localStorage.removeItem("duel_random_room");
-  localStorage.removeItem("duel_is_player1");
-  const pseudo = await window.getPseudo();
-
-  const start = Date.now();
-  let foundRoom = false;
-
-  // On essaie de trouver une room existante pendant 30 secondes maximum
-  while (Date.now() - start < 30000) {
-    let { data: rooms } = await window.supabase
-      .from('duels')
-      .select('*')
-      .eq('status', 'waiting')
-      .neq('player1_pseudo', pseudo);
-    if (rooms && rooms.length > 0) {
-      const room = rooms[0];
-      const player2_id = await window.getUserId();
-      await window.supabase.from('duels').update({
-        player2_id,
-        player2_pseudo: pseudo,
-        status: 'playing',
-        starttime: Date.now()
-      }).eq('id', room.id);
-      localStorage.setItem("duel_random_room", room.id);
-      localStorage.setItem("duel_is_player1", "0");
-      setTimeout(() => {
-        window.location.href = `duel_game.html?room=${room.id}`;
-      }, 200);
-      foundRoom = true;
-      break;
-    }
-    // Délai randomisé entre 800 et 1300 ms
-    const delay = 800 + Math.floor(Math.random() * 500);
-    await new Promise(r => setTimeout(r, delay));
-  }
-
-  if (foundRoom) return;
-
-  // SÉCURITÉ finale : on vérifie une dernière fois avant de créer
-  let { data: rooms } = await window.supabase
-    .from('duels')
-    .select('*')
-    .eq('status', 'waiting')
-    .neq('player1_pseudo', pseudo);
-  if (rooms && rooms.length > 0) {
-    const room = rooms[0];
-    const player2_id = await window.getUserId();
-    await window.supabase.from('duels').update({
-      player2_id,
-      player2_pseudo: pseudo,
-      status: 'playing',
-      starttime: Date.now()
-    }).eq('id', room.id);
-    localStorage.setItem("duel_random_room", room.id);
-    localStorage.setItem("duel_is_player1", "0");
-    setTimeout(() => {
-      window.location.href = `duel_game.html?room=${room.id}`;
-    }, 200);
-    return;
-  }
-
-  // Toujours aucune room, on crée la nôtre
-  const player1Id = await window.getUserId();
-  const defis = await getDefisDuelFromSupabase(3);
-
-  const roomObj = {
-    player1_id: player1Id,
-    player2_id: null,
-    player1_pseudo: pseudo,
-    player2_pseudo: null,
-    score1: 0, score2: 0, status: 'waiting',
-    createdat: Date.now(), defis, starttime: null, photosa: {}, photosb: {}, type: 'random'
-  };
-
-  const { data, error } = await window.supabase.from('duels').insert([roomObj]).select();
-  if (error) {
-    alert("Erreur création duel : " + error.message);
-    return;
-  }
-  localStorage.setItem("duel_random_room", data[0].id);
-  localStorage.setItem("duel_is_player1", "1");
-  setTimeout(() => {
-    waitRoom(data[0].id);
-  }, 200);
-}
-window.findOrCreateRoom = findOrCreateRoom;
-
-// ========== FONCTION CREATION DUEL PRIVE/PREMIUM ==========
-window.creerDuelPrive = async function(amiPseudo) {
-  const monPseudo = await window.getPseudo();
-  const defis = await getDefisDuelFromSupabase(3);
-  const roomObj = {
-    player1_pseudo: monPseudo,
-    player2_pseudo: amiPseudo,
-    score1: 0, score2: 0,
-    status: 'playing',
-    createdat: Date.now(),
-    defis,
-    starttime: Date.now(),
-    photosa: {}, photosb: {},
-    type: 'prive'
-  };
-  const { data, error } = await window.supabase.from('duels').insert([roomObj]).select();
-  if (error) {
-    alert("Erreur création duel privé : " + error.message);
-    return;
-  }
-  window.location.href = `duel_game.html?room=${data[0].id}`;
-}
-
-window.creerDuelPremium = async function(amiPseudo) {
-  const monPseudo = await window.getPseudo();
-  const defis = await getDefisDuelFromSupabase(3);
-  const roomObj = {
-    player1_pseudo: monPseudo,
-    player2_pseudo: amiPseudo,
-    score1: 0, score2: 0,
-    status: 'playing',
-    createdat: Date.now(),
-    defis,
-    starttime: Date.now(),
-    photosa: {}, photosb: {},
-    type: 'premium'
-  };
-  const { data, error } = await window.supabase.from('duels').insert([roomObj]).select();
-  if (error) {
-    alert("Erreur création duel premium : " + error.message);
-    return;
-  }
-  window.location.href = `duel_game.html?room=${data[0].id}`;
-}
-
-// ========== GESTION ROOM & DUEL ==========
+};
+// ========== Matchmaking et création/rejoindre room ==========
 async function checkAlreadyInDuel() {
   const pseudo = await window.getPseudo();
   const { data: duelsEnCours, error } = await window.supabase
@@ -390,7 +158,71 @@ async function checkAlreadyInDuel() {
   }
   return false;
 }
-window.checkAlreadyInDuel = checkAlreadyInDuel;
+
+window.findOrCreateRoom = async function() {
+  if (await checkAlreadyInDuel()) return;
+  localStorage.removeItem("duel_random_room");
+  localStorage.removeItem("duel_is_player1");
+  const pseudo = await window.getPseudo();
+
+  for (let i = 0; i < 5; i++) {
+    let { data: rooms } = await window.supabase
+      .from('duels')
+      .select('*')
+      .eq('status', 'waiting')
+      .neq('player1_pseudo', pseudo);
+
+    if (rooms && rooms.length > 0) {
+      const room = rooms[0];
+      const player2_id = await window.getUserId();
+      await window.supabase.from('duels').update({
+        player2_id: player2_id,
+        player2_pseudo: pseudo,
+        status: 'playing',
+        starttime: Date.now()
+      }).eq('id', room.id);
+
+      localStorage.setItem("duel_random_room", room.id);
+      localStorage.setItem("duel_is_player1", "0");
+      setTimeout(() => {
+        window.location.href = `duel_game.html?room=${room.id}`;
+      }, 200);
+      return;
+    }
+    await new Promise(r => setTimeout(r, 1200));
+  }
+
+  const player1Id = await window.getUserId();
+  const player1Pseudo = await window.getPseudo();
+  const defis = await getDefisDuelFromSupabase(3);
+
+  const roomObj = {
+    player1_id: player1Id,
+    player2_id: null,
+    player1_pseudo: player1Pseudo,
+    player2_pseudo: null,
+    score1: 0,
+    score2: 0,
+    status: 'waiting',
+    createdat: Date.now(),
+    defis: defis,
+    starttime: null,
+    photosa: {},
+    photosb: {},
+    type: 'random'
+  };
+
+  const { data, error } = await window.supabase.from('duels').insert([roomObj]).select();
+  if (error) {
+    alert("Erreur création duel : " + error.message);
+    return;
+  }
+  localStorage.setItem("duel_random_room", data[0].id);
+  localStorage.setItem("duel_is_player1", "1");
+  setTimeout(() => {
+    waitRoom(data[0].id);
+  }, 200);
+}
 
 function waitRoom(roomId) {
   const poll = async () => {
@@ -415,110 +247,56 @@ function waitRoom(roomId) {
   };
   poll();
 }
-window.waitRoom = waitRoom;
 
-// ========== LOGIQUE DU JEU : INIT, SYNC, RENDER ==========
-async function initDuelGame() {
-  if (!(path.includes("duel_game.html") && roomId)) return;
-  currentRoomId = roomId;
-  window.currentRoomId = currentRoomId;
-  const pseudo = await window.getPseudo();
-  const room = await getRoom(roomId);
-  isPlayer1 = (room.player1_pseudo === pseudo);
-
-  subscribeRoom(roomId, (data) => {
-    roomData = data;
-     console.log("roomData reçu via subscribe:", roomData);
-    updateDuelUI();
-    checkFinDuel();
-  });
-  roomData = await getRoom(roomId);
-  console.log("roomData après getRoom:", roomData);
-  updateDuelUI();
-  await checkFinDuel();
-
-  async function updateDuelUI() {
-    if (!roomData) return;
-    const pseudo = await window.getPseudo();
-
-    let advID = isPlayer1 ? roomData.player2_pseudo : roomData.player1_pseudo;
-    let myID = isPlayer1 ? roomData.player1_pseudo : roomData.player2_pseudo;
-    let headerLabel = advID ? advID : "Adversaire";
-
-    if ($("nom-adversaire")) $("nom-adversaire").textContent = headerLabel;
-    if ($("pseudo-moi")) $("pseudo-moi").textContent = myID ? myID : "Moi";
-
-    if ($("pseudo-adv")) {
-      if (advID) {
-        const { data: advUser } = await window.supabase
-          .from('users')
-          .select('id_color')
-          .eq('pseudo', advID)
-          .single();
-        let color = (advUser && advUser.id_color) ? advUser.id_color : "white";
-        $("pseudo-adv").innerHTML = `<span style="color:${color};font-weight:bold;">${advID}</span>`;
-      } else {
-        $("pseudo-adv").textContent = "Adversaire";
-      }
-    }
-    if (roomData.starttime && $("timer")) startGlobalTimer(roomData.starttime);
-    else if ($("timer")) $("timer").textContent = "--:--:--";
-    window.renderDefis();
-  }
-
-  function startGlobalTimer(startTime) {
-    clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-      const duration = 24 * 60 * 60 * 1000;
-      const now = Date.now();
-      const diff = Math.max(0, (startTime + duration) - now);
-      const h = Math.floor(diff / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      $("timer").textContent = `${h}h ${m}m ${s}s`;
-      if (diff <= 0) clearInterval(timerInterval);
-    }, 1000);
+// Patch reprise de room en cours
+if (path.includes("duel_random.html")) {
+  const existingRoomId = localStorage.getItem("duel_random_room");
+  if (existingRoomId) {
+    window.supabase
+      .from('duels')
+      .select('id, status')
+      .eq('id', existingRoomId)
+      .single()
+      .then(({ data }) => {
+        if (data && data.status && data.status !== 'finished') {
+          setTimeout(() => {
+            window.location.href = `duel_game.html?room=${existingRoomId}`;
+          }, 200);
+        } else {
+          localStorage.removeItem("duel_random_room");
+          localStorage.removeItem("duel_is_player1");
+          window.findOrCreateRoom();
+        }
+      });
+  } else {
+    window.findOrCreateRoom();
   }
 }
-window.initDuelGame = initDuelGame;
 
-// ========== PATCH : GESTION ABONNEMENT CANAL SUPABASE ==========
-function subscribeRoom(roomId, callback) {
-  // Si déjà abonné à cette room, ne rien faire
-  if (window._duelRoomChannel && window._duelRoomChannelId === roomId) return;
+// =================== HELPERS UTILS ===================
+function $(id) { return document.getElementById(id); }
 
-  // Si abonné à une autre room, clean l'ancien abonnement
-  if (window._duelRoomChannel && window._duelRoomChannelId !== roomId) {
-    window._duelRoomChannel.unsubscribe();
-    window._duelRoomChannel = null;
-    window._duelRoomChannelId = null;
+async function getDefisDuelFromSupabase(count = 3) {
+  let { data, error } = await window.supabase
+    .from('defis')
+    .select('intitule')
+    .order('random()', { ascending: false })
+    .limit(count);
+  if (error || !data || data.length < count) {
+    const backup = [
+      "Un escargot",
+      "Photo d'un animal",
+      "Photo d'une ombre"
+    ];
+    return backup.sort(() => 0.5 - Math.random()).slice(0, count);
   }
-
-  // Nouveau subscribe
-  const channel = window.supabase
-    .channel('duel_room_' + roomId)
-    .on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'duels',
-      filter: `id=eq.${roomId}`
-    }, payload => {
-      callback(payload.new);
-    })
-    .subscribe();
-
-  window._duelRoomChannel = channel;
-  window._duelRoomChannelId = roomId;
+  return data.map(x => x.intitule);
 }
-window.subscribeRoom = subscribeRoom;
 
-// ========== UTILS GET ROOM, PHOTO DUEL, SAVE PHOTO ==========
 async function getRoom(roomId) {
   const { data } = await window.supabase.from('duels').select('*').eq('id', roomId).single();
-    console.log('getRoom data:', data);
   return data;
 }
-window.getRoom = getRoom;
 
 async function getPhotoDuel(roomId, champ, idx) {
   const cacheKey = `${roomId}_${champ}_${idx}`;
@@ -541,301 +319,368 @@ async function getPhotoDuel(roomId, champ, idx) {
   }
   return null;
 }
-window.getPhotoDuel = getPhotoDuel;
 
-async function savePhotoDuel(idx, url, cadreId = null) {
-  const champ = isPlayer1 ? 'photosa' : 'photosb';
-  if (!cadreId) cadreId = getCadreDuel(roomId, idx);
-  const room = await getRoom(roomId);
-  let photos = room[champ] || {};
-  photos[idx] = { url, cadre: cadreId };
-  await window.supabase.from('duels').update({ [champ]: photos }).eq('id', roomId);
-  await VFindDuelDB.set(`${roomId}_${champ}_${idx}`, { url, cadre: cadreId });
-  setCadreDuel(roomId, idx, cadreId);
-}
-window.savePhotoDuel = savePhotoDuel;
-
-function agrandirPhoto(url, cadre) {
-  $("photo-affichee").src = url;
-  $("cadre-affiche").src = `./assets/cadres/${cadre}.webp`;
-  const popup = $("popup-photo");
-  popup.classList.remove('hidden');
-  popup.classList.add('show');
-}
-window.agrandirPhoto = agrandirPhoto;
-
-async function cleanupDuelPhotos() {
-  await VFindDuelDB.deleteAllForRoom(roomId);
-}
-window.cleanupDuelPhotos = cleanupDuelPhotos;
-
-// ========== LOGIQUE FIN DE DUEL + POPUP ==========
-async function checkFinDuel() {
-  if (!roomData) return;
-  const start = roomData.starttime;
-  const duration = 24 * 60 * 60 * 1000;
-  if (start && (Date.now() > start + duration)) {
-    await finirDuel();
+// =================== Suite à venir : rendering, UI, signalement, popups, tout le visuel ===================
+// =============== RENDERING DEFI LIST + COLONNES UI DUEL =================
+async function renderDefis({ myID, advID }) {
+  const ul = $("duel-defi-list");
+  if (!ul || !roomData || !roomData.defis || roomData.defis.length === 0) {
+    if (ul) ul.innerHTML = `<li>Aucun défi.</li>`;
     return;
   }
-  const nbDefis = (roomData.defis || []).length;
-  const okA = Object.values(roomData.photosa || {}).filter(x => x && x.url).length === nbDefis;
-  const okB = Object.values(roomData.photosb || {}).filter(x => x && x.url).length === nbDefis;
-  if (okA && okB) await finirDuel();
-}
-window.checkFinDuel = checkFinDuel;
 
-async function finirDuel() {
-  if (roomData.status !== 'finished') {
-    await window.supabase.from('duels').update({ status: 'finished' }).eq('id', roomData.id);
-  }
-  afficherPopupFinDuel(roomData);
-}
-window.finirDuel = finirDuel;
+  const myChamp = isPlayer1 ? 'photosa' : 'photosb';
+  const advChamp = isPlayer1 ? 'photosb' : 'photosa';
+  const photosAimees = getPhotosAimeesDuel();
 
-// ========== POPUP FIN DE DUEL ==========
-async function afficherPopupFinDuel(room) {
-  const pseudo = await window.getPseudo();
-  const isP1 = room.player1 === pseudo;
-  const myChamp = isP1 ? 'photosa' : 'photosb';
-  const advChamp = isP1 ? 'photosb' : 'photosa';
-  const myID = isP1 ? room.player1 : room.player2;
-  const advID = isP1 ? room.player2 : room.player1;
+  ul.innerHTML = '';
+  for (let idx = 0; idx < roomData.defis.length; idx++) {
+    const defi = roomData.defis[idx];
+    const idxStr = String(idx);
+    const li = document.createElement('li');
+    li.className = 'defi-item';
 
-  const nbDefis = (room.defis || []).length;
-  const photosMy = room[myChamp] || {};
-  const photosAdv = room[advChamp] || {};
+    // Titre défi au centre
+    const cartouche = document.createElement('div');
+    cartouche.className = 'defi-cartouche-center';
+    cartouche.textContent = defi;
+    li.appendChild(cartouche);
 
-  let html = '<table class="fin-defis-table"><tr><th>Défi</th><th>Moi</th><th>' + (advID || "Adversaire") + '</th></tr>';
-  for (let i = 0; i < nbDefis; i++) {
-    const defi = room.defis[i] || "-";
-    const okMe = photosMy[i] && photosMy[i].url ? "✅" : "❌";
-    const okAdv = photosAdv[i] && photosAdv[i].url ? "✅" : "❌";
-    html += `<tr><td>${defi}</td><td style="text-align:center">${okMe}</td><td style="text-align:center">${okAdv}</td></tr>`;
-  }
-  html += '</table>';
+    const row = document.createElement('div');
+    row.className = 'duel-defi-row';
 
-  $("fin-faceaface").innerHTML =
-    `<div class="fin-faceaface-row">
-      <span><b>${myID || "Moi"}</b> (toi)</span>
-      <span>vs</span>
-      <span><b>${advID || "Adversaire"}</b></span>
-    </div>`;
-  $("fin-details").innerHTML = html;
+    // ========== Colonne joueur ==========
+    const colJoueur = document.createElement('div');
+    colJoueur.className = 'joueur-col';
 
-  let nbFaits = Object.values(photosMy).filter(p => p && p.url).length;
-  let gain = nbFaits * 10;
-  if (nbFaits === nbDefis) gain += 10;
+    const titreJoueur = document.createElement('div');
+    titreJoueur.className = 'col-title';
+    titreJoueur.textContent = myID ? myID : "Moi";
+    colJoueur.appendChild(titreJoueur);
+    setColTitlePremium(titreJoueur, myID);
 
-  let gainFlag = "gain_duel_" + room.id + "_" + myID;
-  if (!localStorage.getItem(gainFlag)) {
-    const { error } = await window.supabase.rpc('secure_add_points', { nb: gain });
-    if (error) {
-      alert("Erreur lors de l'ajout des points : " + error.message);
-    } else {
-      localStorage.setItem(gainFlag, "1");
+    const myPhotoObj = await getPhotoDuel(roomId, myChamp, idxStr);
+    const myPhoto = myPhotoObj ? myPhotoObj.url : null;
+    const myCadre = myPhotoObj && myPhotoObj.cadre ? myPhotoObj.cadre : getCadreDuel(roomId, idxStr);
+
+    if (myPhoto) {
+      // Cadre visuel
+      const cadreDiv = document.createElement("div");
+      cadreDiv.className = "cadre-item cadre-duel-mini";
+      const preview = document.createElement("div");
+      preview.className = "cadre-preview";
+      // SVG/Cadre
+      const cadreImg = document.createElement("img");
+      cadreImg.className = "photo-cadre";
+      cadreImg.src = window.getCadreUrl ? window.getCadreUrl(myCadre) : `assets/cadres/${myCadre}.webp`;
+      // Photo joueur
+      const photoImg = document.createElement("img");
+      photoImg.className = "photo-user";
+      photoImg.src = myPhoto;
+      photoImg.onclick = () => agrandirPhoto(myPhoto, myCadre);
+      photoImg.oncontextmenu = (e) => { e.preventDefault(); ouvrirPopupChoixCadre(roomId, idxStr, myChamp); };
+      photoImg.ontouchstart = function(e) {
+        this._touchTimer = setTimeout(() => { ouvrirPopupChoixCadre(roomId, idxStr, myChamp); }, 500);
+      };
+      photoImg.ontouchend = function() { clearTimeout(this._touchTimer); };
+
+      preview.appendChild(cadreImg);
+      preview.appendChild(photoImg);
+
+      // Cœur "aimer photo"
+      const coeurBtn = document.createElement("img");
+      coeurBtn.src = photosAimees.includes(`${roomId}_${myChamp}_${idxStr}`) ? "assets/icons/coeur_plein.svg" : "assets/icons/coeur.svg";
+      coeurBtn.alt = "Aimer";
+      coeurBtn.style.width = "2em";
+      coeurBtn.style.cursor = "pointer";
+      coeurBtn.style.marginLeft = "0.6em";
+      coeurBtn.title = photosAimees.includes(`${roomId}_${myChamp}_${idxStr}`) ? "Retirer des photos aimées" : "Ajouter aux photos aimées";
+      coeurBtn.onclick = () => {
+        if (photosAimees.includes(`${roomId}_${myChamp}_${idxStr}`)) {
+          retirerPhotoAimeeDuel(`${roomId}_${myChamp}_${idxStr}`);
+        } else {
+          aimerPhotoDuel(`${roomId}_${myChamp}_${idxStr}`);
+        }
+        renderDefis({ myID, advID });
+      };
+      preview.appendChild(coeurBtn);
+
+      cadreDiv.appendChild(preview);
+      colJoueur.appendChild(cadreDiv);
     }
-  }
 
-  $("fin-gain").innerHTML =
-    `+${gain} pièces (${nbFaits} défi${nbFaits > 1 ? "s" : ""} x10${nbFaits === 3 ? " +10 bonus" : ""})`;
+    // Bouton appareil photo SVG (prendre ou reprendre)
+    const btnRow = document.createElement('div');
+    btnRow.className = "duel-btnrow-joueur";
+    btnRow.style.display = "flex";
+    btnRow.style.justifyContent = "center";
+    btnRow.style.marginTop = "10px";
 
-  $("fin-titre").textContent = "Fin du duel";
-  $("popup-fin-duel").classList.remove("hidden");
-  $("popup-fin-duel").classList.add("show");
+    const btnPhoto = document.createElement('button');
+    btnPhoto.className = "btn-photo";
+    btnPhoto.title = myPhoto ? "Reprendre la photo" : "Prendre une photo";
+    btnPhoto.style.background = "none";
+    btnPhoto.style.border = "none";
+    btnPhoto.style.padding = "0";
+    btnPhoto.style.cursor = "pointer";
+    btnPhoto.style.display = "flex";
+    btnPhoto.style.alignItems = "center";
 
-  $("fin-btn-replay").onclick = function () {
-    window.location.href = "duel_random.html";
-  };
-  $("fin-btn-retour").onclick = function () {
-    window.location.href = "index.html";
-  };
-  $("close-popup-fin").onclick = function () {
-    $("popup-fin-duel").classList.add("hidden");
-    $("popup-fin-duel").classList.remove("show");
-  };
-}
-window.afficherPopupFinDuel = afficherPopupFinDuel;
+    // Appareil photo SVG/icon
+    const imgPhoto = document.createElement('img');
+    imgPhoto.src = "assets/icons/photo.svg";
+    imgPhoto.alt = "Prendre une photo";
+    imgPhoto.style.width = "2.8em";
+    imgPhoto.style.display = "block";
+    imgPhoto.style.margin = "0 auto";
 
-// ========== POPUP PUB/PREMIUM ==========
-function ouvrirPopupRepriseDuel(onPub) {
-  const popup = document.getElementById("popup-reprise-photo-duel");
-  popup.classList.remove("hidden");
-  popup.classList.add("show");
-  document.getElementById("btnReprisePremiumDuel").onclick = function() {
-    window.open("https://play.google.com/store/apps/details?id=TON_APP_ID", "_blank");
-  };
-  document.getElementById("btnReprisePubDuel").onclick = function() {
-    popup.classList.add("hidden");
-    popup.classList.remove("show");
-    onPub && onPub();
-  };
-  document.getElementById("btnAnnulerRepriseDuel").onclick = function() {
-    popup.classList.add("hidden");
-    popup.classList.remove("show");
-  };
-}
-window.ouvrirPopupRepriseDuel = ouvrirPopupRepriseDuel;
+    btnPhoto.appendChild(imgPhoto);
 
-// ========== PRISE PHOTO : GESTION PREMIUM/PUB ==========
-async function gererPrisePhotoDuel(idx, cadreId = null) {
-  let duelId = currentRoomId || window.currentRoomId || roomId;
-  if (!duelId) {
-    alert("Erreur critique : identifiant duel introuvable.");
-    return;
-  }
-  if (!cadreId) cadreId = getCadreDuel(duelId, idx);
-
-  // Vérifie si une photo existe déjà (donc demande de reprise)
-  const cacheKey = `${duelId}_${isPlayer1 ? 'photosa' : 'photosb'}_${idx}`;
-  const dejaPhoto = await VFindDuelDB.get(cacheKey);
-
-  const premium = await window.isPremium();
-  const repriseKey = `reprise_duel_${duelId}_${idx}`;
-  let reprises = parseInt(localStorage.getItem(repriseKey) || "0");
-
-  // Première photo : OK, aucune restriction
-  if (!dejaPhoto) {
-    localStorage.setItem(repriseKey, "0");
-    window.cameraOuvrirCameraPourDuel && window.cameraOuvrirCameraPourDuel(idx, duelId, cadreId);
-    return;
-  }
-
-  // PREMIUM : illimité
-  if (premium) {
-    window.cameraOuvrirCameraPourDuel && window.cameraOuvrirCameraPourDuel(idx, duelId, cadreId);
-    return;
-  }
-
-  // NON PREMIUM : max 1 pub possible par photo
-  if (reprises === 0) {
-    ouvrirPopupRepriseDuel(() => {
-      localStorage.setItem(repriseKey, "1");
-      window.cameraOuvrirCameraPourDuel && window.cameraOuvrirCameraPourDuel(idx, duelId, cadreId);
-      window.pubAfterPhoto = true;
-    });
-    return;
-  } else {
-    alert("Pour reprendre encore la photo, passe en Premium !");
-    return;
-  }
-}
-window.gererPrisePhotoDuel = gererPrisePhotoDuel;
-
-// ========== POPUP JETON (pour valider avec jeton) ==========
-window.ouvrirPopupValiderJeton = function(idx) {
-  window._idxJetonToValidate = idx;
-  document.getElementById("popup-jeton-valider").classList.remove("hidden");
-};
-
-// Handler bouton valider jeton
-document.addEventListener("DOMContentLoaded", () => {
-  const btnValider = document.getElementById("btn-confirm-jeton");
-  const btnCancel = document.getElementById("btn-cancel-jeton");
-  if(btnValider) btnValider.onclick = async function() {
-    const idx = window._idxJetonToValidate;
-    if(typeof ouvrirPopupJeton === "function") await ouvrirPopupJeton(idx);
-    document.getElementById("popup-jeton-valider").classList.add("hidden");
-    window._idxJetonToValidate = null;
-    await afficherSolde();
-  };
-  if(btnCancel) btnCancel.onclick = function() {
-    document.getElementById("popup-jeton-valider").classList.add("hidden");
-    window._idxJetonToValidate = null;
-  };
-});
-
-// ========== POPUP CHOIX CADRE ==========
-window.ouvrirPopupChoixCadre = async function(duelId, idx, champ) {
-  let cadres = [];
-  try {
-    cadres = window.getCadresPossedes ? await window.getCadresPossedes() : ["polaroid_01"];
-  } catch(e) { cadres = ["polaroid_01"]; }
-
-  const actuel = getCadreDuel(duelId, idx);
-  const list = document.getElementById("list-cadres-popup");
-  list.innerHTML = "";
-  cadres.forEach(cadre => {
-    let el = document.createElement("img");
-    el.src = "./assets/cadres/" + cadre + ".webp";
-    el.style.width = "72px";
-    el.style.cursor = "pointer";
-    el.style.borderRadius = "12px";
-    el.style.boxShadow = "0 0 7px #0006";
-    el.style.border = cadre === actuel ? "3px solid #FFD900" : "3px solid transparent";
-    el.title = cadre;
-    el.onclick = async () => {
-      setCadreDuel(duelId, idx, cadre);
-      const { data: room } = await window.supabase.from('duels').select('*').eq('id', duelId).single();
-      let photos = (room && room[champ]) ? room[champ] : {};
-      if (photos[idx] && typeof photos[idx] === "object") {
-        photos[idx].cadre = cadre;
-      } else if (typeof photos[idx] === "string") {
-        photos[idx] = { url: photos[idx], cadre: cadre };
-      }
-      await window.supabase.from('duels').update({ [champ]: photos }).eq('id', duelId);
-      await VFindDuelDB.set(`${duelId}_${champ}_${idx}`, { url: photos[idx].url, cadre: cadre });
-      fermerPopupCadreChoix();
-      location.reload();
+    btnPhoto.onclick = () => gererPrisePhotoDuel(idxStr, myCadre);
+    btnPhoto.oncontextmenu = (e) => { e.preventDefault(); ouvrirPopupValiderJeton(idxStr); };
+    btnPhoto.ontouchstart = function(e) {
+      this._touchTimer = setTimeout(() => { ouvrirPopupValiderJeton(idxStr); }, 500);
     };
-    list.appendChild(el);
-  });
-  document.getElementById("popup-cadre-choix").classList.remove("hidden");
-};
-window.fermerPopupCadreChoix = function() {
-  document.getElementById("popup-cadre-choix").classList.add("hidden");
-};
+    btnPhoto.ontouchend = function() { clearTimeout(this._touchTimer); };
 
-// ========== GESTION SIGNAL PHOTO ==========
-window.fermerPopupSignal = function() {
-  const popup = document.getElementById("popup-signal-photo");
-  if (popup) {
-    popup.classList.add("hidden");
-    popup.classList.remove("show");
-    popup.dataset.url = "";
-    popup.dataset.idx = "";
+    btnRow.appendChild(btnPhoto);
+    colJoueur.appendChild(btnRow);
+
+    // ========== Colonne adversaire ==========
+    const colAdv = document.createElement('div');
+    colAdv.className = 'adversaire-col';
+    const titreAdv = document.createElement('div');
+    titreAdv.className = 'col-title';
+    titreAdv.textContent = advID ? advID : "Adversaire";
+    colAdv.appendChild(titreAdv);
+    setColTitlePremium(titreAdv, advID);
+
+    // Chargement photo adv (si existe)
+    const advPhotoObj = await getPhotoDuel(roomId, advChamp, idxStr);
+    if (roomData && roomData[advChamp] && roomData[advChamp][idxStr]) {
+      let obj = roomData[advChamp][idxStr];
+      let url, cadre;
+      if (typeof obj === "object") {
+        url = obj.url;
+        cadre = obj.cadre;
+      } else {
+        url = obj;
+        cadre = "polaroid_01";
+      }
+      await VFindDuelDB.set(`${roomId}_${advChamp}_${idxStr}`, { url, cadre });
+    }
+
+    const advPhoto = advPhotoObj ? advPhotoObj.url : null;
+    const advCadre = advPhotoObj && advPhotoObj.cadre ? advPhotoObj.cadre : "polaroid_01";
+
+    if (advPhoto) {
+      const cadreDiv = document.createElement("div");
+      cadreDiv.className = "cadre-item cadre-duel-mini";
+      const preview = document.createElement("div");
+      preview.className = "cadre-preview";
+      const cadreImg = document.createElement("img");
+      cadreImg.className = "photo-cadre";
+      cadreImg.src = window.getCadreUrl ? window.getCadreUrl(advCadre) : `assets/cadres/${advCadre}.webp`;
+
+      const photoImg = document.createElement("img");
+      photoImg.className = "photo-user";
+      photoImg.src = advPhoto;
+      photoImg.onclick = () => agrandirPhoto(advPhoto, advCadre);
+
+      preview.appendChild(cadreImg);
+      preview.appendChild(photoImg);
+      cadreDiv.appendChild(preview);
+
+      // Bouton signaler la photo
+      const signalDiv = document.createElement("div");
+      signalDiv.style.display = "flex";
+      signalDiv.style.justifyContent = "center";
+      signalDiv.style.marginTop = "8px";
+
+      const signalBtn = document.createElement("button");
+      signalBtn.className = "btn-signal-photo";
+      signalBtn.title = "Signaler cette photo";
+      signalBtn.style.background = "none";
+      signalBtn.style.border = "none";
+      signalBtn.style.cursor = "pointer";
+
+      const signalImg = document.createElement("img");
+      signalImg.src = "assets/icons/alert.svg";
+      signalImg.alt = "Signaler";
+      signalImg.style.width = "2.8em";
+
+      signalBtn.appendChild(signalImg);
+      signalBtn.dataset.idx = idxStr;
+      signalBtn.onclick = function() {
+        ouvrirPopupSignal(advPhoto, idxStr);
+      };
+      signalDiv.appendChild(signalBtn);
+
+      colAdv.appendChild(cadreDiv);
+      colAdv.appendChild(signalDiv);
+    }
+
+    row.appendChild(colJoueur);
+    row.appendChild(colAdv);
+
+    li.appendChild(row);
+    ul.appendChild(li);
   }
-};
+}
+// =================== PREMIUM DUEL AMIS ===================
+// (Cette partie n’est utile que si tu as la page duel_amis_premium.html)
+async function mainPremiumDuelDefis() {
+  if (!roomId) return;
+  const pseudo = await getCurrentUser();
+  const userId = await getUserId();
 
-// Signalement : gestion du clic sur motif
-document.body.addEventListener("click", async function(e) {
-  const signalTypeBtn = e.target.closest(".btn-signal-type");
-  if (!signalTypeBtn) return;
+  // Récupère la room
+  let { data: room } = await supabase.from('duels').select('*').eq('id', roomId).single();
+  if (!room) {
+    document.getElementById("info-premium").innerHTML = "Room introuvable.";
+    return;
+  }
+  roomData = room;
+  isPlayer1 = (room.player1_id === userId);
 
-  const popup = document.getElementById("popup-signal-photo");
-  const photoUrl = popup.dataset.url;
-  const idx = popup.dataset.idx || "";
-  const motif = signalTypeBtn.dataset.type;
+  // Vérifie Premium
+  const premium = await isPremium();
 
-  if (!photoUrl || !motif) {
-    alert("Erreur : impossible de retrouver la photo ou le motif.");
+  // Affiche la bonne UI
+  if (room.type !== "amis_premium") {
+    document.getElementById("info-premium").innerHTML = "Accès réservé au mode Premium.";
     return;
   }
 
-  try {
-    const response = await fetch(photoUrl);
-    const blob = await response.blob();
+  // Saisie des défis
+  async function handleValiderDefis() {
+    let d1 = document.getElementById("input-defi1").value.trim();
+    let d2 = document.getElementById("input-defi2").value.trim();
 
-    const fileName = `defi${idx}_${motif}_${Date.now()}.webp`;
-
-    const { error } = await window.supabase
-      .storage
-      .from('signalements')
-      .upload(fileName, blob, { contentType: 'image/webp' });
-
-    if (error) {
-      alert("Erreur d’envoi : " + error.message);
-    } else {
-      alert("Signalement envoyé à la modération.");
-      window.fermerPopupSignal();
+    // Cas : on écrit le 3e défi
+    let d1Filled = d1.length > 0, d2Filled = d2.length > 0;
+    let champ = isPlayer1 ? "defis_player1" : "defis_player2";
+    let existing = roomData[champ] ? JSON.parse(roomData[champ]) : [];
+    // Si déjà 2 défis => il ne doit remplir que le 3e
+    if (existing.length === 2) {
+      if (!d2Filled) { alert("Merci d’entrer le 3e défi."); return; }
+      let updateArr = [existing[0], existing[1], d2];
+      let updateObj = {}; updateObj[champ] = JSON.stringify(updateArr);
+      await supabase.from('duels').update(updateObj).eq('id', roomId);
+      showAttente();
+      return;
     }
-  } catch (err) {
-    alert("Erreur lors de l'envoi : " + err.message);
+    // Normal : 2 défis à écrire
+    if (!d1Filled || !d2Filled) { alert("Merci de remplir 2 défis."); return; }
+    let updateObj = {};
+    updateObj[champ] = JSON.stringify([d1, d2]);
+    await supabase.from('duels').update(updateObj).eq('id', roomId);
+    showAttente();
   }
-});
 
-// ========== FERMER POPUP CROIX GÉNÉRAL ==========
+  // Synchro temps réel
+  supabase
+    .channel('duel_room_' + roomId)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'duels', filter: `id=eq.${roomId}` }, payload => {
+      roomData = payload.new;
+      majUI();
+    })
+    .subscribe();
+
+  // UI helpers
+  let blocSaisie = document.getElementById("bloc-defi-saisie");
+  let blocFinal = document.getElementById("bloc-defis-final");
+  let blocAttente = document.getElementById("bloc-attente");
+
+  function showAttente() {
+    blocSaisie.style.display = "none";
+    blocAttente.style.display = "block";
+    blocFinal.style.display = "none";
+  }
+  function showDefisFinal(defis) {
+    blocSaisie.style.display = "none";
+    blocAttente.style.display = "none";
+    blocFinal.style.display = "block";
+    document.getElementById("liste-defis-final").innerHTML = defis.map(d => `<li>${d}</li>`).join('');
+  }
+  function majUI() {
+    let d1 = roomData.defis_player1 ? JSON.parse(roomData.defis_player1) : [];
+    let d2 = roomData.defis_player2 ? JSON.parse(roomData.defis_player2) : [];
+    let final = roomData.defis_final ? JSON.parse(roomData.defis_final) : [];
+    if (final.length === 3) { showDefisFinal(final); return; }
+    // Deux premiums
+    if (roomData.premium1 && roomData.premium2) {
+      if ((isPlayer1 && d1.length < 2) || (!isPlayer1 && d2.length < 2)) {
+        // Saisie défis (2 à remplir)
+        blocSaisie.style.display = "block";
+        document.getElementById("text-saisie-defis").textContent = "Propose 2 défis originaux pour ce duel :";
+        document.getElementById("input-defi1").style.display = "";
+        document.getElementById("input-defi2").style.display = "";
+        document.getElementById("input-defi1").value = "";
+        document.getElementById("input-defi2").value = "";
+        blocAttente.style.display = "none";
+        blocFinal.style.display = "none";
+      } else if (d1.length === 2 && d2.length === 2 && final.length < 3) {
+        // Les 2 ont proposé, on tire au sort pour tous
+        if (isPlayer1) {
+          let all = d1.concat(d2);
+          shuffle(all);
+          let choisis = [all[0], all[1]];
+          let restant = all.filter((x, i) => i > 1);
+          choisis.push(restant[Math.floor(Math.random() * restant.length)]);
+          supabase.from('duels').update({ defis_final: JSON.stringify(choisis) }).eq('id', roomId);
+        }
+        showAttente();
+      } else {
+        showAttente();
+      }
+    } else {
+      // 1 seul premium : il écrit les 3 défis (il fait 2 champs puis 1 champ)
+      if (premium && ((isPlayer1 && d1.length < 2) || (!isPlayer1 && d2.length < 2))) {
+        blocSaisie.style.display = "block";
+        document.getElementById("text-saisie-defis").textContent = "Écris 2 défis (tu auras un 3e champ après) :";
+        document.getElementById("input-defi1").style.display = "";
+        document.getElementById("input-defi2").style.display = "";
+        document.getElementById("input-defi1").value = "";
+        document.getElementById("input-defi2").value = "";
+        blocAttente.style.display = "none";
+        blocFinal.style.display = "none";
+      } else if ((isPlayer1 && d1.length === 2) || (!isPlayer1 && d2.length === 2)) {
+        blocSaisie.style.display = "block";
+        document.getElementById("text-saisie-defis").textContent = "Écris un 3e défi pour ce duel :";
+        document.getElementById("input-defi1").style.display = "none";
+        document.getElementById("input-defi2").placeholder = "Défi 3...";
+        document.getElementById("input-defi2").value = "";
+        blocAttente.style.display = "none";
+        blocFinal.style.display = "none";
+      } else if ((d1.length === 3 || d2.length === 3) && final.length < 3) {
+        let choisis = isPlayer1 ? d1 : d2;
+        supabase.from('duels').update({ defis_final: JSON.stringify(choisis) }).eq('id', roomId);
+        showAttente();
+      } else {
+        showAttente();
+      }
+    }
+  }
+  function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  document.getElementById("btn-valider-defis").onclick = handleValiderDefis;
+  majUI();
+}
+// Init auto
+if (window.location.pathname.includes("duel_amis_premium.html")) {
+  mainPremiumDuelDefis();
+}
+
+// =============== HANDLERS GÉNÉRAUX ===============
+document.addEventListener("DOMContentLoaded", afficherSolde);
 document.addEventListener("DOMContentLoaded", () => {
+  // Ferme toutes les popups sur .close-btn ou #close-popup
   document.querySelectorAll('.close-btn, #close-popup').forEach(btn => {
     btn.onclick = function() {
       let popup = btn.closest('.popup');
@@ -845,65 +690,29 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
   });
+  // Maj solde points/jetons sur page load
+  afficherSolde();
 });
-
-// ========== INIT AUTO DES PAGES ==========
-if (window.location.pathname.includes("duel_game.html")) {
-  initDuelGame();
-}
-if (window.location.pathname.includes("duel_amis_premium.html")) {
-  // Ta logique premium si tu veux (non recopiée ici)
-}
-document.addEventListener("DOMContentLoaded", afficherSolde);
-window.renderDefis = function () {
-  console.log('renderDefis', window.roomData); // Ajout pour debug
-  if (!window.roomData || !roomData.defis) return;
-
-  const liste = document.getElementById("duel-defi-list");
-  if (!liste) return;
-  liste.innerHTML = "";
-
-  roomData.defis.forEach((defi, idx) => {
-    const li = document.createElement("li");
-    li.className = "defi-item";
-
-    li.innerHTML = `
-      <div class="defi-col defi-titre">${defi}</div>
-      <div class="defi-col">
-        <button onclick="window.gererPrisePhotoDuel(${idx})">📷</button>
-      </div>
-      <div class="defi-col">
-        <button onclick="window.afficherPhotoDuel(${idx})">👁️</button>
-      </div>
-    `;
-
-    liste.appendChild(li);
-  });
-};
-window.afficherPhotoDuel = async function(idx) {
-  const champ = window.isPlayer1 ? 'photosa' : 'photosb';
-  const photo = await window.getPhotoDuel(window.currentRoomId, champ, idx);
-  if (!photo || !photo.url) {
-    alert("Aucune photo trouvée pour ce défi.");
-    return;
+// Ferme popup signalement
+window.fermerPopupSignal = function() {
+  const popup = document.getElementById("popup-signal-photo");
+  if (popup) {
+    popup.classList.add("hidden");
+    popup.classList.remove("show");
+    popup.dataset.url = "";
+    popup.dataset.idx = "";
   }
-  window.agrandirPhoto(photo.url, photo.cadre || "polaroid_01");
+};
+// Ferme popup choix cadre
+window.fermerPopupCadreChoix = function() {
+  document.getElementById("popup-cadre-choix").classList.add("hidden");
 };
 
-// ... (tout le reste inchangé : popup, gestion jeton, choix cadre, etc.)
-
-// ========== INIT AUTO DES PAGES ==========
+// =============== INIT AUTO DUEL GAME ===============
 if (window.location.pathname.includes("duel_game.html")) {
   initDuelGame();
 }
-document.addEventListener("DOMContentLoaded", afficherSolde);
 
+// =============== UTILS ===============
+function $(id) { return document.getElementById(id); }
 
-
-// ... (tout le reste inchangé : popup, gestion jeton, choix cadre, etc.)
-
-// ========== INIT AUTO DES PAGES ==========
-if (window.location.pathname.includes("duel_game.html")) {
-  initDuelGame();
-}
-document.addEventListener("DOMContentLoaded", afficherSolde);
