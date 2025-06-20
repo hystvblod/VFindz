@@ -50,10 +50,6 @@ window.genererImageAvecCadreBlob = function(imageSrc, cadreId, callback) {
   }
 };
 
-  img.onerror = () => callback("Erreur chargement photo !");
-  img.src = imageSrc;
-};
-
 
 // -------- Upload dans le bucket concours --------
 window.uploadPhotoConcoursBlob = async function(blob, concoursId, userId) {
