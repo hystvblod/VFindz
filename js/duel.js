@@ -754,23 +754,8 @@ window.ouvrirPopupValiderJeton = function(idx) {
   window._idxJetonToValidate = idx;
   document.getElementById("popup-jeton-valider").classList.remove("hidden");
 };
-document.addEventListener("DOMContentLoaded", () => {
-  const btnValider = document.getElementById("btn-confirm-jeton");
-  const btnCancel = document.getElementById("btn-cancel-jeton");
-  if(btnValider) btnValider.onclick = async function() {
-    const idx = window._idxJetonToValidate;
-    if(typeof window.ouvrirPopupJeton === "function") await window.ouvrirPopupJeton(idx);
-    document.getElementById("popup-jeton-valider").classList.add("hidden");
-    window._idxJetonToValidate = null;
-    await window.afficherSolde();
-  };
-  if(btnCancel) btnCancel.onclick = function() {
-    document.getElementById("popup-jeton-valider").classList.add("hidden");
-    window._idxJetonToValidate = null;
-  };
-});
 
-// HANDLER : Quand tu retires un jeton (ex : valider défi)
+
 // HANDLER : Quand tu retires un jeton (ex : valider défi)
 window.validerDefiAvecJeton = async function(idx) {
   await window.removeJeton();
@@ -940,18 +925,7 @@ window.cleanupDuelPhotos = async function() {
   await window.VFindDuelDB.deleteAllForRoom(roomId);
 };
 
-// Fermer la popup (bouton croix, général)
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll('.close-btn, #close-popup').forEach(btn => {
-    btn.onclick = function() {
-      let popup = btn.closest('.popup');
-      if (popup) {
-        popup.classList.add('hidden');
-        popup.classList.remove('show');
-      }
-    };
-  });
-});
+
 window.fermerPopupSignal = function() {
   const popup = document.getElementById("popup-signal-photo");
   if (popup) {
@@ -976,20 +950,6 @@ window.afficherSolde = async function() {
   if (pointsSpan) pointsSpan.textContent = points ?? 0;
   if (jetonsSpan) jetonsSpan.textContent = jetons ?? 0;
 };
-
-document.addEventListener("DOMContentLoaded", () => {
-  window.afficherSolde();
-});
-// Handler pour valider un défi AVEC jeton (DUEL)
-document.addEventListener("DOMContentLoaded", () => {
-  const btnValiderJeton = document.getElementById("valider-jeton-btn");
-  if (btnValiderJeton) {
-    btnValiderJeton.onclick = async function() {
-      await window.validerDefiAvecJeton(window._idxJetonToValidate);
-      window._idxJetonToValidate = null;
-    };
-  }
-});
 
 // Gestion du signalement photo vers Supabase Storage
 document.body.addEventListener("click", async function(e) {
@@ -1034,4 +994,68 @@ document.body.addEventListener("click", async function(e) {
 // Patch compat duel.js (lecture cloud ONLY, anti-triche !)
 window.getPoints = window.getPointsCloud;
 window.getJetons = window.getJetonsCloud;
+// ========== POPUP VALIDATION DE DEFI AVEC JETON ==========
+
+// Ouvre la popup pour valider un défi avec un jeton
+window.ouvrirPopupValiderJeton = function(idx) {
+  window._idxJetonToValidate = idx;
+  document.getElementById("popup-jeton-valider").classList.remove("hidden");
+};
+
+// Handler pour le bouton Valider et Annuler
+document.addEventListener("DOMContentLoaded", () => {
+  // Bouton Valider
+  const btnValider = document.getElementById("btn-confirm-jeton");
+  if (btnValider) {
+    btnValider.onclick = async function() {
+      // Appel logique de validation avec un jeton
+      await window.validerDefiAvecJeton(window._idxJetonToValidate);
+      window._idxJetonToValidate = null;
+      document.getElementById("popup-jeton-valider").classList.add("hidden");
+    };
+  }
+
+  // Bouton Annuler
+  const btnCancel = document.getElementById("btn-cancel-jeton");
+  if (btnCancel) {
+    btnCancel.onclick = function() {
+      document.getElementById("popup-jeton-valider").classList.add("hidden");
+      window._idxJetonToValidate = null;
+    };
+  }
+});
+
+// La logique pour valider le défi avec un jeton
+window.validerDefiAvecJeton = async function(idx) {
+  // 1. Retire un jeton (doit être définie dans userData.js)
+  await window.removeJeton();
+  await window.afficherSolde && window.afficherSolde();
+
+  // 2. Mets l'image "jeton validé" comme photo pour le défi
+  let duelId = window.currentRoomId || (new URLSearchParams(window.location.search)).get("room");
+  const pseudo = await window.getPseudo();
+  const room = await window.getRoom(duelId);
+  const myChamp = (room.player1_pseudo === pseudo) ? 'photosa' : 'photosb';
+
+  const urlJeton = "assets/jeton_pp.jpg"; // Mets l'image de ton jeton ici
+  const cadreId = window.getCadreDuel ? window.getCadreDuel(duelId, idx) : "polaroid_01";
+
+  let photos = room[myChamp] || {};
+  photos[idx] = { url: urlJeton, cadre: cadreId };
+  await window.supabase.from('duels').update({ [myChamp]: photos }).eq('id', duelId);
+
+  // Mets à jour le cache local
+  if (window.VFindDuelDB && window.VFindDuelDB.set) {
+    await window.VFindDuelDB.set(`${duelId}_${myChamp}_${idx}`, { url: urlJeton, cadre: cadreId });
+  }
+  if (window.setCadreDuel) window.setCadreDuel(duelId, idx, cadreId);
+
+  // Rafraîchit l'affichage (ou reload)
+  if (typeof window.renderDefis === "function") {
+    const advID = (room.player1_pseudo === pseudo ? room.player2_pseudo : room.player1_pseudo);
+    await window.renderDefis({ myID: pseudo, advID });
+  } else {
+    location.reload();
+  }
+};
 
