@@ -182,14 +182,16 @@ async function inviterDuelPremium(amiPseudo) {
   const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
   if (!ami) { alert("Ami introuvable."); return; }
   const demandesRecues = new Set([...(ami.demandesDuelRecuesPremium || []), pseudoPublic]);
-  await window.supabase.from("users").update({
+  const { error: errRecues } = await window.supabase.from("users").update({
     demandesDuelRecuesPremium: Array.from(demandesRecues)
   }).eq("pseudo", amiPseudo);
+  if (errRecues) console.error("Erreur update Recues:", errRecues);
 
   const demandesEnvoyees = new Set([...(profil.demandesDuelEnvoyeesPremium || []), amiPseudo]);
-  await window.supabase.from("users").update({
+  const { error: errEnvoyees } = await window.supabase.from("users").update({
     demandesDuelEnvoyeesPremium: Array.from(demandesEnvoyees)
   }).eq("pseudo", pseudoPublic);
+  if (errEnvoyees) console.error("Erreur update Envoyees:", errEnvoyees);
 
   await loadProfil();
   afficherAmis();
@@ -215,14 +217,16 @@ async function accepterDuelPremium(amiPseudo) {
   }]).select();
 
   // MAJ demandes
-  await window.supabase.from("users").update({
+  const { error: errRecues } = await window.supabase.from("users").update({
     demandesDuelRecuesPremium: (profil.demandesDuelRecuesPremium || []).filter(p => p !== amiPseudo)
   }).eq("pseudo", pseudoPublic);
+  if (errRecues) console.error("Erreur update Recues:", errRecues);
 
   const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
-  await window.supabase.from("users").update({
+  const { error: errEnvoyees } = await window.supabase.from("users").update({
     demandesDuelEnvoyeesPremium: (ami.demandesDuelEnvoyeesPremium || []).filter(p => p !== pseudoPublic)
   }).eq("pseudo", amiPseudo);
+  if (errEnvoyees) console.error("Erreur update Envoyees:", errEnvoyees);
 
   await loadProfil();
   afficherDemandesDuel();
@@ -233,14 +237,16 @@ async function accepterDuelPremium(amiPseudo) {
 }
 
 async function refuserDuelPremium(amiPseudo) {
-  await window.supabase.from("users").update({
+  const { error: errRecues } = await window.supabase.from("users").update({
     demandesDuelRecuesPremium: (profil.demandesDuelRecuesPremium || []).filter(p => p !== amiPseudo)
   }).eq("pseudo", pseudoPublic);
+  if (errRecues) console.error("Erreur update Recues:", errRecues);
 
   const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
-  await window.supabase.from("users").update({
+  const { error: errEnvoyees } = await window.supabase.from("users").update({
     demandesDuelEnvoyeesPremium: (ami.demandesDuelEnvoyeesPremium || []).filter(p => p !== pseudoPublic)
   }).eq("pseudo", amiPseudo);
+  if (errEnvoyees) console.error("Erreur update Envoyees:", errEnvoyees);
 
   await loadProfil();
   afficherDemandesDuel();

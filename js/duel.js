@@ -900,13 +900,16 @@ window.savePhotoDuel = async function(idx, url, cadreId = null) {
   window.setCadreDuel(roomId, idx, cadreId);
 };
 
-window.agrandirPhoto = function(url, cadre) {
+// Récupère l’URL du cadre (depuis Supabase ou cache local)
+window.agrandirPhoto = async function(url, cadreId) {
   $("photo-affichee").src = url;
-  $("cadre-affiche").src = `./assets/cadres/${cadre}.webp`;
+  let cadreUrl = await window.getCadreUrl(cadreId); // fonction à avoir dans userData.js !
+  $("cadre-affiche").src = cadreUrl || ""; // sécurise si jamais pas trouvé
   const popup = $("popup-photo");
   popup.classList.remove('hidden');
   popup.classList.add('show');
 };
+
 
 window.cleanupDuelPhotos = async function() {
   await window.VFindDuelDB.deleteAllForRoom(roomId);
