@@ -205,6 +205,26 @@ window.checkAlreadyInDuel = async function() {
 };
 
 // ================= FIN PATCH ANTI-MULTI ===================
+// ============ FULL LOCAL DEFIS =============
+
+window._allDefis = null;
+window._langDefi = (navigator.language || 'fr').slice(0,2); // ex: 'fr', 'en', etc.
+
+window.chargerDefisLocal = async function() {
+  if (window._allDefis) return window._allDefis;
+  const rep = await fetch('data/defis.json'); // ← adapte si ton chemin est différent
+  const json = await rep.json();
+  window._allDefis = json.defis;
+  return window._allDefis;
+};
+
+window.getDefisLocal = async function(n = 3, forceLang = null) {
+  const defis = await window.chargerDefisLocal();
+  const lang = forceLang || window._langDefi || 'fr';
+  const shuffled = defis.slice().sort(() => Math.random() - 0.5);
+  // On retourne juste la bonne langue pour chaque défi
+  return shuffled.slice(0, n).map(d => d[lang] || d["fr"] || Object.values(d)[1]);
+};
 
 window.findOrCreateRoom = async function() {
   if (await window.checkAlreadyInDuel()) return;
@@ -865,23 +885,10 @@ window.deleteDuelPhotosFromSupabase = async function(roomId) {
 };
 
 window.getDefisDuelFromSupabase = async function(count = 3) {
-  let { data, error } = await window.supabase
-    .from('defis')
-    .select('intitule')
-    .order('random()', { ascending: false })
-    .limit(count);
-      console.log("DEBUG DEFIS SUPABASE", { data, error });
-
-  if (error || !data || data.length < count) {
-    const backup = [
-      "Un escargot ",
-      "Photo d'un animal",
-      "Photo d'une ombre"
-    ];
-    return backup.sort(() => 0.5 - Math.random()).slice(0, count);
-  }
-  return data.map(x => x.intitule);
+  // FULL LOCAL
+  return await window.getDefisLocal(count);
 };
+
 
 window.getRoom = async function(roomId) {
   const { data } = await window.supabase.from('duels').select('*').eq('id', roomId).single();
