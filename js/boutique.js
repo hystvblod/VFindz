@@ -263,7 +263,7 @@ async function afficherPhotosSauvegardees(photosMap) {
 
       const fond = document.createElement("img");
       fond.className = "photo-cadre";
-      fond.src = `./assets/cadres/${cadreActuel}.webp`;
+     fond.src = window.getCadreUrl(cadreActuel);
 
       const photo = document.createElement("img");
       photo.className = "photo-user";
@@ -343,7 +343,8 @@ async function renderBoutique(categoryKey) {
       wrapper.style.margin = "0 auto 10px";
 
       const cadreEl = document.createElement("img");
-      cadreEl.src = `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadre.id}.webp`;
+      cadreEl.src = window.getCadreUrl(cadre.id);
+
       cadreEl.className = "photo-cadre";
       cadreEl.style.width = "100%";
       cadreEl.style.height = "100%";
