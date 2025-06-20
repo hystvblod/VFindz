@@ -102,28 +102,41 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
 
       // ----- CONCOURS -----
 if (mode === "concours") {
-  const cadre =
-    (await window.getCadreSelectionne?.()) || "polaroid_01";
+  const dataUrl = canvas.toDataURL("image/webp", 0.93);
   const userId = await window.getUserId();
-  return await new Promise((resolve, reject) => {
-    window.genererImageAvecCadreBlob(dataUrl, cadre, async (err, blob) => {
-      if (err) return reject(err);
-      try {
-        const urlPhoto = await window.uploadPhotoConcoursBlob(blob, defiId, userId);
-        resolve(urlPhoto);
-      } catch (e) {
-        reject(e);
-      }
-    });
-  });
-}
 
-    } catch (err) {
-      alert("Erreur caméra native : " + (err.message || err));
-      throw err;
-    }
+  // === Utilitaire pour transformer dataURL en Blob (à mettre une seule fois dans ton code) ===
+  function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+      bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while (n--) u8arr[n] = bstr.charCodeAt(n);
+    return new Blob([u8arr], { type: mime });
+  }
+
+  const blob = dataURLtoBlob(dataUrl);
+  const fileName = `${userId}_${Date.now()}.webp`;
+
+  const { data: uploadData, error: uploadError } = await window.supabase
+    .storage
+    .from('photoconcours') // <- juste le bucket concours !
+    .upload(fileName, blob, { contentType: 'image/webp' });
+
+  if (uploadError) {
+    alert("Erreur upload concours : " + uploadError.message);
+    container.remove();
+    resolve(null);
     return;
   }
+  const { data: publicUrlData } = window.supabase
+    .storage
+    .from('photoconcours')
+    .getPublicUrl(fileName);
+
+  container.remove();
+  resolve(publicUrlData.publicUrl);
+  return;
+}
+
 
   // ======= NAVIGATEUR WEB =======
   return new Promise((resolve, reject) => {
