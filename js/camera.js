@@ -369,18 +369,28 @@ else if (mode === "concours") {
     resolve(null);
     return;
   }
+  const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
   const userId = await window.getUserId();
-  try {
-    const urlPhoto = await window.uploadPhotoConcoursBlob(dataUrl, defiId, userId);
-    container.remove();
-    resolve(urlPhoto);
-  } catch (e) {
-    alert("Erreur upload : " + (e.message || e));
-    container.remove();
-    resolve(null);
-  }
+  window.genererImageAvecCadreBlob(dataUrl, cadre, async (err, blob) => {
+    if (err) {
+      alert(err);
+      container.remove();
+      resolve(null);
+      return;
+    }
+    try {
+      const urlPhoto = await window.uploadPhotoConcoursBlob(blob, defiId, userId);
+      container.remove();
+      resolve(urlPhoto);
+    } catch (e) {
+      alert("Erreur upload : " + (e.message || e));
+      container.remove();
+      resolve(null);
+    }
+  });
+  return;
 }
-};
+    };
 
       previewDiv.querySelector("#retakePhoto").onclick = () => {
         previewDiv.remove();
