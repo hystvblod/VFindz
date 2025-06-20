@@ -5,16 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Duel Amis Premium</title>
   <link rel="stylesheet" href="style/main.css" />
+  <style>
+    .duel-main { max-width: 420px; margin: 2.4rem auto 0 auto; background: rgba(38,41,56,0.93); border-radius: 1.3rem; box-shadow: 0 8px 32px #0003, 0 2px 0 #232435; padding: 2.2rem 1.4rem 1.6rem 1.4rem;}
+    .amis-list { display: flex; flex-direction: column; gap: 1.1rem; margin-bottom: 2.2rem;}
+    .ami-card { display: flex; align-items: center; justify-content: space-between; background: #2e3047; border-radius: 0.9rem; padding: 0.9em 1.2em; box-shadow: 0 3px 12px #0002; min-height: 52px;}
+    .ami-nom { font-weight: 600; font-size: 1.14em; color: #ffe04a; letter-spacing: .2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px;}
+    .btn-duel-ami { background: #ffe04a; color: #2b2b2b; font-weight: bold; border: none; border-radius: 8px; padding: 7px 16px; font-size: 1.03em; box-shadow: 0 2px 8px #0002; cursor: pointer; transition: background .14s; margin-left: 14px;}
+    .btn-duel-ami:active { background: #ffd900; }
+    .section-titre { color: #e8eaf6; font-size: 1.15em; font-weight: 600; margin: 1.7em 0 0.7em 0; letter-spacing: .2px; text-align: center;}
+    .duel-demandes-list { background: #24263b; border-radius: 0.9rem; padding: 1em 1em 0.6em 1em; min-height: 45px; margin-bottom: 1.1rem; box-shadow: 0 2px 8px #0001;}
+    .demande-card { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6em; gap: 0.6em;}
+    .demande-nom { font-weight: 500; color: #ffe04a; font-size: 1.03em; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+    .badge-nouveau { background: #ffe04a; color: #2a2a23; font-size: 0.97em; border-radius: 6px; padding: 1px 7px; margin-left: 5px; font-weight: bold; letter-spacing: .4px; box-shadow: 0 1px 4px #0001;}
+    .btn-accepter, .btn-refuser { border: none; border-radius: 8px; padding: 6px 14px; font-weight: bold; font-size: 0.97em; margin-left: 5px; cursor: pointer; transition: background .13s;}
+    .btn-accepter { background: #65e965; color: #253a25;}
+    .btn-refuser { background: #f36d6d; color: #232323;}
+    .btn-accepter:active { background: #32d132; }
+    .btn-refuser:active { background: #de3a3a; }
+    .aucune-demande { color: #bdbdc8; text-align: center; font-size: 1.01em; margin: 0.3em 0 0.8em 0;}
+    @media (max-width: 600px) {.duel-main { max-width: 98vw; padding: 1.1em 0.5em; } .ami-nom { max-width: 110px; } .demande-nom { max-width: 90px; }}
+  </style>
 </head>
 <body class="duel-container">
 
-  <!-- ✅ HEADER IDENTIQUE -->
+  <!-- HEADER identique -->
   <header class="header-solo" style="border-bottom: 5px solid #888;">
     <div class="header-row">
       <a href="index.html" class="back-btn" title="Retour">
         <img src="assets/icons/arrow_back.svg" alt="Retour" />
       </a>
-      <h1>Mode Duel Premium</h1>
+      <h1>Duel Premium</h1>
       <div class="top-buttons">
         <a href="profil.html" class="btn-icon">
           <img src="assets/icons/user.svg" alt="Profil" />
@@ -24,7 +44,7 @@
         </a>
       </div>
     </div>
-    <div class="solde-container solde-solo">
+    <div class="solde-container solde-solo" id="solde-container">
       <div class="solde-item">
         <div class="solde-ligne">
           <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" />
@@ -40,139 +60,196 @@
     </div>
   </header>
 
-  <!-- ✅ ADVERSAIRE ET TIMER -->
-  <div style="text-align:center; margin-top: 1rem; font-size: 1.2rem;">
-    Contre <strong id="nom-adversaire">...</strong>
-  </div>
-  <div class="timer-box">
-    <img src="assets/icons/clock.svg" alt="Horloge" class="icon-svg" />
-    <span class="timer-text">
-      Temps restant&nbsp;: <span id="timer">--:--:--</span>
-    </span>
-  </div>
-
-  <!-- ✅ POPUPS -->
-  <div id="popup-photo" class="popup hidden" tabindex="-1">
-    <div class="popup-inner">
-      <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
-        <button id="btn-aimer-photo" style="background: none; border: none; padding: 0;">
-          <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" />
-        </button>
-        <button id="close-popup" style="background: none; border: none; padding: 0;">
-          <img src="assets/icons/croix.svg" alt="Fermer" style="width: 32px; height: 32px;" />
-        </button>
-      </div>
-      <div class="cadre-preview cadre-popup" style="margin-top: 44px;">
-        <img id="cadre-affiche" src="" alt="Cadre" style="width:220px;height:220px;position:absolute;left:0;right:0;margin:auto;top:0;bottom:0;z-index:0;">
-        <img id="photo-affichee" src="" alt="Photo" style="width:210px;height:210px;object-fit:cover;position:relative;z-index:2;">
-      </div>
-    </div>
-  </div>
-  <div id="popup-cadre-choix" class="popup hidden">
-    <div class="popup-inner">
-      <div style="text-align:right;">
-        <button class="close-btn" style="background:none;border:none;cursor:pointer;"><img src="assets/icons/croix.svg" style="width:32px;" /></button>
-      </div>
-      <h3>Choisis ton cadre :</h3>
-      <div id="list-cadres-popup" style="display:flex;flex-wrap:wrap;gap:12px;"></div>
-    </div>
-  </div>
-  <div id="popup-signal-photo" class="popup hidden">
-    <div class="popup-inner">
-      <div style="text-align:right;">
-        <button class="close-btn" style="background:none;border:none;cursor:pointer;"><img src="assets/icons/croix.svg" style="width:32px;" /></button>
-      </div>
-      <h3>Signaler la photo</h3>
-      <div id="signalement-types" style="display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="btn-signal-type" data-type="hors_sujet">Hors sujet</button>
-        <button class="btn-signal-type" data-type="offensive">Offensive</button>
-        <button class="btn-signal-type" data-type="spam">Spam</button>
-        <button class="btn-signal-type" data-type="autre">Autre</button>
-      </div>
-    </div>
-  </div>
-  <div id="popup-jeton-valider" class="popup hidden">
-    <div class="popup-inner">
-      <div style="text-align:right;">
-        <button class="close-btn" style="background:none;border:none;cursor:pointer;"><img src="assets/icons/croix.svg" style="width:32px;" /></button>
-      </div>
-      <h3>Valider ce défi avec 1 jeton ?</h3>
-      <div style="text-align:center;">
-        <button id="btn-confirm-jeton">Valider</button>
-        <button id="btn-cancel-jeton">Annuler</button>
-      </div>
-    </div>
-  </div>
-  <div id="popup-fin-duel" class="popup hidden">
-    <div class="popup-inner">
-      <div style="text-align:right;">
-        <button id="close-popup-fin" class="close-btn" style="background:none;border:none;cursor:pointer;"><img src="assets/icons/croix.svg" style="width:32px;" /></button>
-      </div>
-      <h2 id="fin-titre"></h2>
-      <div id="fin-faceaface"></div>
-      <div id="fin-details"></div>
-      <div id="fin-gain" style="margin:12px 0;"></div>
-      <div style="text-align:center;">
-        <button id="fin-btn-replay">Rejouer</button>
-        <button id="fin-btn-retour">Retour accueil</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ✅ CONTENU PRINCIPAL -->
   <main>
-    <div class="duel-main-container" style="max-width:600px;margin:30px auto 0 auto;padding:20px;">
-      <div id="duel-premium-info" style="text-align:center;margin-bottom:15px;color:#c59100;font-weight:bold;"></div>
-      <div id="bloc-defi-saisie" style="display:none;">
-        <div id="text-saisie-defis" style="margin-bottom:10px;font-weight:bold;"></div>
-        <input id="input-defi1" type="text" placeholder="Défi 1..." style="margin-bottom:8px;width:100%;padding:12px 10px;border-radius:10px;border:none;font-size:1.1em;">
-        <input id="input-defi2" type="text" placeholder="Défi 2..." style="margin-bottom:8px;width:100%;padding:12px 10px;border-radius:10px;border:none;font-size:1.1em;">
-        <button id="btn-valider-defis" style="padding:12px 24px;border-radius:10px;font-size:1.09em;background:#ffd966;font-weight:bold;border:none;margin-top:10px;">Valider</button>
-      </div>
-      <div id="bloc-attente" style="display:none;text-align:center;font-style:italic;color:#b7b7b7;">
-        En attente de l’autre joueur...
-      </div>
-      <div id="bloc-defis-final" style="display:none;">
-        <h3>Liste des défis sélectionnés :</h3>
-        <ul id="liste-defis-final"></ul>
-      </div>
-      <ul id="duel-defi-list"></ul>
-      <div id="zone-timer"></div>
+    <div class="duel-main">
+      <div id="premium-alert" style="display:none;color:#f36d6d;text-align:center;margin-bottom:1.1em;font-weight:bold;"></div>
+      <div class="section-titre">Mes amis</div>
+      <div id="liste-amis" class="amis-list"></div>
+
+      <div class="section-titre" style="margin-top:2.4em;">Demandes de duel premium reçues</div>
+      <div id="demandes-recue" class="duel-demandes-list"></div>
+
+      <div class="section-titre" style="margin-top:2.4em;">Demandes de duel premium envoyées</div>
+      <div id="demandes-envoyees" class="duel-demandes-list"></div>
     </div>
   </main>
-
   <footer>
     <p>&copy; 2025 VFindz</p>
   </footer>
 
-  <!-- ✅ SCRIPTS FINAUX GLOBAUX -->
-  <!-- 1. Supabase global (PAS de /+esm) -->
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <!-- 2. Fichiers JS : tout en mode global, pas de module ! -->
-  <script src="js/init.js"></script>
-  <script src="js/duel.js"></script>
-  <script src="js/camera.js"></script>
-  <script src="js/pub.js"></script>
-
+  <script src="js/userData.js"></script>
   <script>
-    // Gestion de la croix popup cœur/croix/close
-    document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll('#btn-aimer-photo img[src*="croix"], #close-popup, .close-btn').forEach(btn => {
-        btn.onclick = function() {
-          let popup = btn.closest('.popup');
-          if (popup) {
-            popup.classList.add('hidden');
-            popup.classList.remove('show');
-          }
-        };
-      });
-    });
+if (!window.supabase) {
+  window.supabase = supabase.createClient(
+    'https://swmdepiukfginzhbeccz.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI'
+  );
+}
+let pseudoPublic = null;
+let profil = null;
+
+async function isPremiumUser() {
+  if (typeof window.isPremium === "function") return await window.isPremium();
+  if (!pseudoPublic) return false;
+  const { data } = await window.supabase.from('users').select('premium').eq('pseudo', pseudoPublic).single();
+  return !!(data && data.premium);
+}
+
+async function loadProfil() {
+  await window.loadUserData();
+  pseudoPublic = await window.getPseudo();
+  const { data } = await window.supabase.from('users').select('*').eq('pseudo', pseudoPublic).single();
+  profil = data;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  if (typeof window.afficherSolde === "function") await window.afficherSolde();
+  await loadProfil();
+  const premium = await isPremiumUser();
+  if (!premium) {
+    document.getElementById("premium-alert").style.display = "block";
+    document.getElementById("premium-alert").textContent = "Cette fonctionnalité est réservée aux membres Premium.";
+    document.getElementById("liste-amis").innerHTML = "";
+    document.getElementById("demandes-recue").innerHTML = "";
+    document.getElementById("demandes-envoyees").innerHTML = "";
+    return;
+  }
+  afficherAmis();
+  afficherDemandesDuel();
+});
+
+async function afficherAmis() {
+  const amis = profil && profil.amis ? profil.amis : [];
+  const ul = document.getElementById("liste-amis");
+  ul.innerHTML = "";
+  if (!amis.length) {
+    ul.innerHTML = "<div class='aucune-demande'>Aucun ami enregistré.</div>";
+    return;
+  }
+  amis.forEach(ami => {
+    const card = document.createElement("div");
+    card.className = "ami-card";
+    card.innerHTML = `
+      <span class="ami-nom">${ami}</span>
+      <button class="btn-duel-ami" data-ami="${ami}">Duel Premium ⚡</button>
+    `;
+    card.querySelector(".btn-duel-ami").onclick = () => inviterDuelPremium(ami);
+    ul.appendChild(card);
+  });
+}
+
+async function afficherDemandesDuel() {
+  // RECUES
+  const ulRecue = document.getElementById("demandes-recue");
+  ulRecue.innerHTML = "";
+  const recues = (profil && profil.demandesDuelRecuesPremium) ? profil.demandesDuelRecuesPremium : [];
+  if (!recues.length) ulRecue.innerHTML = "<div class='aucune-demande'>Aucune demande reçue.</div>";
+  recues.forEach(ami => {
+    const card = document.createElement("div");
+    card.className = "demande-card";
+    card.innerHTML = `
+      <span class="demande-nom">${ami}<span class="badge-nouveau">Nouveau</span></span>
+      <div>
+        <button class="btn-accepter" data-ami="${ami}">Accepter</button>
+        <button class="btn-refuser" data-ami="${ami}">Refuser</button>
+      </div>
+    `;
+    card.querySelector(".btn-accepter").onclick = () => accepterDuelPremium(ami);
+    card.querySelector(".btn-refuser").onclick = () => refuserDuelPremium(ami);
+    ulRecue.appendChild(card);
+  });
+
+  // ENVOYÉES
+  const ulEnv = document.getElementById("demandes-envoyees");
+  ulEnv.innerHTML = "";
+  const envoyees = (profil && profil.demandesDuelEnvoyeesPremium) ? profil.demandesDuelEnvoyeesPremium : [];
+  if (!envoyees.length) ulEnv.innerHTML = "<div class='aucune-demande'>Aucune demande envoyée.</div>";
+  envoyees.forEach(ami => {
+    const card = document.createElement("div");
+    card.className = "demande-card";
+    card.innerHTML = `
+      <span class="demande-nom">${ami}</span>
+      <span class="badge-nouveau" style="background:#b3e2ff;color:#20435a;">En attente</span>
+    `;
+    ulEnv.appendChild(card);
+  });
+}
+
+// INVITE un ami à un duel premium
+async function inviterDuelPremium(amiPseudo) {
+  const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
+  if (!ami) { alert("Ami introuvable."); return; }
+  const demandesRecues = new Set([...(ami.demandesDuelRecuesPremium || []), pseudoPublic]);
+  await window.supabase.from("users").update({
+    demandesDuelRecuesPremium: Array.from(demandesRecues)
+  }).eq("pseudo", amiPseudo);
+
+  const demandesEnvoyees = new Set([...(profil.demandesDuelEnvoyeesPremium || []), amiPseudo]);
+  await window.supabase.from("users").update({
+    demandesDuelEnvoyeesPremium: Array.from(demandesEnvoyees)
+  }).eq("pseudo", pseudoPublic);
+
+  await loadProfil();
+  afficherAmis();
+  afficherDemandesDuel();
+}
+
+// ACCEPTE une demande de duel premium : crée une room en type "amis_premium"
+async function accepterDuelPremium(amiPseudo) {
+  const { data } = await window.supabase.from('duels').insert([{
+    player1_pseudo: amiPseudo,
+    player2_pseudo: pseudoPublic,
+    status: 'playing',
+    createdat: Date.now(),
+    type: "amis_premium",
+    premium1: true,
+    premium2: null,
+    defis_player1: null,
+    defis_player2: null,
+    defis_final: null,
+    starttime: Date.now(),
+    photosa: {},
+    photosb: {}
+  }]).select();
+
+  // MAJ demandes
+  await window.supabase.from("users").update({
+    demandesDuelRecuesPremium: (profil.demandesDuelRecuesPremium || []).filter(p => p !== amiPseudo)
+  }).eq("pseudo", pseudoPublic);
+
+  const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
+  await window.supabase.from("users").update({
+    demandesDuelEnvoyeesPremium: (ami.demandesDuelEnvoyeesPremium || []).filter(p => p !== pseudoPublic)
+  }).eq("pseudo", amiPseudo);
+
+  await loadProfil();
+  afficherDemandesDuel();
+
+  if (data && data.length) {
+    window.location.href = `duel_amis_premium_room.html?room=${data[0].id}`;
+  }
+}
+
+async function refuserDuelPremium(amiPseudo) {
+  await window.supabase.from("users").update({
+    demandesDuelRecuesPremium: (profil.demandesDuelRecuesPremium || []).filter(p => p !== amiPseudo)
+  }).eq("pseudo", pseudoPublic);
+
+  const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
+  await window.supabase.from("users").update({
+    demandesDuelEnvoyeesPremium: (ami.demandesDuelEnvoyeesPremium || []).filter(p => p !== pseudoPublic)
+  }).eq("pseudo", amiPseudo);
+
+  await loadProfil();
+  afficherDemandesDuel();
+}
   </script>
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    if (window.afficherSolde) window.afficherSolde();
-  });
-</script>
-
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.afficherSolde) window.afficherSolde();
+    });
+  </script>
 </body>
 </html>
