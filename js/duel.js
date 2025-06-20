@@ -751,9 +751,41 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // HANDLER : Quand tu retires un jeton (ex : valider défi)
+// HANDLER : Quand tu retires un jeton (ex : valider défi)
 window.validerDefiAvecJeton = async function(idx) {
   await window.removeJeton();
   await window.afficherSolde();
+
+  // Récupère les infos de room courante
+  let duelId = window.currentRoomId || roomId;
+  if (!duelId) duelId = (new URLSearchParams(window.location.search)).get("room");
+  const pseudo = await window.getPseudo();
+  const room = await window.getRoom(duelId);
+  const myChamp = (room.player1_pseudo === pseudo) ? 'photosa' : 'photosb';
+
+  // Chemin local de l'image "jeton validé"
+  const urlJeton = "assets/jeton_pp.jpg"; // (mets ton image stylée ici)
+  const cadreId = window.getCadreDuel ? window.getCadreDuel(duelId, idx) : "polaroid_01";
+
+  // Mise à jour Supabase
+  let photos = room[myChamp] || {};
+  photos[idx] = { url: urlJeton, cadre: cadreId };
+  await window.supabase.from('duels').update({ [myChamp]: photos }).eq('id', duelId);
+
+  // Mise à jour cache local
+  if (window.VFindDuelDB && window.VFindDuelDB.set) {
+    await window.VFindDuelDB.set(`${duelId}_${myChamp}_${idx}`, { url: urlJeton, cadre: cadreId });
+  }
+  if (window.setCadreDuel) window.setCadreDuel(duelId, idx, cadreId);
+
+  // Forcer le rendu à jour (pour voir directement le visuel "jeton" sur le défi)
+  if (typeof window.renderDefis === "function") {
+    const advID = (room.player1_pseudo === pseudo ? room.player2_pseudo : room.player1_pseudo);
+    await window.renderDefis({ myID: pseudo, advID });
+  } else {
+    location.reload();
+  }
+
 };
 // HANDLER : Ajoute un jeton (récompense/pub)
 window.gagnerJeton = async function() {
