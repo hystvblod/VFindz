@@ -1,7 +1,6 @@
 // ========== camera.js ==========
 // Prérequis : charger duel.js, userData.js, supabase (via window.supabase) AVANT ce fichier !
 
-// -------- Génère l'image finale AVEC cadre en BLOB --------
 window.genererImageAvecCadreBlob = function(imageSrc, cadreId, callback) {
   const sizeW = 500, sizeH = 550;
   const canvas = document.createElement('canvas');
@@ -11,35 +10,46 @@ window.genererImageAvecCadreBlob = function(imageSrc, cadreId, callback) {
   ctx.fillStyle = "#fff";
   ctx.fillRect(0, 0, sizeW, sizeH);
 
-  const img = new Image();
-  img.onload = () => {
-    let w = img.width, h = img.height;
-    let nw = w * Math.min(1, sizeW / w);
-    let nh = h * Math.min(1, sizeH / h);
-    let nx = (sizeW - nw) / 2, ny = (sizeH - nh) / 2;
-    ctx.drawImage(img, nx, ny, nw, nh);
+  // 1. On charge le cadre D’ABORD
+  if (!window.getCadreUrl) {
+    callback("Erreur : getCadreUrl non dispo !");
+    return;
+  }
+  try {
+    const url = window.getCadreUrl(cadreId || "polaroid_01");
+    const cadre = new Image();
+    cadre.crossOrigin = "anonymous";
+    cadre.onload = () => {
+      // DESSINE le cadre EN PREMIER
+      ctx.drawImage(cadre, 0, 0, sizeW, sizeH);
 
-    // --- ATTENTION, on doit attendre l'URL du cadre ! ---
-    if (!window.getCadreUrl) {
-      callback("Erreur : getCadreUrl non dispo !");
-      return;
-    }
-    try {
-      const url = window.getCadreUrl(cadreId || "polaroid_01");
-      const cadre = new Image();
-      cadre.onload = () => {
-        ctx.drawImage(cadre, 0, 0, sizeW, sizeH);
+      // 2. On charge la photo utilisateur ensuite
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        // DESSINE la photo utilisateur PAR-DESSUS, centrée et redimensionnée
+        let w = img.width, h = img.height;
+        let scale = Math.min(sizeW / w, sizeH / h, 1);
+        let nw = w * scale, nh = h * scale;
+        let nx = (sizeW - nw) / 2, ny = (sizeH - nh) / 2;
+        ctx.drawImage(img, nx, ny, nw, nh);
+
+        // ENREGISTRE le résultat
         canvas.toBlob(blob => {
           if (!blob) callback("Erreur génération blob !");
           else callback(null, blob);
         }, "image/webp", 0.93);
       };
-      cadre.onerror = () => callback("Erreur chargement cadre !");
-      cadre.src = url;
-    } catch (e) {
-      callback("Erreur chargement cadre (url)");
-    }
-  };
+      img.onerror = () => callback("Erreur chargement photo !");
+      img.src = imageSrc;
+    };
+    cadre.onerror = () => callback("Erreur chargement cadre !");
+    cadre.src = url;
+  } catch (e) {
+    callback("Erreur chargement cadre (url)");
+  }
+};
+
   img.onerror = () => callback("Erreur chargement photo !");
   img.src = imageSrc;
 };
