@@ -24,22 +24,21 @@ window.genererImageAvecCadreBlob = function(imageSrc, cadreId, callback) {
       callback("Erreur : getCadreUrl non dispo !");
       return;
     }
-    window.getCadreUrl(cadreId || "polaroid_01")
-      .then(url => {
-        const cadre = new Image();
-        cadre.onload = () => {
-          ctx.drawImage(cadre, 0, 0, sizeW, sizeH);
-          canvas.toBlob(blob => {
-            if (!blob) callback("Erreur génération blob !");
-            else callback(null, blob);
-          }, "image/webp", 0.93);
-        };
-        cadre.onerror = () => callback("Erreur chargement cadre !");
-        cadre.src = url;
-      })
-      .catch(() => {
-        callback("Erreur chargement cadre (url)");
-      });
+    try {
+      const url = window.getCadreUrl(cadreId || "polaroid_01");
+      const cadre = new Image();
+      cadre.onload = () => {
+        ctx.drawImage(cadre, 0, 0, sizeW, sizeH);
+        canvas.toBlob(blob => {
+          if (!blob) callback("Erreur génération blob !");
+          else callback(null, blob);
+        }, "image/webp", 0.93);
+      };
+      cadre.onerror = () => callback("Erreur chargement cadre !");
+      cadre.src = url;
+    } catch (e) {
+      callback("Erreur chargement cadre (url)");
+    }
   };
   img.onerror = () => callback("Erreur chargement photo !");
   img.src = imageSrc;
