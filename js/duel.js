@@ -749,11 +749,6 @@ window.gererPrisePhotoDuel = async function(idx, cadreId = null) {
   }
 };
 
-// -------- POPUP VALIDER AVEC JETON (à ajouter dans ton HTML aussi !) --------
-window.ouvrirPopupValiderJeton = function(idx) {
-  window._idxJetonToValidate = idx;
-  document.getElementById("popup-jeton-valider").classList.remove("hidden");
-};
 
 
 // HANDLER : Quand tu retires un jeton (ex : valider défi)
