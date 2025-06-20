@@ -991,3 +991,7 @@ document.body.addEventListener("click", async function(e) {
     alert("Erreur lors de l'envoi : " + err.message);
   }
 });
+// Patch compat duel.js (lecture cloud ONLY, anti-triche !)
+window.getPoints = window.getPointsCloud;
+window.getJetons = window.getJetonsCloud;
+
