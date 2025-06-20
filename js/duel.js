@@ -160,30 +160,7 @@ const params = new URLSearchParams(window.location.search);
 const roomId = params.get("room");
 const path = window.location.pathname;
 
-// PATCH : REPRISE DE PARTIE EN COURS SI EXISTE
-if (path.includes("duel_random.html")) {
-  const existingRoomId = localStorage.getItem("duel_random_room");
-  if (existingRoomId) {
-    window.supabase
-      .from('duels')
-      .select('id, status')
-      .eq('id', existingRoomId)
-      .single()
-      .then(({ data }) => {
-        if (data && data.status && data.status !== 'finished') {
-          setTimeout(() => {
-            window.location.href = `duel_game.html?room=${existingRoomId}`;
-          }, 200);
-        } else {
-          localStorage.removeItem("duel_random_room");
-          localStorage.removeItem("duel_is_player1");
-          window.findOrCreateRoom();
-        }
-      });
-  } else {
-    window.findOrCreateRoom();
-  }
-}
+
 
 // ==================== PATCH ANTI-MULTI =====================
 window.checkAlreadyInDuel = async function() {
@@ -1054,3 +1031,27 @@ window.validerDefiAvecJeton = async function(idx) {
   }
 };
 
+// PATCH : REPRISE DE PARTIE EN COURS SI EXISTE
+if (path.includes("duel_random.html")) {
+  const existingRoomId = localStorage.getItem("duel_random_room");
+  if (existingRoomId) {
+    window.supabase
+      .from('duels')
+      .select('id, status')
+      .eq('id', existingRoomId)
+      .single()
+      .then(({ data }) => {
+        if (data && data.status && data.status !== 'finished') {
+          setTimeout(() => {
+            window.location.href = `duel_game.html?room=${existingRoomId}`;
+          }, 200);
+        } else {
+          localStorage.removeItem("duel_random_room");
+          localStorage.removeItem("duel_is_player1");
+          window.findOrCreateRoom();
+        }
+      });
+  } else {
+    window.findOrCreateRoom();
+  }
+}
