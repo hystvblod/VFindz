@@ -870,6 +870,7 @@ window.getDefisDuelFromSupabase = async function(count = 3) {
     .select('intitule')
     .order('random()', { ascending: false })
     .limit(count);
+      console.log("DEBUG DEFIS SUPABASE", { data, error });
 
   if (error || !data || data.length < count) {
     const backup = [
