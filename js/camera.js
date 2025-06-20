@@ -10,7 +10,7 @@ window.genererImageAvecCadreBlob = function(imageSrc, callback) {
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = "#fff";
   ctx.fillRect(0, 0, sizeW, sizeH);
-
+  console.log("➡️ [genererImageAvecCadreBlob] imageSrc =", imageSrc);
   const img = new Image();
   img.onload = () => {
     let w = img.width, h = img.height;
