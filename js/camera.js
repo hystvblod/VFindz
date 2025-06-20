@@ -10,7 +10,7 @@ window.genererImageAvecCadreBlob = function(imageSrc, cadreId, callback) {
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = "#fff";
   ctx.fillRect(0, 0, sizeW, sizeH);
-  // console.log("➡️ [genererImageAvecCadreBlob] imageSrc =", imageSrc);
+
   const img = new Image();
   img.onload = () => {
     let w = img.width, h = img.height;
@@ -19,20 +19,32 @@ window.genererImageAvecCadreBlob = function(imageSrc, cadreId, callback) {
     let nx = (sizeW - nw) / 2, ny = (sizeH - nh) / 2;
     ctx.drawImage(img, nx, ny, nw, nh);
 
-    const cadre = new Image();
-    cadre.onload = () => {
-      ctx.drawImage(cadre, 0, 0, sizeW, sizeH);
-      canvas.toBlob(blob => {
-        if (!blob) callback("Erreur génération blob !");
-        else callback(null, blob);
-      }, "image/webp", 0.93);
-    };
-    cadre.onerror = () => callback("Erreur chargement cadre !");
-    cadre.src = "assets/cadres/" + (cadreId || "polaroid_01") + ".webp";
+    // --- ATTENTION, on doit attendre l'URL du cadre ! ---
+    if (!window.getCadreUrl) {
+      callback("Erreur : getCadreUrl non dispo !");
+      return;
+    }
+    window.getCadreUrl(cadreId || "polaroid_01")
+      .then(url => {
+        const cadre = new Image();
+        cadre.onload = () => {
+          ctx.drawImage(cadre, 0, 0, sizeW, sizeH);
+          canvas.toBlob(blob => {
+            if (!blob) callback("Erreur génération blob !");
+            else callback(null, blob);
+          }, "image/webp", 0.93);
+        };
+        cadre.onerror = () => callback("Erreur chargement cadre !");
+        cadre.src = url;
+      })
+      .catch(() => {
+        callback("Erreur chargement cadre (url)");
+      });
   };
   img.onerror = () => callback("Erreur chargement photo !");
   img.src = imageSrc;
 };
+
 
 // -------- Upload dans le bucket concours --------
 window.uploadPhotoConcoursBlob = async function(blob, concoursId, userId) {
