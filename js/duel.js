@@ -81,12 +81,22 @@ window.setCadreDuel = function(duelId, idx, cadreId) {
 };
 
 window.uploadPhotoDuelWebp = async function(dataUrl, duelId, idx, cadreId) {
-  function dataURLtoBlob(dataurl) {
-    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-      bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-    while(n--) u8arr[n] = bstr.charCodeAt(n);
-    return new Blob([u8arr], {type:mime});
+function dataURLtoBlob(dataurl) {
+  if (!dataurl || typeof dataurl !== "string" || !dataurl.includes(",")) {
+    // Correction : si jamais ça arrive, on génère un blob blanc pour éviter TOUT PLANTAGE
+    const canvas = document.createElement("canvas");
+    canvas.width = 32; canvas.height = 32;
+    canvas.getContext("2d").fillStyle = "#fff";
+    canvas.getContext("2d").fillRect(0,0,32,32);
+    return new Promise(res => canvas.toBlob(b=>res(b),"image/webp"));
   }
+  var arr = dataurl.split(','), match = arr[0].match(/:(.*?);/);
+  var mime = match && match[1] ? match[1] : "image/webp";
+  var bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+  while(n--) u8arr[n] = bstr.charCodeAt(n);
+  return new Blob([u8arr], {type:mime});
+}
+
   const userId = window.getUserId ? window.getUserId() : (await window.getPseudo());
   const blob = dataURLtoBlob(dataUrl);
   const filePath = `duel_photos/${duelId}_${idx}_${userId}_${Date.now()}.webp`;
