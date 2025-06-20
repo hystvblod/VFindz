@@ -780,6 +780,7 @@ window.gagnerPoints = async function(montant) {
 };
 
 // Changement de cadre après la photo (popup choix)
+// Changement de cadre après la photo (popup choix)
 window.ouvrirPopupChoixCadre = async function(duelId, idx, champ) {
   let cadres = [];
   try {
@@ -791,9 +792,11 @@ window.ouvrirPopupChoixCadre = async function(duelId, idx, champ) {
   const actuel = window.getCadreDuel(duelId, idx);
   const list = document.getElementById("list-cadres-popup");
   list.innerHTML = "";
-  cadres.forEach(cadre => {
+
+  // BOUCLE CORRIGÉE : for...of pour await
+  for (const cadre of cadres) {
     let el = document.createElement("img");
-    el.src = "./assets/cadres/" + cadre + ".webp";
+    el.src = await window.getCadreUrl(cadre); // ⬅️ URL Supabase et non plus chemin local !
     el.style.width = "72px";
     el.style.cursor = "pointer";
     el.style.borderRadius = "12px";
@@ -815,7 +818,8 @@ window.ouvrirPopupChoixCadre = async function(duelId, idx, champ) {
       location.reload();
     };
     list.appendChild(el);
-  });
+  }
+
   document.getElementById("popup-cadre-choix").classList.remove("hidden");
 };
 window.fermerPopupCadreChoix = function() {
