@@ -358,30 +358,25 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
           resolve(dataUrl);
           return;
         }
-        // Mode concours (➡️ BLOB !)
-        else if (mode === "concours") {
-          // Génère l'image finale avec cadre puis BLOB direct
-          const dataUrl = canvas.toDataURL("image/webp", 0.93);
-          const userId = await window.getUserId();
-          window.genererImageAvecCadreBlob(dataUrl, async (err, blob) => {
-            if (err) {
-              alert("Erreur : " + err);
-              container.remove();
-              resolve(null);
-              return;
-            }
-            try {
-              const urlPhoto = await window.uploadPhotoConcoursBlob(blob, defiId, userId);
-              container.remove();
-              resolve(urlPhoto);
-            } catch (e) {
-              alert("Erreur upload : " + (e.message || e));
-              container.remove();
-              resolve(null);
-            }
-          });
-        }
-      };
+else if (mode === "concours") {
+  const dataUrl = canvas.toDataURL("image/webp", 0.93);
+  if (!dataUrl || !dataUrl.startsWith("data:image/webp")) {
+    alert("Erreur technique : la capture a échoué. (canvas vide)");
+    container.remove();
+    resolve(null);
+    return;
+  }
+  const userId = await window.getUserId();
+  try {
+    const urlPhoto = await window.uploadPhotoConcoursBlob(dataUrl, defiId, userId);
+    container.remove();
+    resolve(urlPhoto);
+  } catch (e) {
+    alert("Erreur upload : " + (e.message || e));
+    container.remove();
+    resolve(null);
+  }
+}
 
       previewDiv.querySelector("#retakePhoto").onclick = () => {
         previewDiv.remove();
