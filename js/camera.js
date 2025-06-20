@@ -2,7 +2,7 @@
 // Prérequis : charger duel.js, userData.js, supabase (via window.supabase) AVANT ce fichier !
 
 // -------- Génère l'image finale AVEC cadre en BLOB --------
-window.genererImageAvecCadreBlob = function(imageSrc, callback) {
+window.genererImageAvecCadreBlob = function(imageSrc, cadreId, callback) {
   const sizeW = 500, sizeH = 550;
   const canvas = document.createElement('canvas');
   canvas.width = sizeW;
@@ -10,7 +10,7 @@ window.genererImageAvecCadreBlob = function(imageSrc, callback) {
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = "#fff";
   ctx.fillRect(0, 0, sizeW, sizeH);
-  console.log("➡️ [genererImageAvecCadreBlob] imageSrc =", imageSrc);
+  // console.log("➡️ [genererImageAvecCadreBlob] imageSrc =", imageSrc);
   const img = new Image();
   img.onload = () => {
     let w = img.width, h = img.height;
@@ -28,7 +28,7 @@ window.genererImageAvecCadreBlob = function(imageSrc, callback) {
       }, "image/webp", 0.93);
     };
     cadre.onerror = () => callback("Erreur chargement cadre !");
-    cadre.src = "assets/cadres/polaroid_01.webp";
+    cadre.src = "assets/cadres/" + (cadreId || "polaroid_01") + ".webp";
   };
   img.onerror = () => callback("Erreur chargement photo !");
   img.src = imageSrc;
