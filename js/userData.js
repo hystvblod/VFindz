@@ -599,3 +599,14 @@ window.getCadreUrl = getCadreUrl;
 window.getUserByPseudo = getUserByPseudo;
 window.getJetons = getJetonsCloud;
 
+// ----- AJOUTE CECI À LA FIN DE userData.js -----
+// Fonction cloud SÉCURISÉE de retrait de jeton pour les duels
+window.removeJeton = async function() {
+  await loadUserData();
+  // Sécurité anti-négatif
+  const jetonsActuels = Number(userDataCache.jetons || 0);
+  if (jetonsActuels <= 0) throw new Error("Plus de jetons disponibles.");
+  userDataCache.jetons = jetonsActuels - 1;
+  await supabase.from('users').update({ jetons: userDataCache.jetons }).eq('id', userIdCache);
+  return userDataCache.jetons;
+};
