@@ -40,7 +40,8 @@
       item.innerHTML = `
         <div class="cadre-preview">
           <img src="${photoData.photo || ''}" style="z-index:2;">
-          <img src="./assets/cadres/${cadreId}.webp" style="z-index:3;">
+          <img src="${window.getCadreUrl ? window.getCadreUrl(cadreId) : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`}" style="z-index:3;">
+
         </div>
       `;
       item.onclick = () => {
