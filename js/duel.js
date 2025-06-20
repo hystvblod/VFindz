@@ -742,7 +742,7 @@ window.validerDefiAvecJeton = async function(idx) {
   const myChamp = (room.player1_pseudo === pseudo) ? 'photosa' : 'photosb';
 
   // Chemin local de l'image "jeton validé"
-  const urlJeton = "assets/jeton_pp.jpg"; // (mets ton image stylée ici)
+  const urlJeton = "data/jeton_pp.jpg"; // (mets ton image stylée ici)
   const cadreId = window.getCadreDuel ? window.getCadreDuel(duelId, idx) : "polaroid_01";
 
   // Mise à jour Supabase
@@ -1010,7 +1010,7 @@ window.validerDefiAvecJeton = async function(idx) {
   const room = await window.getRoom(duelId);
   const myChamp = (room.player1_pseudo === pseudo) ? 'photosa' : 'photosb';
 
-  const urlJeton = "assets/jeton_pp.jpg"; // Mets l'image de ton jeton ici
+  const urlJeton = "data/jeton_pp.jpg"; // Mets l'image de ton jeton ici
   const cadreId = window.getCadreDuel ? window.getCadreDuel(duelId, idx) : "polaroid_01";
 
   let photos = room[myChamp] || {};
