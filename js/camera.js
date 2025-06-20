@@ -90,20 +90,23 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
       }
 
       // ----- CONCOURS -----
-      if (mode === "concours") {
-        const userId = await window.getUserId();
-        return await new Promise((resolve, reject) => {
-          window.genererImageAvecCadreBlob(dataUrl, async (err, blob) => {
-            if (err) return reject(err);
-            try {
-              const urlPhoto = await window.uploadPhotoConcoursBlob(blob, defiId, userId);
-              resolve(urlPhoto);
-            } catch (e) {
-              reject(e);
-            }
-          });
-        });
+if (mode === "concours") {
+  const cadre =
+    (await window.getCadreSelectionne?.()) || "polaroid_01";
+  const userId = await window.getUserId();
+  return await new Promise((resolve, reject) => {
+    window.genererImageAvecCadreBlob(dataUrl, cadre, async (err, blob) => {
+      if (err) return reject(err);
+      try {
+        const urlPhoto = await window.uploadPhotoConcoursBlob(blob, defiId, userId);
+        resolve(urlPhoto);
+      } catch (e) {
+        reject(e);
       }
+    });
+  });
+}
+
     } catch (err) {
       alert("Erreur caméra native : " + (err.message || err));
       throw err;
