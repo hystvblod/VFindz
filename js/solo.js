@@ -518,12 +518,8 @@ window.ouvrirPopupJeton = async function(index) {
   } else {
     if (confirm("Plus de jeton disponible. Regarder une pub pour gagner 3 jetons ?")) {
       await showRewardedAd();
-      // Ici tu fais l'appel RPC sécurisé Supabase ou incrémente localement selon ton back
-      // Exemple :
-      // const { error } = await supabase.rpc('secure_add_jetons', { nb: 3 });
-      // if (error) { alert("Erreur lors de l'ajout des jetons : " + error.message); return; }
-      // majSolde();
       alert("3 jetons crédités !");
+      majSolde();
     }
   }
 };

@@ -618,6 +618,7 @@ window.afficherPopupFinDuel = async function(room) {
   if (!localStorage.getItem(gainFlag)) {
     await window.addPoints(gain);
     localStorage.setItem(gainFlag, "1");
+    await window.afficherSolde();
   }
 
   $("fin-gain").innerHTML =
@@ -1054,4 +1055,10 @@ if (path.includes("duel_random.html")) {
   } else {
     window.findOrCreateRoom();
   }
+}
+async function updateSoldeAffichage() {
+  const points = await window.getPointsCloud();
+  const jetons = await window.getJetonsCloud();
+  document.getElementById("points").textContent = points;
+  document.getElementById("jetons").textContent = jetons;
 }
