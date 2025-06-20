@@ -1,134 +1,108 @@
 // ========== camera.js ==========
 // Prérequis : charger duel.js, userData.js, supabase (via window.supabase) AVANT ce fichier !
 
-// Générer image + cadre concours (inchangé)
-window.genererImageConcoursAvecCadre = async function(base64Image) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const sizeW = 500;
-      const sizeH = 550;
-      const canvas = document.createElement('canvas');
-      canvas.width = sizeW;
-      canvas.height = sizeH;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = "#fff";
-      ctx.fillRect(0, 0, sizeW, sizeH);
+// -------- Génère l'image finale AVEC cadre en BLOB --------
+window.genererImageAvecCadreBlob = function(imageSrc, callback) {
+  const sizeW = 500, sizeH = 550;
+  const canvas = document.createElement('canvas');
+  canvas.width = sizeW;
+  canvas.height = sizeH;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0, 0, sizeW, sizeH);
 
-      // Respect ratio, jamais agrandir
-      let w = img.width, h = img.height;
-      let scale = Math.max(sizeW / w, sizeH / h, 1);
-      let nw = w * Math.min(1, sizeW / w);
-      let nh = h * Math.min(1, sizeH / h);
-      let nx = (sizeW - nw) / 2, ny = (sizeH - nh) / 2;
-      ctx.drawImage(img, nx, ny, nw, nh);
+  const img = new Image();
+  img.onload = () => {
+    let w = img.width, h = img.height;
+    let nw = w * Math.min(1, sizeW / w);
+    let nh = h * Math.min(1, sizeH / h);
+    let nx = (sizeW - nw) / 2, ny = (sizeH - nh) / 2;
+    ctx.drawImage(img, nx, ny, nw, nh);
 
-      const cadre = new Image();
-      cadre.onload = () => {
-        ctx.drawImage(cadre, 0, 0, sizeW, sizeH);
-        resolve(canvas.toDataURL("image/webp", 0.93));
-      };
-      cadre.onerror = () => reject("Erreur chargement cadre concours !");
-      cadre.src = "assets/cadres/polaroid_01.webp";
+    const cadre = new Image();
+    cadre.onload = () => {
+      ctx.drawImage(cadre, 0, 0, sizeW, sizeH);
+      canvas.toBlob(blob => {
+        if (!blob) callback("Erreur génération blob !");
+        else callback(null, blob);
+      }, "image/webp", 0.93);
     };
-    img.onerror = () => reject("Erreur chargement photo !");
-    img.src = base64Image;
-  });
+    cadre.onerror = () => callback("Erreur chargement cadre !");
+    cadre.src = "assets/cadres/polaroid_01.webp";
+  };
+  img.onerror = () => callback("Erreur chargement photo !");
+  img.src = imageSrc;
 };
 
-// Upload dans le bucket concours (inchangé)
-window.uploadPhotoConcoursWebp = async function(dataUrl, concoursId, userId) {
-  const arr = dataUrl.split(',');
-  const mime = arr[0].match(/:(.*?);/)[1];
-  const bstr = atob(arr[1].split(',')[1] || arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while (n--) u8arr[n] = bstr.charCodeAt(n);
-  const blob = new Blob([u8arr], { type: mime });
+// -------- Upload dans le bucket concours --------
+window.uploadPhotoConcoursBlob = async function(blob, concoursId, userId) {
   const fileName = `${userId}_${Date.now()}.webp`;
-
-  // === AJOUTE CE LOG JUSTE ICI ===
-  console.log("Tentative d'upload dans photoconcours : fileName =", fileName, "blob size =", blob.size);
-
   const { data: uploadData, error: uploadError } = await window.supabase
     .storage
     .from('photoconcours')
     .upload(fileName, blob, { contentType: 'image/webp' });
-
-  // === ET CE LOG ICI ===
-  if (uploadError) {
-    console.error("Erreur Supabase upload:", uploadError);
-    throw uploadError;
-  }
-
-
+  if (uploadError) throw uploadError;
   const { data: publicUrlData } = window.supabase
     .storage
     .from('photoconcours')
     .getPublicUrl(fileName);
-
   return publicUrlData.publicUrl;
 };
 
-// --------- UNIFIÉ ---------
+// ----------- Fonction unifiée : ouverture caméra/capture/upload --------
 window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, cadreId = null) {
-  // SI mobile natif (Capacitor), utilise plugin Camera
+  // ======= MOBILE (CAPACITOR) =======
   if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
     try {
-      // @capacitor/camera doit être intégré dans le projet
       const cameraModule = await import('@capacitor/camera');
       const Camera = cameraModule.Camera;
-
       const photo = await Camera.getPhoto({
         quality: 85,
         allowEditing: false,
-        resultType: 'dataUrl',
+        resultType: 'dataUrl', // tu peux aussi utiliser 'uri'
         source: 'CAMERA'
       });
-
       const dataUrl = photo.dataUrl;
 
-      // Mode duel
+      // ----- DUEL -----
       if (mode === "duel") {
         if (!duelId) return alert("Erreur interne : duelId manquant.");
         if (!cadreId) cadreId = "polaroid_01";
-        try {
-          const urlPhoto = await window.uploadPhotoDuelWebp(dataUrl, duelId, defiId, cadreId);
-          const userId = await window.getUserId();
-          localStorage.setItem(`photo_duel_${duelId}_${userId}`, urlPhoto);
-          await window.savePhotoDuel(defiId, urlPhoto, cadreId);
-          const champ = (window.isPlayer1) ? 'photosa' : 'photosb';
-          if (window.VFindDuelDB && window.currentRoomId) {
-            await window.VFindDuelDB.set(`${duelId}_${champ}_${defiId}`, { url: urlPhoto, cadre: cadreId });
-          }
-          if (window.updateDuelUI) window.updateDuelUI();
-          return urlPhoto;
-        } catch (err) {
-          alert("Erreur upload duel : " + err.message);
-          throw err;
+        const urlPhoto = await window.uploadPhotoDuelWebp(dataUrl, duelId, defiId, cadreId);
+        const userId = await window.getUserId();
+        localStorage.setItem(`photo_duel_${duelId}_${userId}`, urlPhoto);
+        await window.savePhotoDuel(defiId, urlPhoto, cadreId);
+        const champ = (window.isPlayer1) ? 'photosa' : 'photosb';
+        if (window.VFindDuelDB && window.currentRoomId) {
+          await window.VFindDuelDB.set(`${duelId}_${champ}_${defiId}`, { url: urlPhoto, cadre: cadreId });
         }
+        if (window.updateDuelUI) window.updateDuelUI();
+        return urlPhoto;
       }
-      // Mode solo
-      else if (mode === "solo") {
+
+      // ----- SOLO -----
+      if (mode === "solo") {
         const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
         const obj = { photo: dataUrl, cadre };
         localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(obj));
-        if (window.afficherPhotoDansCadreSolo) {
-          window.afficherPhotoDansCadreSolo(defiId, dataUrl);
-        }
+        if (window.afficherPhotoDansCadreSolo) window.afficherPhotoDansCadreSolo(defiId, dataUrl);
         return dataUrl;
       }
-      // Mode concours
-      else if (mode === "concours") {
-        try {
-          const userId = await window.getUserId();
-          const finalDataUrl = await window.genererImageConcoursAvecCadre(dataUrl);
-          const urlPhoto = await window.uploadPhotoConcoursWebp(finalDataUrl, defiId, userId);
-          return urlPhoto;
-        } catch (err) {
-          alert("Erreur upload concours : " + (err.message || err));
-          throw err;
-        }
+
+      // ----- CONCOURS -----
+      if (mode === "concours") {
+        const userId = await window.getUserId();
+        return await new Promise((resolve, reject) => {
+          window.genererImageAvecCadreBlob(dataUrl, async (err, blob) => {
+            if (err) return reject(err);
+            try {
+              const urlPhoto = await window.uploadPhotoConcoursBlob(blob, defiId, userId);
+              resolve(urlPhoto);
+            } catch (e) {
+              reject(e);
+            }
+          });
+        });
       }
     } catch (err) {
       alert("Erreur caméra native : " + (err.message || err));
@@ -137,9 +111,7 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
     return;
   }
 
-  // ----- Sinon version navigateur web -----
-  // ... (suite bloc 2, trop long pour une seule réponse)
-  // ----- Sinon version navigateur web -----
+  // ======= NAVIGATEUR WEB =======
   return new Promise((resolve, reject) => {
     const container = document.createElement("div");
     container.className = "camera-container-fullscreen";
@@ -355,47 +327,60 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
       container.appendChild(previewDiv);
 
       previewDiv.querySelector("#validerPhoto").onclick = async () => {
-        const dataUrl = canvas.toDataURL("image/webp", 0.85);
-        let result = null;
-        try {
-          // Mode duel
-          if (mode === "duel") {
-            if (!duelId) return alert("Erreur interne : duelId manquant.");
-            if (!cadreId) cadreId = "polaroid_01";
-            const urlPhoto = await window.uploadPhotoDuelWebp(dataUrl, duelId, defiId, cadreId);
-            const userId = await window.getUserId();
-            localStorage.setItem(`photo_duel_${duelId}_${userId}`, urlPhoto);
-            await window.savePhotoDuel(defiId, urlPhoto, cadreId);
-            const champ = (window.isPlayer1) ? 'photosa' : 'photosb';
-            if (window.VFindDuelDB && window.currentRoomId) {
-              await window.VFindDuelDB.set(`${duelId}_${champ}_${defiId}`, { url: urlPhoto, cadre: cadreId });
-            }
-            if (window.updateDuelUI) window.updateDuelUI();
-            result = urlPhoto;
+        // Mode duel
+        if (mode === "duel") {
+          const dataUrl = canvas.toDataURL("image/webp", 0.85);
+          if (!duelId) return alert("Erreur interne : duelId manquant.");
+          if (!cadreId) cadreId = "polaroid_01";
+          const urlPhoto = await window.uploadPhotoDuelWebp(dataUrl, duelId, defiId, cadreId);
+          const userId = await window.getUserId();
+          localStorage.setItem(`photo_duel_${duelId}_${userId}`, urlPhoto);
+          await window.savePhotoDuel(defiId, urlPhoto, cadreId);
+          const champ = (window.isPlayer1) ? 'photosa' : 'photosb';
+          if (window.VFindDuelDB && window.currentRoomId) {
+            await window.VFindDuelDB.set(`${duelId}_${champ}_${defiId}`, { url: urlPhoto, cadre: cadreId });
           }
-          // Mode solo
-          else if (mode === "solo") {
-            const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
-            const obj = { photo: dataUrl, cadre };
-            localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(obj));
-            if (window.afficherPhotoDansCadreSolo) {
-              window.afficherPhotoDansCadreSolo(defiId, dataUrl);
-            }
-            result = dataUrl;
-          }
-          // Mode concours
-          else if (mode === "concours") {
-            const userId = await window.getUserId();
-            const finalDataUrl = await window.genererImageConcoursAvecCadre(dataUrl);
-            const urlPhoto = await window.uploadPhotoConcoursWebp(finalDataUrl, defiId, userId);
-            result = urlPhoto;
-          }
-        } catch (err) {
-          alert("Erreur upload : " + (err.message || err));
-          result = null;
+          if (window.updateDuelUI) window.updateDuelUI();
+          container.remove();
+          resolve(urlPhoto);
+          return;
         }
-        container.remove();
-        resolve(result);
+        // Mode solo
+        else if (mode === "solo") {
+          const dataUrl = canvas.toDataURL("image/webp", 0.85);
+          const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
+          const obj = { photo: dataUrl, cadre };
+          localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(obj));
+          if (window.afficherPhotoDansCadreSolo) {
+            window.afficherPhotoDansCadreSolo(defiId, dataUrl);
+          }
+          container.remove();
+          resolve(dataUrl);
+          return;
+        }
+        // Mode concours (➡️ BLOB !)
+        else if (mode === "concours") {
+          // Génère l'image finale avec cadre puis BLOB direct
+          const dataUrl = canvas.toDataURL("image/webp", 0.93);
+          const userId = await window.getUserId();
+          window.genererImageAvecCadreBlob(dataUrl, async (err, blob) => {
+            if (err) {
+              alert("Erreur : " + err);
+              container.remove();
+              resolve(null);
+              return;
+            }
+            try {
+              const urlPhoto = await window.uploadPhotoConcoursBlob(blob, defiId, userId);
+              container.remove();
+              resolve(urlPhoto);
+            } catch (e) {
+              alert("Erreur upload : " + (e.message || e));
+              container.remove();
+              resolve(null);
+            }
+          });
+        }
       };
 
       previewDiv.querySelector("#retakePhoto").onclick = () => {
