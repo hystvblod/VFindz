@@ -377,6 +377,7 @@ else if (mode === "concours") {
     resolve(null);
   }
 }
+};
 
       previewDiv.querySelector("#retakePhoto").onclick = () => {
         previewDiv.remove();
