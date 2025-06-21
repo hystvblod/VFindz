@@ -4862,7 +4862,35 @@
   "ar": "سياج سلكي",
   "ja": "金網フェンス",
   "ko": "철망 울타리"
+},
+{
+  "id": 375,
+  "intitule": "Un rasoir",
+  "en": "A razor",
+  "es": "Una maquinilla de afeitar",
+  "de": "Ein Rasierer",
+  "it": "Un rasoio",
+  "nl": "Een scheermes",
+  "pt": "Um barbeador",
+  "ar": "شفرة حلاقة",
+  "ja": "かみそり",
+  "ko": "면도기"
+},
+{
+  "id": 376,
+  "intitule": "Une montre à aiguilles",
+  "en": "An analog watch",
+  "es": "Un reloj analógico",
+  "de": "Eine analoge Uhr",
+  "it": "Un orologio analogico",
+  "nl": "Een analoog horloge",
+  "pt": "Um relógio analógico",
+  "ar": "ساعة بعقارب",
+  "ja": "アナログ腕時計",
+  "ko": "아날로그 시계"
 }
+
+
 
 
   ]
