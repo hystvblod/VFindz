@@ -1,5 +1,3 @@
-// ========== camera.js ==========
-// Prérequis : charger duel.js, userData.js, supabase (via window.supabase) AVANT ce fichier !
 window.genererImageAvecCadreBlob = function(imageSrc, cadreId, callback) {
   const sizeW = 500, sizeH = 550;
   const canvas = document.createElement('canvas');
@@ -9,44 +7,35 @@ window.genererImageAvecCadreBlob = function(imageSrc, cadreId, callback) {
   ctx.fillStyle = "#fff";
   ctx.fillRect(0, 0, sizeW, sizeH);
 
-  // 1. Charger le cadre EN PREMIER !
-  if (!window.getCadreUrl) {
-    callback("Erreur : getCadreUrl non dispo !");
-    return;
-  }
-  try {
-    const url = window.getCadreUrl(cadreId || "polaroid_01");
-    const cadre = new Image();
-    cadre.crossOrigin = "anonymous";
-    cadre.onload = () => {
-      // Dessine le cadre en premier (fond)
-      ctx.drawImage(cadre, 0, 0, sizeW, sizeH);
+  // 1. Charger le cadre EN PREMIER (fond)
+  let url = window.getCadreUrl ? window.getCadreUrl(cadreId || "polaroid_01") : "assets/cadres/polaroid_01.webp";
+  const cadre = new Image();
+  cadre.crossOrigin = "anonymous";
+  cadre.onload = () => {
+    ctx.drawImage(cadre, 0, 0, sizeW, sizeH); // CADRE D'ABORD
 
-      // 2. Charger la photo utilisateur, et la dessiner par-dessus
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        let w = img.width, h = img.height;
-        let scale = Math.min(sizeW / w, sizeH / h, 1);
-        let nw = w * scale, nh = h * scale;
-        let nx = (sizeW - nw) / 2, ny = (sizeH - nh) / 2;
-        // *** PHOTO PAR-DESSUS ***
-        ctx.drawImage(img, nx, ny, nw, nh);
+    // 2. Ensuite charger la photo et la dessiner PAR-DESSUS
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      let scale = Math.min(sizeW / w, sizeH / h, 1);
+      let nw = w * scale, nh = h * scale;
+      let nx = (sizeW - nw) / 2, ny = (sizeH - nh) / 2;
+      ctx.drawImage(img, nx, ny, nw, nh); // PHOTO PAR-DESSUS
 
-        canvas.toBlob(blob => {
-          if (!blob) callback("Erreur génération blob !");
-          else callback(null, blob);
-        }, "image/webp", 0.93);
-      };
-      img.onerror = () => callback("Erreur chargement photo !");
-      img.src = imageSrc;
+      canvas.toBlob(blob => {
+        if (!blob) callback("Erreur génération blob !");
+        else callback(null, blob);
+      }, "image/webp", 0.93);
     };
-    cadre.onerror = () => callback("Erreur chargement cadre !");
-    cadre.src = url;
-  } catch (e) {
-    callback("Erreur chargement cadre (url)");
-  }
+    img.onerror = () => callback("Erreur chargement photo !");
+    img.src = imageSrc;
+  };
+  cadre.onerror = () => callback("Erreur chargement cadre !");
+  cadre.src = url;
 };
+
 
 // -------- Upload dans le bucket concours --------
 window.uploadPhotoConcoursBlob = async function(blob, concoursId, userId) {
@@ -134,7 +123,6 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
     }
     return;
   }
-
 
   // ======= NAVIGATEUR WEB =======
   return new Promise((resolve, reject) => {
@@ -357,7 +345,6 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
         const userId = await window.getUserId();
 
         if (mode === "duel") {
-          // => Génère l’image fusionnée puis upload dans le bucket duel
           window.genererImageAvecCadreBlob(dataUrl, cadre, async (err, blob) => {
             if (err) {
               alert(err);
