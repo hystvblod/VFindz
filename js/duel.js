@@ -449,7 +449,7 @@ window.renderDefis = async function({ myID, advID }) {
       preview.appendChild(photoImg);
 
       const coeurBtn = document.createElement("img");
-      coeurBtn.src = photosAimees.includes(`${roomId}_${myChamp}_${idxStr}`) ? "assets/icons/coeur_plein.svg" : "assets/icons/coeur.svg";
+      coeurBtn.src = photosAimees.includes(`${roomId}_${myChamp}_${idxStr}`) ? "assets/icons/coeur_rouge.svg" : "assets/icons/coeur.svg";
       coeurBtn.alt = "Aimer";
       coeurBtn.style.width = "2em";
       coeurBtn.style.cursor = "pointer";
