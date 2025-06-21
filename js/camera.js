@@ -32,7 +32,9 @@ export async function genererImageConcoursAvecCadre(base64Image) {
         resolve(canvas.toDataURL("image/webp", 0.93));
       };
       cadre.onerror = () => reject("Erreur chargement cadre concours !");
-      cadre.src = "assets/cadres/polaroid_01.webp";
+    cadre.src = window.getCadreUrl ? window.getCadreUrl(cadreId || "polaroid_01") :
+  "https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/polaroid_01.webp";
+
     };
     img.onerror = () => reject("Erreur chargement photo !");
     img.src = base64Image;

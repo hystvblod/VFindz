@@ -98,7 +98,8 @@ function dataURLtoBlob(dataurl) {
 }
 
   const userId = window.getUserId ? window.getUserId() : (await window.getPseudo());
-  const blob = dataURLtoBlob(dataUrl);
+  const blob = await dataURLtoBlob(dataUrl);
+
   const filePath = `duel_photos/${duelId}_${idx}_${userId}_${Date.now()}.webp`;
 
   // Upload photo dans le storage

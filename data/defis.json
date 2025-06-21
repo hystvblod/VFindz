@@ -4888,6 +4888,45 @@
   "ar": "ساعة بعقارب",
   "ja": "アナログ腕時計",
   "ko": "아날로그 시계"
+},
+{
+  "id": 378,
+  "intitule": "Une montre à aiguilles",
+  "en": "An analog watch",
+  "es": "Un reloj analógico",
+  "de": "Eine analoge Uhr",
+  "it": "Un orologio analogico",
+  "nl": "Een analoog horloge",
+  "pt": "Um relógio analógico",
+  "ar": "ساعة بعقارب",
+  "ja": "アナログ腕時計",
+  "ko": "아날로그 시계"
+},
+{
+  "id": 379,
+  "intitule": "Un œil dessiné",
+  "en": "A drawn eye",
+  "es": "Un ojo dibujado",
+  "de": "Ein gezeichnetes Auge",
+  "it": "Un occhio disegnato",
+  "nl": "Een getekend oog",
+  "pt": "Um olho desenhado",
+  "ar": "عين مرسومة",
+  "ja": "描かれた目",
+  "ko": "그려진 눈"
+},
+{
+  "id": 380,
+  "intitule": "Un cœur dessiné",
+  "en": "A drawn heart",
+  "es": "Un corazón dibujado",
+  "de": "Ein gezeichnetes Herz",
+  "it": "Un cuore disegnato",
+  "nl": "Een getekend hart",
+  "pt": "Um coração desenhado",
+  "ar": "قلب مرسوم",
+  "ja": "描かれたハート",
+  "ko": "그려진 하트"
 }
 
 
