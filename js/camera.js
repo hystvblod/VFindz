@@ -1,8 +1,9 @@
-// ========== camera.js ==========
-// Prérequis : charger duel.js, userData.js, supabase (via window.supabase) AVANT ce fichier !
+// ==== Fonctions accessibles globalement ====
 
-// Générer image + cadre concours (inchangé)
-window.genererImageConcoursAvecCadre = async function(base64Image) {
+// Nécessite que window.supabase, window.uploadPhotoDuelWebp, window.savePhotoDuel, window.getUserId, window.getCadreSelectionne soient déjà chargés dans le scope global !
+
+// Générer image + cadre concours (inchangé, version Promise, sur window)
+window.genererImageConcoursAvecCadre = function(base64Image) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
@@ -36,7 +37,7 @@ window.genererImageConcoursAvecCadre = async function(base64Image) {
   });
 };
 
-// Upload dans le bucket concours (inchangé)
+// Upload d'une image webp dans le bucket concours, version globale
 window.uploadPhotoConcoursWebp = async function(dataUrl, concoursId, userId) {
   const arr = dataUrl.split(',');
   const mime = arr[0].match(/:(.*?);/)[1];
@@ -47,20 +48,12 @@ window.uploadPhotoConcoursWebp = async function(dataUrl, concoursId, userId) {
   const blob = new Blob([u8arr], { type: mime });
   const fileName = `${userId}_${Date.now()}.webp`;
 
-  // === AJOUTE CE LOG JUSTE ICI ===
-  console.log("Tentative d'upload dans photoconcours : fileName =", fileName, "blob size =", blob.size);
-
   const { data: uploadData, error: uploadError } = await window.supabase
     .storage
     .from('photoconcours')
     .upload(fileName, blob, { contentType: 'image/webp' });
 
-  // === ET CE LOG ICI ===
-  if (uploadError) {
-    console.error("Erreur Supabase upload:", uploadError);
-    throw uploadError;
-  }
-
+  if (uploadError) throw uploadError;
 
   const { data: publicUrlData } = window.supabase
     .storage
@@ -69,13 +62,11 @@ window.uploadPhotoConcoursWebp = async function(dataUrl, concoursId, userId) {
 
   return publicUrlData.publicUrl;
 };
-
-// --------- UNIFIÉ ---------
+// --------- OUVERTURE CAMERA UNIFIÉE CAPACITOR + WEB ---------
 window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, cadreId = null) {
-  // SI mobile natif (Capacitor), utilise plugin Camera
+  // Cas mobile natif Capacitor
   if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
     try {
-      // @capacitor/camera doit être intégré dans le projet
       const cameraModule = await import('@capacitor/camera');
       const Camera = cameraModule.Camera;
 
@@ -87,7 +78,6 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
       });
 
       const dataUrl = photo.dataUrl;
-
       // Mode duel
       if (mode === "duel") {
         if (!duelId) return alert("Erreur interne : duelId manquant.");
@@ -138,8 +128,6 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
   }
 
   // ----- Sinon version navigateur web -----
-  // ... (suite bloc 2, trop long pour une seule réponse)
-  // ----- Sinon version navigateur web -----
   return new Promise((resolve, reject) => {
     const container = document.createElement("div");
     container.className = "camera-container-fullscreen";
@@ -165,6 +153,7 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
     `;
     document.body.appendChild(container);
 
+    // ... (le style et toute la gestion UI, inchangé, voir ci-dessous pour la suite)
     const style = document.createElement("style");
     style.innerHTML = `
 .camera-video-zone {
@@ -300,6 +289,7 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
       startCamera();
     };
 
+    // ... suite Bloc 4 pour la capture et preview (pas de coupure de logique, tout est prêt pour copier/coller)
     takeBtn.onclick = async () => {
       if (isPinching) return;
       const sourceW = video.videoWidth;
@@ -416,11 +406,10 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
   });
 };
 
-// ==== Exports/accès global ====
+// Alias rapide pour les autres usages globaux
 window.cameraOuvrirCameraPourDuel = (idx, duelId, cadreId) => {
   window.ouvrirCameraPour(idx, "duel", duelId, cadreId);
 };
 window.cameraOuvrirCameraPourConcours = (concoursId) => {
   window.ouvrirCameraPour(concoursId, "concours");
 };
-// ==============================
