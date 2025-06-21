@@ -4810,9 +4810,59 @@
   "ar": "كاميرا مراقبة",
   "ja": "防犯カメラ",
   "ko": "보안 카메라"
+},
+{
+  "id": 371,
+  "intitule": "Un moule à gâteau",
+  "en": "A cake mold",
+  "es": "Un molde para pastel",
+  "de": "Eine Kuchenform",
+  "it": "Uno stampo per dolci",
+  "nl": "Een cakevorm",
+  "pt": "Uma forma de bolo",
+  "ar": "قالب كعك",
+  "ja": "ケーキ型",
+  "ko": "케이크 틀"
+},
+{
+  "id": 372,
+  "intitule": "Un robinet",
+  "en": "A faucet",
+  "es": "Un grifo",
+  "de": "Ein Wasserhahn",
+  "it": "Un rubinetto",
+  "nl": "Een kraan",
+  "pt": "Uma torneira",
+  "ar": "صنبور",
+  "ja": "蛇口",
+  "ko": "수도꼭지"
+},
+{
+  "id": 373,
+  "intitule": "Des lignes électriques extérieures",
+  "en": "Outdoor power lines",
+  "es": "Líneas eléctricas exteriores",
+  "de": "Stromleitungen im Freien",
+  "it": "Linee elettriche esterne",
+  "nl": "Buitenstroomleidingen",
+  "pt": "Linhas elétricas externas",
+  "ar": "خطوط كهرباء خارجية",
+  "ja": "屋外の電線",
+  "ko": "야외 전선"
+},
+{
+  "id": 374,
+  "intitule": "Un grillage",
+  "en": "A wire fence",
+  "es": "Una verja metálica",
+  "de": "Ein Drahtzaun",
+  "it": "Una rete metallica",
+  "nl": "Een draadomheining",
+  "pt": "Uma cerca de arame",
+  "ar": "سياج سلكي",
+  "ja": "金網フェンス",
+  "ko": "철망 울타리"
 }
-
-
 
 
   ]
