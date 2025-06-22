@@ -1,7 +1,6 @@
 // ==== Fonctions accessibles globalement ====
 
 // Nécessite que window.supabase, window.uploadPhotoDuelWebp, window.savePhotoDuel, window.getUserId, window.getCadreSelectionne soient déjà chargés dans le scope global !
-
 // Générer image + cadre concours (inchangé, version Promise, sur window)
 window.genererImageConcoursAvecCadre = function(base64Image) {
   return new Promise((resolve, reject) => {
@@ -30,7 +29,8 @@ window.genererImageConcoursAvecCadre = function(base64Image) {
         resolve(canvas.toDataURL("image/webp", 0.93));
       };
       cadre.onerror = () => reject("Erreur chargement cadre concours !");
-      cadre.src = "assets/cadres/polaroid_01.webp";
+      // Prend le cadre polaroid_01 via le cache local OU Supabase, comme partout :
+      cadre.src = window.getCadreUrl ? window.getCadreUrl("polaroid_01") : "https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/polaroid_01.webp";
     };
     img.onerror = () => reject("Erreur chargement photo !");
     img.src = base64Image;
