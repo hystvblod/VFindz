@@ -533,7 +533,7 @@ header nav a:hover {
 }
 
 .profil-sections button:hover {
-  background-color: #ffd700;
+  background-color: #fff;
   transform: translateY(-2px);
 }
 /* ✅ Conteneur principal centré */

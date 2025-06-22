@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VFindz - Choix Duel</title>
+  <title data-i18n="header.title.duel">Duel</title>
   <link rel="stylesheet" href="style/main.css" />
 </head>
 <body class="duel-container">
@@ -11,16 +11,19 @@
   <!-- HEADER STYLE SOLO/DUEL -->
   <header class="header-solo">
     <div class="header-row">
-      <a href="index.html" class="back-btn" title="Retour">
-        <img src="assets/icons/arrow_back.svg" alt="Retour" />
+      <a href="index.html" class="back-btn" title="" data-i18n="header.back">
+        <img src="assets/icons/arrow_back.svg" alt="" />
+        <span data-i18n="header.back">Retour</span>
       </a>
-      <h1 class="duel-titre-pro">Duel</h1>
+      <h1 class="duel-titre-pro" data-i18n="header.title.duel">Duel</h1>
       <div class="top-buttons">
-        <a href="profil.html" class="btn-icon">
-          <img src="assets/icons/user.svg" alt="Profil" />
+        <a href="profil.html" class="btn-icon" data-i18n="button.profile" title="">
+          <img src="assets/icons/user.svg" alt="" />
+          <span data-i18n="button.profile">Profil</span>
         </a>
-        <a href="parametres.html" class="btn-icon">
-          <img src="assets/icons/settings.svg" alt="Paramètres" />
+        <a href="parametres.html" class="btn-icon" data-i18n="button.settings" title="">
+          <img src="assets/icons/settings.svg" alt="" />
+          <span data-i18n="button.settings">Paramètres</span>
         </a>
       </div>
     </div>
@@ -42,13 +45,13 @@
 
   <main>
     <div class="duel-choice-box">
-      <a href="duel_random.html" class="duel-choice-btn">Jouer contre un adversaire aléatoire</a>
-      <a href="duel_amis.html" class="duel-choice-btn">Jouer contre un ami</a>
-      <a href="duel_premium.html" class="duel-choice-btn">Duel Premium</a>
+      <a href="duel_random.html" class="duel-choice-btn" data-i18n="duel.choice.random">Jouer contre un adversaire aléatoire</a>
+      <a href="duel_amis.html" class="duel-choice-btn" data-i18n="duel.choice.friend">Jouer contre un ami</a>
+      <a href="duel_premium.html" class="duel-choice-btn" data-i18n="duel.choice.premium">Duel Premium</a>
     </div>
   </main>
   <footer>
-    <p>&copy; 2025 VFindz</p>
+    <p data-i18n="footer">© 2025 VFindz</p>
   </footer>
 
   <!-- ===================== POPUPS À GARDER DANS CHAQUE PAGE DUEL ===================== -->
@@ -56,30 +59,29 @@
   <!-- ✅ POPUP SIGNALER PHOTO -->
   <div id="popup-signal-photo" class="popup hidden" tabindex="-1">
     <div class="popup-inner">
-      <h2>Signaler cette photo</h2>
-      <p>Quel est le problème ?</p>
+      <h2 data-i18n="popup.signal.title">Signaler cette photo</h2>
+      <p data-i18n="popup.signal.question">Quel est le problème ?</p>
       <div class="signal-motifs">
-        <button class="btn-signal-type" data-type="triche">Triche / Hors-sujet</button>
-        <button class="btn-signal-type" data-type="nudite">Nudité / Contenu choquant</button>
-        <button class="btn-signal-type" data-type="autre">Autre motif</button>
+        <button class="btn-signal-type" data-type="triche" data-i18n="popup.signal.cheat">Triche / Hors-sujet</button>
+        <button class="btn-signal-type" data-type="nudite" data-i18n="popup.signal.nudity">Nudité / Contenu choquant</button>
+        <button class="btn-signal-type" data-type="autre" data-i18n="popup.signal.other">Autre motif</button>
       </div>
-      <button id="close-popup" class="close-btn">Fermer</button>
+      <button id="close-popup" class="close-btn" data-i18n="popup.signal.close">Fermer</button>
     </div>
   </div>
 
   <!-- ✅ POPUP JETON VALIDER -->
   <div id="popup-jeton-valider" class="popup hidden" tabindex="-1">
     <div class="popup-inner">
-      <h2>Valider avec 1 jeton ?</h2>
-      <button id="btn-confirm-jeton">Valider</button>
-      <button id="btn-cancel-jeton">Annuler</button>
+      <h2 data-i18n="popup.jeton.title">Valider avec 1 jeton ?</h2>
+      <button id="btn-confirm-jeton" data-i18n="popup.jeton.confirm">Valider</button>
+      <button id="btn-cancel-jeton" data-i18n="popup.jeton.cancel">Annuler</button>
     </div>
   </div>
 
   <!-- ===================== SCRIPTS ===================== -->
-  <!-- 1. Charge Supabase (version globale, PAS de +esm) -->
+  <script src="js/i18n.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <!-- 2. Charge userData (doit faire le createClient une seule fois dedans si possible) -->
   <script src="js/userData.js"></script>
   <script src="js/duel.js"></script>
 </body>

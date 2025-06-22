@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Duel privé - VFindz</title>
+  <title data-i18n="header.title.duelprive">Duel privé - VFindz</title>
   <link rel="stylesheet" href="style/main.css" />
   <style>
     .duel-main {
@@ -135,16 +135,19 @@
   <!-- HEADER STYLE SOLO/DUEL -->
   <header class="header-solo" style="border-bottom: 5px solid #888;">
     <div class="header-row">
-      <a href="index.html" class="back-btn" title="Retour">
-        <img src="assets/icons/arrow_back.svg" alt="Retour" />
+      <a href="index.html" class="back-btn" title="" data-i18n="header.back">
+        <img src="assets/icons/arrow_back.svg" alt="" />
+        <span data-i18n="header.back">Retour</span>
       </a>
-      <h1>Duel privé</h1>
+      <h1 data-i18n="header.title.duelprive">Duel privé</h1>
       <div class="top-buttons">
-        <a href="profil.html" class="btn-icon">
-          <img src="assets/icons/user.svg" alt="Profil" />
+        <a href="profil.html" class="btn-icon" data-i18n="button.profile" title="">
+          <img src="assets/icons/user.svg" alt="" />
+          <span data-i18n="button.profile">Profil</span>
         </a>
-        <a href="parametres.html" class="btn-icon">
-          <img src="assets/icons/settings.svg" alt="Paramètres" />
+        <a href="parametres.html" class="btn-icon" data-i18n="button.settings" title="">
+          <img src="assets/icons/settings.svg" alt="" />
+          <span data-i18n="button.settings">Paramètres</span>
         </a>
       </div>
     </div>
@@ -167,18 +170,18 @@
 
   <main>
     <div class="duel-main">
-      <div class="section-titre">Mes amis</div>
+      <div class="section-titre" data-i18n="duel.friends">Mes amis</div>
       <div id="liste-amis" class="amis-list"></div>
 
-      <div class="section-titre" style="margin-top:2.4em;">Demandes de duel reçues</div>
+      <div class="section-titre" style="margin-top:2.4em;" data-i18n="duel.requests.received">Demandes de duel reçues</div>
       <div id="demandes-recue" class="duel-demandes-list"></div>
 
-      <div class="section-titre" style="margin-top:2.4em;">Demandes de duel envoyées</div>
+      <div class="section-titre" style="margin-top:2.4em;" data-i18n="duel.requests.sent">Demandes de duel envoyées</div>
       <div id="demandes-envoyees" class="duel-demandes-list"></div>
     </div>
   </main>
   <footer>
-    <p>&copy; 2025 VFindz</p>
+    <p data-i18n="footer">&copy; 2025 VFindz</p>
   </footer>
 
   <!-- 1. Supabase global -->
@@ -217,7 +220,7 @@
       const ul = document.getElementById("liste-amis");
       ul.innerHTML = "";
       if (!amis.length) {
-        ul.innerHTML = "<div class='aucune-demande'>Aucun ami enregistré.</div>";
+        ul.innerHTML = `<div class='aucune-demande' data-i18n="duel.friends.empty">${window.i18n ? window.i18n("duel.friends.empty") : "Aucun ami enregistré."}</div>`;
         return;
       }
       amis.forEach(ami => {
@@ -225,7 +228,7 @@
         card.className = "ami-card";
         card.innerHTML = `
           <span class="ami-nom">${ami}</span>
-          <button class="btn-duel-ami" data-ami="${ami}">Duel ⚡</button>
+          <button class="btn-duel-ami" data-ami="${ami}" data-i18n="duel.friends.invite">${window.i18n ? window.i18n("duel.friends.invite") : "Duel ⚡"}</button>
         `;
         card.querySelector(".btn-duel-ami").onclick = () => inviterDuel(ami);
         ul.appendChild(card);
@@ -237,15 +240,15 @@
       const ulRecue = document.getElementById("demandes-recue");
       ulRecue.innerHTML = "";
       const recues = (profil && profil.demandesDuelRecues) ? profil.demandesDuelRecues : [];
-      if (!recues.length) ulRecue.innerHTML = "<div class='aucune-demande'>Aucune demande reçue.</div>";
+      if (!recues.length) ulRecue.innerHTML = `<div class='aucune-demande' data-i18n="duel.requests.empty">${window.i18n ? window.i18n("duel.requests.empty") : "Aucune demande reçue."}</div>`;
       recues.forEach(ami => {
         const card = document.createElement("div");
         card.className = "demande-card";
         card.innerHTML = `
-          <span class="demande-nom">${ami}<span class="badge-nouveau">Nouveau</span></span>
+          <span class="demande-nom">${ami}<span class="badge-nouveau" data-i18n="duel.requests.badge">${window.i18n ? window.i18n("duel.requests.badge") : "Nouveau"}</span></span>
           <div>
-            <button class="btn-accepter" data-ami="${ami}">Accepter</button>
-            <button class="btn-refuser" data-ami="${ami}">Refuser</button>
+            <button class="btn-accepter" data-ami="${ami}" data-i18n="duel.requests.accept">${window.i18n ? window.i18n("duel.requests.accept") : "Accepter"}</button>
+            <button class="btn-refuser" data-ami="${ami}" data-i18n="duel.requests.refuse">${window.i18n ? window.i18n("duel.requests.refuse") : "Refuser"}</button>
           </div>
         `;
         card.querySelector(".btn-accepter").onclick = () => accepterDuel(ami);
@@ -257,13 +260,13 @@
       const ulEnv = document.getElementById("demandes-envoyees");
       ulEnv.innerHTML = "";
       const envoyees = (profil && profil.demandesDuelEnvoyees) ? profil.demandesDuelEnvoyees : [];
-      if (!envoyees.length) ulEnv.innerHTML = "<div class='aucune-demande'>Aucune demande envoyée.</div>";
+      if (!envoyees.length) ulEnv.innerHTML = `<div class='aucune-demande' data-i18n="duel.sent.empty">${window.i18n ? window.i18n("duel.sent.empty") : "Aucune demande envoyée."}</div>`;
       envoyees.forEach(ami => {
         const card = document.createElement("div");
         card.className = "demande-card";
         card.innerHTML = `
           <span class="demande-nom">${ami}</span>
-          <span class="badge-nouveau" style="background:#b3e2ff;color:#20435a;">En attente</span>
+          <span class="badge-nouveau" style="background:#b3e2ff;color:#20435a;" data-i18n="duel.requests.waiting">${window.i18n ? window.i18n("duel.requests.waiting") : "En attente"}</span>
         `;
         ulEnv.appendChild(card);
       });
@@ -272,7 +275,7 @@
     async function inviterDuel(amiPseudo) {
       const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
       if (!ami) {
-        alert("Ami introuvable.");
+        alert(window.i18n ? window.i18n("duel.alert.friendnotfound") : "Ami introuvable.");
         return;
       }
       const demandesRecues = new Set([...(ami.demandesDuelRecues || []), pseudoPublic]);

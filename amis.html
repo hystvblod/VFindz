@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VFind - Amis</title>
+  <title data-i18n="header.title.amis">Mes amis</title>
   <link rel="stylesheet" href="style/main.css" />
   <style>
     body {
@@ -158,61 +158,64 @@
 </head>
 <body style="background:#313142;min-height:100vh;">
   <header class="header-boutique">
-    <a href="profil.html" class="back-btn" title="Retour">
-      <img src="assets/icons/arrow_back.svg" alt="Retour" />
+    <a href="profil.html" class="back-btn" title="" data-i18n="header.back">
+      <img src="assets/icons/arrow_back.svg" alt="" />
+      <span data-i18n="header.back">Retour</span>
     </a>
-    <h1 class="titre-centre">Mes amis</h1>
+    <h1 class="titre-centre" data-i18n="header.title.amis">Mes amis</h1>
     <div class="top-buttons">
-      <a href="parametres.html" class="btn-icon">
-        <img src="assets/icons/settings.svg" alt="Paramètres" />
+      <a href="parametres.html" class="btn-icon" title="" data-i18n="button.settings">
+        <img src="assets/icons/settings.svg" alt="" />
+        <span data-i18n="button.settings">Paramètres</span>
       </a>
     </div>
   </header>
 
   <main>
     <div class="main-buttons">
-
       <!-- Ajout par pseudo -->
-      <input id="pseudo-ami" type="text" placeholder="Pseudo public de l'ami" class="main-button" autocomplete="off"/>
-      <button class="main-button" id="btn-ajouter-ami">Ajouter un ami</button>
+      <input id="pseudo-ami" type="text" class="main-button" autocomplete="off"
+        data-i18n="input.friend.placeholder" placeholder="Pseudo public de l'ami" />
+      <button class="main-button" id="btn-ajouter-ami" data-i18n="button.add">Ajouter un ami</button>
       
       <!-- Ajout par lien d'invitation -->
       <div style="width:100%;margin-top:1.3em;">
-        <button class="main-button" id="btn-lien-invit" style="background:#3a3a9f;color:#fff;">Générer mon lien d’invitation</button>
+        <button class="main-button" id="btn-lien-invit" style="background:#3a3a9f;color:#fff;"
+          data-i18n="button.generate.invite">Générer mon lien d’invitation</button>
         <input id="lien-invit-output" readonly style="width:100%;margin-top:6px;text-align:center;font-size:0.98em;" onclick="this.select();" />
       </div>
 
       <hr style="margin:2em 0 1em 0; border: 0; border-top: 1.5px dashed #444;">
 
-      <h3>Mes amis</h3>
+      <h3 data-i18n="main.friends">Mes amis</h3>
       <ul id="liste-amis"></ul>
 
-      <h3>Demandes d’amis reçues</h3>
+      <h3 data-i18n="main.requests.received">Demandes d’amis reçues</h3>
       <ul id="demandes-recue"></ul>
 
-      <h3>Demandes d’amis envoyées</h3>
+      <h3 data-i18n="main.requests.sent">Demandes d’amis envoyées</h3>
       <ul id="demandes-envoyees"></ul>
     </div>
   </main>
   <footer style="text-align:center;margin-top:2.8em;color:#aaa;">
-    <p>&copy; 2025 VFind</p>
+    <p data-i18n="footer">© 2025 VFind</p>
   </footer>
 
   <!-- POPUP suppression ami -->
   <div id="popup-suppr-ami" class="popup hidden" style="z-index:9999;">
     <div class="popup-inner">
-      <p>Es-tu sûr de vouloir supprimer <span id="popup-suppr-ami-nom" style="font-weight:bold;"></span> de ta liste d'amis&nbsp;?</p>
+      <p data-i18n="popup.suppr.text">Es-tu sûr de vouloir supprimer <span id="popup-suppr-ami-nom" style="font-weight:bold;"></span> de ta liste d'amis&nbsp;?</p>
       <div style="text-align:center;margin-top:1em;">
-        <button onclick="window.confirmerSuppressionAmi()" class="main-button" style="margin-right:1em;">Oui, supprimer</button>
-        <button onclick="window.annulerSuppressionAmi()" class="main-button">Annuler</button>
+        <button onclick="window.confirmerSuppressionAmi()" class="main-button" style="margin-right:1em;" data-i18n="button.confirm.suppr">Oui, supprimer</button>
+        <button onclick="window.annulerSuppressionAmi()" class="main-button" data-i18n="button.cancel">Annuler</button>
       </div>
     </div>
   </div>
 
   <!-- 1. Charge Supabase UMD (pas le +esm, ni module) -->
+  <script src="js/i18n.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <!-- 2. userData global (doit setter sur window toutes les fonctions) -->
   <script src="js/userData.js"></script>
-  <!-- 3. Script des amis global -->
   <script src="js/amis.js"></script>
+</body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VFind - Concours</title>
+  <title data-i18n="header.title.concours">Concours</title>
   <link rel="stylesheet" href="style/main.css" />
   <style>
     .grid-photos-concours {
@@ -37,7 +37,6 @@
       margin-top: 7px;
       font-weight: 500;
     }
-    /* Amélioration responsive pour le bouton participer */
     #participerBtn {
       max-width: 400px;
     }
@@ -48,53 +47,57 @@
   <!-- HEADER -->
   <header class="header-solo" style="border-bottom: 5px solid #888;">
     <div class="header-row">
-      <a href="index.html" class="back-btn" title="Retour">
-        <img src="assets/icons/arrow_back.svg" alt="Retour" />
+      <a href="index.html" class="back-btn" title="" data-i18n="header.back">
+        <img src="assets/icons/arrow_back.svg" alt="" />
+        <span data-i18n="header.back">Retour</span>
       </a>
-      <h1>Concours</h1>
+      <h1 data-i18n="header.title.concours">Concours</h1>
       <div class="top-buttons">
-        <!-- Bouton Profil -->
-        <a href="profil.html" class="btn-icon">
-          <img src="assets/icons/user.svg" alt="Profil" />
+        <a href="profil.html" class="btn-icon" data-i18n="button.profile" title="">
+          <img src="assets/icons/user.svg" alt="" />
+          <span data-i18n="button.profile">Profil</span>
         </a>
-        <a href="parametres.html" class="btn-icon">
-          <img src="assets/icons/settings.svg" alt="Paramètres" />
+        <a href="parametres.html" class="btn-icon" data-i18n="button.settings" title="">
+          <img src="assets/icons/settings.svg" alt="" />
+          <span data-i18n="button.settings">Paramètres</span>
         </a>
       </div>
     </div>
     <div class="lot-concours" style="text-align:center;margin:22px 0 10px 0;font-size:1.22em;font-weight:600;color:#ffe04a;">
-      Lot à gagner : <span id="lot-concours">Une carte cadeau Amazon de 50€</span>
+      <span data-i18n="concours.lot">Lot à gagner :</span>
+      <span id="lot-concours" data-i18n="concours.lot.label">Une carte cadeau Amazon de 50€</span>
     </div>
   </header>
 
   <main class="solo-container">
-    <h2 class="titre-concours" style="margin-top:22px; margin-bottom:16px; text-align:center;">Titre du défi concours ici</h2>
+    <h2 class="titre-concours" style="margin-top:22px; margin-bottom:16px; text-align:center;" data-i18n="concours.title">
+      Titre du défi concours ici
+    </h2>
     
-    <!-- Bouton Participer -->
-    <button id="participerBtn" class="main-button" style="width:90%;margin:0 auto 26px auto;display:flex;align-items:center;justify-content:center;gap:12px;">
-      <img src="assets/icons/photo.svg" alt="Prendre une photo" style="height:28px;width:28px;vertical-align:middle;" />
-      Participer
+    <button id="participerBtn" class="main-button" style="width:90%;margin:0 auto 26px auto;display:flex;align-items:center;justify-content:center;gap:12px;" data-i18n="button.participer">
+      <img src="assets/icons/photo.svg" alt="" data-i18n="button.photo.alt" style="height:28px;width:28px;vertical-align:middle;" />
+      <span data-i18n="button.participer">Participer</span>
     </button>
 
-    <!-- Barre de recherche -->
     <div style="margin:24px 0 14px 0; text-align:center;">
       <input id="recherche-pseudo-concours" type="text"
+        data-i18n-placeholder="search.placeholder"
         placeholder="🔍 Rechercher un pseudo..."
         style="width:240px; padding:9px 14px; font-size:1em; border-radius:12px; border:1.2px solid #ccc; outline:none;">
       <span id="resultats-recherche-concours" style="font-size:0.98em;color:#888; margin-left:12px;"></span>
     </div>
 
-    <!-- Nombre de votes restants (injecté automatiquement par JS) -->
-
     <!-- Galerie des photos -->
     <div id="galerie-concours" class="galerie-concours"></div>
   </main>
 
-  <!-- La popup zoom sera injectée par JS -->
+  <footer>
+    <p data-i18n="footer">© 2025 VFindz</p>
+  </footer>
 
-  <!-- SCRIPTS JS (Aucun Storage requis) -->
-   <!-- 1. Charge Supabase -->
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <!-- JS -->
+  <script src="js/i18n.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="js/userData.js"></script>
   <script src="js/camera.js"></script>
   <script src="js/concours.js"></script>

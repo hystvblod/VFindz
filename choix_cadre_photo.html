@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Choisir le cadre de la photo</title>
+  <meta charset="utf-8">
+  <title data-i18n="header.title.choixcadre">Choisir le cadre de la photo</title>
   <link rel="stylesheet" href="style/main.css">
   <style>
     body { background: #1a1c24; color: #fff; font-family: 'Inter', Arial, sans-serif; }
@@ -16,10 +16,10 @@
   </style>
 </head>
 <body>
-  <div class="header">Choisis un cadre pour cette photo</div>
+  <div class="header" data-i18n="main.chooseframe">Choisis un cadre pour cette photo</div>
   <div id="cadre-list" class="cadre-list"></div>
   <div style="text-align:center;">
-    <button class="btn-retour" onclick="history.back()">Retour</button>
+    <button class="btn-retour" onclick="history.back()" data-i18n="button.back">Retour</button>
   </div>
   <script>
     // Chargement des cadres possédés (exemple depuis localStorage, adapte si besoin)
@@ -41,14 +41,13 @@
         <div class="cadre-preview">
           <img src="${photoData.photo || ''}" style="z-index:2;">
           <img src="${window.getCadreUrl ? window.getCadreUrl(cadreId) : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`}" style="z-index:3;">
-
         </div>
       `;
       item.onclick = () => {
         photoData.cadre = cadreId;
         localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(photoData));
         item.classList.add("selected");
-        alert("✅ Nouveau cadre appliqué !");
+        alert(window.i18n ? window.i18n("alert.success") : "✅ Nouveau cadre appliqué !");
         history.back();
       };
       cadreList.appendChild(item);
