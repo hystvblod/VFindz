@@ -661,11 +661,7 @@ window.checkFinDuel = async function() {
     await window.finirDuel();
     return;
   }
-  // 2. Tous les défis faits des deux côtés
-  const nbDefis = (window.roomData.defis || []).length;
-  const okA = Object.values(window.roomData.photosa || {}).filter(x => x && x.url).length === nbDefis;
-  const okB = Object.values(window.roomData.photosb || {}).filter(x => x && x.url).length === nbDefis;
-  if (okA && okB) await window.finirDuel();
+
 };
 window.finirDuel = async function() {
   if (window.roomData.status !== 'finished') {

@@ -109,17 +109,17 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
         return dataUrl;
       }
       // Mode concours
-      else if (mode === "concours") {
-        try {
-          const userId = await window.getUserId();
-          const finalDataUrl = await window.genererImageConcoursAvecCadre(dataUrl);
-          const urlPhoto = await window.uploadPhotoConcoursWebp(finalDataUrl, defiId, userId);
-          return urlPhoto;
-        } catch (err) {
-          alert("Erreur upload concours : " + (err.message || err));
-          throw err;
-        }
-      }
+else if (mode === "concours") {
+  try {
+    const userId = await window.getUserId();
+    const urlPhoto = await window.uploadPhotoConcoursWebp(dataUrl, defiId, userId);
+    return urlPhoto;
+  } catch (err) {
+    alert("Erreur upload concours : " + (err.message || err));
+    throw err;
+  }
+}
+
     } catch (err) {
       alert("Erreur caméra native : " + (err.message || err));
       throw err;
