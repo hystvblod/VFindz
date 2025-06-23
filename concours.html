@@ -5,50 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title data-i18n="header.title.concours">Concours</title>
   <link rel="stylesheet" href="style/main.css" />
-  <style>
-    
-    .grid-photos-concours {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 22px 18px;
-      margin-bottom: 24px;
-    }
-    @media (max-width: 820px) {
-      .grid-photos-concours { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 540px) {
-      .grid-photos-concours { grid-template-columns: 1fr; }
-    }
-    .photo-concours-item {
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 2px 10px #0001;
-      padding: 13px 9px 11px 9px;
-      text-align: center;
-      transition: box-shadow .17s;
-    }
-    .photo-concours-item .photo-concours-img {
-      width: 100%;
-      border-radius: 10px;
-      background: #f9f9fa;
-    }
-    .photo-concours-user {
-      font-size: 1.02em;
-      color: #444;
-      margin-top: 7px;
-      font-weight: 500;
-    }
-    #participerBtn {
-      max-width: 400px;
-    }
-  </style>
 </head>
 <body class="page-container">
 
   <!-- HEADER -->
-
-
-
   <header class="header-solo">
     <div class="header-row">
       <a href="profil.html" class="back-btn" title="Retour" data-i18n-title="header.back">
@@ -64,9 +24,6 @@
         </a>
       </div>
     </div>
-        </a>
-      </div>
-    </div>
     <div class="lot-concours" style="text-align:center;margin:22px 0 10px 0;font-size:1.22em;font-weight:600;color:#ffe04a;">
       <span data-i18n="concours.lot">Lot à gagner :</span>
       <span id="lot-concours" data-i18n="concours.lot.label">Une carte cadeau Amazon de 50€</span>
@@ -77,7 +34,6 @@
     <h2 class="titre-concours" style="margin-top:22px; margin-bottom:16px; text-align:center;" data-i18n="concours.title">
       Titre du défi concours ici
     </h2>
-    
     <button id="participerBtn" class="main-button" style="width:90%;margin:0 auto 26px auto;display:flex;align-items:center;justify-content:center;gap:12px;" data-i18n="button.participer">
       <img src="assets/icons/photo.svg" alt="" data-i18n="button.photo.alt" style="height:28px;width:28px;vertical-align:middle;" />
       <span data-i18n="button.participer">Participer</span>
@@ -92,7 +48,7 @@
     </div>
 
     <!-- Galerie des photos -->
-    <div id="galerie-concours" class="galerie-concours"></div>
+    <div id="galerie-concours" class="grid-photos-concours"></div>
   </main>
 
   <footer>
