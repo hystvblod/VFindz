@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Duel Amis Premium</title>
+  <title data-i18n="header.title.duel_premium">Duel Amis Premium</title>
   <link rel="stylesheet" href="style/main.css" />
   <style>
     .duel-main { max-width: 420px; margin: 2.4rem auto 0 auto; background: rgba(38,41,56,0.93); border-radius: 1.3rem; box-shadow: 0 8px 32px #0003, 0 2px 0 #232435; padding: 2.2rem 1.4rem 1.6rem 1.4rem;}
@@ -31,29 +31,29 @@
   <!-- HEADER identique -->
   <header class="header-solo" style="border-bottom: 5px solid #888;">
     <div class="header-row">
-      <a href="index.html" class="back-btn" title="Retour">
-        <img src="assets/icons/arrow_back.svg" alt="Retour" />
+      <a href="index.html" class="back-btn" title="Retour" data-i18n-title="header.back">
+        <img src="assets/icons/arrow_back.svg" alt="Retour" data-i18n-alt="header.back" />
       </a>
-      <h1>Duel Premium</h1>
+      <h1 data-i18n="header.title.duel_premium">Duel Premium</h1>
       <div class="top-buttons">
         <a href="profil.html" class="btn-icon">
           <img src="assets/icons/user.svg" alt="Profil" />
         </a>
         <a href="parametres.html" class="btn-icon">
-          <img src="assets/icons/settings.svg" alt="Paramètres" />
+          <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings" />
         </a>
       </div>
     </div>
     <div class="solde-container solde-solo" id="solde-container">
       <div class="solde-item">
         <div class="solde-ligne">
-          <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" />
+          <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" data-i18n-alt="solde.pieces" />
           <span id="points"></span>
         </div>
       </div>
       <div class="solde-item">
         <div class="solde-ligne">
-          <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" />
+          <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" data-i18n-alt="solde.jetons" />
           <span id="jetons"></span>
         </div>
       </div>
@@ -62,19 +62,19 @@
 
   <main>
     <div class="duel-main">
-      <div id="premium-alert" style="display:none;color:#f36d6d;text-align:center;margin-bottom:1.1em;font-weight:bold;"></div>
-      <div class="section-titre">Mes amis</div>
+      <div id="premium-alert" style="display:none;color:#f36d6d;text-align:center;margin-bottom:1.1em;font-weight:bold;" data-i18n="alert.premium_only"></div>
+      <div class="section-titre" data-i18n="section.friends">Mes amis</div>
       <div id="liste-amis" class="amis-list"></div>
 
-      <div class="section-titre" style="margin-top:2.4em;">Demandes de duel premium reçues</div>
+      <div class="section-titre" style="margin-top:2.4em;" data-i18n="section.received">Demandes de duel premium reçues</div>
       <div id="demandes-recue" class="duel-demandes-list"></div>
 
-      <div class="section-titre" style="margin-top:2.4em;">Demandes de duel premium envoyées</div>
+      <div class="section-titre" style="margin-top:2.4em;" data-i18n="section.sent">Demandes de duel premium envoyées</div>
       <div id="demandes-envoyees" class="duel-demandes-list"></div>
     </div>
   </main>
   <footer>
-    <p>&copy; 2025 VFindz</p>
+    <p data-i18n="footer">&copy; 2025 VFindz</p>
   </footer>
 
   <!-- SCRIPTS -->
@@ -110,7 +110,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const premium = await isPremiumUser();
   if (!premium) {
     document.getElementById("premium-alert").style.display = "block";
-    document.getElementById("premium-alert").textContent = "Cette fonctionnalité est réservée aux membres Premium.";
+    document.getElementById("premium-alert").setAttribute('data-i18n', 'alert.premium_only');
     document.getElementById("liste-amis").innerHTML = "";
     document.getElementById("demandes-recue").innerHTML = "";
     document.getElementById("demandes-envoyees").innerHTML = "";
@@ -125,7 +125,7 @@ async function afficherAmis() {
   const ul = document.getElementById("liste-amis");
   ul.innerHTML = "";
   if (!amis.length) {
-    ul.innerHTML = "<div class='aucune-demande'>Aucun ami enregistré.</div>";
+    ul.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande'>Aucun ami enregistré.</div>";
     return;
   }
   amis.forEach(ami => {
@@ -133,7 +133,7 @@ async function afficherAmis() {
     card.className = "ami-card";
     card.innerHTML = `
       <span class="ami-nom">${ami}</span>
-      <button class="btn-duel-ami" data-ami="${ami}">Duel Premium ⚡</button>
+      <button class="btn-duel-ami" data-ami="${ami}" data-i18n="btn.premium.duel">Duel Premium ⚡</button>
     `;
     card.querySelector(".btn-duel-ami").onclick = () => inviterDuelPremium(ami);
     ul.appendChild(card);
@@ -145,15 +145,15 @@ async function afficherDemandesDuel() {
   const ulRecue = document.getElementById("demandes-recue");
   ulRecue.innerHTML = "";
   const recues = (profil && profil.demandesDuelRecuesPremium) ? profil.demandesDuelRecuesPremium : [];
-  if (!recues.length) ulRecue.innerHTML = "<div class='aucune-demande'>Aucune demande reçue.</div>";
+  if (!recues.length) ulRecue.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande.received'>Aucune demande reçue.</div>";
   recues.forEach(ami => {
     const card = document.createElement("div");
     card.className = "demande-card";
     card.innerHTML = `
-      <span class="demande-nom">${ami}<span class="badge-nouveau">Nouveau</span></span>
+      <span class="demande-nom">${ami}<span class="badge-nouveau" data-i18n="badge.new">Nouveau</span></span>
       <div>
-        <button class="btn-accepter" data-ami="${ami}">Accepter</button>
-        <button class="btn-refuser" data-ami="${ami}">Refuser</button>
+        <button class="btn-accepter" data-ami="${ami}" data-i18n="btn.accept">Accepter</button>
+        <button class="btn-refuser" data-ami="${ami}" data-i18n="btn.refuse">Refuser</button>
       </div>
     `;
     card.querySelector(".btn-accepter").onclick = () => accepterDuelPremium(ami);
@@ -165,13 +165,13 @@ async function afficherDemandesDuel() {
   const ulEnv = document.getElementById("demandes-envoyees");
   ulEnv.innerHTML = "";
   const envoyees = (profil && profil.demandesDuelEnvoyeesPremium) ? profil.demandesDuelEnvoyeesPremium : [];
-  if (!envoyees.length) ulEnv.innerHTML = "<div class='aucune-demande'>Aucune demande envoyée.</div>";
+  if (!envoyees.length) ulEnv.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande.sent'>Aucune demande envoyée.</div>";
   envoyees.forEach(ami => {
     const card = document.createElement("div");
     card.className = "demande-card";
     card.innerHTML = `
       <span class="demande-nom">${ami}</span>
-      <span class="badge-nouveau" style="background:#b3e2ff;color:#20435a;">En attente</span>
+      <span class="badge-nouveau" style="background:#b3e2ff;color:#20435a;" data-i18n="badge.waiting">En attente</span>
     `;
     ulEnv.appendChild(card);
   });

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Duel Aléatoire - VFindz</title>
+  <title data-i18n="header.title.duel_random">Duel aléatoire</title>
   <link rel="stylesheet" href="style/main.css" />
   <style>
     .searching-box {
@@ -39,16 +39,16 @@
   <!-- HEADER STYLE SOLO/DUEL -->
   <header class="header-solo" style="border-bottom: 5px solid #888;">
     <div class="header-row">
-      <a href="index.html" class="back-btn" title="Retour">
+      <a href="index.html" class="back-btn" title="Retour" data-i18n="header.back">
         <img src="assets/icons/arrow_back.svg" alt="Retour" />
+        <span data-i18n="header.back">Retour</span>
       </a>
-      <h1>Duel aléatoire</h1>
+      <h1 data-i18n="header.title.duel_random">Duel aléatoire</h1>
       <div class="top-buttons">
-        <a href="profil.html" class="btn-icon">
-          <img src="assets/icons/user.svg" alt="Profil" />
-        </a>
-        <a href="parametres.html" class="btn-icon">
+        <a href="profil.html" class="btn-icon"></a>
+        <a href="parametres.html" class="btn-icon" title="Paramètres" data-i18n="button.settings">
           <img src="assets/icons/settings.svg" alt="Paramètres" />
+          <span data-i18n="button.settings">Paramètres</span>
         </a>
       </div>
     </div>
@@ -71,18 +71,18 @@
   <main>
     <div id="searching-adversary" class="searching-box">
       <img src="assets/img/logo.png" alt="Logo VFind" class="spin-logo"/>
-      <div class="searching-text">Recherche d’adversaire…</div>
+      <div class="searching-text" data-i18n="searching.text">Recherche d’adversaire…</div>
     </div>
     <div id="searching-failed" class="searching-box" style="display:none;">
-      <div class="searching-text">
+      <div class="searching-text" data-i18n="searching.failed">
         ⏳ Aucun adversaire trouvé pour l’instant.<br>Réessaie plus tard !
       </div>
     </div>
     <div class="main-buttons" style="margin-top:2.5rem;"></div>
-    <p style="text-align:center;color:#ccc;">Un adversaire va être sélectionné automatiquement.</p>
+    <p style="text-align:center;color:#ccc;" data-i18n="searching.info">Un adversaire va être sélectionné automatiquement.</p>
   </main>
   <footer>
-    <p>&copy; 2025 VFindz</p>
+    <p data-i18n="footer">&copy; 2025 VFindz</p>
   </footer>
 
   <!-- SCRIPTS GLOBAUX : PAS de /+esm, PAS de type="module" -->

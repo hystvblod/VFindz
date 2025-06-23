@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VFind - Infos</title>
+  <title>VFindz - Infos</title>
   <link rel="stylesheet" href="style/main.css" />
 </head>
 <body class="duel-container">
@@ -11,16 +11,16 @@
   <!-- HEADER (même style que duel) -->
   <header class="header-solo">
     <div class="header-row">
-      <a href="profil.html" class="back-btn" title="Retour">
-        <img src="assets/icons/arrow_back.svg" alt="Retour" />
+      <a href="profil.html" class="back-btn" title="Retour" data-i18n-title="header.back">
+        <img src="assets/icons/arrow_back.svg" alt="Retour" data-i18n-alt="header.back"/>
       </a>
-      <h1 class="duel-titre-pro">Infos & Aide</h1>
+      <h1 class="duel-titre-pro" data-i18n="header.title.infos">Infos & Aide</h1>
       <div class="top-buttons">
         <a href="profil.html" class="btn-icon">
           <img src="assets/icons/user.svg" alt="Profil" />
         </a>
         <a href="parametres.html" class="btn-icon">
-          <img src="assets/icons/settings.svg" alt="Paramètres" />
+          <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings" />
         </a>
       </div>
     </div>
@@ -28,13 +28,13 @@
 
   <main>
     <div class="duel-choice-box">
-      <a href="faq.html" class="duel-choice-btn">FAQ</a>
-      <a href="reglement.html" class="duel-choice-btn">Règlement</a>
+      <a href="faq.html" class="duel-choice-btn" data-i18n="infos.faq">FAQ</a>
+      <a href="reglement.html" class="duel-choice-btn" data-i18n="infos.rules">Règlement</a>
     </div>
   </main>
 
   <footer>
-    <p>&copy; 2025 VFindz</p>
+    <p data-i18n="footer.copyright">&copy; 2025 VFindz</p>
   </footer>
 
   <!-- ======= SCRIPTS GLOBAUX pour compatibilité universelle ======= -->
@@ -42,13 +42,17 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <!-- 2. Charge ta logique utilisateur -->
   <script src="js/userData.js"></script>
+  <!-- 3. Script de traduction multilingue (à ajouter dans tous tes .html) -->
+  <script src="js/i18lang.js"></script>
   <script>
     // Tu pourras ici initialiser Supabase/userData si besoin plus tard (popup RGPD, stats, etc)
-    // Exemple :
+    // Exemple :
     window.addEventListener("DOMContentLoaded", async () => {
       if (window.loadUserData && typeof window.loadUserData === "function") {
         await window.loadUserData(true);
       }
+      // Lance la traduction automatique
+      if (window.i18nTranslateAll) window.i18nTranslateAll();
     });
   </script>
 </body>

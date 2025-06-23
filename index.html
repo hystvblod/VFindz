@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VFind</title>
+  <title data-i18n="index.title">VFindz</title>
   <link rel="stylesheet" href="style/main.css" />
   <link rel="icon" type="image/png" href="assets/img/logo.png" />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
@@ -47,29 +47,29 @@
   <div id="onboarding-modal" class="onboarding-modal" style="display:none;">
     <div class="onboarding-content">
       <div class="onboarding-slide active">
-        <h2>Bienvenue sur VFind !</h2>
-        <p>Recois chaque jour une liste de défi funs et créatifs. 🎉</p>
+        <h2 data-i18n="index.onboard1.title">Bienvenue sur VFindz !</h2>
+        <p data-i18n="index.onboard1.body">Recois chaque jour une liste de défi funs et créatifs. 🎉</p>
         <img src="assets/img/slide1.jpg" alt="Défi Photo" class="onboarding-img">
       </div>
       <div class="onboarding-slide">
-        <h2>Prends des photos</h2>
-        <p>Au fil de la journée, prends en photo les défis et sois créatif.</p>
+        <h2 data-i18n="index.onboard2.title">Prends des photos</h2>
+        <p data-i18n="index.onboard2.body">Au fil de la journée, prends en photo les défis et sois créatif.</p>
         <img src="assets/img/slide2.jpg" alt="Cadres à débloquer" class="onboarding-img">
       </div>
       <div class="onboarding-slide">
-        <h2>Compare</h2>
-        <p>Joue en solo, contre des inconnus ou tes potes et compare tes photos!</p>
+        <h2 data-i18n="index.onboard3.title">Compare</h2>
+        <p data-i18n="index.onboard3.body">Joue en solo, contre des inconnus ou tes potes et compare tes photos!</p>
         <img src="assets/img/slide3.jpg" alt="Votes et concours" class="onboarding-img">
       </div>
       <div class="onboarding-slide">
-        <h2>Gagne</h2>
-        <p>Gagne des pièces et achète des cadres exclusifs pour personnaliser tes photos!</p>
+        <h2 data-i18n="index.onboard4.title">Gagne</h2>
+        <p data-i18n="index.onboard4.body">Gagne des pièces et achète des cadres exclusifs pour personnaliser tes photos!</p>
         <img src="assets/img/slide4.jpg" alt="Votes et concours" class="onboarding-img">
       </div>
       <div class="onboarding-controls">
-        <button id="onboarding-prev" style="display:none;">Précédent</button>
-        <button id="onboarding-next">Suivant</button>
-        <button id="onboarding-close" style="display:none;">C'est parti !</button>
+        <button id="onboarding-prev" style="display:none;" data-i18n="index.onboard.prev">Précédent</button>
+        <button id="onboarding-next" data-i18n="index.onboard.next">Suivant</button>
+        <button id="onboarding-close" style="display:none;" data-i18n="index.onboard.start">C'est parti !</button>
       </div>
       <div class="onboarding-dots">
         <span class="dot active"></span>
@@ -84,15 +84,15 @@
   <!-- -------- POPUP RGPD/CONSENT -------- -->
   <div id="popup-consent" class="popup-consent-bg" style="display:none;">
     <div class="popup-consent-box">
-      <h2>Confidentialité & Publicités</h2>
-      <p>
+      <h2 data-i18n="index.rgpd.title">Confidentialité & Publicités</h2>
+      <p data-i18n="index.rgpd.body1">
         VFindz utilise des identifiants publicitaires pour diffuser des pubs personnalisées.<br>
-        Tu peux refuser ou accepter la personnalisation.<br>
-        <small>(Tu peux changer d'avis plus tard dans les paramètres)</small>
+        Tu peux refuser ou accepter la personnalisation.
       </p>
+      <small data-i18n="index.rgpd.body2">(Tu peux changer d'avis plus tard dans les paramètres)</small>
       <div style="display:flex;gap:1em;justify-content:center;margin-top:1em;">
-        <button id="consent-accept" class="btn-accept">Accepter</button>
-        <button id="consent-refuse" class="btn-refuse">Refuser</button>
+        <button id="consent-accept" class="btn-accept" data-i18n="index.rgpd.accept">Accepter</button>
+        <button id="consent-refuse" class="btn-refuse" data-i18n="index.rgpd.refuse">Refuser</button>
       </div>
     </div>
   </div>
@@ -102,7 +102,7 @@
   <div id="popupCustom" style="display:none;">
     <div class="popup-custom-content">
       <div id="popupCustomMessage"></div>
-      <button onclick="closePopupCustom()">OK</button>
+      <button onclick="closePopupCustom()" data-i18n="popupcustom.ok">OK</button>
     </div>
   </div>
   <!-- -------- FIN POPUP CUSTOM -------- -->
@@ -110,11 +110,13 @@
   <div class="page-container">
 
     <div class="top-buttons top-buttons-home">
-      <a href="profil.html" class="btn-icon">
+      <a href="profil.html" class="btn-icon" title="Profil">
         <img src="assets/icons/user.svg" alt="Profil" />
+        <span data-i18n="menu.profil" style="display:none;">Profil</span>
       </a>
-      <a href="parametres.html" class="btn-icon">
+      <a href="parametres.html" class="btn-icon" title="Paramètres">
         <img src="assets/icons/settings.svg" alt="Paramètres" />
+        <span data-i18n="menu.parametres" style="display:none;">Paramètres</span>
       </a>
     </div>
 
@@ -123,14 +125,14 @@
     </div>
 
     <div class="main-buttons">
-      <a href="concours.html">Concours</a>
-      <a href="solo.html">Mode Solo</a>
-      <a href="duel.html">Mode Duel</a>
-      <a href="boutique.html">Boutique</a>
+      <a href="concours.html" data-i18n="menu.concours">Concours</a>
+      <a href="solo.html" data-i18n="menu.solo">Mode Solo</a>
+      <a href="duel.html" data-i18n="menu.duel">Mode Duel</a>
+      <a href="boutique.html" data-i18n="menu.boutique">Boutique</a>
     </div>
 
     <footer>
-      © 2025 VFindz. Tous droits réservés.
+      <span data-i18n="index.footer">© 2025 VFindz. Tous droits réservés.</span>
     </footer>
   </div>
   <!-- ======================== SCRIPTS GLOBAUX ======================== -->
@@ -139,6 +141,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <!-- 2. Charge ta logique utilisateur (tout doit exposer sur window, ex : window.loadUserData) -->
   <script src="js/userData.js"></script>
+
+  <!-- 3. Charge ton script i18lang.js ICI (à ajouter dans le projet) -->
+  <script src="js/i18lang.js"></script>
 
   <script>
     // Animation logo au premier chargement de la session uniquement
