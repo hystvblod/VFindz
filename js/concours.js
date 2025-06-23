@@ -315,9 +315,11 @@ async function votePourPhoto(photoId) {
 }
 
 // ----------- POPUP ZOOM -----------
-function ouvrirPopupZoom(photo) {
+async function ouvrirPopupZoom(photo) {
   let old = document.getElementById("popup-photo-zoom");
   if (old) old.remove();
+  const cadreId = photo.cadre_id || "polaroid_01";
+  let cadreUrl = cadreId.startsWith("http") ? cadreId : (await window.getCadreUrl ? await window.getCadreUrl(cadreId) : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`);
   const popup = document.createElement("div");
   popup.id = "popup-photo-zoom";
   popup.className = "popup show";
@@ -327,10 +329,10 @@ function ouvrirPopupZoom(photo) {
       <button id="close-popup-zoom" class="close-btn" style="position:absolute;top:10px;right:14px;font-size:1.4em;">✖</button>
       <div style="display:flex;flex-direction:column;align-items:center;">
         <div class="cadre-preview cadre-popup" style="margin-bottom:18px;">
-        <img class="photo-cadre" src="https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${photo.cadre_id || 'polaroid_01'}.webp" />
+          <img class="photo-cadre" src="${cadreUrl}" />
           <img class="photo-user" src="${photo.photo_url}" style="max-width:230px;max-height:230px;" />
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
+        <div style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:10px;">
           <span style="color:#ffe04a;font-weight:bold;font-size:1.1em;letter-spacing:1px;">${photo.user || "?"}</span>
           <span style="color:#bbb;font-size:0.92em;">ID: ${photo.id}</span>
         </div>
@@ -347,6 +349,7 @@ window.ajouterPhotoConcours = async function() {
   const userId = user.data?.user?.id || "Inconnu";
   const pseudo = user.data?.user?.user_metadata?.pseudo || userId;
   const premium = user.data?.user?.user_metadata?.premium || false;
+  const cadre_id = await window.getCadreSelectionne ? await window.getCadreSelectionne() : "polaroid_01"; // Ajout cadre
 
   // Ouvre la caméra et upload automatiquement avec le bon mode
   const photo_url = await window.ouvrirCameraPour(concoursId, "concours");
@@ -361,7 +364,8 @@ window.ajouterPhotoConcours = async function() {
           user_id: userId,
           pseudo,
           votes_total: 0,
-          premium: !!premium
+          premium: !!premium,
+          cadre_id
         }
       ]);
     if (error) throw error;
@@ -370,7 +374,6 @@ window.ajouterPhotoConcours = async function() {
     console.error(e);
   }
 }
-
 
 // ----------- INITIALISATION -----------
 document.addEventListener("DOMContentLoaded", async () => {
