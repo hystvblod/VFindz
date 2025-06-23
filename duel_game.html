@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VFindz - Duel (Partie)</title>
+  <title data-i18n="header.title.duelgame">VFindz - Duel (Partie)</title>
   <link rel="stylesheet" href="style/main.css" />
 </head>
 <body class="duel-container">
@@ -15,32 +15,30 @@
     <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
       <button id="btn-aimer-photo" style="background: none; border: none; padding: 0;">
         <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" />
-
       </button>
       <button id="close-popup" style="background: none; border: none; padding: 0;">
-        <img src="assets/icons/croix.svg" alt="Fermer" style="width: 32px; height: 32px;" />
+        <img src="assets/icons/croix.svg" alt="Fermer" style="width: 32px; height: 32px;" data-i18n="button.close"/>
       </button>
     </div>
     <div class="cadre-preview cadre-popup boutique-style">
       <img id="cadre-affiche" class="photo-cadre" src="" />
       <img id="photo-affichee" class="photo-user" src="" />
     </div>
-    <!-- Le bouton de téléchargement a été supprimé -->
   </div>
 </div>
 
   <!-- ✅ Popup validation de défi (Jeton) -->
   <div id="popup-jeton" class="popup hidden">
     <div class="popup-inner popup-premium-pro">
-      <div class="premium-badge">VALIDER</div>
-      <div class="popup-premium-title">Valider ce défi</div>
-      <div class="popup-premium-price" style="margin-bottom: 18px;">
-        Veux-tu valider ce défi avec un jeton&nbsp;?
+      <div class="premium-badge" data-i18n="popup.valider.badge">VALIDER</div>
+      <div class="popup-premium-title" data-i18n="popup.valider.title">Valider ce défi</div>
+      <div class="popup-premium-price" style="margin-bottom: 18px;" data-i18n="popup.valider.question">
+        Veux-tu valider ce défi avec un jeton ?
       </div>
       <div class="premium-list-pro" style="margin-bottom:18px;">
-        <button class="btn-premium-pro" id="valider-jeton-btn">✅ Valider</button>
+        <button class="btn-premium-pro" id="valider-jeton-btn" data-i18n="popup.valider.btn">✅ Valider</button>
       </div>
-      <button class="btn-annuler-premium-pro" onclick="fermerPopupJeton()">
+      <button class="btn-annuler-premium-pro" onclick="fermerPopupJeton()" data-i18n="popup.valider.annuler">
         Annuler
       </button>
       <div id="solde-jeton" style="margin-top:10px;text-align:center;color:#ffe04a;font-weight:bold;"></div>
@@ -50,44 +48,45 @@
   <!-- ✅ Popup FIN DU DUEL -->
   <div id="popup-fin-duel" class="popup hidden">
     <div class="popup-inner">
-      <button id="close-popup-fin" class="close-btn">❌</button>
+      <button id="close-popup-fin" class="close-btn" data-i18n="popup.fin.close">❌</button>
       <div id="fin-titre" class="popup-title"></div>
       <div id="fin-faceaface"></div>
       <div id="fin-details" style="margin:1.2em 0;"></div>
       <div id="fin-gain" style="font-weight:bold; color:#f2a900; font-size:1.22em; margin-bottom:1em;"></div>
       <div class="popup-buttons" style="display:flex; gap: 1em; justify-content:center;">
-        <button id="fin-btn-replay" class="main-btn">Rejouer</button>
-        <button id="fin-btn-retour" class="main-btn">Retour</button>
+        <button id="fin-btn-replay" class="main-btn" data-i18n="popup.fin.btn.replay">Rejouer</button>
+        <button id="fin-btn-retour" class="main-btn" data-i18n="popup.fin.btn.retour">Retour</button>
       </div>
     </div>
   </div>
 
   <!-- ✅ HEADER -->
-  <header class="header-solo" style="border-bottom: 5px solid #888;">
+
+  <header class="header-solo">
     <div class="header-row">
-      <a href="index.html" class="back-btn" title="Retour">
-        <img src="assets/icons/arrow_back.svg" alt="Retour" />
+      <a href="index.html" class="back-btn" title="Retour" data-i18n-title="header.back">
+        <img src="assets/icons/arrow_back.svg" alt="Retour" data-i18n-alt="header.back"/>
       </a>
-      <h1>Mode Duel</h1>
+        <h1 data-i18n="header.title.duelgame">Mode Duel</h1>
       <div class="top-buttons">
-        <a href="profil.html" class="btn-icon">
+        <a href="index.html" class="btn-icon">
           <img src="assets/icons/user.svg" alt="Profil" />
         </a>
         <a href="parametres.html" class="btn-icon">
-          <img src="assets/icons/settings.svg" alt="Paramètres" />
+          <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings" />
         </a>
       </div>
-    </div>
+
     <div class="solde-container solde-solo">
       <div class="solde-item">
         <div class="solde-ligne">
-          <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" />
+          <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" data-i18n="label.pieces"/>
           <span id="points"></span>
         </div>
       </div>
       <div class="solde-item">
         <div class="solde-ligne">
-          <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" />
+          <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" data-i18n="label.jetons"/>
           <span id="jetons"></span>
         </div>
       </div>
@@ -95,13 +94,13 @@
   </header>
 
   <div style="text-align:center; margin-top: 1rem; font-size: 1.2rem;">
-    Contre <strong id="nom-adversaire">...</strong>
+    <span data-i18n="main.against">Contre</span> <strong id="nom-adversaire">...</strong>
   </div>
 
   <div class="timer-box">
     <img src="assets/icons/clock.svg" alt="Horloge" class="icon-svg" />
     <span class="timer-text">
-      Temps restant&nbsp;: <span id="timer">--:--:--</span>
+      <span data-i18n="main.timer">Temps restant&nbsp;:</span> <span id="timer">--:--:--</span>
     </span>
   </div>
 
@@ -112,25 +111,25 @@
   </main>
 
   <footer>
-    <p>&copy; 2025 VFindz</p>
+    <p data-i18n="footer">&copy; 2025 VFindz</p>
   </footer>
 
   <!-- ✅ POPUPS SUPPLÉMENTAIRES -->
   <div id="popup-cadre-choix" class="popup hidden">
     <div class="popup-inner">
-      <h3>Choisir un cadre pour cette photo</h3>
+      <h3 data-i18n="popup.cadre.title">Choisir un cadre pour cette photo</h3>
       <div id="list-cadres-popup" style="display:flex; gap:14px; flex-wrap:wrap"></div>
-      <button onclick="fermerPopupCadreChoix()" class="btn-premium-pro" style="margin-top:18px;">Annuler</button>
+      <button onclick="fermerPopupCadreChoix()" class="btn-premium-pro" style="margin-top:18px;" data-i18n="popup.cadre.annuler">Annuler</button>
     </div>
   </div>
 
   <div id="popup-jeton-valider" class="popup hidden">
     <div class="popup-inner popup-premium-pro">
-      <div class="premium-badge">JETON</div>
-      <div class="popup-premium-title">Valider avec un jeton ?</div>
+      <div class="premium-badge" data-i18n="popup.jeton.badge">JETON</div>
+      <div class="popup-premium-title" data-i18n="popup.jeton.title">Valider avec un jeton ?</div>
       <div class="premium-list-pro popup-btns-center">
-        <button class="btn-premium-pro" id="btn-confirm-jeton">✅ Oui, valider</button>
-        <button class="btn-annuler-premium-pro" id="btn-cancel-jeton">Annuler</button>
+        <button class="btn-premium-pro" id="btn-confirm-jeton" data-i18n="popup.jeton.btn.valider">✅ Oui, valider</button>
+        <button class="btn-annuler-premium-pro" id="btn-cancel-jeton" data-i18n="popup.jeton.btn.annuler">Annuler</button>
       </div>
     </div>
   </div>
@@ -138,12 +137,12 @@
   <div id="popup-reprise-photo-duel" class="popup hidden">
     <div class="popup-inner">
       <p>
-        <b>Reprendre une photo est réservé aux Premium.</b><br>
-        <small>Tu peux regarder une pub (1 fois par défi) pour reprendre la photo.</small>
+        <b data-i18n="popup.reprise.titre">Reprendre une photo est réservé aux Premium.</b><br>
+        <small data-i18n="popup.reprise.texte">Tu peux regarder une pub (1 fois par défi) pour reprendre la photo.</small>
       </p>
-      <button id="btnReprisePremiumDuel" class="main-button">Passer Premium</button>
-      <button id="btnReprisePubDuel" class="main-button">Regarder une pub</button>
-      <button id="btnAnnulerRepriseDuel" class="main-button">Annuler</button>
+      <button id="btnReprisePremiumDuel" class="main-button" data-i18n="popup.reprise.premium">Passer Premium</button>
+      <button id="btnReprisePubDuel" class="main-button" data-i18n="popup.reprise.pub">Regarder une pub</button>
+      <button id="btnAnnulerRepriseDuel" class="main-button" data-i18n="popup.reprise.annuler">Annuler</button>
     </div>
   </div>
 
@@ -151,27 +150,26 @@
   <div id="popup-signal-photo" class="popup hidden">
     <div class="popup-inner" style="max-width:350px;text-align:center;">
       <img src="assets/icons/alert.svg" alt="Alerte" width="50" style="margin-bottom:12px;" />
-      <h3>Signaler la photo</h3>
-      <div style="margin-bottom:18px;">
+      <h3 data-i18n="popup.signal.titre">Signaler la photo</h3>
+      <div style="margin-bottom:18px;" data-i18n="popup.signal.texte">
         Pourquoi veux-tu signaler cette photo ?
       </div>
-      <button class="btn-signal-type" data-type="inapproprie">Contenu inapproprié ou interdit</button>
-      <button class="btn-signal-type" data-type="triche" style="margin-top:12px;">Triche (faux, triche, hors sujet...)</button>
-      <button id="fermer-popup-signal-btn" class="btn-premium-pro" style="margin-top:18px;" onclick="window.fermerPopupSignal()">
-  Annuler
-</button>
+      <button class="btn-signal-type" data-type="inapproprie" data-i18n="popup.signal.inapproprie">Contenu inapproprié ou interdit</button>
+      <button class="btn-signal-type" data-type="triche" style="margin-top:12px;" data-i18n="popup.signal.triche">Triche (faux, triche, hors sujet...)</button>
+      <button id="fermer-popup-signal-btn" class="btn-premium-pro" style="margin-top:18px;" onclick="window.fermerPopupSignal()" data-i18n="popup.signal.annuler">
+        Annuler
       </button>
     </div>
   </div>
 
   <!-- ✅ SCRIPTS -->
   <!-- NE PAS UTILISER type="module" POUR CAPACITOR ! -->
-     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="js/userData.js"></script>
   <script src="js/duel.js"></script>
   <script src="js/camera.js"></script>
   <script src="js/pub.js"></script>
-  <script src="js/i18lang.js"></script>
+  <script src="js/i18n.js"></script>
 
   <!-- Gestion de la croix dans le bouton cœur/croix (popup photo) -->
   <script>
@@ -189,10 +187,10 @@
     });
   </script>
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    if (window.afficherSolde) window.afficherSolde();
-  });
-</script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (window.afficherSolde) window.afficherSolde();
+    });
+  </script>
 
 </body>
 </html>

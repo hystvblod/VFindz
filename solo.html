@@ -79,16 +79,21 @@
 </div>
 
 <!-- ✅ Header -->
-<header class="header-solo" style="border-bottom: 5px solid #888;">
-  <div class="header-row">
-    <a href="index.html" class="back-btn" title="Retour" data-i18n-title="button.back">
-      <img src="assets/icons/arrow_back.svg" alt="Retour" data-i18n-alt="button.back" />
-    </a>
-    <h1 data-i18n="header.title.solo">Mode Solo</h1>
-    <div class="top-buttons">
-      <a href="parametres.html" class="btn-icon">
-        <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings"/>
+
+  <header class="header-solo">
+    <div class="header-row">
+      <a href="index.html" class="back-btn" title="Retour" data-i18n-title="header.back">
+        <img src="assets/icons/arrow_back.svg" alt="Retour" data-i18n-alt="header.back"/>
       </a>
+      <h1 data-i18n="header.title.solo">Mode Solo</h1>
+      <div class="top-buttons">
+        <a href="index.html" class="btn-icon">
+          <img src="assets/icons/user.svg" alt="Profil" />
+        </a>
+        <a href="parametres.html" class="btn-icon">
+          <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings" />
+        </a>
+      </div>
     </div>
   </div>
   <div class="solde-container solde-solo" id="solde-container">
@@ -139,7 +144,7 @@
 <script src="js/camera.js"></script>
 <script src="js/pub.js"></script>
 <script src="js/solo.js"></script>
-<script src="js/i18lang.js"></script>
+<script src="js/i18n.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const heartBtn = document.getElementById("btn-aimer-photo");
