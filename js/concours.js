@@ -327,7 +327,7 @@ function ouvrirPopupZoom(photo) {
       <button id="close-popup-zoom" class="close-btn" style="position:absolute;top:10px;right:14px;font-size:1.4em;">✖</button>
       <div style="display:flex;flex-direction:column;align-items:center;">
         <div class="cadre-preview cadre-popup" style="margin-bottom:18px;">
-          <img class="photo-cadre" src="assets/cadres/polaroid_01.webp" />
+        <img class="photo-cadre" src="https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${photo.cadre_id || 'polaroid_01'}.webp" />
           <img class="photo-user" src="${photo.photo_url}" style="max-width:230px;max-height:230px;" />
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;width:100%;">
