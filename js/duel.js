@@ -627,7 +627,7 @@ window.afficherPopupFinDuel = async function(room) {
 
   let gainFlag = "gain_duel_" + room.id + "_" + myID;
   if (!localStorage.getItem(gainFlag)) {
-    await window.addPoints(gain);
+    await window.supabase.rpc('secure_add_points', { nb: gain });
     localStorage.setItem(gainFlag, "1");
     await window.afficherSolde();
   }
