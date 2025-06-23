@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VFind - Profil</title>
+  <title data-i18n="header.title.profil">VFind - Profil</title>
   <link rel="stylesheet" href="style/main.css"/>
   <style>
     .id-user {
@@ -65,31 +65,31 @@
 
 <header class="header-solo">
   <div class="header-row">
-    <a href="index.html" class="back-btn" title="Retour">
-      <img src="assets/icons/arrow_back.svg" alt="Retour" />
+    <a href="index.html" class="back-btn" title="Retour" data-i18n-title="header.back">
+      <img src="assets/icons/arrow_back.svg" alt="Retour" data-i18n-alt="header.back" />
     </a>
-    <h1>Mon Profil</h1>
+    <h1 data-i18n="header.title.profil">Mon Profil</h1>
     <div class="top-buttons">
       <a href="parametres.html" class="btn-icon">
-        <img src="assets/icons/settings.svg" alt="Paramètres" />
+        <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings" />
       </a>
     </div>
   </div>
-  <div class="id-user" id="idUserDisplay">(ID...)</div>
+  <div class="id-user" id="idUserDisplay" data-i18n="id.copy">(ID...)</div>
 </header>
 
 <div style="text-align:center;margin-bottom:2em;">
-  <button id="showChangeIdBtn" style="background:#ffe04a;padding:7px 16px;border-radius:7px;border:none;font-weight:bold;cursor:pointer;">Changer mon identifiant</button>
+  <button id="showChangeIdBtn" style="background:#ffe04a;padding:7px 16px;border-radius:7px;border:none;font-weight:bold;cursor:pointer;" data-i18n="id.change">Changer mon identifiant</button>
 </div>
 
 <!-- Popup changement ID -->
 <div class="popChangementID-bg" id="popChangementID-bg">
   <div class="popChangementID">
-    <div id="popIdText" style="font-size:1.11em;margin-bottom:0.2em;">Modifier mon identifiant :</div>
-    <input type="text" id="popNewIdInput" placeholder="Nouveau ID unique" maxlength="18" autocomplete="off" />
+    <div id="popIdText" style="font-size:1.11em;margin-bottom:0.2em;" data-i18n="id.popup.title">Modifier mon identifiant :</div>
+    <input type="text" id="popNewIdInput" placeholder="Nouveau ID unique" maxlength="18" autocomplete="off" data-i18n-placeholder="id.popup.placeholder" />
     <div>
-      <button id="popValidateId">Valider</button>
-      <button id="popCancelId" type="button">Annuler</button>
+      <button id="popValidateId" data-i18n="id.popup.validate">Valider</button>
+      <button id="popCancelId" type="button" data-i18n="id.popup.cancel">Annuler</button>
     </div>
     <span id="popIdError"></span>
   </div>
@@ -98,10 +98,10 @@
 <!-- Popup sélection couleur ID -->
 <div class="popChangementID-bg" id="popChangeColor-bg" style="z-index:2100;">
   <div class="popChangementID">
-    <div style="font-size:1.11em;margin-bottom:0.5em;">Choisis la couleur de ton identifiant</div>
+    <div style="font-size:1.11em;margin-bottom:0.5em;" data-i18n="color.popup.title">Choisis la couleur de ton identifiant</div>
     <div id="list-color-popup"></div>
-    <button id="popValidateColor">Valider</button>
-    <button id="popCancelColor" type="button" style="background:#e6e6e6;color:#444;margin-left:0.6em;">Annuler</button>
+    <button id="popValidateColor" data-i18n="color.popup.validate">Valider</button>
+    <button id="popCancelColor" type="button" style="background:#e6e6e6;color:#444;margin-left:0.6em;" data-i18n="color.popup.cancel">Annuler</button>
     <span id="popColorError"></span>
   </div>
 </div>
@@ -110,38 +110,39 @@
   <div class="profil-solde-bar">
     <div class="solde-piece">
       <img src="assets/img/vcoin.webp" alt="VCoins" class="vcoin-solo" />
-      <span id="vcoins">100</span>
+      <span id="vcoins" data-i18n="solde.pieces">100</span>
     </div>
     <div class="solde-jeton">
       <img src="assets/img/jeton_p.webp" alt="Jetons" class="jeton-solo" />
-      <span id="jetons">6</span>
+      <span id="jetons" data-i18n="solde.jetons">6</span>
     </div>
   </div>
 </section>
 
 <main class="profil-container">
   <section class="profil-sections">
-    <button onclick="location.href='cadres.html'">Mes cadres</button>
-    <button id="btnAmis" onclick="location.href='amis.html'">Mes amis</button>
-    <button onclick="location.href='calendrier.html'">Mon calendrier</button>
-    <button onclick="location.href='photos_aimees.html'">Photos aimées</button>
-    <button onclick="location.href='page_choix.html'">FAQ/Reglement</button>
+    <button onclick="location.href='cadres.html'" data-i18n="section.cadres">Mes cadres</button>
+    <button id="btnAmis" onclick="location.href='amis.html'" data-i18n="section.amis">Mes amis</button>
+    <button onclick="location.href='calendrier.html'" data-i18n="section.calendrier">Mon calendrier</button>
+    <button onclick="location.href='photos_aimees.html'" data-i18n="section.photos_aimees">Photos aimées</button>
+    <button onclick="location.href='page_choix.html'" data-i18n="section.faq">FAQ/Reglement</button>
   </section>
 </main>
 
 <footer>
-  <p>© 2025 VFindz</p>
+  <p data-i18n="footer.copyright">© 2025 VFindz</p>
 </footer>
 <!-- ===== SUPABASE/USERDATA GLOBAL (compat everywhere) ===== -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script src="js/userData.js"></script>
+<script src="js/i18lang.js"></script>
 <script>
 async function isPseudoTaken(pseudo) {
   const { data } = await window.supabase.from('users').select('id').eq('pseudo', pseudo);
   return data && data.length > 0;
 }
 async function changeUserId(newPseudo) {
-  if (await isPseudoTaken(newPseudo)) throw new Error("Ce pseudo est déjà utilisé.");
+  if (await isPseudoTaken(newPseudo)) throw new Error(window.i18nTr('id.popup.taken'));
   await window.setPseudo(newPseudo);
 }
 async function getProfile() {
@@ -150,14 +151,13 @@ async function getProfile() {
 async function refreshProfilDisplay() {
   const profil = await getProfile();
   const pseudo = profil?.pseudo || "???";
-  document.getElementById("idUserDisplay").innerHTML = "ID : " + window.renderID(pseudo, profil?.id_color, profil?.premium);
+  document.getElementById("idUserDisplay").innerHTML = window.i18nTr('id.label') + " " + window.renderID(pseudo, profil?.id_color, profil?.premium);
   document.getElementById("vcoins").textContent = profil?.points || 0;
   document.getElementById("jetons").textContent = profil?.jetons || 0;
 }
-
 async function setupProfile() {
+  if (window.i18nTranslateAll) window.i18nTranslateAll();
   await refreshProfilDisplay();
-
   document.getElementById("showChangeIdBtn").onclick = () => {
     document.getElementById("popChangementID-bg").classList.add("active");
     document.getElementById("popNewIdInput").value = "";
@@ -173,22 +173,21 @@ async function setupProfile() {
     const err = document.getElementById("popIdError");
     err.textContent = "";
     err.classList.remove("valid");
-    if (newId.length < 3) { err.textContent = "ID trop court (min 3 caractères)"; return; }
-    if (newId.length > 18) { err.textContent = "ID trop long (max 18 caractères)"; return; }
-    if (!/^[a-zA-Z0-9_.-]+$/.test(newId)) { err.textContent = "Caractères autorisés : A-Z 0-9 . _ -"; return; }
+    if (newId.length < 3) { err.textContent = window.i18nTr("id.popup.short"); return; }
+    if (newId.length > 18) { err.textContent = window.i18nTr("id.popup.long"); return; }
+    if (!/^[a-zA-Z0-9_.-]+$/.test(newId)) { err.textContent = window.i18nTr("id.popup.invalid"); return; }
     try {
       await changeUserId(newId);
       err.classList.add("valid");
-      err.textContent = "✅ Ton ID a bien été changé !";
+      err.textContent = window.i18nTr("id.popup.ok");
       setTimeout(() => {
         document.getElementById("popChangementID-bg").classList.remove("active");
         refreshProfilDisplay();
       }, 900);
     } catch(e) {
-      err.textContent = e.message || "Erreur inconnue";
+      err.textContent = e.message || window.i18nTr("id.popup.unknown");
     }
   };
-
   // --- Gestion couleur ID premium ---
   const colorOptions = [
     "#FFD700", "#FFFFFF", "#111111", "#F76C6C", "#56E39F",
@@ -223,7 +222,7 @@ async function setupProfile() {
   };
   document.getElementById("popValidateColor").onclick = async () => {
     if (!selectedColor) {
-      document.getElementById("popColorError").textContent = "Choisis une couleur";
+      document.getElementById("popColorError").textContent = window.i18nTr("color.popup.choose");
       return;
     }
     await window.setIdColor(selectedColor);
