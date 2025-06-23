@@ -3,6 +3,9 @@
 // Liste des langues supportées
 const SUPPORTED_LANGS = ["fr", "en", "es", "de", "it", "nl", "pt", "ptbr", "ar", "id", "ja", "ko"];
 
+// Version du fichier de langue (à incrémenter si tu changes les textes)
+const I18N_VER = "1.0.0";
+
 // Sur window, la data i18n globale
 window.i18nData = window.i18nData || {};
 
@@ -53,22 +56,24 @@ window.i18nTranslateAll = function() {
 // Charger la langue depuis le cache/localStorage ou via fetch si besoin
 window.loadI18nLang = async function(force = false) {
   const lang = window.getCurrentLang();
+  const cacheKey = "lang_" + lang + "_" + I18N_VER;
+  // Déjà en mémoire ?
   if (window.i18nData && Object.keys(window.i18nData).length > 0 && !force) return;
   try {
-    let data = localStorage.getItem("lang_" + lang);
+    let data = localStorage.getItem(cacheKey);
     if (data && !force) {
       window.i18nData = JSON.parse(data);
     } else {
       const res = await fetch(`data/lang_${lang}.json`);
       if (!res.ok) throw new Error("Langue introuvable");
       window.i18nData = await res.json();
-      localStorage.setItem("lang_" + lang, JSON.stringify(window.i18nData));
+      localStorage.setItem(cacheKey, JSON.stringify(window.i18nData));
     }
   } catch (e) {
     // Fallback français en cas d’erreur
     const res = await fetch(`data/lang_fr.json`);
     window.i18nData = await res.json();
-    localStorage.setItem("lang_fr", JSON.stringify(window.i18nData));
+    localStorage.setItem("lang_fr_" + I18N_VER, JSON.stringify(window.i18nData));
   }
 };
 
@@ -80,7 +85,7 @@ document.addEventListener("DOMContentLoaded", async function() {
   document.body.style.visibility = "visible";
 });
 
-// (optionnel) Permet de forcer le reload si changement de langue
+// Permet de forcer le reload si changement de langue
 window.setLang = async function(newLang) {
   if (!SUPPORTED_LANGS.includes(newLang)) newLang = "fr";
   localStorage.setItem("langue", newLang);
