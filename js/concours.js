@@ -345,7 +345,8 @@ window.ajouterPhotoConcours = async function() {
   const concoursId = getConcoursId();
   const user = await window.supabase.auth.getUser();
   const userId = user.data?.user?.id || "Inconnu";
-  const userName = user.data?.user?.user_metadata?.pseudo || userId;
+  const pseudo = user.data?.user?.user_metadata?.pseudo || userId;
+  const premium = user.data?.user?.user_metadata?.premium || false;
 
   // Ouvre la caméra et upload automatiquement avec le bon mode
   const photo_url = await window.ouvrirCameraPour(concoursId, "concours");
@@ -357,8 +358,10 @@ window.ajouterPhotoConcours = async function() {
         {
           concours_id: concoursId,
           photo_url,
-          user: userName,
-          votes_total: 0
+          user_id: userId,
+          pseudo,
+          votes_total: 0,
+          premium: !!premium
         }
       ]);
     if (error) throw error;
@@ -367,6 +370,7 @@ window.ajouterPhotoConcours = async function() {
     console.error(e);
   }
 }
+
 
 // ----------- INITIALISATION -----------
 document.addEventListener("DOMContentLoaded", async () => {
