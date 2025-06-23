@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VFind - Mode Solo</title>
+  <title data-i18n="header.title.solo">VFind - Mode Solo</title>
   <link rel="stylesheet" href="style/main.css" />
 </head>
 <body>
@@ -13,11 +13,11 @@
   <div class="popup-inner">
     <!-- Boutons croix + cœur -->
     <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
-      <button id="btn-aimer-photo" style="background: none; border: none; padding: 0;">
-        <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" />
+      <button id="btn-aimer-photo" style="background: none; border: none; padding: 0;" title="Aimer" data-i18n-title="button.like">
+        <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" alt="Aimer" data-i18n-alt="button.like" />
       </button>
-      <button id="close-popup" style="background: none; border: none; padding: 0;">
-        <img src="assets/icons/croix.svg" alt="Fermer" style="width: 32px; height: 32px;margin-top:-5px;" />
+      <button id="close-popup" style="background: none; border: none; padding: 0;" title="Fermer" data-i18n-title="button.close">
+        <img src="assets/icons/croix.svg" alt="Fermer" data-i18n-alt="button.close" style="width: 32px; height: 32px;margin-top:-5px;" />
       </button>
     </div>
     <!-- Contenu photo -->
@@ -31,15 +31,15 @@
 <!-- ✅ Popup validation de défi -->
 <div id="popup-jeton" class="popup hidden">
   <div class="popup-inner popup-premium-pro">
-    <div class="premium-badge">VALIDER</div>
-    <div class="popup-premium-title">Valider ce défi</div>
-    <div class="popup-premium-price" style="margin-bottom: 18px;">
+    <div class="premium-badge" data-i18n="solo.validate.badge">VALIDER</div>
+    <div class="popup-premium-title" data-i18n="solo.validate.title">Valider ce défi</div>
+    <div class="popup-premium-price" style="margin-bottom: 18px;" data-i18n="solo.validate.question">
       Veux-tu valider ce défi avec un jeton&nbsp;?
     </div>
     <div class="premium-list-pro" style="margin-bottom:18px;">
-      <button class="btn-premium-pro" id="valider-jeton-btn">✅ Valider</button>
+      <button class="btn-premium-pro" id="valider-jeton-btn" data-i18n="solo.validate.button">✅ Valider</button>
     </div>
-    <button class="btn-annuler-premium-pro" onclick="fermerPopupJeton()">Annuler</button>
+    <button class="btn-annuler-premium-pro" onclick="fermerPopupJeton()" data-i18n="button.cancel">Annuler</button>
     <div id="solde-jeton" style="margin-top:10px;text-align:center;color:#ffe04a;font-weight:bold;"></div>
   </div>
 </div>
@@ -47,17 +47,17 @@
 <!-- ✅ Popup fin de partie -->
 <div id="popup-end" class="popup hidden">
   <div class="popup-inner popup-premium-pro">
-    <div class="premium-badge">FIN DE PARTIE</div>
-    <div class="popup-premium-title">🎉 Partie terminée !</div>
-    <div class="popup-premium-price" id="end-message" style="margin-bottom: 18px;">
+    <div class="premium-badge" data-i18n="solo.end.badge">FIN DE PARTIE</div>
+    <div class="popup-premium-title" data-i18n="solo.end.title">🎉 Partie terminée !</div>
+    <div class="popup-premium-price" id="end-message" style="margin-bottom: 18px;" data-i18n="solo.end.congrats">
       Félicitations, tu as terminé cette partie !
     </div>
     <ul class="premium-list-pro" style="margin-bottom:18px;">
       <li id="gain-message"></li>
     </ul>
     <div class="btn-boutique-inline" style="margin-top: 16px;">
-      <button id="replayBtnEnd" class="btn-boutique-pill">🔁 Rejouer</button>
-      <button id="returnBtnEnd" class="btn-boutique-pill">🏠 Retour</button>
+      <button id="replayBtnEnd" class="btn-boutique-pill" data-i18n="button.replay">🔁 Rejouer</button>
+      <button id="returnBtnEnd" class="btn-boutique-pill" data-i18n="button.back">🏠 Retour</button>
     </div>
   </div>
 </div>
@@ -65,15 +65,15 @@
 <!-- ✅ Popup premium photo -->
 <div id="popup-premium-photo" class="popup hidden">
   <div class="popup-inner popup-premium-pro">
-    <div class="premium-badge">PREMIUM</div>
-    <div class="popup-premium-title">Reprendre la photo</div>
-    <div class="popup-premium-price" style="margin-bottom: 18px;">
+    <div class="premium-badge" data-i18n="solo.premium.badge">PREMIUM</div>
+    <div class="popup-premium-title" data-i18n="solo.premium.title">Reprendre la photo</div>
+    <div class="popup-premium-price" style="margin-bottom: 18px;" data-i18n="solo.premium.desc">
       Cette fonctionnalité est réservée aux abonnés Premium<br>
-      <span style="font-size:0.98em;opacity:0.8;">ou accessible après avoir regardé une publicité.</span>
+      <span style="font-size:0.98em;opacity:0.8;" data-i18n="solo.premium.pubdesc">ou accessible après avoir regardé une publicité.</span>
     </div>
     <div class="premium-list-pro" style="margin-bottom:18px;display:flex;gap:0.7em;">
-      <button class="btn-premium-pro" id="btnPubReprise">Regarder la pub</button>
-      <button class="btn-annuler-premium-pro" id="btnAnnulerReprise" style="background:#eee;color:#222;">Annuler</button>
+      <button class="btn-premium-pro" id="btnPubReprise" data-i18n="button.watchad">Regarder la pub</button>
+      <button class="btn-annuler-premium-pro" id="btnAnnulerReprise" style="background:#eee;color:#222;" data-i18n="button.cancel">Annuler</button>
     </div>
   </div>
 </div>
@@ -81,26 +81,26 @@
 <!-- ✅ Header -->
 <header class="header-solo" style="border-bottom: 5px solid #888;">
   <div class="header-row">
-    <a href="index.html" class="back-btn" title="Retour">
-      <img src="assets/icons/arrow_back.svg" alt="Retour" />
+    <a href="index.html" class="back-btn" title="Retour" data-i18n-title="button.back">
+      <img src="assets/icons/arrow_back.svg" alt="Retour" data-i18n-alt="button.back" />
     </a>
-    <h1>Mode Solo</h1>
+    <h1 data-i18n="header.title.solo">Mode Solo</h1>
     <div class="top-buttons">
       <a href="parametres.html" class="btn-icon">
-        <img src="assets/icons/settings.svg" alt="Paramètres" />
+        <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings"/>
       </a>
     </div>
   </div>
   <div class="solde-container solde-solo" id="solde-container">
     <div class="solde-item">
       <div class="solde-ligne">
-        <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" />
+        <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" data-i18n-alt="solde.pieces"/>
         <span id="points"></span>
       </div>
     </div>
     <div class="solde-item">
       <div class="solde-ligne">
-        <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" />
+        <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" data-i18n-alt="solde.jetons"/>
         <span id="jetons"></span>
       </div>
     </div>
@@ -112,35 +112,34 @@
   <section id="game-section" class="hidden">
     <div class="timer-box">
       <img src="assets/icons/clock.svg" alt="Horloge" class="icon-svg" />
-      <span class="timer-text">Temps restant&nbsp;: <span id="timer">--:--:--</span></span>
+      <span class="timer-text" data-i18n="solo.timer.label">Temps restant&nbsp;: <span id="timer">--:--:--</span></span>
     </div>
     <ul id="defi-list" class="defi-list"></ul>
   </section>
 
   <section id="end-section" class="hidden">
-    <h2>🎉 Bravo !</h2>
+    <h2 data-i18n="solo.end.title2">🎉 Bravo !</h2>
     <p id="final-message"></p>
-    <button id="replayBtn" class="main-button">🔁 Rejouer</button>
+    <button id="replayBtn" class="main-button" data-i18n="button.replay">🔁 Rejouer</button>
   </section>
 </main>
 
 <!-- ✅ Popup sélection de cadre -->
 <div id="popup-cadre-solo" class="popup hidden">
   <div class="popup-inner">
-    <h3>Choisir un cadre pour cette photo</h3>
+    <h3 data-i18n="solo.frame.title">Choisir un cadre pour cette photo</h3>
     <div id="list-cadres-popup-solo" style="display:flex; gap:14px; flex-wrap:wrap"></div>
-    <button onclick="fermerPopupCadreSolo()" class="btn-premium-pro" style="margin-top:18px;">Annuler</button>
+    <button onclick="fermerPopupCadreSolo()" class="btn-premium-pro" style="margin-top:18px;" data-i18n="button.cancel">Annuler</button>
   </div>
 </div>
 
 <!-- ✅ Scripts -->
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script src="js/userData.js"></script>
 <script src="js/camera.js"></script>
 <script src="js/pub.js"></script>
 <script src="js/solo.js"></script>
-
-<!-- ✅ Script cœur / favoris en JS vanilla (PAS EN MODULE) -->
+<script src="js/i18lang.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const heartBtn = document.getElementById("btn-aimer-photo");
@@ -151,14 +150,14 @@
       heartBtn.querySelector('img').src = "assets/icons/coeur_rouge.svg";
       let favoris = JSON.parse(localStorage.getItem("photos_favoris") || "[]");
       if (favoris.length >= 30) {
-        alert("Limite de 30 photos atteinte.");
+        alert(window.i18nGet ? window.i18nGet("solo.fav.limit") : "Limite de 30 photos atteinte.");
       } else {
         if (!favoris.includes(photoAffichee.src)) {
           favoris.push(photoAffichee.src);
           localStorage.setItem("photos_favoris", JSON.stringify(favoris));
-          alert("Photo ajoutée aux favoris !");
+          alert(window.i18nGet ? window.i18nGet("solo.fav.added") : "Photo ajoutée aux favoris !");
         } else {
-          alert("Photo déjà ajoutée aux favoris.");
+          alert(window.i18nGet ? window.i18nGet("solo.fav.already") : "Photo déjà ajoutée aux favoris.");
         }
       }
     });
@@ -167,6 +166,7 @@
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     if (window.afficherSolde) window.afficherSolde();
+    if (window.i18nTranslateAll) window.i18nTranslateAll();
   });
 </script>
 
