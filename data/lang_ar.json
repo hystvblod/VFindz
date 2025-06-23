@@ -301,5 +301,14 @@
   "section.amis": "أصدقائي",
   "section.calendrier": "تقويمي",
   "section.photos_aimees": "الصور المعجبة",
-  "section.faq": "الأسئلة الشائعة/القواعد"
+  "section.faq": "الأسئلة الشائعة/القواعد",
+  "header.title.likedphotos": "الصور المفضلة",
+  "header.back": "رجوع",
+  "button.profile": "الملف الشخصي",
+  "button.settings": "الإعدادات",
+  "button.clearall": "مسح الكل",
+  "main.noliked": "لا توجد صور مفضلة حتى الآن.",
+  "footer": "© 2025 VFindz",
+  "alert.clearall": "مسح جميع الصور المفضلة؟"
+
 }

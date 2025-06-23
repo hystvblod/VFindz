@@ -323,5 +323,13 @@
   "solo.frame.title": "Scegli una cornice per questa foto",
   "solo.fav.limit": "Limite di 30 foto raggiunto.",
   "solo.fav.added": "Foto aggiunta ai preferiti!",
-  "solo.fav.already": "Foto già aggiunta ai preferiti."
+  "solo.fav.already": "Foto già aggiunta ai preferiti.", 
+  "header.title.likedphotos": "Foto preferite",
+  "header.back": "Indietro",
+  "button.profile": "Profilo",
+  "button.settings": "Impostazioni",
+  "button.clearall": "Cancella tutto",
+  "main.noliked": "Nessuna foto preferita al momento.",
+  "footer": "© 2025 VFindz",
+  "alert.clearall": "Cancellare tutte le foto preferite?"
 }

@@ -323,5 +323,14 @@
   "solo.frame.title": "Pilih bingkai untuk foto ini",
   "solo.fav.limit": "Batas 30 foto tercapai.",
   "solo.fav.added": "Foto ditambahkan ke favorit!",
-  "solo.fav.already": "Foto sudah di favorit."
+  "solo.fav.already": "Foto sudah di favorit.",
+  "header.title.likedphotos": "Foto yang disukai",
+  "header.back": "Kembali",
+  "button.profile": "Profil",
+  "button.settings": "Pengaturan",
+  "button.clearall": "Hapus semua",
+  "main.noliked": "Belum ada foto yang disukai.",
+  "footer": "© 2025 VFindz",
+  "alert.clearall": "Hapus semua foto yang disukai?"
+
 }

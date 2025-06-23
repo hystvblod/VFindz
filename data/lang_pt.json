@@ -323,5 +323,14 @@
   "solo.frame.title": "Escolhe uma moldura para esta foto",
   "solo.fav.limit": "Limite de 30 fotos atingido.",
   "solo.fav.added": "Foto adicionada aos favoritos!",
-  "solo.fav.already": "Foto já está nos favoritos."
+  "solo.fav.already": "Foto já está nos favoritos.",
+  "header.title.likedphotos": "Fotos favoritas",
+  "header.back": "Voltar",
+  "button.profile": "Perfil",
+  "button.settings": "Definições",
+  "button.clearall": "Limpar tudo",
+  "main.noliked": "Ainda não há fotos favoritas.",
+  "footer": "© 2025 VFindz",
+  "alert.clearall": "Limpar todas as fotos favoritas?"
+
 }

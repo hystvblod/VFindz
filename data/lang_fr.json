@@ -323,5 +323,13 @@
   "solo.frame.title": "Choisir un cadre pour cette photo",
   "solo.fav.limit": "Limite de 30 photos atteinte.",
   "solo.fav.added": "Photo ajoutée aux favoris !",
-  "solo.fav.already": "Photo déjà ajoutée aux favoris."
+  "solo.fav.already": "Photo déjà ajoutée aux favoris.",
+  "header.title.likedphotos": "Photos aimées",
+  "header.back": "Retour",
+  "button.profile": "Profil",
+  "button.settings": "Paramètres",
+  "button.clearall": "Vider la liste",
+  "main.noliked": "Aucune photo aimée pour l’instant.",
+  "footer": "© 2025 VFindz",
+  "alert.clearall": "Vider toutes les photos aimées ?"
 }

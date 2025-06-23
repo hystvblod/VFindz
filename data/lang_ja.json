@@ -323,5 +323,14 @@
   "solo.frame.title": "この写真のフレームを選択",
   "solo.fav.limit": "お気に入りは30枚までです。",
   "solo.fav.added": "写真をお気に入りに追加しました！",
-  "solo.fav.already": "すでにお気に入りに追加済みです。"
+  "solo.fav.already": "すでにお気に入りに追加済みです。",
+  "header.title.likedphotos": "お気に入りの写真",
+  "header.back": "戻る",
+  "button.profile": "プロフィール",
+  "button.settings": "設定",
+  "button.clearall": "すべて削除",
+  "main.noliked": "まだお気に入りの写真はありません。",
+  "footer": "© 2025 VFindz",
+  "alert.clearall": "すべてのお気に入り写真を削除しますか？"
+
 }

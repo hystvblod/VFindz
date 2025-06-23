@@ -301,5 +301,13 @@
   "section.amis": "Meus amigos",
   "section.calendrier": "Meu calendário",
   "section.photos_aimees": "Fotos curtidas",
-  "section.faq": "FAQ/Regras"
+  "section.faq": "FAQ/Regras",
+  "header.title.likedphotos": "Fotos curtidas",
+  "header.back": "Voltar",
+  "button.profile": "Perfil",
+  "button.settings": "Configurações",
+  "button.clearall": "Limpar tudo",
+  "main.noliked": "Ainda não há fotos curtidas.",
+  "footer": "© 2025 VFindz",
+  "alert.clearall": "Limpar todas as fotos curtidas?"
 }

@@ -323,5 +323,14 @@
   "solo.frame.title": "Kies een lijst voor deze foto",
   "solo.fav.limit": "Limiet van 30 foto's bereikt.",
   "solo.fav.added": "Foto toegevoegd aan favorieten!",
-  "solo.fav.already": "Foto is al aan favorieten toegevoegd."
+  "solo.fav.already": "Foto is al aan favorieten toegevoegd.",
+  "header.title.likedphotos": "Geliefde foto's",
+  "header.back": "Terug",
+  "button.profile": "Profiel",
+  "button.settings": "Instellingen",
+  "button.clearall": "Alles wissen",
+  "main.noliked": "Nog geen favoriete foto's.",
+  "footer": "© 2025 VFindz",
+  "alert.clearall": "Alle favoriete foto's wissen?"
+
 }
