@@ -5,6 +5,33 @@
 const URL_CONCOURS = "https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/concours//concours.json";
 const PAGE_SIZE = 30;
 
+// ----------- SYSTEME ACCES/REWARD/VOTES -----------
+const VOTES_PAR_REWARD = () => (window.userIsPremium ? 6 : 3);
+function getVotesCycleKey() {
+  return 'concours_vote_cycle_' + getConcoursDateStr();
+}
+function getVotesLeft() {
+  const d = JSON.parse(localStorage.getItem(getVotesCycleKey()) || '{}');
+  return d?.left ?? 0;
+}
+function setVotesLeft(left) {
+  localStorage.setItem(getVotesCycleKey(), JSON.stringify({ left }));
+}
+function resetVotesCycle() {
+  setVotesLeft(VOTES_PAR_REWARD());
+  localStorage.setItem('concours_reward_done_' + getConcoursDateStr(), '1');
+  localStorage.setItem('concours_recharge_done_' + getConcoursDateStr(), '0');
+}
+function isRewardDone() {
+  return localStorage.getItem('concours_reward_done_' + getConcoursDateStr()) === '1';
+}
+function isRechargeDone() {
+  return localStorage.getItem('concours_recharge_done_' + getConcoursDateStr()) === '1';
+}
+function setRechargeDone() {
+  localStorage.setItem('concours_recharge_done_' + getConcoursDateStr(), '1');
+}
+
 // ----------- UTILS DATE/TOP 6 LOCAL -----------
 function getConcoursDateStr() {
   return new Date().toISOString().slice(0, 10);
@@ -73,17 +100,6 @@ function majVotesConcoursAffichage(votesData) {
       el.textContent = vote.votes_total;
     });
   });
-}
-
-function getVotedPhotoIdsToday() {
-  const key = 'photos_votees_' + getConcoursDateStr();
-  return JSON.parse(localStorage.getItem(key) || "[]");
-}
-function addVotedPhotoIdToday(photoId) {
-  const key = 'photos_votees_' + getConcoursDateStr();
-  let arr = JSON.parse(localStorage.getItem(key) || "[]");
-  if (!arr.includes(photoId)) arr.push(photoId);
-  localStorage.setItem(key, JSON.stringify(arr));
 }
 
 // ----------- INFOS CONCOURS DYNAMIQUES -----------
@@ -199,12 +215,17 @@ function filtrerPhotosParPseudo(photos, search) {
 let currentPage = 1;
 
 window.afficherGalerieConcours = async function(forceReload = false) {
+  // Protection : ACCES seulement si pub reward faite ce jour
+  if (!isRewardDone()) {
+    await showConcoursRewardPopup();
+    return;
+  }
   const galerie = document.getElementById("galerie-concours");
   galerie.innerHTML = "<div style='text-align:center;color:#888;'>Chargement...</div>";
 
   let { allPhotos, orderedPhotos } = await getPhotosAPaginer(forceReload);
 
-  // ➡️ Ajout : récupération votes optimisés
+  // ➡️ Ajout : récupération votes optimisés
   const concoursId = getConcoursId();
   const votesData = await getVotesConcoursFromCacheOrDB(concoursId);
   const votesMap = {};
@@ -235,6 +256,21 @@ window.afficherGalerieConcours = async function(forceReload = false) {
     html += `<button id="btn-next" class="main-button" style="margin-left:16px;">Suivant &rarr;</button>`;
   html += `</div>`;
 
+  // Bloc recharge votes
+  const votesLeft = getVotesLeft();
+  html += `
+    <div style="text-align:center;margin:16px 0;">
+      <span style="font-size:1.04em;color:#444;font-weight:500;">
+        Votes restants : <b>${votesLeft}</b> / ${VOTES_PAR_REWARD()}
+      </span>
+      <br>
+      <button id="btn-recharge-votes" class="main-button" style="margin-top:10px;${(votesLeft>0||isRechargeDone())?"display:none;":""}">
+        <img src="assets/icons/reward.svg" style="height: 22px; margin-right: 7px;">
+        Regarder une pub pour recharger les votes
+      </button>
+    </div>
+  `;
+
   if (resultatsElt)
     resultatsElt.textContent = `(${filteredOrderedPhotos.length} résultat${filteredOrderedPhotos.length > 1 ? 's' : ''})`;
 
@@ -248,6 +284,19 @@ window.afficherGalerieConcours = async function(forceReload = false) {
   if (document.getElementById('btn-next'))
     document.getElementById('btn-next').onclick = () => { currentPage++; window.afficherGalerieConcours(); }
 
+  // Recharge votes event
+  const btnRecharge = document.getElementById('btn-recharge-votes');
+  if (btnRecharge) {
+    btnRecharge.onclick = async () => {
+      if (!isRechargeDone()) {
+        await window.showAd();
+        resetVotesCycle();
+        setRechargeDone();
+        window.afficherGalerieConcours(true);
+      }
+    }
+  }
+
   // Events zoom/vote popup (photo-cadre clique)
   Array.from(document.querySelectorAll('.photo-concours-img-wrapper')).forEach(div => {
     div.onclick = function() {
@@ -260,14 +309,12 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 
 // ----------- GÉNÈRE UNE CARTE HTML (boutique/polaroïd) -----------
 function creerCartePhotoHTML(photo, isPlayer, nbVotes) {
-  const dejaVotees = getVotedPhotoIdsToday();
-  let coeurOpacity = dejaVotees.includes(photo.id) ? "0.43" : "1";
   return `
     <div class="photo-concours-item${isPlayer ? ' joueur-photo' : ''}">
       <div class="photo-concours-img-wrapper" data-photoid="${photo.id}" style="position:relative;cursor:pointer;">
         <img src="${photo.photo_url}" class="photo-concours-img" style="width:100%;border-radius:10px;background:#f9f9fa;">
         <div class="photo-concours-coeur" style="position:absolute;right:7px;top:7px;">
-          <img src="assets/icons/coeur.svg" alt="Vote" style="width:22px;height:22px;vertical-align:middle;opacity:${coeurOpacity};">
+          <img src="assets/icons/coeur.svg" alt="Vote" style="width:22px;height:22px;vertical-align:middle;opacity:1;">
           <span class="nbvotes" style="margin-left:5px;color:#ffe04a;font-weight:bold;">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
         </div>
       </div>
@@ -276,16 +323,13 @@ function creerCartePhotoHTML(photo, isPlayer, nbVotes) {
   `;
 }
 
-// ----------- POPUP ZOOM STYLE DUEL ----------- //
+// ----------- POPUP ZOOM STYLE DUEL -----------
 async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
   let old = document.getElementById("popup-photo-zoom");
   if (old) old.remove();
   const cadreId = photo.cadre_id || "polaroid_01";
   let cadreUrl = cadreId.startsWith("http") ? cadreId : (await window.getCadreUrl ? await window.getCadreUrl(cadreId) : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`);
-  const dejaVote = getVotedPhotoIdsToday().includes(photo.id);
-  const coeurSVG = dejaVote
-    ? `<img src="assets/icons/coeur_rouge.svg" style="width:38px;vertical-align:middle;opacity:0.75;" alt="Déjà voté"/>`
-    : `<img src="assets/icons/coeur.svg" style="width:38px;vertical-align:middle;cursor:pointer;" alt="Voter"/>`;
+  const votesLeft = getVotesLeft();
 
   const popup = document.createElement("div");
   popup.id = "popup-photo-zoom";
@@ -305,49 +349,49 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
           <span style="color:#ffe04a;font-weight:bold;font-size:1.1em;">${photo.pseudo || photo.user || "?"}</span>
           <span style="color:#bbb;font-size:0.95em;">ID: ${photo.id}</span>
         </div>
-        <button class="vote-coeur-btn" style="margin:22px auto 0 auto;display:flex;align-items:center;background:none;border:none;" ${dejaVote ? "disabled" : ""} data-photoid="${photo.id}">
-          ${coeurSVG}
+        <button class="vote-coeur-btn" style="margin:22px auto 0 auto;display:flex;align-items:center;background:none;border:none;" ${votesLeft<=0?"disabled":""} data-photoid="${photo.id}">
+          <img src="assets/icons/coeur.svg" style="width:38px;vertical-align:middle;cursor:pointer;" alt="Voter"/>
           <span style="margin-left:8px;color:#ffe04a;font-weight:bold;font-size:1.13em;">Voter</span>
           <span class="nbvotes" style="margin-left:12px;color:#ffe04a;font-weight:bold;font-size:1.03em;">${votesTotal}</span>
         </button>
+        <div style="margin-top:7px;color:#aaa;font-size:0.97em;">Votes restants aujourd'hui : <b>${votesLeft}</b> / ${VOTES_PAR_REWARD()}</div>
       </div>
     </div>`;
   document.body.appendChild(popup);
   popup.querySelector("#close-popup-zoom").onclick = () => popup.remove();
 
-  // Vote si pas déjà voté
-  if (!dejaVote) {
+  if (votesLeft > 0) {
     popup.querySelector(".vote-coeur-btn").onclick = async function() {
       await votePourPhoto(photo.id);
       popup.remove();
-      window.afficherGalerieConcours(true); // force reload pour vote instantané
+      window.afficherGalerieConcours(true);
     };
   }
 }
 
-// ----------- VOTE POURPHOTO (un vote par jour) ----------- //
+// ----------- VOTE POUR PHOTO (max votes par cycle, sécurisé RPC) -----------
 async function votePourPhoto(photoId) {
-  if (getVotedPhotoIdsToday().includes(photoId)) return;
-
-  const { data, error } = await window.supabase
-    .from('photosconcours')
-    .select('votes_total')
-    .eq('id', photoId)
-    .single();
-  if (!data) return;
-  const nouveauTotal = (data.votes_total || 0) + 1;
-  const { error: errUpdate } = await window.supabase
-    .from('photosconcours')
-    .update({ votes_total: nouveauTotal })
-    .eq('id', photoId);
-  if (errUpdate) return;
-
-  addVotedPhotoIdToday(photoId);
-  // Vide le cache photos pour forcer reload avec votes à jour
-  setConcoursPhotosCache(getConcoursId(), []);
+  let left = getVotesLeft();
+  if (left <= 0) {
+    alert("Plus de votes aujourd'hui. Recharge pour en avoir d'autres !");
+    return;
+  }
+  // Exécute la procédure stockée sécurisée (exemple : concours_vote)
+  const { error } = await window.supabase.rpc("concours_vote", {
+    p_user_id: window.userId,
+    p_photo_id: photoId,
+    p_cycle: 1 // ou autre si besoin : pour support recharge
+  });
+  if (error) {
+    alert("Erreur lors du vote");
+    return;
+  }
+  left -= 1;
+  setVotesLeft(left);
+  setConcoursPhotosCache(getConcoursId(), []); // Vide le cache photos pour forcer reload avec votes à jour
 }
 
-// ----------- PARTICIPATION PHOTO ----------- //
+// ----------- PARTICIPATION PHOTO -----------
 window.ajouterPhotoConcours = async function() {
   const concoursId = getConcoursId();
   const user = await window.supabase.auth.getUser();
@@ -372,7 +416,6 @@ window.ajouterPhotoConcours = async function() {
         cadre_id
       }]);
     if (error) throw error;
-    // Vide cache photos pour rechargement
     setConcoursPhotosCache(concoursId, []);
   } catch (e) {
     alert("Erreur lors de l'ajout de la photo au concours.");
@@ -380,11 +423,35 @@ window.ajouterPhotoConcours = async function() {
   }
 }
 
-// ----------- INITIALISATION ----------- //
+// ----------- POPUP REWARD A L’OUVERTURE -----------
+async function showConcoursRewardPopup() {
+  return new Promise(resolve => {
+    const popup = document.createElement("div");
+    popup.className = "popup show";
+    popup.innerHTML = `
+      <div style="background:#fff;border-radius:18px;padding:36px 24px 32px 24px;max-width:340px;margin:auto;text-align:center;">
+        <img src="assets/icons/gift.svg" style="width:62px;margin-bottom:18px;" />
+        <div style="font-size:1.23em;font-weight:bold;margin-bottom:16px;">Concours Photo</div>
+        <div style="color:#555;margin-bottom:19px;">
+          Pour accéder au concours, merci de regarder une pub. Ça finance le lot et te donne <span style="color:#f90">${VOTES_PAR_REWARD()} votes</span> à utiliser aujourd’hui${window.userIsPremium ? " (x2 si premium)" : ""}.
+        </div>
+        <button id="btnRewardConcours" class="main-button" style="margin-top:12px;">Regarder une pub</button>
+      </div>
+    `;
+    document.body.appendChild(popup);
+    popup.querySelector("#btnRewardConcours").onclick = async () => {
+      await window.showAd(); // Reward pub
+      resetVotesCycle();
+      popup.remove();
+      resolve();
+    };
+  });
+}
+
+// ----------- INITIALISATION -----------
 document.addEventListener("DOMContentLoaded", async () => {
   await chargerInfosConcours();
 
-  // Mise à jour automatique du TOP 6 à minuit
   async function checkTop6Minuit() {
     const lastTop6 = localStorage.getItem(getTop6CacheKey() + "_date");
     const today = getConcoursDateStr();
