@@ -19,7 +19,7 @@ window.i18nTranslateAll = function () {
 };
 
 (async function initLang() {
-  const supported = ["fr", "en", "es", "de", "it", "nl", "pt", "ptbr", "ar", "ja", "ko"];
+  const supported = ["fr", "en", "es", "de", "it", "nl", "pt", "ptbr", "ar", "id", "ja", "ko"];
   let lang = localStorage.getItem("langue") || navigator.language?.split("-")[0] || "fr";
   if (!supported.includes(lang)) lang = "fr";
 
