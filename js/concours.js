@@ -264,20 +264,21 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 // ----------- GÉNÈRE UNE CARTE HTML (boutique/polaroïd) -----------
 function creerCartePhotoHTML(photo, isPlayer, nbVotes) {
   const dejaVotees = getVotedPhotoIdsToday();
-  let coeurOpacity = dejaVotees.includes(photo.id) ? "0.43" : "1";
+  let coeurOpacity = dejaVotees.includes(photo.id) ? "0.42" : "1";
   return `
     <div class="photo-concours-item${isPlayer ? ' joueur-photo' : ''}">
       <div class="photo-concours-img-wrapper" data-photoid="${photo.id}">
         <img src="${photo.photo_url}" class="photo-concours-img" />
         <div class="photo-concours-coeur">
-          <img src="assets/icons/coeur.svg" alt="Vote" style="width:21px;opacity:${coeurOpacity};">
-          <span class="nbvotes" style="margin-left:6px;color:#ffe04a;font-weight:bold;">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
+          <img src="assets/icons/coeur.svg" alt="Vote" style="width:20px;opacity:${coeurOpacity};">
+          <span class="nbvotes">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
         </div>
       </div>
       <div class="photo-concours-user">${photo.pseudo || photo.user || "?"}</div>
     </div>
   `;
 }
+
 
 
 // ----------- POPUP ZOOM STYLE DUEL ----------- //
