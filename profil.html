@@ -151,7 +151,8 @@ async function getProfile() {
 async function refreshProfilDisplay() {
   const profil = await getProfile();
   const pseudo = profil?.pseudo || "???";
-  document.getElementById("idUserDisplay").innerHTML = window.i18nTr('id.label') + " " + window.renderID(pseudo, profil?.id_color, profil?.premium);
+  // === Correction ici : affichage du pseudo stylisé (plus de window.i18nTr sur l'ID)
+  document.getElementById("idUserDisplay").innerHTML = "ID : " + window.renderID(pseudo, profil?.id_color, profil?.premium);
   document.getElementById("vcoins").textContent = profil?.points || 0;
   document.getElementById("jetons").textContent = profil?.jetons || 0;
 }
