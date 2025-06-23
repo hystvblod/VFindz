@@ -1,15 +1,16 @@
-// concours.js
+// ========= DÉBUT : Variables et Protection globales ===========
 
-// Nécessite que userData.js et camera.js soient chargés avant ce fichier !
+// Sécurise les variables globales pour éviter undefined
+window.showAd = window.showAd || (() => Promise.resolve());
+window.userIsPremium = window.userIsPremium || false;
+window.userId = window.userId || null;
 
 const URL_CONCOURS = "https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/concours//concours.json";
 const PAGE_SIZE = 30;
 
 // ----------- SYSTEME ACCES/REWARD/VOTES -----------
 const VOTES_PAR_REWARD = () => (window.userIsPremium ? 6 : 3);
-function getVotesCycleKey() {
-  return 'concours_vote_cycle_' + getConcoursDateStr();
-}
+function getVotesCycleKey() { return 'concours_vote_cycle_' + getConcoursDateStr(); }
 function getVotesLeft() {
   const d = JSON.parse(localStorage.getItem(getVotesCycleKey()) || '{}');
   return d?.left ?? 0;
@@ -59,7 +60,6 @@ async function fetchAndCacheTop6() {
     .from('photosconcours')
     .select('id, votes_total')
     .eq('concours_id', concoursId);
-
   if (error || !data) return [];
   data.sort((a, b) => b.votes_total - a.votes_total);
   const top6 = data.slice(0, 6).map(d => d.id);
@@ -164,12 +164,10 @@ function getConcoursId() {
 async function getPhotosAPaginer(forceReload = false) {
   const concoursId = getConcoursId();
   let allPhotos;
-  // 1. Utilise le cache si possible
   if (!forceReload) {
     allPhotos = getConcoursPhotosCache(concoursId);
     if (!allPhotos) forceReload = true;
   }
-  // 2. Si pas de cache ou forcer, reload
   if (forceReload) {
     const { data } = await window.supabase
       .from('photosconcours')
@@ -178,12 +176,10 @@ async function getPhotosAPaginer(forceReload = false) {
     allPhotos = data || [];
     setConcoursPhotosCache(concoursId, allPhotos);
   }
-
   const user = await window.supabase.auth.getUser();
   const userId = user.data?.user?.id;
   const photoJoueur = allPhotos.find(p => p.user_id === userId);
 
-  // Respect "joueur en premier"
   let uniqueSet = new Set();
   let orderedPhotos = [];
   if (photoJoueur && !uniqueSet.has(photoJoueur.id)) {
@@ -214,6 +210,7 @@ function filtrerPhotosParPseudo(photos, search) {
 
 let currentPage = 1;
 
+// ============ AFFICHAGE PRINCIPAL =============
 window.afficherGalerieConcours = async function(forceReload = false) {
   // Protection : ACCES seulement si pub reward faite ce jour
   if (!isRewardDone()) {
@@ -380,7 +377,7 @@ async function votePourPhoto(photoId) {
   const { error } = await window.supabase.rpc("concours_vote", {
     p_user_id: window.userId,
     p_photo_id: photoId,
-    p_cycle: 1 // ou autre si besoin : pour support recharge
+    p_cycle: 1 // ou autre si besoin : pour support recharge, voir plus bas
   });
   if (error) {
     alert("Erreur lors du vote");
@@ -448,9 +445,15 @@ async function showConcoursRewardPopup() {
   });
 }
 
-// ----------- INITIALISATION -----------
+// ----------- INITIALISATION : set userId/premium -----------
+
 document.addEventListener("DOMContentLoaded", async () => {
   await chargerInfosConcours();
+
+  // Récupération de l'utilisateur connecté dès le début (pour sécurité RPC)
+  const user = await window.supabase.auth.getUser();
+  window.userId = user.data?.user?.id || null;
+  window.userIsPremium = !!user.data?.user?.user_metadata?.premium;
 
   async function checkTop6Minuit() {
     const lastTop6 = localStorage.getItem(getTop6CacheKey() + "_date");
