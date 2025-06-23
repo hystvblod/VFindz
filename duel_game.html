@@ -62,12 +62,12 @@
 
   <!-- ✅ HEADER -->
 
-  <header class="header-solo">
+    <header class="header-solo">
     <div class="header-row">
       <a href="index.html" class="back-btn" title="Retour" data-i18n-title="header.back">
         <img src="assets/icons/arrow_back.svg" alt="Retour" data-i18n-alt="header.back"/>
       </a>
-        <h1 data-i18n="header.title.duelgame">Mode Duel</h1>
+            <h1 data-i18n="header.title.duelgame">Mode Duel</h1>
       <div class="top-buttons">
         <a href="index.html" class="btn-icon">
           <img src="assets/icons/user.svg" alt="Profil" />
@@ -76,22 +76,24 @@
           <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings" />
         </a>
       </div>
-
-    <div class="solde-container solde-solo">
-      <div class="solde-item">
-        <div class="solde-ligne">
-          <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" data-i18n="label.pieces"/>
-          <span id="points"></span>
-        </div>
-      </div>
-      <div class="solde-item">
-        <div class="solde-ligne">
-          <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" data-i18n="label.jetons"/>
-          <span id="jetons"></span>
-        </div>
+    </div>
+  </div>
+  <div class="solde-container solde-solo" id="solde-container">
+    <div class="solde-item">
+      <div class="solde-ligne">
+        <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" data-i18n-alt="solde.pieces"/>
+        <span id="points"></span>
       </div>
     </div>
-  </header>
+    <div class="solde-item">
+      <div class="solde-ligne">
+        <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" data-i18n-alt="solde.jetons"/>
+        <span id="jetons"></span>
+      </div>
+    </div>
+  </div>
+</header>
+
 
   <div style="text-align:center; margin-top: 1rem; font-size: 1.2rem;">
     <span data-i18n="main.against">Contre</span> <strong id="nom-adversaire">...</strong>
