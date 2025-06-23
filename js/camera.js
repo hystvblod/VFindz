@@ -374,12 +374,12 @@ else if (mode === "concours") {
             result = dataUrl;
           }
           // Mode concours
-          else if (mode === "concours") {
-            const userId = await window.getUserId();
-            const finalDataUrl = await window.genererImageConcoursAvecCadre(dataUrl);
-            const urlPhoto = await window.uploadPhotoConcoursWebp(finalDataUrl, defiId, userId);
-            result = urlPhoto;
-          }
+     else if (mode === "concours") {
+  const userId = await window.getUserId();
+  const urlPhoto = await window.uploadPhotoConcoursWebp(dataUrl, defiId, userId);
+  result = urlPhoto;
+}
+
         } catch (err) {
           alert("Erreur upload : " + (err.message || err));
           result = null;
