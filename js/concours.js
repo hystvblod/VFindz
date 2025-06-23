@@ -267,17 +267,18 @@ function creerCartePhotoHTML(photo, isPlayer, nbVotes) {
   let coeurOpacity = dejaVotees.includes(photo.id) ? "0.43" : "1";
   return `
     <div class="photo-concours-item${isPlayer ? ' joueur-photo' : ''}">
-      <div class="photo-concours-img-wrapper" data-photoid="${photo.id}" style="position:relative;cursor:pointer;">
-        <img src="${photo.photo_url}" class="photo-concours-img" style="border-radius:14px;box-shadow:0 2px 9px #0002;">
-        <div class="photo-concours-coeur" style="position:absolute;right:7px;top:7px;">
-          <img src="assets/icons/coeur.svg" alt="Vote" style="width:22px;height:22px;vertical-align:middle;opacity:${coeurOpacity};">
-          <span class="nbvotes" style="margin-left:5px;color:#ffe04a;font-weight:bold;">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
+      <div class="photo-concours-img-wrapper" data-photoid="${photo.id}">
+        <img src="${photo.photo_url}" class="photo-concours-img" />
+        <div class="photo-concours-coeur">
+          <img src="assets/icons/coeur.svg" alt="Vote" style="width:21px;opacity:${coeurOpacity};">
+          <span class="nbvotes" style="margin-left:6px;color:#ffe04a;font-weight:bold;">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
         </div>
       </div>
       <div class="photo-concours-user">${photo.pseudo || photo.user || "?"}</div>
     </div>
   `;
 }
+
 
 // ----------- POPUP ZOOM STYLE DUEL ----------- //
 async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
