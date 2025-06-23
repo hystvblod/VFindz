@@ -549,6 +549,16 @@ async function getUserByPseudo(pseudo) {
     .single();
   return data || null;
 }
+// Ajout local d'une photo aimée complète (cadre inclus, limité à 30)
+window.ajouterPhotoAimeeComplete = function(defiId, imageDataUrl, cadreId) {
+  let aimes = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]");
+  // déjà présente ?
+  if (aimes.some(obj => obj.defiId === defiId)) return;
+  // Limite à 30
+  if (aimes.length >= 30) aimes.shift();
+  aimes.push({ defiId, imageDataUrl, cadreId, date: Date.now() });
+  localStorage.setItem("photos_aimees_obj", JSON.stringify(aimes));
+};
 
 // ========== GLOBALISATION DES FONCTIONS ==========
 window.supabase = supabase;

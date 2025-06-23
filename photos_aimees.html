@@ -1,2 +1,56 @@
-<div id="photos-aimees-list"></div>
-<script src="js/i18n.js"></script>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Photos Aimées</title>
+  <link rel="stylesheet" href="style/main.css" />
+  <style>
+    body { background: #171723; color: #fff; font-family: 'Inter', Arial, sans-serif; margin: 0; padding: 0; }
+    .list-aimees { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; padding: 30px 8px; }
+    .item-aimee { background: #23234c; border-radius: 16px; box-shadow: 0 6px 30px #0008; padding: 18px 12px 16px 12px; display: flex; flex-direction: column; align-items: center; width: 220px; }
+    .item-aimee img { width: 200px; border-radius: 11px; box-shadow: 0 1px 12px #0004; margin-bottom: 8px; }
+    .item-aimee .date { color: #ffe04a; font-size: 0.95em; margin-bottom: 2px; }
+    .vider-btn { background: #e44; color: #fff; border: none; border-radius: 10px; padding: 10px 20px; margin: 22px auto 12px; cursor: pointer; font-weight: bold; font-size: 1.07em; display: block; }
+    .vider-btn:hover { background: #b10; }
+  </style>
+</head>
+<body>
+  <h1 style="text-align:center;margin-top:30px;">Photos aimées ❤️</h1>
+  <button class="vider-btn" onclick="viderPhotosAimees()">Vider la liste</button>
+  <div id="photos-aimees-list" class="list-aimees"></div>
+
+  <script>
+    function formatDate(ts) {
+      const d = new Date(ts);
+      return d.toLocaleDateString('fr-FR', {day:'2-digit',month:'short',year:'numeric'}) + ' ' + d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    }
+
+    function renderPhotosAimees() {
+      const list = document.getElementById('photos-aimees-list');
+      let aimes = [];
+      try { aimes = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]"); } catch{}
+      if (!aimes.length) {
+        list.innerHTML = `<div style="color:#aaa;margin-top:50px;font-size:1.08em;">Aucune photo aimée pour l’instant.</div>`;
+        return;
+      }
+      list.innerHTML = aimes.reverse().map(obj => `
+        <div class="item-aimee">
+          <img src="${obj.imageDataUrl}" alt="Photo aimée"/>
+          <div class="date">${formatDate(obj.date)}</div>
+        </div>
+      `).join('');
+    }
+
+    function viderPhotosAimees() {
+      if (confirm("Vider toutes les photos aimées ?")) {
+        localStorage.removeItem("photos_aimees_obj");
+        renderPhotosAimees();
+      }
+    }
+
+    renderPhotosAimees();
+  </script>
+  <script src="js/i18n.js"></script>
+</body>
+</html>
