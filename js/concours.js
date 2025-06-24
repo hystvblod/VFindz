@@ -219,6 +219,7 @@ window.afficherGalerieConcours = async function(forceReload = false) {
   }
   const galerie = document.getElementById("galerie-concours");
   galerie.innerHTML = "<div style='text-align:center;color:#888;'>Chargement...</div>";
+  galerie.classList.add("grid-cadres");
 
   let { allPhotos, orderedPhotos } = await getPhotosAPaginer(forceReload);
 
