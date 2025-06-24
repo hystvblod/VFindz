@@ -343,10 +343,9 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
           <img class="photo-cadre" src="${cadreUrl}" style="max-width:240px;max-height:240px;">
           <img class="photo-user" src="${photo.photo_url}" style="max-width:200px;max-height:200px;position:absolute;top:28px;left:50%;transform:translateX(-50%);" />
         </div>
-        <div style="margin-top:10px;display:flex;align-items:center;gap:20px;">
-          <span style="color:#ffe04a;font-weight:bold;font-size:1.1em;">${photo.pseudo || photo.user || "?"}</span>
-          <span style="color:#bbb;font-size:0.95em;">ID: ${photo.id}</span>
-        </div>
+     <div style="margin-top:10px;text-align:center;">
+  <span style="color:#ffe04a;font-weight:500;font-size:1.09em;">${photo.pseudo || photo.user || "?"}</span>
+</div>
         <button class="vote-coeur-btn" style="margin:22px auto 0 auto;display:flex;align-items:center;background:none;border:none;" ${votesLeft<=0?"disabled":""} data-photoid="${photo.id}">
           <img src="assets/icons/coeur.svg" style="width:38px;vertical-align:middle;cursor:pointer;" alt="Voter"/>
           <span style="margin-left:8px;color:#ffe04a;font-weight:bold;font-size:1.13em;">Voter</span>
