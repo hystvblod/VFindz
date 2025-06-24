@@ -326,17 +326,20 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
   let old = document.getElementById("popup-photo-zoom");
   if (old) old.remove();
   const cadreId = photo.cadre_id || "polaroid_01";
-  let cadreUrl = cadreId.startsWith("http") ? cadreId : (await window.getCadreUrl ? await window.getCadreUrl(cadreId) : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`);
+  let cadreUrl = cadreId.startsWith("http")
+    ? cadreId
+    : (await window.getCadreUrl
+        ? await window.getCadreUrl(cadreId)
+        : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`);
   const votesLeft = getVotesLeft();
 
   const popup = document.createElement("div");
   popup.id = "popup-photo-zoom";
   popup.className = "popup show";
-  popup.style = ""; // Sers-toi uniquement du CSS
 
   popup.innerHTML = `
     <div class="popup-inner">
-      <button id="close-popup-zoom" class="close-btn" style="position:absolute;top:10px;right:14px;font-size:1.4em;background:none;border:none;">
+      <button id="close-popup-zoom" class="close-btn" style="position:absolute;top:10px;right:14px;">
         <img src="assets/icons/close.svg" style="width:24px;" />
       </button>
       <div style="display:flex;flex-direction:column;align-items:center;">
@@ -345,17 +348,27 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
           <img class="photo-user" src="${photo.photo_url}">
         </div>
         <div class="pseudo-solo">${photo.pseudo || photo.user || "?"}</div>
-        <button class="vote-coeur-btn" style="margin:22px auto 0 auto;display:flex;align-items:center;background:none;border:none;" ${votesLeft<=0?"disabled":""} data-photoid="${photo.id}">
-          <img src="assets/icons/coeur.svg" style="width:38px;vertical-align:middle;cursor:pointer;" alt="Voter"/>
+        <button class="vote-coeur-btn"
+                style="margin:22px auto 0 auto;display:flex;align-items:center;background:none;border:none;"
+                ${votesLeft <= 0 ? "disabled" : ""} data-photoid="${photo.id}">
+          <img src="assets/icons/coeur.svg"
+               style="width:38px;vertical-align:middle;cursor:pointer;" alt="Voter"/>
           <span style="margin-left:8px;color:#ffe04a;font-weight:bold;font-size:1.13em;">Voter</span>
-          <span class="nbvotes" style="margin-left:12px;color:#ffe04a;font-weight:bold;font-size:1.03em;">${votesTotal}</span>
+          <span class="nbvotes"
+                style="margin-left:12px;color:#ffe04a;font-weight:bold;font-size:1.03em;">${votesTotal}</span>
         </button>
-        <div style="margin-top:7px;color:#aaa;font-size:0.97em;">Votes restants aujourd'hui : <b>${votesLeft}</b> / ${VOTES_PAR_REWARD()}</div>
+        <div style="margin-top:7px;color:#aaa;font-size:0.97em;">
+          Votes restants aujourd'hui&nbsp;: <b>${votesLeft}</b> / ${VOTES_PAR_REWARD()}
+        </div>
       </div>
-    </div>`;
+    </div>
+  `;
   document.body.appendChild(popup);
+
+  // Fermer la popup sur croix
   popup.querySelector("#close-popup-zoom").onclick = () => popup.remove();
 
+  // Gérer le vote
   if (votesLeft > 0) {
     popup.querySelector(".vote-coeur-btn").onclick = async function() {
       await votePourPhoto(photo.id);
