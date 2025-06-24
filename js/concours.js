@@ -328,7 +328,7 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 // ----------- GÉNÈRE UNE CARTE HTML (polaroïd, pseudo dynamique) -----------
 function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
   return `
-    <div class="photo-concours-item${isPlayer ? ' joueur-photo' : ''}">
+    <div class="cadre-item${isPlayer ? ' joueur-photo' : ''}">
       <div class="photo-concours-img-wrapper" data-photoid="${photo.id}" style="position:relative;cursor:pointer;">
         <img src="${photo.photo_url}" class="photo-concours-img" style="width:100%;border-radius:10px;background:#f9f9fa;">
         <div class="photo-concours-coeur" style="position:absolute;right:7px;top:7px;">
