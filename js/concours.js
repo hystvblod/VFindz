@@ -195,6 +195,20 @@ async function getPhotosAPaginer(forceReload = false) {
   return { allPhotos, orderedPhotos };
 }
 
+// ----------- MAPPING USER_ID -> PSEUDO -----------
+async function getPseudoMapFromPhotos(photos) {
+  const userIds = [...new Set(photos.map(p => p.user_id).filter(Boolean))];
+  if (!userIds.length) return {};
+  const { data, error } = await window.supabase
+    .from('users')
+    .select('id, pseudo')
+    .in('id', userIds);
+  if (error || !data) return {};
+  const map = {};
+  data.forEach(u => { map[u.id] = u.pseudo; });
+  return map;
+}
+
 // ----------- GÉNÉRATION PAGINATION -----------
 function getPagePhotos(orderedPhotos, page = 1, pageSize = PAGE_SIZE) {
   const start = (page - 1) * pageSize;
@@ -202,10 +216,10 @@ function getPagePhotos(orderedPhotos, page = 1, pageSize = PAGE_SIZE) {
 }
 
 // ----------- FILTRAGE RECHERCHE PSEUDO -----------
-function filtrerPhotosParPseudo(photos, search) {
+function filtrerPhotosParPseudo(photos, search, pseudoMap = {}) {
   if (!search) return photos;
   const query = search.trim().toLowerCase();
-  return photos.filter(p => (p.pseudo || p.user || "").toLowerCase().includes(query));
+  return photos.filter(p => (pseudoMap[p.user_id] || p.pseudo || p.user || "").toLowerCase().includes(query));
 }
 
 let currentPage = 1;
@@ -223,24 +237,30 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 
   let { allPhotos, orderedPhotos } = await getPhotosAPaginer(forceReload);
 
-  // ➡️ Ajout : récupération votes optimisés
+  // Votes
   const concoursId = getConcoursId();
   const votesData = await getVotesConcoursFromCacheOrDB(concoursId);
   const votesMap = {};
   votesData.forEach(v => votesMap[v.id] = v.votes_total);
 
-  // Recherche
+  // Pseudos dynamiques (toujours à jour)
+  const pseudoMap = await getPseudoMapFromPhotos(orderedPhotos);
+
+  // Recherche dynamique avec pseudoMap
   const inputSearch = document.getElementById('recherche-pseudo-concours');
   const resultatsElt = document.getElementById('resultats-recherche-concours');
   let search = (inputSearch && inputSearch.value) || "";
-  let filteredOrderedPhotos = filtrerPhotosParPseudo(orderedPhotos, search);
+  let filteredOrderedPhotos = filtrerPhotosParPseudo(orderedPhotos, search, pseudoMap);
 
-  // Grille style boutique (max 30)
+  // Pagination
   const paginatedPhotos = getPagePhotos(filteredOrderedPhotos, currentPage, PAGE_SIZE);
 
+  // Affichage grille
   let html = `<div class="grid-photos-concours">`;
+  const user = await window.supabase.auth.getUser();
+  const userId = user.data?.user?.id;
   for (const photo of paginatedPhotos) {
-    html += creerCartePhotoHTML(photo, photo.user_id === (await window.supabase.auth.getUser()).data?.user?.id, votesMap[photo.id] ?? photo.votes_total);
+    html += creerCartePhotoHTML(photo, pseudoMap[photo.user_id] || "?", photo.user_id === userId, votesMap[photo.id] ?? photo.votes_total);
   }
   html += `</div>`;
 
@@ -300,15 +320,15 @@ window.afficherGalerieConcours = async function(forceReload = false) {
     div.onclick = function() {
       const photoId = this.dataset.photoid;
       const photo = allPhotos.find(p => p.id == photoId);
-      if (photo) ouvrirPopupZoomConcours(photo, votesMap[photo.id] ?? photo.votes_total);
+      if (photo) ouvrirPopupZoomConcours(photo, pseudoMap[photo.user_id] || "?", votesMap[photo.id] ?? photo.votes_total);
     };
   });
 };
 
-// ----------- GÉNÈRE UNE CARTE HTML (boutique/polaroïd) -----------
-function creerCartePhotoHTML(photo, isPlayer, nbVotes) {
+// ----------- GÉNÈRE UNE CARTE HTML (polaroïd, pseudo dynamique) -----------
+function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
   return `
-    <div class="cadre-item${isPlayer ? ' joueur-photo' : ''}">
+    <div class="photo-concours-item${isPlayer ? ' joueur-photo' : ''}">
       <div class="photo-concours-img-wrapper" data-photoid="${photo.id}" style="position:relative;cursor:pointer;">
         <img src="${photo.photo_url}" class="photo-concours-img" style="width:100%;border-radius:10px;background:#f9f9fa;">
         <div class="photo-concours-coeur" style="position:absolute;right:7px;top:7px;">
@@ -316,13 +336,13 @@ function creerCartePhotoHTML(photo, isPlayer, nbVotes) {
           <span class="nbvotes" style="margin-left:5px;color:#ffe04a;font-weight:bold;">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
         </div>
       </div>
-      <div class="cadre-item">${photo.pseudo || "?"}</div>
+      <div class="cadre-item">${pseudo || "?"}</div>
     </div>
   `;
 }
 
-// ----------- POPUP ZOOM STYLE DUEL -----------
-async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
+// ----------- POPUP ZOOM STYLE DUEL, pseudo dynamique -----------
+async function ouvrirPopupZoomConcours(photo, pseudo, votesTotal = 0) {
   let old = document.getElementById("popup-photo-zoom");
   if (old) old.remove();
   const cadreId = photo.cadre_id || "polaroid_01";
@@ -347,7 +367,7 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
           <img class="photo-cadre" src="${cadreUrl}">
           <img class="photo-user" src="${photo.photo_url}">
         </div>
-        <div class="pseudo-solo">${photo.pseudo || photo.user || "?"}</div>
+        <div class="pseudo-solo">${pseudo}</div>
         <button class="vote-coeur-btn"
                 style="margin:22px auto 0 auto;display:flex;align-items:center;background:none;border:none;"
                 ${votesLeft <= 0 ? "disabled" : ""} data-photoid="${photo.id}">
@@ -377,7 +397,6 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
     };
   }
 }
-
 
 // ----------- VOTE POUR PHOTO (max votes par cycle, sécurisé RPC) -----------
 async function votePourPhoto(photoId) {
