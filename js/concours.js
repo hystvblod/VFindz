@@ -332,20 +332,19 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
   const popup = document.createElement("div");
   popup.id = "popup-photo-zoom";
   popup.className = "popup show";
-  popup.style = "z-index:10002;background:rgba(30,30,40,0.82);";
+  popup.style = ""; // Sers-toi uniquement du CSS
+
   popup.innerHTML = `
-    <div class="popup-inner" style="max-width:350px;margin:auto;background:#181829;border-radius:24px;padding:22px 16px;position:relative;">
+    <div class="popup-inner">
       <button id="close-popup-zoom" class="close-btn" style="position:absolute;top:10px;right:14px;font-size:1.4em;background:none;border:none;">
         <img src="assets/icons/close.svg" style="width:24px;" />
       </button>
       <div style="display:flex;flex-direction:column;align-items:center;">
         <div class="cadre-preview cadre-popup" style="margin-bottom:18px;position:relative;">
-          <img class="photo-cadre" src="${cadreUrl}" style="max-width:240px;max-height:240px;">
-          <img class="photo-user" src="${photo.photo_url}" style="max-width:200px;max-height:200px;position:absolute;top:28px;left:50%;transform:translateX(-50%);" />
+          <img class="photo-cadre" src="${cadreUrl}">
+          <img class="photo-user" src="${photo.photo_url}">
         </div>
-     <div style="margin-top:10px;text-align:center;">
-  <span style="color:#ffe04a;font-weight:500;font-size:1.09em;">${photo.pseudo || photo.user || "?"}</span>
-</div>
+        <div class="pseudo-solo">${photo.pseudo || photo.user || "?"}</div>
         <button class="vote-coeur-btn" style="margin:22px auto 0 auto;display:flex;align-items:center;background:none;border:none;" ${votesLeft<=0?"disabled":""} data-photoid="${photo.id}">
           <img src="assets/icons/coeur.svg" style="width:38px;vertical-align:middle;cursor:pointer;" alt="Voter"/>
           <span style="margin-left:8px;color:#ffe04a;font-weight:bold;font-size:1.13em;">Voter</span>
@@ -365,6 +364,7 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
     };
   }
 }
+
 
 // ----------- VOTE POUR PHOTO (max votes par cycle, sécurisé RPC) -----------
 async function votePourPhoto(photoId) {
