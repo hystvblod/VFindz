@@ -316,7 +316,7 @@ function creerCartePhotoHTML(photo, isPlayer, nbVotes) {
           <span class="nbvotes" style="margin-left:5px;color:#ffe04a;font-weight:bold;">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
         </div>
       </div>
-      <div class="photo-concours-user">${photo.pseudo || photo.user || "?"}</div>
+      <div class="cadre-item">${photo.pseudo || photo.user || "?"}</div>
     </div>
   `;
 }
