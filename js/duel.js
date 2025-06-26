@@ -221,11 +221,14 @@ window.findOrCreateRoom = async function() {
   const pseudo = await window.getPseudo();
 
   for (let i = 0; i < 5; i++) {
-    let { data: rooms } = await window.supabase
-      .from('duels')
-      .select('*')
-      .eq('status', 'waiting')
-      .neq('player1_pseudo', pseudo);
+let { data: rooms } = await window.supabase
+  .from('duels')
+  .select('*')
+  .eq('status', 'waiting')
+  .neq('player1_pseudo', pseudo)
+  .order('createdat', { ascending: true }) // prend la plus ancienne
+  .limit(1); // empêche plusieurs joueurs d'en prendre plusieurs
+
 
     if (rooms && rooms.length > 0) {
       const room = rooms[0];
@@ -234,12 +237,21 @@ window.findOrCreateRoom = async function() {
 
       console.log("Tentative d'update room:", room.id, pseudo2, player2_id);
 
-      const { error: updError } = await window.supabase.from('duels').update({
-        player2_id: player2_id,
-        player2_pseudo: pseudo2,
-        status: 'playing',
-        starttime: Date.now()
-      }).eq('id', room.id);
+ const { data: updated, error: updError } = await window.supabase.from('duels').update({
+  player2_id: player2_id,
+  player2_pseudo: pseudo2,
+  status: 'playing',
+  starttime: Date.now()
+})
+.eq('id', room.id)
+.eq('status', 'waiting') // ✅ ne modifie que si elle n’a pas été prise entre-temps
+.select();
+
+if (updError || !updated || updated.length === 0) {
+  console.warn("Room déjà prise ou erreur. Nouvelle tentative...");
+  continue; // relance la boucle
+}
+
 
       if (updError) {
         console.error("⚠️ Erreur lors de l'update du joueur 2 :", updError.message);
