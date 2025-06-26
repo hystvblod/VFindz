@@ -326,6 +326,7 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 };
 
 // ----------- GÉNÈRE UNE CARTE HTML (polaroïd, pseudo dynamique) -----------
+// Remplace TOUTE ta fonction creerCartePhotoHTML par ça :
 function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
   const cadreId = photo.cadre_id || "polaroid_01";
   let cadreUrl = cadreId.startsWith("http")
@@ -333,19 +334,20 @@ function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
     : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`;
 
   return `
-    <div class="cadre-item${isPlayer ? ' joueur-photo' : ''}">
-      <div class="cadre-preview miniature" style="position:relative;width:80px;height:80px;margin:0 auto 8px auto;overflow:hidden;border-radius:16px;">
-        <img class="photo-cadre" src="${cadreUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;border-radius:16px;">
-        <img class="photo-user" src="${photo.photo_url}" style="width:80%;height:80%;object-fit:cover;position:absolute;top:10%;left:10%;border-radius:12px;">
-        <div class="photo-concours-coeur" style="position:absolute;right:9px;top:9px;z-index:10;">
-          <img src="assets/icons/coeur.svg" alt="Vote" style="width:22px;height:22px;vertical-align:middle;">
-          <span class="nbvotes" style="margin-left:5px;color:#ffe04a;font-weight:bold;">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
+    <div class="cadre-item cadre-duel-mini${isPlayer ? ' joueur-photo' : ''}">
+      <div class="cadre-preview" style="position:relative;">
+        <img class="photo-cadre" src="${cadreUrl}">
+        <img class="photo-user" src="${photo.photo_url}">
+        <div class="photo-concours-coeur" style="position:absolute;right:7px;top:7px;z-index:10;">
+          <img src="assets/icons/coeur.svg" alt="Vote" style="width:19px;height:19px;vertical-align:middle;">
+          <span class="nbvotes" style="margin-left:4px;color:#ffe04a;font-weight:bold;font-size:1.01em;">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
         </div>
       </div>
-      <div class="pseudo-miniature" style="color:#fff;text-align:center;font-size:1.1em;font-weight:500;margin-bottom:2px;margin-top:6px;letter-spacing:.05em;opacity:.94;">${pseudo || "?"}</div>
+      <div class="pseudo-miniature" style="color:#fff;text-align:center;font-size:1.08em;font-weight:500;margin-bottom:2px;margin-top:5px;letter-spacing:.04em;opacity:.94;">${pseudo || "?"}</div>
     </div>
   `;
 }
+
 
 
 
