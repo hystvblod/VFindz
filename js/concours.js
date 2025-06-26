@@ -342,9 +342,11 @@ function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
 }
 
 // ----------- POPUP ZOOM STYLE DUEL, pseudo dynamique -----------
-async function ouvrirPopupZoomConcours(photo, pseudo, votesTotal = 0) {
-  let old = document.getElementById("popup-photo-zoom");
+async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
+  // Supprime popup existante si présente
+  let old = document.getElementById("popup-photo");
   if (old) old.remove();
+
   const cadreId = photo.cadre_id || "polaroid_01";
   let cadreUrl = cadreId.startsWith("http")
     ? cadreId
@@ -353,50 +355,50 @@ async function ouvrirPopupZoomConcours(photo, pseudo, votesTotal = 0) {
         : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`);
   const votesLeft = getVotesLeft();
 
+  // Structure DOM identique au duel/boutique
   const popup = document.createElement("div");
-  popup.id = "popup-photo-zoom";
+  popup.id = "popup-photo";
   popup.className = "popup show";
-
   popup.innerHTML = `
     <div class="popup-inner">
-      <button id="close-popup-zoom" class="close-btn" style="position:absolute;top:10px;right:14px;">
-        <img src="assets/icons/close.svg" style="width:24px;" />
-      </button>
-      <div style="display:flex;flex-direction:column;align-items:center;">
-        <div class="cadre-preview cadre-popup" style="margin-bottom:18px;position:relative;">
-          <img class="photo-cadre" src="${cadreUrl}">
-          <img class="photo-user" src="${photo.photo_url}">
-        </div>
-        <div class="pseudo-solo">${pseudo}</div>
-        <button class="vote-coeur-btn"
-                style="margin:22px auto 0 auto;display:flex;align-items:center;background:none;border:none;"
-                ${votesLeft <= 0 ? "disabled" : ""} data-photoid="${photo.id}">
-          <img src="assets/icons/coeur.svg"
-               style="width:38px;vertical-align:middle;cursor:pointer;" alt="Voter"/>
-          <span style="margin-left:8px;color:#ffe04a;font-weight:bold;font-size:1.13em;">Voter</span>
-          <span class="nbvotes"
-                style="margin-left:12px;color:#ffe04a;font-weight:bold;font-size:1.03em;">${votesTotal}</span>
+      <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
+        <button id="btn-voter-photo" style="background: none; border: none; padding: 0;" ${votesLeft <= 0 ? "disabled" : ""}>
+          <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" />
         </button>
-        <div style="margin-top:7px;color:#aaa;font-size:0.97em;">
-          Votes restants aujourd'hui&nbsp;: <b>${votesLeft}</b> / ${VOTES_PAR_REWARD()}
-        </div>
+        <button id="close-popup" style="background: none; border: none; padding: 0;">
+          <img src="assets/icons/croix.svg" alt="Fermer" style="width: 32px; height: 32px;" />
+        </button>
+      </div>
+      <div class="cadre-preview cadre-popup boutique-style" style="margin-top:32px;">
+        <img class="photo-cadre" src="${cadreUrl}">
+        <img class="photo-user" src="${photo.photo_url}">
+      </div>
+      <div class="pseudo-solo" style="margin:18px 0 2px 0; color:#ffe04a; font-size:1.09em; font-weight:500; text-align:center;">
+        ${photo.pseudo || photo.user || "?"}
+      </div>
+      <div class="nbvotes" style="text-align:center; font-size:1.03em; color:#ffe04a; font-weight:700; margin-bottom:5px;">
+        ${votesTotal} votes
+      </div>
+      <div style="margin-top:7px;color:#aaa;font-size:0.97em;text-align:center;">
+        Votes restants aujourd'hui&nbsp;: <b>${votesLeft}</b> / ${VOTES_PAR_REWARD()}
       </div>
     </div>
   `;
   document.body.appendChild(popup);
 
-  // Fermer la popup sur croix
-  popup.querySelector("#close-popup-zoom").onclick = () => popup.remove();
+  // Bouton fermer
+  popup.querySelector("#close-popup").onclick = () => popup.remove();
 
-  // Gérer le vote
+  // Bouton cœur (vote)
   if (votesLeft > 0) {
-    popup.querySelector(".vote-coeur-btn").onclick = async function() {
+    popup.querySelector("#btn-voter-photo").onclick = async function() {
       await votePourPhoto(photo.id);
       popup.remove();
       window.afficherGalerieConcours(true);
     };
   }
 }
+
 
 // ----------- VOTE POUR PHOTO (max votes par cycle, sécurisé RPC) -----------
 async function votePourPhoto(photoId) {
