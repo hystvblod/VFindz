@@ -316,13 +316,15 @@ window.afficherGalerieConcours = async function(forceReload = false) {
   }
 
   // Events zoom/vote popup (photo-cadre clique)
-  Array.from(document.querySelectorAll('.photo-concours-img-wrapper')).forEach(div => {
-    div.onclick = function() {
-      const photoId = this.dataset.photoid;
-      const photo = allPhotos.find(p => p.id == photoId);
-      if (photo) ouvrirPopupZoomConcours(photo, pseudoMap[photo.user_id] || "?", votesMap[photo.id] ?? photo.votes_total);
-    };
-  });
+// Events zoom/vote popup (photo-cadre clique)
+Array.from(document.querySelectorAll('.cadre-item[data-photoid]')).forEach(div => {
+  div.onclick = function() {
+    const photoId = this.dataset.photoid;
+    const photo = allPhotos.find(p => p.id == photoId);
+    if (photo) ouvrirPopupZoomConcours(photo, pseudoMap[photo.user_id] || "?", votesMap[photo.id] ?? photo.votes_total);
+  };
+});
+
 };
 
 // ----------- GÉNÈRE UNE CARTE HTML (polaroïd, pseudo dynamique) -----------
