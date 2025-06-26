@@ -328,25 +328,26 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 // ----------- GÉNÈRE UNE CARTE HTML (polaroïd, pseudo dynamique) -----------
 function creerCartePhotoHTML(photo, isPlayer, nbVotes) {
   const cadreId = photo.cadre_id || "polaroid_01";
-  const cadreUrl = cadreId.startsWith("http")
+  // Mets bien getCadreUrl selon ta logique
+  let cadreUrl = cadreId.startsWith("http")
     ? cadreId
-    : (window.getCadreUrl
-      ? window.getCadreUrl(cadreId)
-      : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`);
+    : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`;
+
   return `
     <div class="cadre-item${isPlayer ? ' joueur-photo' : ''}">
-      <div class="cadre-img" data-photoid="${photo.id}" style="position:relative;">
-        <img class="img-cadre" src="${cadreUrl}">
-        <img class="img-user" src="${photo.photo_url}">
-        <div class="vote-bulle">
-          <img src="assets/icons/coeur.svg" class="coeur-mini" />
-          <span class="nbvotes">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
+      <div class="cadre-preview miniature" style="position:relative;">
+        <img class="photo-cadre" src="${cadreUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;border-radius:16px;">
+        <img class="photo-user" src="${photo.photo_url}" style="width:80%;height:80%;object-fit:cover;position:absolute;top:10%;left:10%;border-radius:12px;">
+        <div class="photo-concours-coeur" style="position:absolute;right:9px;top:9px;z-index:10;">
+          <img src="assets/icons/coeur.svg" alt="Vote" style="width:22px;height:22px;vertical-align:middle;">
+          <span class="nbvotes" style="margin-left:5px;color:#ffe04a;font-weight:bold;">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
         </div>
       </div>
-      <div class="cadre-pseudo">${photo.pseudo || "?"}</div>
+      <div class="pseudo-miniature">${photo.pseudo || "?"}</div>
     </div>
   `;
 }
+
 
 
 
