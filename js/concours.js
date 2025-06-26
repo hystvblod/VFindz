@@ -326,17 +326,24 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 };
 
 // ----------- GÉNÈRE UNE CARTE HTML (polaroïd, pseudo dynamique) -----------
-function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
+function creerCartePhotoHTML(photo, isPlayer, nbVotes) {
+  const cadreId = photo.cadre_id || "polaroid_01";
+  // Gère les URLs locales ou distantes
+  const cadreUrl = cadreId.startsWith("http")
+    ? cadreId
+    : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`;
+
   return `
-    <div class="cadre-item${isPlayer ? ' joueur-photo' : ''}">
-      <div class="photo-concours-img-wrapper" data-photoid="${photo.id}" style="position:relative;cursor:pointer;">
-        <img src="${photo.photo_url}" class="photo-concours-img" style="width:100%;border-radius:10px;background:#f9f9fa;">
-        <div class="photo-concours-coeur" style="position:absolute;right:7px;top:7px;">
+    <div class="photo-concours-item${isPlayer ? ' joueur-photo' : ''}">
+      <div class="cadre-preview cadre-popup" style="margin:0 auto 12px auto;position:relative;width:94px;height:94px;cursor:pointer;" data-photoid="${photo.id}">
+        <img class="photo-cadre" src="${cadreUrl}">
+        <img class="photo-user" src="${photo.photo_url}">
+        <div class="photo-concours-coeur" style="position:absolute;right:7px;top:7px;z-index:10;">
           <img src="assets/icons/coeur.svg" alt="Vote" style="width:22px;height:22px;vertical-align:middle;opacity:1;">
           <span class="nbvotes" style="margin-left:5px;color:#ffe04a;font-weight:bold;">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
         </div>
       </div>
-      <div class="cadre-item">${pseudo || "?"}</div>
+      <div class="cadre-item">${photo.pseudo || "?"}</div>
     </div>
   `;
 }
