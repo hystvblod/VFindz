@@ -333,9 +333,10 @@ function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
     ? cadreId
     : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`;
 
+  // La div cliquable a les 2 classes : cadre-preview et photo-concours-img-wrapper
   return `
     <div class="cadre-item cadre-duel-mini${isPlayer ? ' joueur-photo' : ''}">
-      <div class="cadre-preview" style="position:relative;">
+      <div class="cadre-preview photo-concours-img-wrapper" data-photoid="${photo.id}" style="position:relative;">
         <img class="photo-cadre" src="${cadreUrl}">
         <img class="photo-user" src="${photo.photo_url}">
         <div class="photo-concours-coeur" style="position:absolute;right:7px;top:7px;z-index:10;">
@@ -347,6 +348,7 @@ function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
     </div>
   `;
 }
+
 
 
 
