@@ -385,7 +385,8 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
           <img src="assets/icons/croix.svg" alt="Fermer" data-i18n-alt="button.close" style="width: 32px; height: 32px;margin-top:-5px;" />
         </button>
       </div>
-      <div class="cadre-preview cadre-popup boutique-style" style="margin-top:32px;">
+     <div class="cadre-preview cadre-popup boutique-style" data-photoid="...">
+
         <img class="photo-cadre" src="${cadreUrl}">
         <img class="photo-user" src="${photo.photo_url}">
       </div>
