@@ -326,16 +326,15 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 };
 
 // ----------- GÉNÈRE UNE CARTE HTML (polaroïd, pseudo dynamique) -----------
-function creerCartePhotoHTML(photo, isPlayer, nbVotes) {
+function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
   const cadreId = photo.cadre_id || "polaroid_01";
-  // Mets bien getCadreUrl selon ta logique
   let cadreUrl = cadreId.startsWith("http")
     ? cadreId
     : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`;
 
   return `
     <div class="cadre-item${isPlayer ? ' joueur-photo' : ''}">
-      <div class="cadre-preview miniature" style="position:relative;">
+      <div class="cadre-preview miniature" style="position:relative;width:80px;height:80px;margin:0 auto 8px auto;overflow:hidden;border-radius:16px;">
         <img class="photo-cadre" src="${cadreUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;border-radius:16px;">
         <img class="photo-user" src="${photo.photo_url}" style="width:80%;height:80%;object-fit:cover;position:absolute;top:10%;left:10%;border-radius:12px;">
         <div class="photo-concours-coeur" style="position:absolute;right:9px;top:9px;z-index:10;">
@@ -343,10 +342,11 @@ function creerCartePhotoHTML(photo, isPlayer, nbVotes) {
           <span class="nbvotes" style="margin-left:5px;color:#ffe04a;font-weight:bold;">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
         </div>
       </div>
-      <div class="pseudo-miniature">${photo.pseudo || "?"}</div>
+      <div class="pseudo-miniature" style="color:#fff;text-align:center;font-size:1.1em;font-weight:500;margin-bottom:2px;margin-top:6px;letter-spacing:.05em;opacity:.94;">${pseudo || "?"}</div>
     </div>
   `;
 }
+
 
 
 
@@ -369,31 +369,32 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
   const popup = document.createElement("div");
   popup.id = "popup-photo";
   popup.className = "popup show";
-  popup.innerHTML = `
-    <div class="popup-inner">
-      <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
-        <button id="btn-voter-photo" style="background: none; border: none; padding: 0;" ${votesLeft <= 0 ? "disabled" : ""}>
-          <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" />
-        </button>
-        <button id="close-popup" style="background: none; border: none; padding: 0;">
-          <img src="assets/icons/croix.svg" alt="Fermer" data-i18n-alt="button.close" style="width: 32px; height: 32px;margin-top:-5px;" />
-        </button>
-      </div>
-      <div class="cadre-preview cadre-popup boutique-style" style="margin-top:32px;">
-        <img class="photo-cadre" src="${cadreUrl}">
-        <img class="photo-user" src="${photo.photo_url}">
-      </div>
-      <div class="pseudo-solo" style="margin:18px 0 2px 0; color:#ffe04a; font-size:1.09em; font-weight:500; text-align:center;">
-        ${photo.pseudo || photo.user || "?"}
-      </div>
-      <div class="nbvotes" style="text-align:center; font-size:1.03em; color:#ffe04a; font-weight:700; margin-bottom:5px;">
-        ${votesTotal} votes
-      </div>
-      <div style="margin-top:7px;color:#aaa;font-size:0.97em;text-align:center;">
-        Votes restants aujourd'hui&nbsp;: <b>${votesLeft}</b> / ${VOTES_PAR_REWARD()}
-      </div>
+popup.innerHTML = `
+  <div class="popup-inner">
+    <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
+      <button id="btn-voter-photo" style="background: none; border: none; padding: 0;" ${votesLeft <= 0 ? "disabled" : ""}>
+        <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" />
+      </button>
+      <button id="close-popup" style="background: none; border: none; padding: 0;">
+        <img src="assets/icons/croix.svg" alt="Fermer" data-i18n-alt="button.close" style="width: 32px; height: 32px;margin-top:-5px;" />
+      </button>
     </div>
-  `;
+    <div class="cadre-preview cadre-popup boutique-style" style="margin-top:32px;position:relative;width:170px;height:170px;overflow:hidden;border-radius:22px;">
+      <img class="photo-cadre" src="${cadreUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;border-radius:22px;">
+      <img class="photo-user" src="${photo.photo_url}" style="width:82%;height:82%;object-fit:cover;position:absolute;top:9%;left:9%;border-radius:16px;">
+    </div>
+    <div class="pseudo-solo" style="margin:18px 0 2px 0; color:#ffe04a; font-size:1.09em; font-weight:500; text-align:center;">
+      ${photo.pseudo || photo.user || "?"}
+    </div>
+    <div class="nbvotes" style="text-align:center; font-size:1.03em; color:#ffe04a; font-weight:700; margin-bottom:5px;">
+      ${votesTotal} votes
+    </div>
+    <div style="margin-top:7px;color:#aaa;font-size:0.97em;text-align:center;">
+      Votes restants aujourd'hui&nbsp;: <b>${votesLeft}</b> / ${VOTES_PAR_REWARD()}
+    </div>
+  </div>
+`;
+
   document.body.appendChild(popup);
 
   // Bouton fermer
