@@ -373,7 +373,7 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
           <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" />
         </button>
         <button id="close-popup" style="background: none; border: none; padding: 0;">
-          <img src="assets/icons/croix.svg" alt="Fermer" style="width: 32px; height: 32px;" />
+          <img src="assets/icons/croix.svg" alt="Fermer" data-i18n-alt="button.close" style="width: 32px; height: 32px;margin-top:-5px;" />
         </button>
       </div>
       <div class="cadre-preview cadre-popup boutique-style" style="margin-top:32px;">
