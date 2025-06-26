@@ -333,10 +333,10 @@ function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
     ? cadreId
     : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadreId}.webp`;
 
-  // La div cliquable a les 2 classes : cadre-preview et photo-concours-img-wrapper
+  // EXEMPLE BOUTIQUE / SOLO
   return `
     <div class="cadre-item cadre-duel-mini${isPlayer ? ' joueur-photo' : ''}">
-      <div class="cadre-preview photo-concours-img-wrapper" data-photoid="${photo.id}" style="position:relative;">
+      <div class="cadre-preview cadre-miniature" style="position:relative;">
         <img class="photo-cadre" src="${cadreUrl}">
         <img class="photo-user" src="${photo.photo_url}">
         <div class="photo-concours-coeur" style="position:absolute;right:7px;top:7px;z-index:10;">
@@ -348,6 +348,7 @@ function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
     </div>
   `;
 }
+
 
 
 
@@ -381,9 +382,9 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
           <img src="assets/icons/croix.svg" alt="Fermer" data-i18n-alt="button.close" style="width: 32px; height: 32px;margin-top:-5px;" />
         </button>
       </div>
-      <div class="cadre-preview cadre-popup boutique-style" style="margin-top:32px;position:relative;width:170px;height:170px;overflow:hidden;border-radius:22px;">
+      <div class="cadre-preview cadre-popup boutique-style" style="margin:38px auto 12px auto;position:relative;width:288px;height:220px;overflow:hidden;border-radius:22px;">
         <img class="photo-cadre" src="${cadreUrl}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;border-radius:22px;">
-        <img class="photo-user" src="${photo.photo_url}" style="width:88%;height:88%;object-fit:cover;position:absolute;top:6%;left:6%;border-radius:16px;">
+        <img class="photo-user" src="${photo.photo_url}" style="width:86%;height:82%;object-fit:cover;position:absolute;top:8%;left:8%;border-radius:16px;">
       </div>
       <div class="pseudo-solo" style="margin:18px 0 2px 0; color:#ffe04a; font-size:1.09em; font-weight:500; text-align:center;">
         ${photo.pseudo || photo.user || "?"}
@@ -407,6 +408,7 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
     };
   }
 }
+
 
 
 // ----------- VOTE POUR PHOTO (max votes par cycle, sécurisé RPC) -----------
