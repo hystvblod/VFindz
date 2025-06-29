@@ -9,10 +9,11 @@
       "it": "Un oggetto che fa rumore",
       "nl": "Een object dat geluid maakt",
       "pt": "Um objeto que faz barulho",
+      "ptbr": "Um objeto que faz barulho",
       "ar": "جسم يُصدر ضوضاء",
       "ja": "音を出す物",
       "ko": "소리를 내는 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sebuah benda yang mengeluarkan suara"
     },
     {
       "id": "02",
@@ -23,10 +24,11 @@
       "it": "Un animale in movimento",
       "nl": "Een dier in beweging",
       "pt": "Um animal em movimento",
+      "ptbr": "Um animal em movimento",
       "ar": "حيوان يتحرك",
       "ja": "動いている動物",
       "ko": "움직이는 동물",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Seekor hewan yang sedang bergerak"
     },
     {
       "id": "03",
@@ -36,11 +38,12 @@
       "de": "Ein Lichtspiel",
       "it": "Un gioco di luce",
       "nl": "Een lichtspel",
-      "pt": "Um jogo de luz",
+      "pt": "Um jogo de luzes",
+      "ptbr": "Um jogo de luz",
       "ar": "تلاعب بالضوء",
       "ja": "光の遊び",
       "ko": "빛의 연출",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Permainan cahaya"
     },
     {
       "id": "04",
@@ -50,11 +53,12 @@
       "de": "Ein Vogel im Freien",
       "it": "Un uccello all'aperto",
       "nl": "Een vogel buiten",
-      "pt": "Um pássaro ao ar livre",
+      "pt": "Um pássaro lá fora",
+      "ptbr": "Um pássaro ao ar livre",
       "ar": "طائر في الخارج",
       "ja": "外にいる鳥",
       "ko": "밖에 있는 새",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Seekor burung di luar ruangan"
     },
     {
       "id": "05",
@@ -64,11 +68,12 @@
       "de": "Zwei gleiche Objekte",
       "it": "Due oggetti identici",
       "nl": "Twee identieke objecten",
-      "pt": "Dois objetos idênticos",
+      "pt": "Dois objetos iguais",
+      "ptbr": "Dois objetos idênticos",
       "ar": "جسمان متطابقان",
       "ja": "同じものが2つ",
       "ko": "같은 물건 두 개",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Dua benda yang sama"
     },
     {
       "id": "06",
@@ -79,10 +84,11 @@
       "it": "Un animale carino",
       "nl": "Een schattig dier",
       "pt": "Um animal fofo",
+      "ptbr": "Um animal fofo",
       "ar": "حيوان لطيف",
       "ja": "かわいい動物",
       "ko": "귀여운 동물",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Seekor hewan lucu"
     },
     {
       "id": "07",
@@ -92,11 +98,12 @@
       "de": "Ein Graffiti",
       "it": "Un graffito",
       "nl": "Een graffiti",
-      "pt": "Um grafite",
+      "pt": "Um graffiti",
+      "ptbr": "Um grafite",
       "ar": "رسم جرافيتي",
       "ja": "落書き",
       "ko": "그래피티",
-      "idn": "Ambil foto grafiti"
+      "idn": "Sebuah grafiti"
     },
     {
       "id": "08",
@@ -106,11 +113,12 @@
       "de": "Ein Schild in deiner Stadt",
       "it": "Un cartello nella tua città",
       "nl": "Een bord in jouw stad",
-      "pt": "Uma placa na sua cidade",
+      "pt": "Uma placa na tua cidade",
+      "ptbr": "Uma placa na sua cidade",
       "ar": "لافتة في مدينتك",
       "ja": "あなたの街の標識",
       "ko": "당신의 도시의 표지판",
-      "idn": "Ambil foto papan tanda"
+      "idn": "Sebuah papan di kotamu"
     },
     {
       "id": "09",
@@ -121,10 +129,11 @@
       "it": "Una forma geometrica",
       "nl": "Een geometrische vorm",
       "pt": "Uma forma geométrica",
+      "ptbr": "Uma forma geométrica",
       "ar": "شكل هندسي",
       "ja": "幾何学的な形",
       "ko": "기하학적인 형태",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bentuk geometris"
     },
     {
       "id": 10,
@@ -135,10 +144,11 @@
       "it": "Un'ombra strana",
       "nl": "Een vreemde schaduw",
       "pt": "Uma sombra estranha",
+      "ptbr": "Uma sombra estranha",
       "ar": "ظل غريب",
       "ja": "奇妙な影",
       "ko": "이상한 그림자",
-      "idn": "Ambil foto bayangan"
+      "idn": "Bayangan aneh"
     },
     {
       "id": 11,
@@ -149,10 +159,11 @@
       "it": "Un momento di felicità",
       "nl": "Een moment van geluk",
       "pt": "Um momento de felicidade",
+      "ptbr": "Um momento de felicidade",
       "ar": "لحظة من السعادة",
       "ja": "幸せなひととき",
       "ko": "행복한 순간",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Momen kebahagiaan"
     },
     {
       "id": 12,
@@ -162,11 +173,12 @@
       "de": "Ein Alltagsgegenstand",
       "it": "Un oggetto quotidiano",
       "nl": "Een alledaags voorwerp",
-      "pt": "Um objeto cotidiano",
+      "pt": "Um objeto do dia a dia",
+      "ptbr": "Um objeto cotidiano",
       "ar": "شيء يومي",
       "ja": "日常的なもの",
       "ko": "일상적인 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda sehari-hari"
     },
     {
       "id": 13,
@@ -176,11 +188,12 @@
       "de": "Ein Tier in Schwarz-Weiß",
       "it": "Un animale in bianco e nero",
       "nl": "Een dier in zwart-wit",
-      "pt": "Um animal em preto e branco",
+      "pt": "Um animal a preto e branco",
+      "ptbr": "Um animal em preto e branco",
       "ar": "حيوان بالأبيض والأسود",
       "ja": "白黒の動物",
       "ko": "흑백 동물",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Hewan hitam putih"
     },
     {
       "id": 14,
@@ -191,10 +204,11 @@
       "it": "Un oggetto in aria",
       "nl": "Een voorwerp in de lucht",
       "pt": "Um objeto no ar",
+      "ptbr": "Um objeto no ar",
       "ar": "جسم في الهواء",
       "ja": "空中の物体",
       "ko": "공중에 있는 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sebuah benda di udara"
     },
     {
       "id": 15,
@@ -205,10 +219,11 @@
       "it": "Una cosa minuscola",
       "nl": "Iets kleins",
       "pt": "Uma coisa minúscula",
+      "ptbr": "Uma coisa minúscula",
       "ar": "شيء صغير جدًا",
       "ja": "とても小さなもの",
       "ko": "아주 작은 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang sangat kecil"
     },
     {
       "id": 16,
@@ -219,10 +234,11 @@
       "it": "Un'opera d'arte",
       "nl": "Een kunstwerk",
       "pt": "Uma obra de arte",
+      "ptbr": "Uma obra de arte",
       "ar": "عمل فني",
       "ja": "芸術作品",
       "ko": "예술 작품",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sebuah karya seni"
     },
     {
       "id": 17,
@@ -233,10 +249,11 @@
       "it": "Un insetto",
       "nl": "Een insect",
       "pt": "Um inseto",
+      "ptbr": "Um inseto",
       "ar": "حشرة",
       "ja": "昆虫",
       "ko": "곤충",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Seekor serangga"
     },
     {
       "id": 18,
@@ -247,10 +264,11 @@
       "it": "Un riflesso",
       "nl": "Een weerspiegeling",
       "pt": "Um reflexo",
+      "ptbr": "Um reflexo",
       "ar": "انعكاس",
       "ja": "反射",
       "ko": "반사",
-      "idn": "Ambil foto bayangan wajahmu"
+      "idn": "Sebuah pantulan"
     },
     {
       "id": 19,
@@ -260,11 +278,12 @@
       "de": "Ein Baum in Schwarz-Weiß",
       "it": "Un albero in bianco e nero",
       "nl": "Een boom in zwart-wit",
-      "pt": "Uma árvore em preto e branco",
+      "pt": "Uma árvore a preto e branco",
+      "ptbr": "Uma árvore em preto e branco",
       "ar": "شجرة بالأبيض والأسود",
       "ja": "白黒の木",
       "ko": "흑백 나무",
-      "idn": "Ambil foto pohon"
+      "idn": "Sebuah pohon hitam putih"
     },
     {
       "id": 20,
@@ -274,11 +293,12 @@
       "de": "Etwas Kaputtes",
       "it": "Qualcosa di rotto",
       "nl": "Iets kapot",
-      "pt": "Algo quebrado",
+      "pt": "Algo partido",
+      "ptbr": "Algo quebrado",
       "ar": "شيء مكسور",
       "ja": "壊れたもの",
       "ko": "부서진 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang rusak"
     },
     {
       "id": 21,
@@ -288,11 +308,12 @@
       "de": "Ein originelles Gebäude",
       "it": "Un edificio originale",
       "nl": "Een origineel gebouw",
-      "pt": "Um prédio original",
+      "pt": "Um edifício original",
+      "ptbr": "Um prédio original",
       "ar": "مبنى فريد",
       "ja": "ユニークな建物",
       "ko": "독특한 건물",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bangunan yang unik"
     },
     {
       "id": 22,
@@ -303,10 +324,11 @@
       "it": "Un albero",
       "nl": "Een boom",
       "pt": "Uma árvore",
+      "ptbr": "Uma árvore",
       "ar": "شجرة",
       "ja": "木",
       "ko": "나무",
-      "idn": "Ambil foto pohon"
+      "idn": "Sebuah pohon"
     },
     {
       "id": 23,
@@ -317,10 +339,11 @@
       "it": "Una linea retta",
       "nl": "Een rechte lijn",
       "pt": "Uma linha reta",
+      "ptbr": "Uma linha reta",
       "ar": "خط مستقيم",
       "ja": "直線",
       "ko": "직선",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Garis lurus"
     },
     {
       "id": 24,
@@ -331,10 +354,11 @@
       "it": "Qualcosa che vola",
       "nl": "Iets dat vliegt",
       "pt": "Algo que voa",
+      "ptbr": "Algo que voa",
       "ar": "شيء يطير",
       "ja": "飛んでいるもの",
       "ko": "나는 무언가",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang terbang"
     },
     {
       "id": 25,
@@ -344,11 +368,12 @@
       "de": "Etwas Unscharfes",
       "it": "Qualcosa di sfocato",
       "nl": "Iets wazigs",
-      "pt": "Algo embaçado",
+      "pt": "Algo desfocado",
+      "ptbr": "Algo embaçado",
       "ar": "شيء ضبابي",
       "ja": "ぼやけたもの",
       "ko": "흐릿한 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang buram"
     },
     {
       "id": 26,
@@ -359,10 +384,11 @@
       "it": "Un paio di scarpe all'interno",
       "nl": "Een paar schoenen binnen",
       "pt": "Um par de sapatos dentro de casa",
+      "ptbr": "Um par de sapatos dentro de casa",
       "ar": "زوج من الأحذية في الداخل",
       "ja": "室内の靴一足",
       "ko": "실내 신발 한 켤레",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sepasang sepatu di dalam ruangan"
     },
     {
       "id": 27,
@@ -373,10 +399,11 @@
       "it": "Una trama (esempio: legno)",
       "nl": "Een textuur (bijvoorbeeld: hout)",
       "pt": "Uma textura (exemplo: madeira)",
+      "ptbr": "Uma textura (exemplo: madeira)",
       "ar": "ملمس (مثال: خشب)",
       "ja": "質感（例：木）",
       "ko": "질감 (예: 나무)",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tekstur (contoh: kayu)"
     },
     {
       "id": 28,
@@ -387,10 +414,11 @@
       "it": "Un paio di pantofole",
       "nl": "Een paar pantoffels",
       "pt": "Um par de chinelos",
+      "ptbr": "Um par de chinelos",
       "ar": "زوج من النعال",
       "ja": "スリッパ一足",
       "ko": "슬리퍼 한 켤레",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sepasang sandal rumah"
     },
     {
       "id": 29,
@@ -401,10 +429,11 @@
       "it": "Un tappeto da interno",
       "nl": "Een binnenkleed",
       "pt": "Um tapete de interior",
+      "ptbr": "Um tapete de interior",
       "ar": "سجادة داخلية",
       "ja": "室内用ラグ",
       "ko": "실내용 러그",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Karpet dalam ruangan"
     },
     {
       "id": 30,
@@ -415,10 +444,11 @@
       "it": "Uno zerbino",
       "nl": "Een deurmat",
       "pt": "Um capacho",
+      "ptbr": "Um capacho",
       "ar": "حصيرة باب",
       "ja": "玄関マット",
       "ko": "현관 매트",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Keset"
     },
     {
       "id": 31,
@@ -428,11 +458,12 @@
       "de": "Ein Stück Seife",
       "it": "Una saponetta",
       "nl": "Een stuk zeep",
-      "pt": "Uma barra de sabão",
+      "pt": "Um sabonete",
+      "ptbr": "Uma barra de sabão",
       "ar": "قطعة صابون",
       "ja": "石けん",
       "ko": "비누 한 개",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sabun"
     },
     {
       "id": 32,
@@ -442,11 +473,12 @@
       "de": "Ein Schatten aus der Nähe",
       "it": "Un'ombra da vicino",
       "nl": "Een schaduw van dichtbij",
-      "pt": "Uma sombra de perto",
+      "pt": "Uma sombra tirada de muito perto",
+      "ptbr": "Uma sombra de perto",
       "ar": "ظل عن قرب",
       "ja": "近接した影",
       "ko": "클로즈업된 그림자",
-      "idn": "Ambil foto bayangan"
+      "idn": "Bayangan yang diambil dari jarak dekat"
     },
     {
       "id": 33,
@@ -456,11 +488,12 @@
       "de": "Ein Paar Schuhe draußen",
       "it": "Un paio di scarpe all'aperto",
       "nl": "Een paar schoenen buiten",
-      "pt": "Um par de sapatos ao ar livre",
+      "pt": "Um par de sapatos no exterior",
+      "ptbr": "Um par de sapatos ao ar livre",
       "ar": "زوج من الأحذية في الخارج",
       "ja": "屋外の靴一足",
       "ko": "야외 신발 한 켤레",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sepasang sepatu di luar ruangan"
     },
     {
       "id": 34,
@@ -470,11 +503,12 @@
       "de": "Ein rundes Objekt in Schwarzweiß",
       "it": "Un oggetto rotondo in bianco e nero",
       "nl": "Een rond object in zwart-wit",
-      "pt": "Um objeto redondo em preto e branco",
+      "pt": "Um objeto redondo a preto e branco",
+      "ptbr": "Um objeto redondo em preto e branco",
       "ar": "جسم دائري بالأبيض والأسود",
       "ja": "白黒の丸い物体",
       "ko": "흑백의 둥근 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda bulat hitam putih"
     },
     {
       "id": 35,
@@ -485,10 +519,11 @@
       "it": "Una pianta",
       "nl": "Een plant",
       "pt": "Uma planta",
+      "ptbr": "Uma planta",
       "ar": "نبتة",
       "ja": "植物",
       "ko": "식물",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sebuah tanaman"
     },
     {
       "id": 36,
@@ -499,10 +534,11 @@
       "it": "Un oggetto rotondo rosso",
       "nl": "Een rood rond object",
       "pt": "Um objeto redondo vermelho",
+      "ptbr": "Um objeto redondo vermelho",
       "ar": "جسم دائري أحمر",
       "ja": "赤い丸い物体",
       "ko": "붉은 둥근 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda bulat berwarna merah"
     },
     {
       "id": 37,
@@ -513,10 +549,11 @@
       "it": "Una forma a cuore",
       "nl": "Een hartvorm",
       "pt": "Uma forma de coração",
+      "ptbr": "Uma forma de coração",
       "ar": "شكل قلب",
       "ja": "ハートの形",
       "ko": "하트 모양",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bentuk hati"
     },
     {
       "id": 38,
@@ -527,10 +564,11 @@
       "it": "Un cartello",
       "nl": "Een bord",
       "pt": "Uma placa",
+      "ptbr": "Uma placa",
       "ar": "لافتة",
       "ja": "看板",
       "ko": "표지판",
-      "idn": "Ambil foto papan tanda"
+      "idn": "Sebuah papan tanda"
     },
     {
       "id": 39,
@@ -541,10 +579,11 @@
       "it": "Un oggetto antico",
       "nl": "Een oud voorwerp",
       "pt": "Um objeto antigo",
+      "ptbr": "Um objeto antigo",
       "ar": "شيء قديم",
       "ja": "古い物",
       "ko": "오래된 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda kuno"
     },
     {
       "id": 40,
@@ -555,10 +594,11 @@
       "it": "Un oggetto che ti ispira",
       "nl": "Een object dat je inspireert",
       "pt": "Um objeto que te inspira",
+      "ptbr": "Um objeto que te inspira",
       "ar": "شيء يلهمك",
       "ja": "あなたをインスパイアする物",
       "ko": "영감을 주는 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda yang menginspirasimu"
     },
     {
       "id": 41,
@@ -569,10 +609,11 @@
       "it": "Un paio di scarpe in movimento",
       "nl": "Een paar schoenen in beweging",
       "pt": "Um par de sapatos em movimento",
+      "ptbr": "Um par de sapatos em movimento",
       "ar": "زوج من الأحذية المتحركة",
       "ja": "動いている靴のペア",
       "ko": "움직이는 신발 한 켤레",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sepasang sepatu yang bergerak"
     },
     {
       "id": 42,
@@ -583,10 +624,11 @@
       "it": "Qualcosa di blu",
       "nl": "Iets blauws",
       "pt": "Algo azul",
+      "ptbr": "Algo azul",
       "ar": "شيء أزرق",
       "ja": "青いもの",
       "ko": "파란 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang berwarna biru"
     },
     {
       "id": 43,
@@ -597,10 +639,11 @@
       "it": "Un cibo appetitoso",
       "nl": "Een smakelijk uitziend gerecht",
       "pt": "Um alimento apetitoso",
+      "ptbr": "Um alimento apetitoso",
       "ar": "طعام يبدو لذيذاً",
       "ja": "おいしそうな食べ物",
       "ko": "맛있어 보이는 음식",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Makanan yang menggugah selera"
     },
     {
       "id": 44,
@@ -610,11 +653,12 @@
       "de": "Ein überfüllter Ort",
       "it": "Un posto affollato",
       "nl": "Een drukke plek",
-      "pt": "Um lugar lotado",
+      "pt": "Um lugar cheio de gente",
+      "ptbr": "Um lugar lotado",
       "ar": "مكان مزدحم",
       "ja": "混雑した場所",
       "ko": "혼잡한 장소",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tempat yang ramai"
     },
     {
       "id": 45,
@@ -625,10 +669,11 @@
       "it": "Qualcosa di brillante",
       "nl": "Iets glanzends",
       "pt": "Algo brilhante",
+      "ptbr": "Algo brilhante",
       "ar": "شيء لامع",
       "ja": "輝いているもの",
       "ko": "반짝이는 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang berkilau"
     },
     {
       "id": 46,
@@ -638,11 +683,12 @@
       "de": "Eine lustige Szene",
       "it": "Una scena divertente",
       "nl": "Een grappige scène",
-      "pt": "Uma cena engraçada",
+      "pt": "Uma cena divertida",
+      "ptbr": "Uma cena engraçada",
       "ar": "مشهد مضحك",
       "ja": "面白いシーン",
       "ko": "재미있는 장면",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Adegan lucu"
     },
     {
       "id": 47,
@@ -653,10 +699,11 @@
       "it": "Un oggetto quadrato",
       "nl": "Een vierkant voorwerp",
       "pt": "Um objeto quadrado",
+      "ptbr": "Um objeto quadrado",
       "ar": "غرض مربع",
       "ja": "四角い物",
       "ko": "네모난 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda berbentuk persegi"
     },
     {
       "id": 48,
@@ -667,10 +714,11 @@
       "it": "Uno spazzolino da denti colorato",
       "nl": "Een kleurrijke tandenborstel",
       "pt": "Uma escova de dentes colorida",
+      "ptbr": "Uma escova de dentes colorida",
       "ar": "فرشاة أسنان ملونة",
       "ja": "カラフルな歯ブラシ",
       "ko": "알록달록한 칫솔",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sikat gigi berwarna"
     },
     {
       "id": 49,
@@ -680,11 +728,12 @@
       "de": "Eine ruhige Ecke",
       "it": "Un angolo tranquillo",
       "nl": "Een rustig hoekje",
-      "pt": "Um canto tranquilo",
+      "pt": "Um cantinho tranquilo",
+      "ptbr": "Um canto tranquilo",
       "ar": "زاوية هادئة",
       "ja": "静かな場所",
       "ko": "조용한 구석",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tempat yang tenang"
     },
     {
       "id": 50,
@@ -695,10 +744,11 @@
       "it": "Un oggetto nascosto",
       "nl": "Een verborgen object",
       "pt": "Um objeto escondido",
+      "ptbr": "Um objeto escondido",
       "ar": "غرض مخفي",
       "ja": "隠された物",
       "ko": "숨겨진 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda tersembunyi"
     },
     {
       "id": 51,
@@ -708,11 +758,12 @@
       "de": "Ein Wecker, der eine volle Stunde anzeigt (wie 12:00 Uhr)",
       "it": "Una sveglia che segna un’ora esatta (come le 12:00)",
       "nl": "Een wekker die een rond uur toont (zoals 12:00)",
-      "pt": "Um despertador marcando uma hora cheia (como 12:00)",
+      "pt": "Um despertador que mostra uma hora certa (como 12:00)",
+      "ptbr": "Um despertador marcando uma hora cheia (como 12:00)",
       "ar": "منبه يعرض ساعة كاملة (مثل 12:00)",
       "ja": "ちょうどの時間を表示している目覚まし時計（例：12:00）",
       "ko": "정각을 표시하는 자명종 시계 (예: 12:00)",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jam weker yang menunjukkan waktu tepat (seperti 12:00)"
     },
     {
       "id": 52,
@@ -722,11 +773,12 @@
       "de": "Ein origineller Alltagsgegenstand",
       "it": "Un oggetto quotidiano originale",
       "nl": "Een origineel alledaags voorwerp",
-      "pt": "Um objeto cotidiano original",
+      "pt": "Um objeto do dia a dia original",
+      "ptbr": "Um objeto cotidiano original",
       "ar": "غرض يومي غير عادي",
       "ja": "ユニークな日常のアイテム",
       "ko": "독특한 일상 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda sehari-hari yang unik"
     },
     {
       "id": 53,
@@ -737,10 +789,11 @@
       "it": "Una porta colorata",
       "nl": "Een kleurrijke deur",
       "pt": "Uma porta colorida",
+      "ptbr": "Uma porta colorida",
       "ar": "باب ملون",
       "ja": "カラフルなドア",
       "ko": "알록달록한 문",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pintu berwarna"
     },
     {
       "id": 54,
@@ -751,10 +804,11 @@
       "it": "Un uccello",
       "nl": "Een vogel",
       "pt": "Um pássaro",
+      "ptbr": "Um pássaro",
       "ar": "طائر",
       "ja": "鳥",
       "ko": "새",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Seekor burung"
     },
     {
       "id": 55,
@@ -765,10 +819,11 @@
       "it": "Una forma geometrica",
       "nl": "Een geometrische vorm",
       "pt": "Uma forma geométrica",
+      "ptbr": "Uma forma geométrica",
       "ar": "شكل هندسي",
       "ja": "幾何学的な形",
       "ko": "기하학적 형태",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bentuk geometris"
     },
     {
       "id": 56,
@@ -779,10 +834,11 @@
       "it": "Una pianta verde",
       "nl": "Een groene plant",
       "pt": "Uma planta verde",
+      "ptbr": "Uma planta verde",
       "ar": "نبتة خضراء",
       "ja": "緑の植物",
       "ko": "초록 식물",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tanaman hijau"
     },
     {
       "id": 57,
@@ -793,10 +849,11 @@
       "it": "Un profumo",
       "nl": "Een parfum",
       "pt": "Um perfume",
+      "ptbr": "Um perfume",
       "ar": "عطر",
       "ja": "香水",
       "ko": "향수",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Parfum"
     },
     {
       "id": 58,
@@ -807,10 +864,11 @@
       "it": "Una mano",
       "nl": "Een hand",
       "pt": "Uma mão",
+      "ptbr": "Uma mão",
       "ar": "يد",
       "ja": "手",
       "ko": "손",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sebuah tangan"
     },
     {
       "id": 59,
@@ -820,11 +878,12 @@
       "de": "Eine Spielsituation",
       "it": "Una scena di gioco",
       "nl": "Een speelscène",
-      "pt": "Uma cena de brincadeira",
+      "pt": "Uma cena de jogo",
+      "ptbr": "Uma cena de brincadeira",
       "ar": "مشهد لعب",
       "ja": "遊びのシーン",
       "ko": "놀이 장면",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Adegan permainan"
     },
     {
       "id": 60,
@@ -835,10 +894,11 @@
       "it": "Un caffè",
       "nl": "Een kopje koffie",
       "pt": "Um café",
+      "ptbr": "Um café",
       "ar": "فنجان قهوة",
       "ja": "コーヒー",
       "ko": "커피",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kopi"
     },
     {
       "id": 61,
@@ -848,11 +908,12 @@
       "de": "Eine Tasse",
       "it": "Una tazza",
       "nl": "Een kopje",
-      "pt": "Uma xícara",
+      "pt": "Uma chávena",
+      "ptbr": "Uma xícara",
       "ar": "كوب",
       "ja": "カップ",
       "ko": "컵",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Cangkir"
     },
     {
       "id": 62,
@@ -863,10 +924,11 @@
       "it": "Un tè",
       "nl": "Een kopje thee",
       "pt": "Um chá",
+      "ptbr": "Um chá",
       "ar": "شاي",
       "ja": "お茶",
       "ko": "차",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Teh"
     },
     {
       "id": 63,
@@ -877,10 +939,11 @@
       "it": "Un biscotto",
       "nl": "Een koekje",
       "pt": "Um biscoito",
+      "ptbr": "Um biscoito",
       "ar": "بسكويت",
       "ja": "クッキー",
       "ko": "쿠키",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Biskuit"
     },
     {
       "id": 64,
@@ -890,11 +953,12 @@
       "de": "Ein Bonbon",
       "it": "Una caramella",
       "nl": "Een snoepje",
-      "pt": "Uma bala",
+      "pt": "Um rebuçado",
+      "ptbr": "Uma bala",
       "ar": "حلوى",
       "ja": "キャンディ",
       "ko": "사탕",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Permen"
     },
     {
       "id": 65,
@@ -905,10 +969,11 @@
       "it": "Zucchero",
       "nl": "Suiker",
       "pt": "Açúcar",
+      "ptbr": "Açúcar",
       "ar": "سكر",
       "ja": "砂糖",
       "ko": "설탕",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Gula"
     },
     {
       "id": 66,
@@ -919,10 +984,11 @@
       "it": "Sale",
       "nl": "Zout",
       "pt": "Sal",
+      "ptbr": "Sal",
       "ar": "ملح",
       "ja": "塩",
       "ko": "소금",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Garam"
     },
     {
       "id": 67,
@@ -932,11 +998,12 @@
       "de": "Ein schwarzes T-Shirt",
       "it": "Una maglietta nera",
       "nl": "Een zwart T-shirt",
-      "pt": "Uma camiseta preta",
+      "pt": "Uma t-shirt preta",
+      "ptbr": "Uma camiseta preta",
       "ar": "قميص أسود",
       "ja": "黒いTシャツ",
       "ko": "검은색 티셔츠",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kaos hitam"
     },
     {
       "id": 68,
@@ -947,10 +1014,11 @@
       "it": "Una porta",
       "nl": "Een deur",
       "pt": "Uma porta",
+      "ptbr": "Uma porta",
       "ar": "باب",
       "ja": "ドア",
       "ko": "문",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pintu"
     },
     {
       "id": 69,
@@ -961,10 +1029,11 @@
       "it": "Legno",
       "nl": "Hout",
       "pt": "Madeira",
+      "ptbr": "Madeira",
       "ar": "خشب",
       "ja": "木材",
       "ko": "나무",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kayu"
     },
     {
       "id": 70,
@@ -975,10 +1044,11 @@
       "it": "Vetro",
       "nl": "Glas",
       "pt": "Vidro",
+      "ptbr": "Vidro",
       "ar": "زجاج",
       "ja": "ガラス",
       "ko": "유리",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kaca"
     },
     {
       "id": 71,
@@ -989,10 +1059,11 @@
       "it": "Un asciugamano",
       "nl": "Een handdoek",
       "pt": "Uma toalha",
+      "ptbr": "Uma toalha",
       "ar": "منشفة",
       "ja": "タオル",
       "ko": "수건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Handuk"
     },
     {
       "id": 72,
@@ -1003,10 +1074,11 @@
       "it": "Una porta bianca",
       "nl": "Een witte deur",
       "pt": "Uma porta branca",
+      "ptbr": "Uma porta branca",
       "ar": "باب أبيض",
       "ja": "白いドア",
       "ko": "하얀 문",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pintu putih"
     },
     {
       "id": 73,
@@ -1017,10 +1089,11 @@
       "it": "Legno",
       "nl": "Hout",
       "pt": "Madeira",
+      "ptbr": "Madeira",
       "ar": "خشب",
       "ja": "木材",
       "ko": "나무",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kayu"
     },
     {
       "id": 74,
@@ -1031,10 +1104,11 @@
       "it": "Vetro",
       "nl": "Glas",
       "pt": "Vidro",
+      "ptbr": "Vidro",
       "ar": "زجاج",
       "ja": "ガラス",
       "ko": "유리",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kaca"
     },
     {
       "id": 75,
@@ -1045,10 +1119,11 @@
       "it": "Metallo",
       "nl": "Metaal",
       "pt": "Metal",
+      "ptbr": "Metal",
       "ar": "معدن",
       "ja": "金属",
       "ko": "금속",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Logam"
     },
     {
       "id": 76,
@@ -1059,10 +1134,11 @@
       "it": "Plastica",
       "nl": "Plastic",
       "pt": "Plástico",
+      "ptbr": "Plástico",
       "ar": "بلاستيك",
       "ja": "プラスチック",
       "ko": "플라스틱",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Plastik"
     },
     {
       "id": 77,
@@ -1072,11 +1148,12 @@
       "de": "Eine Zahnbürste mit Zahnpasta",
       "it": "Uno spazzolino da denti con dentifricio",
       "nl": "Een tandenborstel met tandpasta",
-      "pt": "Uma escova de dentes com pasta de dente",
+      "pt": "Uma escova de dentes com pasta",
+      "ptbr": "Uma escova de dentes com pasta de dente",
       "ar": "فرشاة أسنان مع معجون",
       "ja": "歯磨き粉のついた歯ブラシ",
       "ko": "치약이 묻은 칫솔",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sikat gigi dengan pasta gigi"
     },
     {
       "id": 78,
@@ -1087,10 +1164,11 @@
       "it": "Una spazzola per capelli",
       "nl": "Een haarborstel",
       "pt": "Uma escova de cabelo",
+      "ptbr": "Uma escova de cabelo",
       "ar": "فرشاة شعر",
       "ja": "ヘアブラシ",
       "ko": "헤어브러시",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sikat rambut"
     },
     {
       "id": 79,
@@ -1101,10 +1179,11 @@
       "it": "Uno specchio",
       "nl": "Een spiegel",
       "pt": "Um espelho",
+      "ptbr": "Um espelho",
       "ar": "مرآة",
       "ja": "鏡",
       "ko": "거울",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Cermin"
     },
     {
       "id": 80,
@@ -1114,11 +1193,12 @@
       "de": "Ein Gesicht in einem Objekt",
       "it": "Un volto in un oggetto",
       "nl": "Een gezicht in een object",
-      "pt": "Um rosto em um objeto",
+      "pt": "Um rosto num objeto",
+      "ptbr": "Um rosto em um objeto",
       "ar": "وجه في شيء",
       "ja": "物の中の顔",
       "ko": "사물 속 얼굴",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Wajah dalam sebuah benda"
     },
     {
       "id": 81,
@@ -1129,10 +1209,11 @@
       "it": "Un albero di notte",
       "nl": "Een boom 's nachts",
       "pt": "Uma árvore à noite",
+      "ptbr": "Uma árvore à noite",
       "ar": "شجرة في الليل",
       "ja": "夜の木",
       "ko": "밤의 나무",
-      "idn": "Ambil foto pohon"
+      "idn": "Pohon di malam hari"
     },
     {
       "id": 82,
@@ -1143,10 +1224,11 @@
       "it": "Una porta colorata di notte",
       "nl": "Een kleurrijke deur 's nachts",
       "pt": "Uma porta colorida à noite",
+      "ptbr": "Uma porta colorida à noite",
       "ar": "باب ملون في الليل",
       "ja": "夜のカラフルなドア",
       "ko": "밤의 화려한 문",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pintu berwarna di malam hari"
     },
     {
       "id": 83,
@@ -1156,11 +1238,12 @@
       "de": "Ein Schlüsselanhänger",
       "it": "Un portachiavi",
       "nl": "Een sleutelhanger",
-      "pt": "Um chaveiro",
+      "pt": "Um porta-chaves",
+      "ptbr": "Um chaveiro",
       "ar": "سلسلة مفاتيح",
       "ja": "キーチェーン",
       "ko": "열쇠고리",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Gantungan kunci"
     },
     {
       "id": 84,
@@ -1171,10 +1254,11 @@
       "it": "Una grande altezza",
       "nl": "Een grote hoogte",
       "pt": "Uma grande altura",
+      "ptbr": "Uma grande altura",
       "ar": "ارتفاع كبير",
       "ja": "高い場所",
       "ko": "매우 높은 곳",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Ketinggian besar"
     },
     {
       "id": 85,
@@ -1185,10 +1269,11 @@
       "it": "Una porta aperta",
       "nl": "Een open deur",
       "pt": "Uma porta aberta",
+      "ptbr": "Uma porta aberta",
       "ar": "باب مفتوح",
       "ja": "開いたドア",
       "ko": "열려 있는 문",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pintu terbuka"
     },
     {
       "id": 86,
@@ -1198,11 +1283,12 @@
       "de": "Eine Handyhülle",
       "it": "Una cover per telefono",
       "nl": "Een telefoonhoesje",
-      "pt": "Uma capa de celular",
+      "pt": "Uma capa de telemóvel",
+      "ptbr": "Uma capa de celular",
       "ar": "غطاء هاتف",
       "ja": "スマホケース",
       "ko": "휴대폰 케이스",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Casing ponsel"
     },
     {
       "id": 87,
@@ -1212,11 +1298,12 @@
       "de": "Eine Herzform aus der Ferne",
       "it": "Una forma di cuore da lontano",
       "nl": "Een hartvorm van veraf",
-      "pt": "Uma forma de coração à distância",
+      "pt": "Uma forma de coração tirada de longe",
+      "ptbr": "Uma forma de coração à distância",
       "ar": "شكل قلب من بعيد",
       "ja": "遠くから見たハートの形",
       "ko": "멀리서 본 하트 모양",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bentuk hati yang diambil dari jauh"
     },
     {
       "id": 88,
@@ -1226,11 +1313,12 @@
       "de": "Ein Bilderrahmen",
       "it": "Una cornice fotografica",
       "nl": "Een fotolijst",
-      "pt": "Uma moldura de foto",
+      "pt": "Uma moldura de fotografia",
+      "ptbr": "Uma moldura de foto",
       "ar": "إطار صورة",
       "ja": "写真のフレーム",
       "ko": "사진 액자",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bingkai foto"
     },
     {
       "id": 89,
@@ -1240,11 +1328,12 @@
       "de": "Ein schwarz-weißes Objekt",
       "it": "Un oggetto in bianco e nero",
       "nl": "Een zwart-wit object",
-      "pt": "Um objeto em preto e branco",
+      "pt": "Um objeto a preto e branco",
+      "ptbr": "Um objeto em preto e branco",
       "ar": "غرض بالأبيض والأسود",
       "ja": "白黒の物",
       "ko": "흑백 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda hitam putih"
     },
     {
       "id": 90,
@@ -1254,11 +1343,12 @@
       "de": "Ein farbiges T-Shirt",
       "it": "Una maglietta colorata",
       "nl": "Een kleurrijk T-shirt",
-      "pt": "Uma camiseta colorida",
+      "pt": "Uma t-shirt colorida",
+      "ptbr": "Uma camiseta colorida",
       "ar": "قميص ملون",
       "ja": "カラフルなTシャツ",
       "ko": "알록달록한 티셔츠",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kaos berwarna"
     },
     {
       "id": 91,
@@ -1269,10 +1359,11 @@
       "it": "Una lampadina accesa",
       "nl": "Een brandende gloeilamp",
       "pt": "Uma lâmpada acesa",
+      "ptbr": "Uma lâmpada acesa",
       "ar": "مصباح مضاء",
       "ja": "点灯している電球",
       "ko": "불이 켜진 전구",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bohlam menyala"
     },
     {
       "id": 92,
@@ -1282,11 +1373,12 @@
       "de": "Ein offener Kühlschrank",
       "it": "Un frigorifero aperto",
       "nl": "Een open koelkast",
-      "pt": "Uma geladeira aberta",
+      "pt": "Um frigorífico aberto",
+      "ptbr": "Uma geladeira aberta",
       "ar": "ثلاجة مفتوحة",
       "ja": "開いた冷蔵庫",
       "ko": "열려 있는 냉장고",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kulkas terbuka"
     },
     {
       "id": 93,
@@ -1296,11 +1388,12 @@
       "de": "Dein Lieblingskuchen",
       "it": "La tua torta preferita",
       "nl": "Jouw favoriete taart",
-      "pt": "O seu bolo favorito",
+      "pt": "O teu bolo preferido",
+      "ptbr": "O seu bolo favorito",
       "ar": "كعكتك المفضلة",
       "ja": "あなたの好きなケーキ",
       "ko": "네가 가장 좋아하는 케이크",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kue favoritmu"
     },
     {
       "id": 94,
@@ -1310,11 +1403,12 @@
       "de": "Ein Lebensmittel, das du nicht magst",
       "it": "Un cibo che non ti piace",
       "nl": "Een voedsel dat je niet lekker vindt",
-      "pt": "Um alimento de que você não gosta",
+      "pt": "Um alimento de que não gostas",
+      "ptbr": "Um alimento de que você não gosta",
       "ar": "طعام لا تحبه",
       "ja": "嫌いな食べ物",
       "ko": "네가 싫어하는 음식",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Makanan yang tidak kamu suka"
     },
     {
       "id": 95,
@@ -1324,11 +1418,12 @@
       "de": "Eine deiner Zeichnungen",
       "it": "Uno dei tuoi disegni",
       "nl": "Een van je tekeningen",
-      "pt": "Um dos seus desenhos",
+      "pt": "Um dos teus desenhos",
+      "ptbr": "Um dos seus desenhos",
       "ar": "أحد رسوماتك",
       "ja": "あなたの描いた絵のひとつ",
       "ko": "네 그림 중 하나",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Salah satu gambarmu"
     },
     {
       "id": 96,
@@ -1339,10 +1434,11 @@
       "it": "Un fiore",
       "nl": "Een bloem",
       "pt": "Uma flor",
+      "ptbr": "Uma flor",
       "ar": "زهرة",
       "ja": "花",
       "ko": "꽃",
-      "idn": "Ambil foto bunga"
+      "idn": "Bunga"
     },
     {
       "id": 97,
@@ -1353,10 +1449,11 @@
       "it": "Una superficie sporca",
       "nl": "Een vuile ondergrond",
       "pt": "Uma superfície suja",
+      "ptbr": "Uma superfície suja",
       "ar": "سطح متّسخ",
       "ja": "汚れた表面",
       "ko": "더러운 표면",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Permukaan yang kotor"
     },
     {
       "id": 98,
@@ -1367,10 +1464,11 @@
       "it": "Un programma televisivo",
       "nl": "Een tv-programma",
       "pt": "Um programa de TV",
+      "ptbr": "Um programa de TV",
       "ar": "برنامج تلفزيوني",
       "ja": "テレビ番組",
       "ko": "TV 프로그램",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Acara TV"
     },
     {
       "id": 99,
@@ -1381,10 +1479,11 @@
       "it": "Un oggetto nero",
       "nl": "Een zwart object",
       "pt": "Um objeto preto",
+      "ptbr": "Um objeto preto",
       "ar": "جسم أسود",
       "ja": "黒い物",
       "ko": "검은색 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda berwarna hitam"
     },
     {
       "id": 100,
@@ -1395,10 +1494,11 @@
       "it": "Un oggetto bianco",
       "nl": "Een wit object",
       "pt": "Um objeto branco",
+      "ptbr": "Um objeto branco",
       "ar": "جسم أبيض",
       "ja": "白い物",
       "ko": "하얀색 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda berwarna putih"
     },
     {
       "id": 101,
@@ -1409,10 +1509,11 @@
       "it": "Qualcosa di brillante",
       "nl": "Iets glanzends",
       "pt": "Algo brilhante",
+      "ptbr": "Algo brilhante",
       "ar": "شيء لامع",
       "ja": "光っているもの",
       "ko": "반짝이는 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang berkilau"
     },
     {
       "id": 102,
@@ -1423,10 +1524,11 @@
       "it": "Una scatoletta di conserva",
       "nl": "Een conservenblik",
       "pt": "Uma lata de conserva",
+      "ptbr": "Uma lata de conserva",
       "ar": "علبة طعام محفوظ",
       "ja": "缶詰",
       "ko": "통조림",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kaleng"
     },
     {
       "id": 103,
@@ -1437,10 +1539,11 @@
       "it": "Un oggetto triangolare",
       "nl": "Een driehoekig object",
       "pt": "Um objeto triangular",
+      "ptbr": "Um objeto triangular",
       "ar": "جسم مثلث الشكل",
       "ja": "三角形の物",
       "ko": "삼각형 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda berbentuk segitiga"
     },
     {
       "id": 104,
@@ -1450,11 +1553,12 @@
       "de": "Von einem wichtigen Datum für dich",
       "it": "Di una data importante per te",
       "nl": "Van een belangrijke datum voor jou",
-      "pt": "De uma data importante para você",
+      "pt": "De uma data importante para ti",
+      "ptbr": "De uma data importante para você",
       "ar": "من تاريخ مهم بالنسبة لك",
       "ja": "あなたにとって大切な日",
       "ko": "너에게 중요한 날짜",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tanggal penting bagimu"
     },
     {
       "id": 105,
@@ -1464,11 +1568,12 @@
       "de": "Ein ruhiger Ort",
       "it": "Un angolo tranquillo",
       "nl": "Een rustig plekje",
-      "pt": "Um canto tranquilo",
+      "pt": "Um cantinho tranquilo",
+      "ptbr": "Um canto tranquilo",
       "ar": "مكان هادئ",
       "ja": "静かな場所",
       "ko": "조용한 장소",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tempat yang tenang"
     },
     {
       "id": 106,
@@ -1479,10 +1584,11 @@
       "it": "Un oggetto nascosto",
       "nl": "Een verborgen object",
       "pt": "Um objeto escondido",
+      "ptbr": "Um objeto escondido",
       "ar": "جسم مخفي",
       "ja": "隠された物",
       "ko": "숨겨진 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda tersembunyi"
     },
     {
       "id": 107,
@@ -1492,11 +1598,12 @@
       "de": "Ein weißes T-Shirt",
       "it": "Una maglietta bianca",
       "nl": "Een wit T-shirt",
-      "pt": "Uma camiseta branca",
+      "pt": "Uma t-shirt branca",
+      "ptbr": "Uma camiseta branca",
       "ar": "قميص أبيض",
       "ja": "白いTシャツ",
       "ko": "흰색 티셔츠",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kaos putih"
     },
     {
       "id": 108,
@@ -1507,10 +1614,11 @@
       "it": "Un oggetto dimenticato",
       "nl": "Een vergeten object",
       "pt": "Um objeto esquecido",
+      "ptbr": "Um objeto esquecido",
       "ar": "جسم منسي",
       "ja": "忘れられた物",
       "ko": "잊혀진 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda yang terlupakan"
     },
     {
       "id": 109,
@@ -1521,10 +1629,11 @@
       "it": "Un'impronta",
       "nl": "Een voetafdruk",
       "pt": "Uma pegada",
+      "ptbr": "Uma pegada",
       "ar": "أثر قدم",
       "ja": "足跡",
       "ko": "발자국",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jejak kaki"
     },
     {
       "id": 110,
@@ -1534,11 +1643,12 @@
       "de": "Eine Buchseite",
       "it": "Una pagina di un libro",
       "nl": "Een bladzijde uit een boek",
-      "pt": "Uma página de um livro",
+      "pt": "Uma página de livro",
+      "ptbr": "Uma página de um livro",
       "ar": "صفحة من كتاب",
       "ja": "本のページ",
       "ko": "책의 한 쪽",
-      "idn": "Ambil foto buku"
+      "idn": "Halaman buku"
     },
     {
       "id": 111,
@@ -1549,10 +1659,11 @@
       "it": "Una persona di spalle",
       "nl": "Een persoon van achteren",
       "pt": "Uma pessoa de costas",
+      "ptbr": "Uma pessoa de costas",
       "ar": "شخص من الخلف",
       "ja": "後ろ姿の人",
       "ko": "뒤에서 본 사람",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Seseorang dari belakang"
     },
     {
       "id": 112,
@@ -1562,11 +1673,12 @@
       "de": "Ein Spiegelbild",
       "it": "Un riflesso in uno specchio",
       "nl": "Een reflectie in een spiegel",
-      "pt": "Um reflexo em um espelho",
+      "pt": "Um reflexo num espelho",
+      "ptbr": "Um reflexo em um espelho",
       "ar": "انعكاس في مرآة",
       "ja": "鏡に映った姿",
       "ko": "거울 속 반사",
-      "idn": "Ambil foto bayangan wajahmu"
+      "idn": "Pantulan di cermin"
     },
     {
       "id": 113,
@@ -1576,11 +1688,12 @@
       "de": "Ein Zitat, das du teilen möchtest",
       "it": "Una citazione che vuoi condividere",
       "nl": "Een citaat dat je wilt delen",
-      "pt": "Uma citação que você quer compartilhar",
+      "pt": "Uma citação que queres partilhar",
+      "ptbr": "Uma citação que você quer compartilhar",
       "ar": "اقتباس تريد مشاركته",
       "ja": "共有したい名言",
       "ko": "공유하고 싶은 인용문",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kutipan yang ingin kamu bagikan"
     },
     {
       "id": 114,
@@ -1591,10 +1704,11 @@
       "it": "Qualcosa di abbandonato",
       "nl": "Iets dat is achtergelaten",
       "pt": "Algo abandonado",
+      "ptbr": "Algo abandonado",
       "ar": "شيء مهجور",
       "ja": "放棄されたもの",
       "ko": "버려진 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang ditinggalkan"
     },
     {
       "id": 115,
@@ -1605,10 +1719,11 @@
       "it": "Qualcosa di rosso trovato per caso",
       "nl": "Iets roods toevallig gevonden",
       "pt": "Algo vermelho encontrado por acaso",
+      "ptbr": "Algo vermelho encontrado por acaso",
       "ar": "شيء أحمر تم العثور عليه بالصدفة",
       "ja": "偶然見つけた赤いもの",
       "ko": "우연히 발견한 빨간 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang berwarna merah ditemukan secara kebetulan"
     },
     {
       "id": 116,
@@ -1619,10 +1734,11 @@
       "it": "Qualcosa di brillante di notte",
       "nl": "Iets glanzends in de nacht",
       "pt": "Algo brilhante à noite",
+      "ptbr": "Algo brilhante à noite",
       "ar": "شيء لامع في الليل",
       "ja": "夜に輝くもの",
       "ko": "밤에 반짝이는 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang berkilau di malam hari"
     },
     {
       "id": 117,
@@ -1632,11 +1748,12 @@
       "de": "Ein Spiegelbild in einem Schaufenster beim Spaziergang",
       "it": "Un riflesso in una vetrina durante una passeggiata",
       "nl": "Een reflectie in een etalage tijdens een wandeling",
-      "pt": "Um reflexo em uma vitrine durante uma caminhada",
+      "pt": "Um reflexo numa montra durante um passeio",
+      "ptbr": "Um reflexo em uma vitrine durante uma caminhada",
       "ar": "انعكاس في واجهة متجر أثناء المشي",
       "ja": "散歩中のショーウィンドウの反射",
       "ko": "산책 중 쇼윈도에 비친 모습",
-      "idn": "Ambil foto bayangan wajahmu"
+      "idn": "Pantulan di etalase saat berjalan"
     },
     {
       "id": 118,
@@ -1646,11 +1763,12 @@
       "de": "Eine geometrische Form im Freien",
       "it": "Una forma geometrica all'esterno",
       "nl": "Een geometrische vorm buiten",
-      "pt": "Uma forma geométrica ao ar livre",
+      "pt": "Uma forma geométrica no exterior",
+      "ptbr": "Uma forma geométrica ao ar livre",
       "ar": "شكل هندسي في الخارج",
       "ja": "屋外の幾何学模様",
       "ko": "야외의 기하학적 형태",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bentuk geometris di luar ruangan"
     },
     {
       "id": 119,
@@ -1661,10 +1779,11 @@
       "it": "Una candela accesa",
       "nl": "Een brandende kaars",
       "pt": "Uma vela acesa",
+      "ptbr": "Uma vela acesa",
       "ar": "شمعة مشتعلة",
       "ja": "灯されたろうそく",
       "ko": "불이 켜진 양초",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Lilin menyala"
     },
     {
       "id": 120,
@@ -1674,11 +1793,12 @@
       "de": "Eine unordentliche oder chaotische Schublade",
       "it": "Un cassetto in disordine o disorganizzato",
       "nl": "Een rommelige of slordige lade",
-      "pt": "Uma gaveta bagunçada ou desorganizada",
+      "pt": "Uma gaveta desarrumada",
+      "ptbr": "Uma gaveta bagunçada ou desorganizada",
       "ar": "درج غير مرتب أو فوضوي",
       "ja": "散らかった引き出し",
       "ko": "어지럽혀진 서랍",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Laci berantakan"
     },
     {
       "id": 121,
@@ -1689,10 +1809,11 @@
       "it": "Una parola scritta a mano",
       "nl": "Een met de hand geschreven woord",
       "pt": "Uma palavra escrita à mão",
+      "ptbr": "Uma palavra escrita à mão",
       "ar": "كلمة مكتوبة بخط اليد",
       "ja": "手書きの言葉",
       "ko": "손글씨로 쓴 단어",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kata yang ditulis tangan"
     },
     {
       "id": 122,
@@ -1702,11 +1823,12 @@
       "de": "Etwas Fliegendes in Bewegung",
       "it": "Qualcosa che vola in movimento",
       "nl": "Iets dat vliegend in beweging is",
-      "pt": "Algo voando em movimento",
+      "pt": "Algo que voa em movimento",
+      "ptbr": "Algo voando em movimento",
       "ar": "شيء يطير أثناء الحركة",
       "ja": "飛びながら動いているもの",
       "ko": "날아가고 있는 움직이는 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang terbang bergerak"
     },
     {
       "id": 123,
@@ -1716,11 +1838,12 @@
       "de": "Etwas Verschwommenes",
       "it": "Qualcosa di sfocato",
       "nl": "Iets wazigs",
-      "pt": "Algo borrado",
+      "pt": "Algo desfocado",
+      "ptbr": "Algo borrado",
       "ar": "شيء غير واضح",
       "ja": "ぼやけたもの",
       "ko": "흐릿한 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang buram"
     },
     {
       "id": 124,
@@ -1731,10 +1854,11 @@
       "it": "Una bevanda calda",
       "nl": "Een warme drank",
       "pt": "Uma bebida quente",
+      "ptbr": "Uma bebida quente",
       "ar": "مشروب ساخن",
       "ja": "温かい飲み物",
       "ko": "따뜻한 음료",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Minuman hangat"
     },
     {
       "id": 125,
@@ -1744,11 +1868,12 @@
       "de": "Eine Einkaufstasche",
       "it": "Una borsa della spesa",
       "nl": "Een boodschappentas",
-      "pt": "Uma sacola de compras",
+      "pt": "Um saco de compras",
+      "ptbr": "Uma sacola de compras",
       "ar": "كيس تسوّق",
       "ja": "買い物袋",
       "ko": "장바구니",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tas belanja"
     },
     {
       "id": 126,
@@ -1759,10 +1884,11 @@
       "it": "Una bandiera",
       "nl": "Een vlag",
       "pt": "Uma bandeira",
+      "ptbr": "Uma bandeira",
       "ar": "علم",
       "ja": "旗",
       "ko": "깃발",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bendera"
     },
     {
       "id": 127,
@@ -1772,11 +1898,12 @@
       "de": "Ein Fußballtrikot",
       "it": "Una maglia da calcio",
       "nl": "Een voetbalshirt",
-      "pt": "Uma camisa de futebol",
+      "pt": "Uma camisola de futebol",
+      "ptbr": "Uma camisa de futebol",
       "ar": "قميص كرة قدم",
       "ja": "サッカージャージ",
       "ko": "축구 유니폼",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Seragam sepak bola"
     },
     {
       "id": 128,
@@ -1787,10 +1914,11 @@
       "it": "Una cassetta delle lettere",
       "nl": "Een brievenbus",
       "pt": "Uma caixa de correio",
+      "ptbr": "Uma caixa de correio",
       "ar": "صندوق بريد",
       "ja": "郵便受け",
       "ko": "우편함",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kotak surat"
     },
     {
       "id": 129,
@@ -1801,10 +1929,11 @@
       "it": "Pannelli solari",
       "nl": "Zonnepanelen",
       "pt": "Painéis solares",
+      "ptbr": "Painéis solares",
       "ar": "ألواح شمسية",
       "ja": "ソーラーパネル",
       "ko": "태양광 패널",
-      "idn": "Ambil foto papan tanda"
+      "idn": "Panel surya"
     },
     {
       "id": 130,
@@ -1815,10 +1944,11 @@
       "it": "Un'unghia",
       "nl": "Een vingernagel",
       "pt": "Uma unha",
+      "ptbr": "Uma unha",
       "ar": "ظفر",
       "ja": "つめ",
       "ko": "손톱",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kuku"
     },
     {
       "id": 131,
@@ -1828,11 +1958,12 @@
       "de": "Eine Zeichentrickfigur",
       "it": "Un personaggio dei cartoni animati",
       "nl": "Een tekenfilmfiguur",
-      "pt": "Um personagem de desenho animado",
+      "pt": "Uma personagem de desenho animado",
+      "ptbr": "Um personagem de desenho animado",
       "ar": "شخصية كرتونية",
       "ja": "アニメキャラクター",
       "ko": "만화 캐릭터",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Karakter kartun"
     },
     {
       "id": 132,
@@ -1843,10 +1974,11 @@
       "it": "Una bicicletta",
       "nl": "Een fiets",
       "pt": "Uma bicicleta",
+      "ptbr": "Uma bicicleta",
       "ar": "دراجة هوائية",
       "ja": "自転車",
       "ko": "자전거",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sepeda"
     },
     {
       "id": 133,
@@ -1857,10 +1989,11 @@
       "it": "Un paio di occhiali",
       "nl": "Een bril",
       "pt": "Um par de óculos",
+      "ptbr": "Um par de óculos",
       "ar": "نظارة",
       "ja": "眼鏡",
       "ko": "안경",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sepasang kacamata"
     },
     {
       "id": 134,
@@ -1870,11 +2003,12 @@
       "de": "Ein Ballon",
       "it": "Un palloncino",
       "nl": "Een ballon",
-      "pt": "Um balão",
+      "pt": "Bola",
+      "ptbr": "Um balão",
       "ar": "بالون",
       "ja": "風船",
       "ko": "풍선",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bola"
     },
     {
       "id": 135,
@@ -1884,11 +2018,12 @@
       "de": "Ein Hydrant",
       "it": "Un idrante",
       "nl": "Een brandkraan",
-      "pt": "Um hidrante",
+      "pt": "Hidrante",
+      "ptbr": "Um hidrante",
       "ar": "صنبور إطفاء",
       "ja": "消火栓",
       "ko": "소화전",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Hidran kebakaran"
     },
     {
       "id": 136,
@@ -1898,11 +2033,12 @@
       "de": "Ein Ohrring",
       "it": "Un orecchino",
       "nl": "Een oorbel",
-      "pt": "Um brinco",
+      "pt": "Brinco",
+      "ptbr": "Um brinco",
       "ar": "قرط",
       "ja": "イヤリング",
       "ko": "귀걸이",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Anting-anting"
     },
     {
       "id": 137,
@@ -1912,11 +2048,12 @@
       "de": "Ein Armband",
       "it": "Un braccialetto",
       "nl": "Een armband",
-      "pt": "Uma pulseira",
+      "pt": "Pulseira",
+      "ptbr": "Uma pulseira",
       "ar": "سوار",
       "ja": "ブレスレット",
       "ko": "팔찌",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Gelang"
     },
     {
       "id": 138,
@@ -1926,11 +2063,12 @@
       "de": "Eine Mütze oder ein Hut",
       "it": "Un berretto o un cappello",
       "nl": "Een pet of hoed",
-      "pt": "Um boné ou chapéu",
+      "pt": "Boné ou chapéu",
+      "ptbr": "Um boné ou chapéu",
       "ar": "قبعة أو طاقية",
       "ja": "帽子またはキャップ",
       "ko": "모자 또는 캡",
-      "idn": "Ambil foto topi"
+      "idn": "Topi"
     },
     {
       "id": 139,
@@ -1940,11 +2078,12 @@
       "de": "Gras",
       "it": "Erba",
       "nl": "Gras",
-      "pt": "Grama",
+      "pt": "Relva",
+      "ptbr": "Grama",
       "ar": "عشب",
       "ja": "草",
       "ko": "잔디",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Rumput"
     },
     {
       "id": 140,
@@ -1955,10 +2094,11 @@
       "it": "Fazzoletti",
       "nl": "Zakdoekjes",
       "pt": "Lenços de papel",
+      "ptbr": "Lenços de papel",
       "ar": "مناديل ورقية",
       "ja": "ティッシュ",
       "ko": "휴지",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tisu"
     },
     {
       "id": 141,
@@ -1968,11 +2108,12 @@
       "de": "Ein paar Ohrhörer",
       "it": "Degli auricolari",
       "nl": "Oordopjes",
-      "pt": "Fones de ouvido",
+      "pt": "Auscultadores",
+      "ptbr": "Fones de ouvido",
       "ar": "سماعات أذن",
       "ja": "イヤホン",
       "ko": "이어폰",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Earphone"
     },
     {
       "id": 142,
@@ -1982,11 +2123,12 @@
       "de": "Ein Dinosaurier",
       "it": "Un dinosauro",
       "nl": "Een dinosaurus",
-      "pt": "Um dinossauro",
+      "pt": "Dinossauro",
+      "ptbr": "Um dinossauro",
       "ar": "ديناصور",
       "ja": "恐竜",
       "ko": "공룡",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Dinosaurus"
     },
     {
       "id": 143,
@@ -1997,10 +2139,11 @@
       "it": "La lettera A",
       "nl": "De letter A",
       "pt": "A letra A",
+      "ptbr": "A letra A",
       "ar": "الحرف A",
       "ja": "アルファベットA",
       "ko": "알파벳 A",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Huruf A"
     },
     {
       "id": 144,
@@ -2011,10 +2154,11 @@
       "it": "La lettera B",
       "nl": "De letter B",
       "pt": "A letra B",
+      "ptbr": "A letra B",
       "ar": "الحرف B",
       "ja": "アルファベットB",
       "ko": "알파벳 B",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Huruf B"
     },
     {
       "id": 145,
@@ -2025,10 +2169,11 @@
       "it": "La lettera C",
       "nl": "De letter C",
       "pt": "A letra C",
+      "ptbr": "A letra C",
       "ar": "الحرف C",
       "ja": "アルファベットC",
       "ko": "알파벳 C",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Huruf C"
     },
     {
       "id": 146,
@@ -2039,10 +2184,11 @@
       "it": "La lettera D",
       "nl": "De letter D",
       "pt": "A letra D",
+      "ptbr": "A letra D",
       "ar": "الحرف D",
       "ja": "アルファベットD",
       "ko": "알파벳 D",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Huruf D"
     },
     {
       "id": 147,
@@ -2053,10 +2199,11 @@
       "it": "La lettera E",
       "nl": "De letter E",
       "pt": "A letra E",
+      "ptbr": "A letra E",
       "ar": "الحرف E",
       "ja": "アルファベットE",
       "ko": "알파벳 E",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Huruf E"
     },
     {
       "id": 148,
@@ -2066,11 +2213,12 @@
       "de": "Eine Straßenlaterne",
       "it": "Un lampione",
       "nl": "Een lantaarnpaal",
-      "pt": "Um poste de luz",
+      "pt": "Candeeiro de rua",
+      "ptbr": "Um poste de luz",
       "ar": "مصباح شارع",
       "ja": "街灯",
       "ko": "가로등",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Lampu jalan"
     },
     {
       "id": 149,
@@ -2081,10 +2229,11 @@
       "it": "Il numero 30",
       "nl": "Het getal 30",
       "pt": "O número 30",
+      "ptbr": "O número 30",
       "ar": "الرقم 30",
       "ja": "数字30",
       "ko": "숫자 30",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Angka 30"
     },
     {
       "id": 150,
@@ -2095,10 +2244,11 @@
       "it": "Il numero 7",
       "nl": "Het getal 7",
       "pt": "O número 7",
+      "ptbr": "O número 7",
       "ar": "الرقم 7",
       "ja": "数字7",
       "ko": "숫자 7",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Angka 7"
     },
     {
       "id": 151,
@@ -2108,11 +2258,12 @@
       "de": "Ein Regenschirm oder Sonnenschirm",
       "it": "Un ombrello o parasole",
       "nl": "Een paraplu of parasol",
-      "pt": "Um guarda-chuva ou sombrinha",
+      "pt": "Guarda-chuva / sombrinha",
+      "ptbr": "Um guarda-chuva ou sombrinha",
       "ar": "مظلة أو شمسية",
       "ja": "傘またはパラソル",
       "ko": "우산 또는 양산",
-      "idn": "Ambil foto bayangan"
+      "idn": "Payung"
     },
     {
       "id": 152,
@@ -2123,10 +2274,11 @@
       "it": "Un gatto",
       "nl": "Een kat",
       "pt": "Um gato",
+      "ptbr": "Um gato",
       "ar": "قطة",
       "ja": "猫",
       "ko": "고양이",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Seekor kucing"
     },
     {
       "id": 153,
@@ -2136,11 +2288,12 @@
       "de": "Ein Hund",
       "it": "Un cane",
       "nl": "Een hond",
-      "pt": "Um cachorro",
+      "pt": "Um cão",
+      "ptbr": "Um cachorro",
       "ar": "كلب",
       "ja": "犬",
       "ko": "개",
-      "idn": "Ambil foto anjing"
+      "idn": "Seekor anjing"
     },
     {
       "id": 154,
@@ -2150,11 +2303,12 @@
       "de": "Eine Bushaltestelle",
       "it": "Una fermata dell'autobus",
       "nl": "Een bushalte",
-      "pt": "Um ponto de ônibus",
+      "pt": "Paragem de autocarro",
+      "ptbr": "Um ponto de ônibus",
       "ar": "موقف حافلات",
       "ja": "バス停",
       "ko": "버스 정류장",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Halte bus"
     },
     {
       "id": 155,
@@ -2165,10 +2319,11 @@
       "it": "Un aereo",
       "nl": "Een vliegtuig",
       "pt": "Um avião",
+      "ptbr": "Um avião",
       "ar": "طائرة",
       "ja": "飛行機",
       "ko": "비행기",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pesawat"
     },
     {
       "id": 156,
@@ -2178,11 +2333,12 @@
       "de": "Ein Ballon",
       "it": "Un palloncino",
       "nl": "Een ballon",
-      "pt": "Um balão",
+      "pt": "Uma bola",
+      "ptbr": "Um balão",
       "ar": "بالون",
       "ja": "風船",
       "ko": "풍선",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bola"
     },
     {
       "id": 157,
@@ -2193,10 +2349,11 @@
       "it": "Una panchina",
       "nl": "Een bankje",
       "pt": "Um banco",
+      "ptbr": "Um banco",
       "ar": "مقعد",
       "ja": "ベンチ",
       "ko": "벤치",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bangku"
     },
     {
       "id": 158,
@@ -2206,11 +2363,12 @@
       "de": "Ein Fußgängerüberweg",
       "it": "Un passaggio pedonale",
       "nl": "Een zebrapad",
-      "pt": "Uma faixa de pedestres",
+      "pt": "Passadeira",
+      "ptbr": "Uma faixa de pedestres",
       "ar": "ممر مشاة",
       "ja": "横断歩道",
       "ko": "횡단보도",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Penyebrangan pejalan kaki"
     },
     {
       "id": 159,
@@ -2221,10 +2379,11 @@
       "it": "Una barca",
       "nl": "Een boot",
       "pt": "Um barco",
+      "ptbr": "Um barco",
       "ar": "قارب",
       "ja": "船",
       "ko": "보트",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Perahu"
     },
     {
       "id": 160,
@@ -2234,11 +2393,12 @@
       "de": "Ein Geldschein",
       "it": "Una banconota",
       "nl": "Een bankbiljet",
-      "pt": "Uma cédula",
+      "pt": "Uma nota",
+      "ptbr": "Uma cédula",
       "ar": "ورقة نقدية",
       "ja": "紙幣",
       "ko": "지폐",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Uang kertas"
     },
     {
       "id": 161,
@@ -2248,11 +2408,12 @@
       "de": "Ein Einfahrt-verboten-Schild",
       "it": "Un segnale di divieto d'accesso",
       "nl": "Een verboden toegang-bord",
-      "pt": "Uma placa de entrada proibida",
+      "pt": "Sinal de sentido proibido",
+      "ptbr": "Uma placa de entrada proibida",
       "ar": "لافتة ممنوع الدخول",
       "ja": "進入禁止の標識",
       "ko": "진입 금지 표지판",
-      "idn": "Ambil foto papan tanda"
+      "idn": "Rambu dilarang masuk"
     },
     {
       "id": 162,
@@ -2263,10 +2424,11 @@
       "it": "Una farfalla",
       "nl": "Een vlinder",
       "pt": "Uma borboleta",
+      "ptbr": "Uma borboleta",
       "ar": "فراشة",
       "ja": "蝶",
       "ko": "나비",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kupu-kupu"
     },
     {
       "id": 163,
@@ -2276,11 +2438,12 @@
       "de": "Ein Parfümflakon",
       "it": "Una bottiglia di profumo",
       "nl": "Een fles parfum",
-      "pt": "Um frasco de perfume",
+      "pt": "Um perfume",
+      "ptbr": "Um frasco de perfume",
       "ar": "زجاجة عطر",
       "ja": "香水のボトル",
       "ko": "향수병",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Parfum"
     },
     {
       "id": 164,
@@ -2291,10 +2454,11 @@
       "it": "Uno pneumatico",
       "nl": "Een band",
       "pt": "Um pneu",
+      "ptbr": "Um pneu",
       "ar": "إطار سيارة",
       "ja": "タイヤ",
       "ko": "타이어",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Ban"
     },
     {
       "id": 165,
@@ -2305,10 +2469,11 @@
       "it": "Un palo",
       "nl": "Een paal",
       "pt": "Um poste",
+      "ptbr": "Um poste",
       "ar": "عمود",
       "ja": "柱",
       "ko": "기둥",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tiang"
     },
     {
       "id": 166,
@@ -2319,10 +2484,11 @@
       "it": "Una roccia",
       "nl": "Een rots",
       "pt": "Uma rocha",
+      "ptbr": "Uma rocha",
       "ar": "صخرة",
       "ja": "岩",
       "ko": "바위",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Batu besar"
     },
     {
       "id": 167,
@@ -2332,11 +2498,12 @@
       "de": "Eine Tasche",
       "it": "Una borsa",
       "nl": "Een tas",
-      "pt": "Uma bolsa",
+      "pt": "Um saco",
+      "ptbr": "Uma bolsa",
       "ar": "حقيبة",
       "ja": "バッグ",
       "ko": "가방",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tas"
     },
     {
       "id": 168,
@@ -2346,11 +2513,12 @@
       "de": "Eine Einkaufstasche",
       "it": "Una borsa della spesa",
       "nl": "Een boodschappentas",
-      "pt": "Uma sacola de compras",
+      "pt": "Um saco de compras",
+      "ptbr": "Uma sacola de compras",
       "ar": "كيس تسوق",
       "ja": "買い物袋",
       "ko": "쇼핑백",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tas belanja"
     },
     {
       "id": 169,
@@ -2360,11 +2528,12 @@
       "de": "Ein Ticket",
       "it": "Un biglietto",
       "nl": "Een ticket",
-      "pt": "Um ingresso",
+      "pt": "Um bilhete",
+      "ptbr": "Um ingresso",
       "ar": "تذكرة",
       "ja": "チケット",
       "ko": "티켓",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tiket"
     },
     {
       "id": 170,
@@ -2375,10 +2544,11 @@
       "it": "Una porta originale",
       "nl": "Een originele deur",
       "pt": "Uma porta original",
+      "ptbr": "Uma porta original",
       "ar": "باب غير تقليدي",
       "ja": "ユニークなドア",
       "ko": "독특한 문",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pintu yang unik"
     },
     {
       "id": 171,
@@ -2389,10 +2559,11 @@
       "it": "Un buco",
       "nl": "Een gat",
       "pt": "Um buraco",
+      "ptbr": "Um buraco",
       "ar": "ثقب",
       "ja": "穴",
       "ko": "구멍",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Lubang"
     },
     {
       "id": 172,
@@ -2402,11 +2573,12 @@
       "de": "Ein Ventilator",
       "it": "Un ventilatore",
       "nl": "Een ventilator",
-      "pt": "Um ventilador",
+      "pt": "Uma ventoinha",
+      "ptbr": "Um ventilador",
       "ar": "مروحة",
       "ja": "扇風機",
       "ko": "선풍기",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kipas angin"
     },
     {
       "id": 173,
@@ -2416,11 +2588,12 @@
       "de": "Ein leeres Spülbecken",
       "it": "Un lavandino vuoto",
       "nl": "Een lege gootsteen",
-      "pt": "Uma pia vazia",
+      "pt": "Um lava-loiça vazio",
+      "ptbr": "Uma pia vazia",
       "ar": "حوض غسيل فارغ",
       "ja": "空のシンク",
       "ko": "빈 싱크대",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Wastafel kosong"
     },
     {
       "id": 174,
@@ -2431,10 +2604,11 @@
       "it": "Una lampadina",
       "nl": "Een gloeilamp",
       "pt": "Uma lâmpada",
+      "ptbr": "Uma lâmpada",
       "ar": "مصباح كهربائي",
       "ja": "電球",
       "ko": "전구",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bohlam"
     },
     {
       "id": 175,
@@ -2445,10 +2619,11 @@
       "it": "Un'antenna",
       "nl": "Een antenne",
       "pt": "Uma antena",
+      "ptbr": "Uma antena",
       "ar": "هوائي",
       "ja": "アンテナ",
       "ko": "안테나",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Antena"
     },
     {
       "id": 176,
@@ -2459,10 +2634,11 @@
       "it": "Un piatto",
       "nl": "Een bord",
       "pt": "Um prato",
+      "ptbr": "Um prato",
       "ar": "طبق",
       "ja": "皿",
       "ko": "접시",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Piring"
     },
     {
       "id": 177,
@@ -2472,11 +2648,12 @@
       "de": "Ein Gullydeckel",
       "it": "Un tombino",
       "nl": "Een riooldeksel",
-      "pt": "Uma tampa de esgoto",
+      "pt": "Tampa de esgoto",
+      "ptbr": "Uma tampa de esgoto",
       "ar": "فتحة مجاري",
       "ja": "マンホール",
       "ko": "맨홀 뚜껑",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Penutup got"
     },
     {
       "id": 178,
@@ -2487,10 +2664,11 @@
       "it": "Una bottiglia",
       "nl": "Een fles",
       "pt": "Uma garrafa",
+      "ptbr": "Uma garrafa",
       "ar": "زجاجة",
       "ja": "ボトル",
       "ko": "병",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Botol"
     },
     {
       "id": 179,
@@ -2501,10 +2679,11 @@
       "it": "Una bottiglia d'acqua",
       "nl": "Een fles water",
       "pt": "Uma garrafa de água",
+      "ptbr": "Uma garrafa de água",
       "ar": "زجاجة ماء",
       "ja": "水のボトル",
       "ko": "물병",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Botol air"
     },
     {
       "id": 180,
@@ -2514,11 +2693,12 @@
       "de": "Ein Ast",
       "it": "Un ramo",
       "nl": "Een tak",
-      "pt": "Um galho",
+      "pt": "Um ramo",
+      "ptbr": "Um galho",
       "ar": "غصن",
       "ja": "枝",
       "ko": "나뭇가지",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Dahan"
     },
     {
       "id": 181,
@@ -2528,11 +2708,12 @@
       "de": "Eine Kamera",
       "it": "Una macchina fotografica",
       "nl": "Een camera",
-      "pt": "Uma câmera",
+      "pt": "Uma câmara",
+      "ptbr": "Uma câmera",
       "ar": "كاميرا",
       "ja": "カメラ",
       "ko": "카메라",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kamera"
     },
     {
       "id": 182,
@@ -2543,10 +2724,11 @@
       "it": "Una sedia",
       "nl": "Een stoel",
       "pt": "Uma cadeira",
+      "ptbr": "Uma cadeira",
       "ar": "كرسي",
       "ja": "椅子",
       "ko": "의자",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kursi"
     },
     {
       "id": 183,
@@ -2557,10 +2739,11 @@
       "it": "Un fiore",
       "nl": "Een bloem",
       "pt": "Uma flor",
+      "ptbr": "Uma flor",
       "ar": "زهرة",
       "ja": "花",
       "ko": "꽃",
-      "idn": "Ambil foto bunga"
+      "idn": "Bunga"
     },
     {
       "id": 184,
@@ -2571,10 +2754,11 @@
       "it": "Una forma a cuore",
       "nl": "Een hartvorm",
       "pt": "Uma forma de coração",
+      "ptbr": "Uma forma de coração",
       "ar": "شكل قلب",
       "ja": "ハートの形",
       "ko": "하트 모양",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bentuk hati"
     },
     {
       "id": 185,
@@ -2585,10 +2769,11 @@
       "it": "Una forchetta",
       "nl": "Een vork",
       "pt": "Um garfo",
+      "ptbr": "Um garfo",
       "ar": "شوكة",
       "ja": "フォーク",
       "ko": "포크",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Garpu"
     },
     {
       "id": 186,
@@ -2599,10 +2784,11 @@
       "it": "Un orologio",
       "nl": "Een klok",
       "pt": "Um relógio",
+      "ptbr": "Um relógio",
       "ar": "ساعة حائط",
       "ja": "時計",
       "ko": "시계",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jam dinding"
     },
     {
       "id": 187,
@@ -2613,10 +2799,11 @@
       "it": "Una lavatrice",
       "nl": "Een wasmachine",
       "pt": "Uma máquina de lavar",
+      "ptbr": "Uma máquina de lavar",
       "ar": "غسالة",
       "ja": "洗濯機",
       "ko": "세탁기",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Mesin cuci"
     },
     {
       "id": 188,
@@ -2627,10 +2814,11 @@
       "it": "Un orologio da polso",
       "nl": "Een horloge",
       "pt": "Um relógio de pulso",
+      "ptbr": "Um relógio de pulso",
       "ar": "ساعة يد",
       "ja": "腕時計",
       "ko": "손목시계",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jam tangan"
     },
     {
       "id": 189,
@@ -2641,10 +2829,11 @@
       "it": "Una ciabatta elettrica",
       "nl": "Een stekkerdoos",
       "pt": "Uma extensão elétrica",
+      "ptbr": "Uma extensão elétrica",
       "ar": "مشترك كهربائي",
       "ja": "電源タップ",
       "ko": "멀티탭",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Steker colokan"
     },
     {
       "id": 190,
@@ -2655,10 +2844,11 @@
       "it": "Un paio di guanti",
       "nl": "Een paar handschoenen",
       "pt": "Um par de luvas",
+      "ptbr": "Um par de luvas",
       "ar": "زوج من القفازات",
       "ja": "手袋一組",
       "ko": "장갑 한 켤레",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sepasang sarung tangan"
     },
     {
       "id": 191,
@@ -2668,11 +2858,12 @@
       "es": "Algo rojo encontrado por casualidad",
       "it": "Qualcosa di rosso trovato per caso",
       "pt": "Algo vermelho encontrado por acaso",
+      "ptbr": "Algo vermelho encontrado por acaso",
       "nl": "Iets roods toevallig gevonden",
       "ja": "偶然見つけた赤いもの",
       "ko": "우연히 발견한 빨간 것",
       "ar": "شيء أحمر وُجد بالصدفة",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang merah ditemukan secara kebetulan"
     },
     {
       "id": 192,
@@ -2682,11 +2873,12 @@
       "es": "Algo brillante en la noche",
       "it": "Qualcosa di brillante di notte",
       "pt": "Algo brilhante à noite",
+      "ptbr": "Algo brilhante à noite",
       "nl": "Iets glanzends in de nacht",
       "ja": "夜に光るもの",
       "ko": "밤에 반짝이는 것",
       "ar": "شيء يلمع في الليل",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang berkilau di malam hari"
     },
     {
       "id": 193,
@@ -2696,11 +2888,12 @@
       "de": "Toilettenpapier",
       "it": "Carta igienica",
       "nl": "Toiletpapier",
-      "pt": "Papel higiênico",
+      "pt": "Papel higiénico",
+      "ptbr": "Papel higiênico",
       "ar": "ورق تواليت",
       "ja": "トイレットペーパー",
       "ko": "화장지",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tisu toilet"
     },
     {
       "id": 194,
@@ -2711,10 +2904,11 @@
       "it": "La copertina di un libro",
       "nl": "De kaft van een boek",
       "pt": "A capa de um livro",
+      "ptbr": "A capa de um livro",
       "ar": "غلاف كتاب",
       "ja": "本の表紙",
       "ko": "책 표지",
-      "idn": "Ambil foto buku"
+      "idn": "Sampul buku"
     },
     {
       "id": 195,
@@ -2723,12 +2917,13 @@
       "de": "Eine Spielszene mit künstlerischem Filter",
       "es": "Una escena de juego con un filtro artístico",
       "it": "Una scena di gioco con un filtro artistico",
-      "pt": "Uma cena de jogo com um filtro artístico",
+      "pt": "Uma cena de jogo com filtro artístico",
+      "ptbr": "Uma cena de jogo com um filtro artístico",
       "nl": "Een spelscène met een artistiek filter",
       "ja": "アートフィルターがかかった遊びのシーン",
       "ko": "예술적 필터가 적용된 놀이 장면",
       "ar": "مشهد لعبة مع فلتر فني",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Adegan permainan dengan filter artistik"
     },
     {
       "id": 196,
@@ -2739,10 +2934,11 @@
       "it": "Cioccolato",
       "nl": "Chocolade",
       "pt": "Chocolate",
+      "ptbr": "Chocolate",
       "ar": "شوكولاتة",
       "ja": "チョコレート",
       "ko": "초콜릿",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Cokelat"
     },
     {
       "id": 197,
@@ -2752,11 +2948,12 @@
       "de": "Ein Auspuff",
       "it": "Un tubo di scarico",
       "nl": "Een uitlaatpijp",
-      "pt": "Um cano de escape",
+      "pt": "Um tubo de escape",
+      "ptbr": "Um cano de escape",
       "ar": "أنبوب عادم",
       "ja": "排気管",
       "ko": "배기 파이프",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Knalpot"
     },
     {
       "id": 198,
@@ -2766,11 +2963,12 @@
       "de": "Ein Kamin",
       "it": "Un camino",
       "nl": "Een open haard",
-      "pt": "Uma lareira",
+      "pt": "Uma chaminé",
+      "ptbr": "Uma lareira",
       "ar": "مدفأة",
       "ja": "暖炉",
       "ko": "벽난로",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Perapian"
     },
     {
       "id": 199,
@@ -2780,11 +2978,12 @@
       "de": "Ein Auto-Logo",
       "it": "Un logo di auto",
       "nl": "Een autologo",
-      "pt": "Um logotipo de carro",
+      "pt": "O logótipo de um carro",
+      "ptbr": "Um logotipo de carro",
       "ar": "شعار سيارة",
       "ja": "車のロゴ",
       "ko": "자동차 로고",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Logo mobil"
     },
     {
       "id": 200,
@@ -2794,11 +2993,12 @@
       "de": "Ein Markenlogo",
       "it": "Un logo di marca",
       "nl": "Een merklogo",
-      "pt": "Um logotipo de marca",
+      "pt": "O logótipo de uma marca",
+      "ptbr": "Um logotipo de marca",
       "ar": "شعار علامة تجارية",
       "ja": "ブランドのロゴ",
       "ko": "브랜드 로고",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Logo merek"
     },
     {
       "id": 201,
@@ -2808,11 +3008,12 @@
       "de": "Ein Geldschein",
       "it": "Una banconota",
       "nl": "Een bankbiljet",
-      "pt": "Uma cédula",
+      "pt": "Uma nota",
+      "ptbr": "Uma cédula",
       "ar": "ورقة نقدية",
       "ja": "紙幣",
       "ko": "지폐",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Uang kertas"
     },
     {
       "id": 202,
@@ -2823,10 +3024,11 @@
       "it": "Un ragno",
       "nl": "Een spin",
       "pt": "Uma aranha",
+      "ptbr": "Uma aranha",
       "ar": "عنكبوت",
       "ja": "クモ",
       "ko": "거미",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Laba-laba"
     },
     {
       "id": 203,
@@ -2837,10 +3039,11 @@
       "it": "Un vaso",
       "nl": "Een vaas",
       "pt": "Um vaso",
+      "ptbr": "Um vaso",
       "ar": "مزهرية",
       "ja": "花瓶",
       "ko": "꽃병",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Vas bunga"
     },
     {
       "id": 204,
@@ -2851,10 +3054,11 @@
       "it": "Un paio di occhiali",
       "nl": "Een bril",
       "pt": "Um par de óculos",
+      "ptbr": "Um par de óculos",
       "ar": "نظارات",
       "ja": "メガネ",
       "ko": "안경",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sepasang kacamata"
     },
     {
       "id": 205,
@@ -2865,10 +3069,11 @@
       "it": "Pallone",
       "nl": "Bal",
       "pt": "Bola",
+      "ptbr": "Bola",
       "ar": "كرة",
       "ja": "ボール",
       "ko": "공",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bola"
     },
     {
       "id": 206,
@@ -2879,10 +3084,11 @@
       "it": "Idrante",
       "nl": "Brandkraan",
       "pt": "Hidrante",
+      "ptbr": "Hidrante",
       "ar": "صنبور إطفاء",
       "ja": "消火栓",
       "ko": "소화전",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Hidran kebakaran"
     },
     {
       "id": 207,
@@ -2893,10 +3099,11 @@
       "it": "Orecchino",
       "nl": "Oorbel",
       "pt": "Brinco",
+      "ptbr": "Brinco",
       "ar": "قرط",
       "ja": "イヤリング",
       "ko": "귀걸이",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Anting-anting"
     },
     {
       "id": 208,
@@ -2907,10 +3114,11 @@
       "it": "Braccialetto",
       "nl": "Armband",
       "pt": "Pulseira",
+      "ptbr": "Pulseira",
       "ar": "سوار",
       "ja": "ブレスレット",
       "ko": "팔찌",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Gelang"
     },
     {
       "id": 209,
@@ -2921,10 +3129,11 @@
       "it": "Cappello o cappellino",
       "nl": "Hoed of pet",
       "pt": "Chapéu ou boné",
+      "ptbr": "Chapéu ou boné",
       "ar": "قبعة أو كاب",
       "ja": "帽子またはキャップ",
       "ko": "모자 또는 캡",
-      "idn": "Ambil foto topi"
+      "idn": "Topi atau topi pet"
     },
     {
       "id": 210,
@@ -2934,11 +3143,12 @@
       "de": "Nudeln",
       "it": "Pasta",
       "nl": "Pasta",
-      "pt": "Macarrão",
+      "pt": "Massa",
+      "ptbr": "Macarrão",
       "ar": "معكرونة",
       "ja": "パスタ",
       "ko": "파스타",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pasta"
     },
     {
       "id": 211,
@@ -2949,10 +3159,11 @@
       "it": "Un biglietto",
       "nl": "Een kaartje",
       "pt": "Um bilhete",
+      "ptbr": "Um bilhete",
       "ar": "تذكرة",
       "ja": "チケット",
       "ko": "티켓",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tiket"
     },
     {
       "id": 212,
@@ -2962,11 +3173,12 @@
       "de": "Ein Kassenbon",
       "it": "Uno scontrino",
       "nl": "Een kassabon",
-      "pt": "Um comprovante",
+      "pt": "Talão de compras",
+      "ptbr": "Um comprovante",
       "ar": "إيصال",
       "ja": "レシート",
       "ko": "영수증",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Struk belanja"
     },
     {
       "id": 213,
@@ -2977,10 +3189,11 @@
       "it": "Un buco",
       "nl": "Een gat",
       "pt": "Um buraco",
+      "ptbr": "Um buraco",
       "ar": "ثقب",
       "ja": "穴",
       "ko": "구멍",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Lubang"
     },
     {
       "id": 214,
@@ -2990,11 +3203,12 @@
       "de": "Ein Ventilator",
       "it": "Un ventilatore",
       "nl": "Een ventilator",
-      "pt": "Um ventilador",
+      "pt": "Uma ventoinha",
+      "ptbr": "Um ventilador",
       "ar": "مروحة",
       "ja": "扇風機",
       "ko": "선풍기",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kipas angin"
     },
     {
       "id": 215,
@@ -3004,11 +3218,12 @@
       "de": "Ein Gegenstand im Spülbecken",
       "it": "Un oggetto in un lavandino",
       "nl": "Een voorwerp in een gootsteen",
-      "pt": "Um objeto em uma pia",
+      "pt": "Um objeto num lava-loiça",
+      "ptbr": "Um objeto em uma pia",
       "ar": "غرض في الحوض",
       "ja": "シンクの中の物",
       "ko": "싱크대 안의 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda di wastafel"
     },
     {
       "id": 216,
@@ -3018,11 +3233,12 @@
       "de": "Ein Pfeil",
       "it": "Una freccia",
       "nl": "Een pijl",
-      "pt": "Uma flecha",
+      "pt": "Uma seta",
+      "ptbr": "Uma flecha",
       "ar": "سهم",
       "ja": "矢印",
       "ko": "화살표",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Panah"
     },
     {
       "id": 217,
@@ -3033,10 +3249,11 @@
       "it": "Un’antenna",
       "nl": "Een antenne",
       "pt": "Uma antena",
+      "ptbr": "Uma antena",
       "ar": "هوائي",
       "ja": "アンテナ",
       "ko": "안테나",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Antena"
     },
     {
       "id": 218,
@@ -3047,10 +3264,11 @@
       "it": "Un piatto",
       "nl": "Een bord",
       "pt": "Um prato",
+      "ptbr": "Um prato",
       "ar": "طبق",
       "ja": "皿",
       "ko": "접시",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Piring"
     },
     {
       "id": 219,
@@ -3060,11 +3278,12 @@
       "de": "Ein Kanaldeckel",
       "it": "Un tombino",
       "nl": "Een riooldeksel",
-      "pt": "Uma tampa de bueiro",
+      "pt": "Tampa de esgoto",
+      "ptbr": "Uma tampa de bueiro",
       "ar": "غطاء بالوعة",
       "ja": "マンホールのふた",
       "ko": "맨홀 뚜껑",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Penutup got"
     },
     {
       "id": 220,
@@ -3075,10 +3294,11 @@
       "it": "Una bottiglia",
       "nl": "Een fles",
       "pt": "Uma garrafa",
+      "ptbr": "Uma garrafa",
       "ar": "زجاجة",
       "ja": "ボトル",
       "ko": "병",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Botol"
     },
     {
       "id": 221,
@@ -3089,10 +3309,11 @@
       "it": "Una bottiglia d’acqua",
       "nl": "Een fles water",
       "pt": "Uma garrafa de água",
+      "ptbr": "Uma garrafa de água",
       "ar": "زجاجة ماء",
       "ja": "水のボトル",
       "ko": "물병",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Botol air"
     },
     {
       "id": 222,
@@ -3102,11 +3323,12 @@
       "de": "Ein Zweig",
       "it": "Un ramo",
       "nl": "Een tak",
-      "pt": "Um galho",
+      "pt": "Um ramo",
+      "ptbr": "Um galho",
       "ar": "غصن",
       "ja": "枝",
       "ko": "나뭇가지",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Dahan"
     },
     {
       "id": 223,
@@ -3116,11 +3338,12 @@
       "de": "Eine Kamera",
       "it": "Una videocamera",
       "nl": "Een camera",
-      "pt": "Uma câmera",
+      "pt": "Uma câmara",
+      "ptbr": "Uma câmera",
       "ar": "كاميرا",
       "ja": "カメラ",
       "ko": "카메라",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kamera"
     },
     {
       "id": 224,
@@ -3130,11 +3353,12 @@
       "de": "Etwas, das du magst",
       "it": "Qualcosa che ti piace",
       "nl": "Iets dat je leuk vindt",
-      "pt": "Algo que você gosta",
+      "pt": "Algo que gostas",
+      "ptbr": "Algo que você gosta",
       "ar": "شيء تحبه",
       "ja": "あなたが好きなもの",
       "ko": "당신이 좋아하는 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang kamu suka"
     },
     {
       "id": 225,
@@ -3145,10 +3369,11 @@
       "it": "Un fiore",
       "nl": "Een bloem",
       "pt": "Uma flor",
+      "ptbr": "Uma flor",
       "ar": "زهرة",
       "ja": "花",
       "ko": "꽃",
-      "idn": "Ambil foto bunga"
+      "idn": "Bunga"
     },
     {
       "id": 226,
@@ -3159,10 +3384,11 @@
       "it": "Una forma a cuore",
       "nl": "Een hartvorm",
       "pt": "Uma forma de coração",
+      "ptbr": "Uma forma de coração",
       "ar": "شكل قلب",
       "ja": "ハートの形",
       "ko": "하트 모양",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bentuk hati"
     },
     {
       "id": 227,
@@ -3173,10 +3399,11 @@
       "it": "Una forchetta",
       "nl": "Een vork",
       "pt": "Um garfo",
+      "ptbr": "Um garfo",
       "ar": "شوكة",
       "ja": "フォーク",
       "ko": "포크",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Garpu"
     },
     {
       "id": 228,
@@ -3187,10 +3414,11 @@
       "it": "Un orologio",
       "nl": "Een klok",
       "pt": "Um relógio",
+      "ptbr": "Um relógio",
       "ar": "ساعة",
       "ja": "時計",
       "ko": "시계",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jam dinding"
     },
     {
       "id": 229,
@@ -3201,10 +3429,11 @@
       "it": "Una lavatrice",
       "nl": "Een wasmachine",
       "pt": "Uma máquina de lavar",
+      "ptbr": "Uma máquina de lavar",
       "ar": "غسالة",
       "ja": "洗濯機",
       "ko": "세탁기",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Mesin cuci"
     },
     {
       "id": 230,
@@ -3215,10 +3444,11 @@
       "it": "Un orologio da polso",
       "nl": "Een horloge",
       "pt": "Um relógio de pulso",
+      "ptbr": "Um relógio de pulso",
       "ar": "ساعة يد",
       "ja": "腕時計",
       "ko": "손목시계",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jam tangan"
     },
     {
       "id": 231,
@@ -3228,11 +3458,12 @@
       "de": "Eine Steckdosenleiste",
       "it": "Una ciabatta multipresa",
       "nl": "Een stekkerdoos",
-      "pt": "Uma régua de energia",
+      "pt": "Uma extensão elétrica",
+      "ptbr": "Uma régua de energia",
       "ar": "مقبس كهربائي متعدد",
       "ja": "電源タップ",
       "ko": "멀티탭",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Steker colokan"
     },
     {
       "id": 232,
@@ -3243,10 +3474,11 @@
       "it": "Un paio di guanti",
       "nl": "Een paar handschoenen",
       "pt": "Um par de luvas",
+      "ptbr": "Um par de luvas",
       "ar": "زوج من القفازات",
       "ja": "手袋一組",
       "ko": "장갑 한 켤레",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sepasang sarung tangan"
     },
     {
       "id": 233,
@@ -3257,10 +3489,11 @@
       "it": "Un paio di occhiali da sole",
       "nl": "Een zonnebril",
       "pt": "Um par de óculos de sol",
+      "ptbr": "Um par de óculos de sol",
       "ar": "نظارات شمسية",
       "ja": "サングラス",
       "ko": "선글라스",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sepasang kacamata hitam"
     },
     {
       "id": 234,
@@ -3270,11 +3503,12 @@
       "de": "Ein Kuscheltier",
       "it": "Un peluche",
       "nl": "Een knuffeldier",
-      "pt": "Um bichinho de pelúcia",
+      "pt": "Um peluche",
+      "ptbr": "Um bichinho de pelúcia",
       "ar": "دمية محشوة",
       "ja": "ぬいぐるみ",
       "ko": "인형",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Boneka"
     },
     {
       "id": 235,
@@ -3285,10 +3519,11 @@
       "it": "Una moneta",
       "nl": "Een munt",
       "pt": "Uma moeda",
+      "ptbr": "Uma moeda",
       "ar": "عملة معدنية",
       "ja": "硬貨",
       "ko": "동전",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Koin"
     },
     {
       "id": 236,
@@ -3299,10 +3534,11 @@
       "it": "Un’insegna stradale",
       "nl": "Een straatnaambord",
       "pt": "Uma placa de rua",
+      "ptbr": "Uma placa de rua",
       "ar": "لافتة شارع",
       "ja": "通りの標識",
       "ko": "거리 표지판",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Plakat jalan"
     },
     {
       "id": 237,
@@ -3312,11 +3548,12 @@
       "de": "Ein Türgriff",
       "it": "Una maniglia",
       "nl": "Een deurklink",
-      "pt": "Uma maçaneta",
+      "pt": "Uma maçaneta de porta",
+      "ptbr": "Uma maçaneta",
       "ar": "مقبض باب",
       "ja": "ドアノブ",
       "ko": "문 손잡이",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Gagang pintu"
     },
     {
       "id": 238,
@@ -3327,10 +3564,11 @@
       "it": "Una pubblicità",
       "nl": "Een reclame",
       "pt": "Um anúncio",
+      "ptbr": "Um anúncio",
       "ar": "إعلان",
       "ja": "広告",
       "ko": "광고",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Iklan"
     },
     {
       "id": 239,
@@ -3341,10 +3579,11 @@
       "it": "Una ruota",
       "nl": "Een wiel",
       "pt": "Uma roda",
+      "ptbr": "Uma roda",
       "ar": "عجلة",
       "ja": "車輪",
       "ko": "바퀴",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Roda"
     },
     {
       "id": 240,
@@ -3354,11 +3593,12 @@
       "de": "Eine Pfütze",
       "it": "Una pozzanghera",
       "nl": "Een plas water",
-      "pt": "Uma poça d'água",
+      "pt": "Uma poça de água",
+      "ptbr": "Uma poça d'água",
       "ar": "بركة ماء",
       "ja": "水たまり",
       "ko": "물웅덩이",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Genangan air"
     },
     {
       "id": 241,
@@ -3368,11 +3608,12 @@
       "de": "Ein Ventilator",
       "it": "Un ventilatore",
       "nl": "Een ventilator",
-      "pt": "Um ventilador",
+      "pt": "Uma ventoinha",
+      "ptbr": "Um ventilador",
       "ar": "مروحة",
       "ja": "扇風機",
       "ko": "선풍기",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kipas angin"
     },
     {
       "id": 242,
@@ -3382,11 +3623,12 @@
       "de": "Eine Dusche oder eine Badewanne",
       "it": "Una doccia o una vasca da bagno",
       "nl": "Een douche of een bad",
-      "pt": "Um chuveiro ou uma banheira",
+      "pt": "Um duche ou uma banheira",
+      "ptbr": "Um chuveiro ou uma banheira",
       "ar": "دش أو حوض استحمام",
       "ja": "シャワーまたはバスタブ",
       "ko": "샤워기 또는 욕조",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Shower atau bak mandi"
     },
     {
       "id": 243,
@@ -3397,10 +3639,11 @@
       "it": "Una pizza",
       "nl": "Een pizza",
       "pt": "Uma pizza",
+      "ptbr": "Uma pizza",
       "ar": "بيتزا",
       "ja": "ピザ",
       "ko": "피자",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pizza"
     },
     {
       "id": 244,
@@ -3411,10 +3654,11 @@
       "it": "Un’antenna",
       "nl": "Een antenne",
       "pt": "Uma antena",
+      "ptbr": "Uma antena",
       "ar": "هوائي",
       "ja": "アンテナ",
       "ko": "안테나",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Antena"
     },
     {
       "id": 245,
@@ -3425,10 +3669,11 @@
       "it": "Un piatto",
       "nl": "Een bord",
       "pt": "Um prato",
+      "ptbr": "Um prato",
       "ar": "صحن",
       "ja": "皿",
       "ko": "접시",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Piring"
     },
     {
       "id": 246,
@@ -3439,10 +3684,11 @@
       "it": "Un ascensore",
       "nl": "Een lift",
       "pt": "Um elevador",
+      "ptbr": "Um elevador",
       "ar": "مصعد",
       "ja": "エレベーター",
       "ko": "엘리베이터",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Lift"
     },
     {
       "id": 247,
@@ -3453,10 +3699,11 @@
       "it": "Un uovo",
       "nl": "Een ei",
       "pt": "Um ovo",
+      "ptbr": "Um ovo",
       "ar": "بيضة",
       "ja": "卵",
       "ko": "계란",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Telur"
     },
     {
       "id": 248,
@@ -3467,10 +3714,11 @@
       "it": "Latte",
       "nl": "Melk",
       "pt": "Leite",
+      "ptbr": "Leite",
       "ar": "حليب",
       "ja": "牛乳",
       "ko": "우유",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Susu"
     },
     {
       "id": 249,
@@ -3480,11 +3728,12 @@
       "de": "Ein Joghurt",
       "it": "Uno yogurt",
       "nl": "Een yoghurt",
-      "pt": "Um iogurte",
+      "pt": "Iogurte",
+      "ptbr": "Um iogurte",
       "ar": "زبادي",
       "ja": "ヨーグルト",
       "ko": "요거트",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Yogurt"
     },
     {
       "id": 250,
@@ -3494,11 +3743,12 @@
       "de": "Eine Kamera",
       "it": "Una videocamera",
       "nl": "Een camera",
-      "pt": "Uma câmera",
+      "pt": "Uma câmara",
+      "ptbr": "Uma câmera",
       "ar": "كاميرا",
       "ja": "カメラ",
       "ko": "카메라",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kamera"
     },
     {
       "id": 251,
@@ -3508,11 +3758,12 @@
       "de": "Eine Spielkonsole",
       "it": "Una console di gioco",
       "nl": "Een spelconsole",
-      "pt": "Um console de videogame",
+      "pt": "Uma consola de jogos",
+      "ptbr": "Um console de videogame",
       "ar": "جهاز ألعاب",
       "ja": "ゲーム機",
       "ko": "게임 콘솔",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Konsol permainan"
     },
     {
       "id": 252,
@@ -3523,10 +3774,11 @@
       "it": "Un pesce",
       "nl": "Een vis",
       "pt": "Um peixe",
+      "ptbr": "Um peixe",
       "ar": "سمكة",
       "ja": "魚",
       "ko": "물고기",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Ikan"
     },
     {
       "id": 253,
@@ -3537,10 +3789,11 @@
       "it": "Un gioco da tavolo",
       "nl": "Een bordspel",
       "pt": "Um jogo de tabuleiro",
+      "ptbr": "Um jogo de tabuleiro",
       "ar": "لعبة لوحية",
       "ja": "ボードゲーム",
       "ko": "보드게임",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Permainan papan"
     },
     {
       "id": 254,
@@ -3551,10 +3804,11 @@
       "it": "Un occhio",
       "nl": "Een oog",
       "pt": "Um olho",
+      "ptbr": "Um olho",
       "ar": "عين",
       "ja": "目",
       "ko": "눈",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Mata"
     },
     {
       "id": 255,
@@ -3565,10 +3819,11 @@
       "it": "Una strada",
       "nl": "Een weg",
       "pt": "Uma estrada",
+      "ptbr": "Uma estrada",
       "ar": "طريق",
       "ja": "道路",
       "ko": "도로",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jalan"
     },
     {
       "id": 256,
@@ -3579,10 +3834,11 @@
       "it": "Una porta colorata",
       "nl": "Een kleurrijke deur",
       "pt": "Uma porta colorida",
+      "ptbr": "Uma porta colorida",
       "ar": "باب ملون",
       "ja": "カラフルなドア",
       "ko": "알록달록한 문",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pintu berwarna"
     },
     {
       "id": 257,
@@ -3593,10 +3849,11 @@
       "it": "La luna",
       "nl": "De maan",
       "pt": "A lua",
+      "ptbr": "A lua",
       "ar": "القمر",
       "ja": "月",
       "ko": "달",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bulan"
     },
     {
       "id": 258,
@@ -3607,10 +3864,11 @@
       "it": "Una nuvola",
       "nl": "Een wolk",
       "pt": "Uma nuvem",
+      "ptbr": "Uma nuvem",
       "ar": "سحابة",
       "ja": "雲",
       "ko": "구름",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Awan"
     },
     {
       "id": 259,
@@ -3621,10 +3879,11 @@
       "it": "Il cielo",
       "nl": "De lucht",
       "pt": "O céu",
+      "ptbr": "O céu",
       "ar": "السماء",
       "ja": "空",
       "ko": "하늘",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Langit"
     },
     {
       "id": 260,
@@ -3634,11 +3893,12 @@
       "de": "Ein fliegender Vogel",
       "it": "Un uccello in volo",
       "nl": "Een vliegende vogel",
-      "pt": "Um pássaro em voo",
+      "pt": "Um pássaro a voar",
+      "ptbr": "Um pássaro em voo",
       "ar": "طائر يطير",
       "ja": "飛んでいる鳥",
       "ko": "날고 있는 새",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Burung yang sedang terbang"
     },
     {
       "id": 261,
@@ -3648,11 +3908,12 @@
       "de": "Eine Nahaufnahme eines Vogels",
       "it": "Un primo piano di un uccello",
       "nl": "Een close-up van een vogel",
-      "pt": "Um close de um pássaro",
+      "pt": "Um pássaro em zoom",
+      "ptbr": "Um close de um pássaro",
       "ar": "لقطة مقرّبة لطائر",
       "ja": "鳥のクローズアップ",
       "ko": "새의 클로즈업",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Seekor burung di-zoom"
     },
     {
       "id": 262,
@@ -3663,10 +3924,11 @@
       "it": "Un pasto",
       "nl": "Een maaltijd",
       "pt": "Uma refeição",
+      "ptbr": "Uma refeição",
       "ar": "وجبة",
       "ja": "食事",
       "ko": "식사",
-      "idn": "Ambil foto makananmu"
+      "idn": "Sebuah hidangan"
     },
     {
       "id": 263,
@@ -3677,10 +3939,11 @@
       "it": "Un oggetto triangolare",
       "nl": "Een driehoekig object",
       "pt": "Um objeto triangular",
+      "ptbr": "Um objeto triangular",
       "ar": "جسم مثلث الشكل",
       "ja": "三角形の物体",
       "ko": "삼각형 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda berbentuk segitiga"
     },
     {
       "id": 264,
@@ -3690,11 +3953,12 @@
       "de": "Ein Baum aus der Ferne",
       "it": "Un albero da lontano",
       "nl": "Een boom van veraf",
-      "pt": "Uma árvore à distância",
+      "pt": "Uma árvore fotografada de longe",
+      "ptbr": "Uma árvore à distância",
       "ar": "شجرة من بعيد",
       "ja": "遠くから見た木",
       "ko": "멀리서 본 나무",
-      "idn": "Ambil foto pohon"
+      "idn": "Sebuah pohon yang difoto dari jauh"
     },
     {
       "id": 265,
@@ -3705,10 +3969,11 @@
       "it": "Un oggetto abbandonato",
       "nl": "Een achtergelaten voorwerp",
       "pt": "Um objeto abandonado",
+      "ptbr": "Um objeto abandonado",
       "ar": "جسم مهجور",
       "ja": "放置された物",
       "ko": "버려진 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda yang ditinggalkan"
     },
     {
       "id": 266,
@@ -3719,10 +3984,11 @@
       "it": "Un sacchetto di patatine",
       "nl": "Een zak chips",
       "pt": "Um pacote de batatas fritas",
+      "ptbr": "Um pacote de batatas fritas",
       "ar": "كيس رقائق بطاطس",
       "ja": "ポテトチップスの袋",
       "ko": "감자칩 한 봉지",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sebungkus keripik"
     },
     {
       "id": 267,
@@ -3732,11 +3998,12 @@
       "de": "Ein geschnitzter Holzgegenstand",
       "it": "Un oggetto in legno scolpito",
       "nl": "Een gesneden houten voorwerp",
-      "pt": "Um objeto de madeira entalhado",
+      "pt": "Um objeto de madeira esculpida",
+      "ptbr": "Um objeto de madeira entalhado",
       "ar": "عنصر خشبي منحوت",
       "ja": "彫刻された木の物",
       "ko": "조각된 나무 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda dari kayu yang diukir"
     },
     {
       "id": 268,
@@ -3747,10 +4014,11 @@
       "it": "Un cuscino",
       "nl": "Een kussen",
       "pt": "Uma almofada",
+      "ptbr": "Uma almofada",
       "ar": "وسادة",
       "ja": "クッション",
       "ko": "쿠션",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bantal"
     },
     {
       "id": 269,
@@ -3760,11 +4028,12 @@
       "de": "Ein schlafendes Tier",
       "it": "Un animale che dorme",
       "nl": "Een slapend dier",
-      "pt": "Um animal dormindo",
+      "pt": "Um animal a dormir",
+      "ptbr": "Um animal dormindo",
       "ar": "حيوان نائم",
       "ja": "眠っている動物",
       "ko": "잠자는 동물",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Hewan yang sedang tidur"
     },
     {
       "id": 270,
@@ -3775,10 +4044,11 @@
       "it": "Una superficie lucida",
       "nl": "Een glanzend oppervlak",
       "pt": "Uma superfície brilhante",
+      "ptbr": "Uma superfície brilhante",
       "ar": "سطح لامع",
       "ja": "光沢のある表面",
       "ko": "빛나는 표면",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Permukaan yang mengkilap"
     },
     {
       "id": 271,
@@ -3789,10 +4059,11 @@
       "it": "Un tavolo",
       "nl": "Een tafel",
       "pt": "Uma mesa",
+      "ptbr": "Uma mesa",
       "ar": "طاولة",
       "ja": "テーブル",
       "ko": "탁자",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Meja"
     },
     {
       "id": 272,
@@ -3802,11 +4073,12 @@
       "de": "Ein zerknittertes Papier",
       "it": "Un foglio spiegazzato",
       "nl": "Een verkreukeld papier",
-      "pt": "Um papel amassado",
+      "pt": "Um papel amarrotado",
+      "ptbr": "Um papel amassado",
       "ar": "ورقة مجعدة",
       "ja": "くしゃくしゃの紙",
       "ko": "구겨진 종이",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kertas kusut"
     },
     {
       "id": 273,
@@ -3817,10 +4089,11 @@
       "it": "Un buco",
       "nl": "Een gat",
       "pt": "Um buraco",
+      "ptbr": "Um buraco",
       "ar": "ثقب",
       "ja": "穴",
       "ko": "구멍",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sebuah lubang"
     },
     {
       "id": 274,
@@ -3831,10 +4104,11 @@
       "it": "Una tastiera",
       "nl": "Een toetsenbord",
       "pt": "Um teclado",
+      "ptbr": "Um teclado",
       "ar": "لوحة مفاتيح",
       "ja": "キーボード",
       "ko": "키보드",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Keyboard"
     },
     {
       "id": 275,
@@ -3844,11 +4118,12 @@
       "de": "Haare",
       "it": "Capelli",
       "nl": "Haar",
-      "pt": "Cabelo",
+      "pt": "Cabelos",
+      "ptbr": "Cabelo",
       "ar": "شعر",
       "ja": "髪の毛",
       "ko": "머리카락",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Rambut"
     },
     {
       "id": 276,
@@ -3859,10 +4134,11 @@
       "it": "Riso",
       "nl": "Rijst",
       "pt": "Arroz",
+      "ptbr": "Arroz",
       "ar": "أرز",
       "ja": "ご飯",
       "ko": "쌀",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Nasi"
     },
     {
       "id": 277,
@@ -3873,10 +4149,11 @@
       "it": "Un allarme",
       "nl": "Een alarm",
       "pt": "Um alarme",
+      "ptbr": "Um alarme",
       "ar": "إنذار",
       "ja": "アラーム",
       "ko": "알람",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Alarm"
     },
     {
       "id": 278,
@@ -3887,10 +4164,11 @@
       "it": "Una gomma",
       "nl": "Een gum",
       "pt": "Uma borracha",
+      "ptbr": "Uma borracha",
       "ar": "ممحاة",
       "ja": "消しゴム",
       "ko": "지우개",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Penghapus"
     },
     {
       "id": 279,
@@ -3901,10 +4179,11 @@
       "it": "Una fogna",
       "nl": "Een riool",
       "pt": "Um esgoto",
+      "ptbr": "Um esgoto",
       "ar": "بالوعة",
       "ja": "下水道",
       "ko": "하수구",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Selokan"
     },
     {
       "id": 280,
@@ -3915,10 +4194,11 @@
       "it": "Una bottiglia",
       "nl": "Een fles",
       "pt": "Uma garrafa",
+      "ptbr": "Uma garrafa",
       "ar": "زجاجة",
       "ja": "ボトル",
       "ko": "병",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Botol"
     },
     {
       "id": 281,
@@ -3929,10 +4209,11 @@
       "it": "Una luce accesa",
       "nl": "Een ingeschakelde lamp",
       "pt": "Uma luz acesa",
+      "ptbr": "Uma luz acesa",
       "ar": "ضوء مُضاء",
       "ja": "点灯されたライト",
       "ko": "켜진 불빛",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Lampu menyala"
     },
     {
       "id": 282,
@@ -3943,10 +4224,11 @@
       "it": "Una maschera",
       "nl": "Een masker",
       "pt": "Uma máscara",
+      "ptbr": "Uma máscara",
       "ar": "قناع",
       "ja": "マスク",
       "ko": "마스크",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Masker"
     },
     {
       "id": 283,
@@ -3957,10 +4239,11 @@
       "it": "Una moneta",
       "nl": "Een munt",
       "pt": "Uma moeda",
+      "ptbr": "Uma moeda",
       "ar": "قطعة نقود",
       "ja": "コイン",
       "ko": "동전",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Koin"
     },
     {
       "id": 284,
@@ -3971,10 +4254,11 @@
       "it": "Un francobollo",
       "nl": "Een postzegel",
       "pt": "Um selo",
+      "ptbr": "Um selo",
       "ar": "طابع بريد",
       "ja": "切手",
       "ko": "우표",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Perangko"
     },
     {
       "id": 285,
@@ -3985,10 +4269,11 @@
       "it": "Una scala",
       "nl": "Een trap",
       "pt": "Uma escada",
+      "ptbr": "Uma escada",
       "ar": "درج",
       "ja": "階段",
       "ko": "계단",
-      "idn": "Ambil foto tangga"
+      "idn": "Tangga"
     },
     {
       "id": 286,
@@ -3998,11 +4283,12 @@
       "de": "Mach ein Foto vom Titel des Songs, den du gerade hörst",
       "it": "Fai una foto del titolo della canzone che stai ascoltando",
       "nl": "Maak een foto van de titel van het nummer dat je luistert",
-      "pt": "Tira uma foto do título da música que você está ouvindo",
+      "pt": "Fotografa o título da tua música do momento",
+      "ptbr": "Tira uma foto do título da música que você está ouvindo",
       "ar": "التقط صورة لعنوان الأغنية التي تسمعها الآن",
       "ja": "今聴いている曲のタイトルを写真に撮って",
       "ko": "요즘 듣는 노래 제목을 사진으로 찍어보세요",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Foto judul lagu yang sedang kamu dengarkan"
     },
     {
       "id": 287,
@@ -4013,10 +4299,11 @@
       "it": "Un paio di occhiali",
       "nl": "Een bril",
       "pt": "Um par de óculos",
+      "ptbr": "Um par de óculos",
       "ar": "نظارات",
       "ja": "眼鏡",
       "ko": "안경",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sepasang kacamata"
     },
     {
       "id": 288,
@@ -4026,11 +4313,12 @@
       "de": "Ein Schnürsenkel",
       "it": "Un laccio da scarpe",
       "nl": "Een schoenveter",
-      "pt": "Um cadarço de sapato",
+      "pt": "Atacador",
+      "ptbr": "Um cadarço de sapato",
       "ar": "رباط حذاء",
       "ja": "靴ひも",
       "ko": "신발끈",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tali sepatu"
     },
     {
       "id": 289,
@@ -4040,11 +4328,12 @@
       "de": "Ein Aufkleber",
       "it": "Un adesivo",
       "nl": "Een sticker",
-      "pt": "Um adesivo",
+      "pt": "Um autocolante",
+      "ptbr": "Um adesivo",
       "ar": "ملصق",
       "ja": "ステッカー",
       "ko": "스티커",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Stiker"
     },
     {
       "id": 290,
@@ -4054,11 +4343,12 @@
       "de": "Ein Ohrring",
       "it": "Un orecchino",
       "nl": "Een oorbel",
-      "pt": "Um brinco",
+      "pt": "Brinco",
+      "ptbr": "Um brinco",
       "ar": "قرط",
       "ja": "イヤリング",
       "ko": "귀걸이",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Anting-anting"
     },
     {
       "id": 291,
@@ -4068,11 +4358,12 @@
       "de": "Ein Armband",
       "it": "Un braccialetto",
       "nl": "Een armband",
-      "pt": "Uma pulseira",
+      "pt": "Pulseira",
+      "ptbr": "Uma pulseira",
       "ar": "سوار",
       "ja": "ブレスレット",
       "ko": "팔찌",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Gelang"
     },
     {
       "id": 292,
@@ -4082,11 +4373,12 @@
       "de": "Ein Kuscheltier",
       "it": "Un peluche",
       "nl": "Een knuffel",
-      "pt": "Um bichinho de pelúcia",
+      "pt": "Um peluche",
+      "ptbr": "Um bichinho de pelúcia",
       "ar": "دمية محشوة",
       "ja": "ぬいぐるみ",
       "ko": "봉제 인형",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Boneka"
     },
     {
       "id": 293,
@@ -4097,10 +4389,11 @@
       "it": "Un gioco da tavolo",
       "nl": "Een bordspel",
       "pt": "Um jogo de tabuleiro",
+      "ptbr": "Um jogo de tabuleiro",
       "ar": "لعبة لوحية",
       "ja": "ボードゲーム",
       "ko": "보드게임",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Permainan papan"
     },
     {
       "id": 294,
@@ -4111,10 +4404,11 @@
       "it": "Alcuni fazzoletti",
       "nl": "Zakdoekjes",
       "pt": "Lenços de papel",
+      "ptbr": "Lenços de papel",
       "ar": "مناديل ورقية",
       "ja": "ティッシュ",
       "ko": "티슈",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tisu"
     },
     {
       "id": 295,
@@ -4124,11 +4418,12 @@
       "de": "Make-up",
       "it": "Trucco",
       "nl": "Make-up",
-      "pt": "Maquiagem",
+      "pt": "Maquilhagem",
+      "ptbr": "Maquiagem",
       "ar": "مكياج",
       "ja": "化粧品",
       "ko": "화장품",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Make up"
     },
     {
       "id": 296,
@@ -4138,11 +4433,12 @@
       "de": "Ein Dinosaurier",
       "it": "Un dinosauro",
       "nl": "Een dinosaurus",
-      "pt": "Um dinossauro",
+      "pt": "Dinossauro",
+      "ptbr": "Um dinossauro",
       "ar": "ديناصور",
       "ja": "恐竜",
       "ko": "공룡",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Dinosaurus"
     },
     {
       "id": 297,
@@ -4152,11 +4448,12 @@
       "de": "Ein Shampoo",
       "it": "Uno shampoo",
       "nl": "Een shampoo",
-      "pt": "Um shampoo",
+      "pt": "Um champô",
+      "ptbr": "Um shampoo",
       "ar": "شامبو",
       "ja": "シャンプー",
       "ko": "샴푸",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sampo"
     },
     {
       "id": 298,
@@ -4167,10 +4464,11 @@
       "it": "Una gruccia",
       "nl": "Een kleerhanger",
       "pt": "Um cabide",
+      "ptbr": "Um cabide",
       "ar": "علاقة ملابس",
       "ja": "ハンガー",
       "ko": "옷걸이",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Gantungan baju"
     },
     {
       "id": 299,
@@ -4180,11 +4478,12 @@
       "de": "Eine Waschmaschine",
       "it": "Una lavatrice",
       "nl": "Een wasmachine",
-      "pt": "Uma máquina de lavar roupa",
+      "pt": "Uma máquina de lavar",
+      "ptbr": "Uma máquina de lavar roupa",
       "ar": "غسالة",
       "ja": "洗濯機",
       "ko": "세탁기",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Mesin cuci"
     },
     {
       "id": 300,
@@ -4195,10 +4494,11 @@
       "it": "Un cucchiaio",
       "nl": "Een lepel",
       "pt": "Uma colher",
+      "ptbr": "Uma colher",
       "ar": "ملعقة",
       "ja": "スプーン",
       "ko": "숟가락",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sendok"
     },
     {
       "id": 301,
@@ -4209,10 +4509,11 @@
       "it": "Un lucchetto",
       "nl": "Een hangslot",
       "pt": "Um cadeado",
+      "ptbr": "Um cadeado",
       "ar": "قفل",
       "ja": "南京錠",
       "ko": "자물쇠",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Gembok"
     },
     {
       "id": 302,
@@ -4222,11 +4523,12 @@
       "de": "Eine Straßenlaterne",
       "it": "Un lampione",
       "nl": "Een lantaarnpaal",
-      "pt": "Um poste de luz",
+      "pt": "Candeeiro de rua",
+      "ptbr": "Um poste de luz",
       "ar": "عمود إنارة",
       "ja": "街灯",
       "ko": "가로등",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Lampu jalan"
     },
     {
       "id": 303,
@@ -4237,10 +4539,11 @@
       "it": "Il numero 50",
       "nl": "Het getal 50",
       "pt": "O número 50",
+      "ptbr": "O número 50",
       "ar": "الرقم50",
       "ja": "数字50",
       "ko": "숫자 50",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Angka 50"
     },
     {
       "id": 304,
@@ -4250,11 +4553,12 @@
       "de": "Ein Tempolimit-Schild",
       "it": "Un segnale di limite di velocità",
       "nl": "Een snelheidsbeperkingsbord",
-      "pt": "Uma placa de limite de velocidade",
+      "pt": "Um sinal de limitação",
+      "ptbr": "Uma placa de limite de velocidade",
       "ar": "لافتة حد السرعة",
       "ja": "速度制限標識",
       "ko": "속도 제한 표지판",
-      "idn": "Ambil foto papan tanda"
+      "idn": "Rambu batas kecepatan"
     },
     {
       "id": 305,
@@ -4264,11 +4568,12 @@
       "de": "Ein Regenschirm oder Sonnenschirm",
       "it": "Un ombrello o parasole",
       "nl": "Een paraplu of parasol",
-      "pt": "Um guarda-chuva ou sombrinha",
+      "pt": "Guarda-chuva / sombrinha",
+      "ptbr": "Um guarda-chuva ou sombrinha",
       "ar": "مظلة أو شمسية",
       "ja": "傘または日傘",
       "ko": "우산 또는 양산",
-      "idn": "Ambil foto bayangan"
+      "idn": "Payung / payung kecil"
     },
     {
       "id": 306,
@@ -4279,10 +4584,11 @@
       "it": "Un gatto",
       "nl": "Een kat",
       "pt": "Um gato",
+      "ptbr": "Um gato",
       "ar": "قط",
       "ja": "猫",
       "ko": "고양이",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Seekor kucing"
     },
     {
       "id": 307,
@@ -4292,11 +4598,12 @@
       "de": "Ein Hund",
       "it": "Un cane",
       "nl": "Een hond",
-      "pt": "Um cachorro",
+      "pt": "Um cão",
+      "ptbr": "Um cachorro",
       "ar": "كلب",
       "ja": "犬",
       "ko": "개",
-      "idn": "Ambil foto anjing"
+      "idn": "Seekor anjing"
     },
     {
       "id": 308,
@@ -4306,11 +4613,12 @@
       "de": "Etwas, das du teilen möchtest",
       "it": "Qualcosa che vuoi condividere",
       "nl": "Iets wat je wilt delen",
-      "pt": "Algo que você quer compartilhar",
+      "pt": "O que quiseres partilhar",
+      "ptbr": "Algo que você quer compartilhar",
       "ar": "شيء ترغب في مشاركته",
       "ja": "あなたが共有したいもの",
       "ko": "공유하고 싶은 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Apa saja yang ingin kamu bagikan"
     },
     {
       "id": 309,
@@ -4321,10 +4629,11 @@
       "it": "Un aereo",
       "nl": "Een vliegtuig",
       "pt": "Um avião",
+      "ptbr": "Um avião",
       "ar": "طائرة",
       "ja": "飛行機",
       "ko": "비행기",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pesawat"
     },
     {
       "id": 310,
@@ -4334,11 +4643,12 @@
       "de": "Ein Finger auf einer Wand",
       "it": "Un dito su un muro",
       "nl": "Een vinger op een muur",
-      "pt": "Um dedo em uma parede",
+      "pt": "Um dedo numa parede",
+      "ptbr": "Um dedo em uma parede",
       "ar": "إصبع على حائط",
       "ja": "壁に触れている指",
       "ko": "벽에 닿은 손가락",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jari di atas dinding"
     },
     {
       "id": 311,
@@ -4348,11 +4658,12 @@
       "de": "Ein geöffneter Kühlschrank im Dunkeln",
       "it": "Un frigorifero aperto al buio",
       "nl": "Een open koelkast in het donker",
-      "pt": "Uma geladeira aberta no escuro",
+      "pt": "Um frigorífico aberto no escuro",
+      "ptbr": "Uma geladeira aberta no escuro",
       "ar": "ثلاجة مفتوحة في الظلام",
       "ja": "暗闇の中で開いた冷蔵庫",
       "ko": "어둠 속에 열린 냉장고",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kulkas terbuka di dalam gelap"
     },
     {
       "id": 312,
@@ -4362,11 +4673,12 @@
       "de": "Ein Geldautomat",
       "it": "Un bancomat",
       "nl": "Een geldautomaat",
-      "pt": "Um caixa eletrônico",
+      "pt": "Uma caixa multibanco",
+      "ptbr": "Um caixa eletrônico",
       "ar": "آلة صراف آلي",
       "ja": "現金自動預け払い機（ATM）",
       "ko": "현금자동입출금기 (ATM)",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Mesin ATM"
     },
     {
       "id": 313,
@@ -4377,10 +4689,11 @@
       "it": "Una confezione di uova",
       "nl": "Een eierdoos",
       "pt": "Uma caixa de ovos",
+      "ptbr": "Uma caixa de ovos",
       "ar": "علبة بيض",
       "ja": "卵のパック",
       "ko": "계란 상자",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kotak telur"
     },
     {
       "id": 314,
@@ -4390,11 +4703,12 @@
       "de": "Ein eingeschalteter Fernseher",
       "it": "Una TV accesa",
       "nl": "Een ingeschakelde tv",
-      "pt": "Uma TV ligada",
+      "pt": "Uma televisão ligada",
+      "ptbr": "Uma TV ligada",
       "ar": "تلفاز مشغّل",
       "ja": "ついているテレビ",
       "ko": "켜진 TV",
-      "idn": "Ambil foto sesuatu"
+      "idn": "TV menyala"
     },
     {
       "id": 315,
@@ -4404,11 +4718,12 @@
       "de": "Ein ausgeschalteter Fernseher",
       "it": "Una TV spenta",
       "nl": "Een uitgeschakelde tv",
-      "pt": "Uma TV desligada",
+      "pt": "Uma televisão desligada",
+      "ptbr": "Uma TV desligada",
       "ar": "تلفاز مطفأ",
       "ja": "消えているテレビ",
       "ko": "꺼진 TV",
-      "idn": "Ambil foto sesuatu"
+      "idn": "TV mati"
     },
     {
       "id": 316,
@@ -4418,11 +4733,12 @@
       "de": "Eine Fernbedienung",
       "it": "Un telecomando",
       "nl": "Een afstandsbediening",
-      "pt": "Um controle remoto",
+      "pt": "Um comando de televisão",
+      "ptbr": "Um controle remoto",
       "ar": "جهاز تحكم عن بعد",
       "ja": "リモコン",
       "ko": "리모컨",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Remote TV"
     },
     {
       "id": 317,
@@ -4433,10 +4749,11 @@
       "it": "Un'etichetta",
       "nl": "Een etiket",
       "pt": "Uma etiqueta",
+      "ptbr": "Uma etiqueta",
       "ar": "ملصق",
       "ja": "ラベル",
       "ko": "라벨",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Label"
     },
     {
       "id": 318,
@@ -4447,10 +4764,11 @@
       "it": "Una stella",
       "nl": "Een ster",
       "pt": "Uma estrela",
+      "ptbr": "Uma estrela",
       "ar": "نجمة",
       "ja": "星",
       "ko": "별",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bintang"
     },
     {
       "id": 319,
@@ -4461,10 +4779,11 @@
       "it": "Un occhio",
       "nl": "Een oog",
       "pt": "Um olho",
+      "ptbr": "Um olho",
       "ar": "عين",
       "ja": "目",
       "ko": "눈",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Mata"
     },
     {
       "id": 320,
@@ -4475,10 +4794,11 @@
       "it": "Una strada",
       "nl": "Een weg",
       "pt": "Uma estrada",
+      "ptbr": "Uma estrada",
       "ar": "طريق",
       "ja": "道路",
       "ko": "도로",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jalan"
     },
     {
       "id": 321,
@@ -4489,10 +4809,11 @@
       "it": "Una vite",
       "nl": "Een schroef",
       "pt": "Um parafuso",
+      "ptbr": "Um parafuso",
       "ar": "برغي",
       "ja": "ネジ",
       "ko": "나사",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Skrup"
     },
     {
       "id": 322,
@@ -4503,10 +4824,11 @@
       "it": "Una caffettiera",
       "nl": "Een koffiezetapparaat",
       "pt": "Uma cafeteira",
+      "ptbr": "Uma cafeteira",
       "ar": "آلة صنع القهوة",
       "ja": "コーヒーメーカー",
       "ko": "커피머신",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pembuat kopi"
     },
     {
       "id": 323,
@@ -4517,10 +4839,11 @@
       "it": "Il cielo",
       "nl": "De lucht",
       "pt": "O céu",
+      "ptbr": "O céu",
       "ar": "السماء",
       "ja": "空",
       "ko": "하늘",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Langit"
     },
     {
       "id": 324,
@@ -4531,10 +4854,11 @@
       "it": "Un chiodo",
       "nl": "Een spijker",
       "pt": "Um prego",
+      "ptbr": "Um prego",
       "ar": "مسمار",
       "ja": "くぎ",
       "ko": "못",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Paku"
     },
     {
       "id": 325,
@@ -4545,10 +4869,11 @@
       "it": "Un codice a barre",
       "nl": "Een streepjescode",
       "pt": "Um código de barras",
+      "ptbr": "Um código de barras",
       "ar": "رمز شريطي",
       "ja": "バーコード",
       "ko": "바코드",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kode batang"
     },
     {
       "id": 326,
@@ -4558,11 +4883,12 @@
       "de": "Ein Nummernschild",
       "it": "Una targa",
       "nl": "Een kentekenplaat",
-      "pt": "Uma placa de carro",
+      "pt": "Uma matrícula",
+      "ptbr": "Uma placa de carro",
       "ar": "لوحة ترخيص",
       "ja": "ナンバープレート",
       "ko": "자동차 번호판",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Plat nomor kendaraan"
     },
     {
       "id": 327,
@@ -4573,10 +4899,11 @@
       "it": "Un gilet giallo",
       "nl": "Een geel hesje",
       "pt": "Um colete amarelo",
+      "ptbr": "Um colete amarelo",
       "ar": "سترة صفراء",
       "ja": "黄色い安全ベスト",
       "ko": "노란색 안전 조끼",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Rompi kuning"
     },
     {
       "id": 328,
@@ -4587,10 +4914,11 @@
       "it": "Un ponte",
       "nl": "Een brug",
       "pt": "Uma ponte",
+      "ptbr": "Uma ponte",
       "ar": "جسر",
       "ja": "橋",
       "ko": "다리",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jembatan"
     },
     {
       "id": 329,
@@ -4600,11 +4928,12 @@
       "de": "Ein Einkaufswagen",
       "it": "Un carrello della spesa",
       "nl": "Een winkelwagentje",
-      "pt": "Um carrinho de compras",
+      "pt": "Um carrinho de supermercado",
+      "ptbr": "Um carrinho de compras",
       "ar": "عربة تسوق",
       "ja": "ショッピングカート",
       "ko": "쇼핑 카트",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Troli supermarket"
     },
     {
       "id": 330,
@@ -4614,11 +4943,12 @@
       "de": "Eine Baustelle",
       "it": "Un cantiere",
       "nl": "Een bouwplaats",
-      "pt": "Um canteiro de obras",
+      "pt": "Uma obra",
+      "ptbr": "Um canteiro de obras",
       "ar": "موقع بناء",
       "ja": "工事現場",
       "ko": "공사장",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Situs konstruksi"
     },
     {
       "id": 331,
@@ -4628,11 +4958,12 @@
       "de": "Eine Baumaschine",
       "it": "Un mezzo da cantiere",
       "nl": "Een bouwvoertuig",
-      "pt": "Um veículo de construção",
+      "pt": "Uma máquina de obras",
+      "ptbr": "Um veículo de construção",
       "ar": "آلة بناء",
       "ja": "工事用車両",
       "ko": "건설 차량",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Alat berat konstruksi"
     },
     {
       "id": 332,
@@ -4642,11 +4973,12 @@
       "de": "Ein Restaurant in deiner Stadt",
       "it": "Un ristorante nella tua città",
       "nl": "Een restaurant in jouw stad",
-      "pt": "Um restaurante na sua cidade",
+      "pt": "Um restaurante na tua cidade",
+      "ptbr": "Um restaurante na sua cidade",
       "ar": "مطعم في مدينتك",
       "ja": "あなたの街のレストラン",
       "ko": "당신의 도시에 있는 식당",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Restoran di kota kamu"
     },
     {
       "id": 333,
@@ -4657,10 +4989,11 @@
       "it": "Un semaforo",
       "nl": "Een verkeerslicht",
       "pt": "Um semáforo",
+      "ptbr": "Um semáforo",
       "ar": "إشارة مرور",
       "ja": "信号機",
       "ko": "신호등",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Lampu lalu lintas"
     },
     {
       "id": 334,
@@ -4670,11 +5003,12 @@
       "de": "Eine Gegensprechanlage",
       "it": "Un citofono",
       "nl": "Een intercom",
-      "pt": "Um interfone",
+      "pt": "Um intercomunicador",
+      "ptbr": "Um interfone",
       "ar": "جهاز اتصال داخلي",
       "ja": "インターホン",
       "ko": "인터폰",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Interkom"
     },
     {
       "id": 335,
@@ -4684,11 +5018,12 @@
       "de": "Dein Lieblingswort",
       "it": "La tua parola preferita",
       "nl": "Jouw favoriete woord",
-      "pt": "Sua palavra favorita",
+      "pt": "A tua palavra preferida",
+      "ptbr": "Sua palavra favorita",
       "ar": "كلمتك المفضلة",
       "ja": "あなたの好きな言葉",
       "ko": "네가 가장 좋아하는 단어",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kata favoritmu"
     },
     {
       "id": 336,
@@ -4699,10 +5034,11 @@
       "it": "Un giornale",
       "nl": "Een krant",
       "pt": "Um jornal",
+      "ptbr": "Um jornal",
       "ar": "جريدة",
       "ja": "新聞",
       "ko": "신문",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Koran"
     },
     {
       "id": 337,
@@ -4712,11 +5048,12 @@
       "de": "Ein Kühlschrankmagnet",
       "it": "Una calamita da frigo",
       "nl": "Een koelkastmagneet",
-      "pt": "Um ímã de geladeira",
+      "pt": "Um íman de frigorífico",
+      "ptbr": "Um ímã de geladeira",
       "ar": "مغناطيس ثلاجة",
       "ja": "冷蔵庫マグネット",
       "ko": "냉장고 자석",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Magnet kulkas"
     },
     {
       "id": 338,
@@ -4726,11 +5063,12 @@
       "de": "Ein Einfahrt-verboten-Schild",
       "it": "Un segnale di divieto d'accesso",
       "nl": "Een verbodsbord",
-      "pt": "Uma placa de sentido proibido",
+      "pt": "Um sinal de sentido proibido",
+      "ptbr": "Uma placa de sentido proibido",
       "ar": "إشارة ممنوع الدخول",
       "ja": "進入禁止標識",
       "ko": "진입 금지 표지판",
-      "idn": "Ambil foto papan tanda"
+      "idn": "Rambu dilarang masuk"
     },
     {
       "id": 339,
@@ -4741,10 +5079,11 @@
       "it": "Una farfalla",
       "nl": "Een vlinder",
       "pt": "Uma borboleta",
+      "ptbr": "Uma borboleta",
       "ar": "فراشة",
       "ja": "蝶",
       "ko": "나비",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kupu-kupu"
     },
     {
       "id": 340,
@@ -4755,10 +5094,11 @@
       "it": "Uno pneumatico",
       "nl": "Een band",
       "pt": "Um pneu",
+      "ptbr": "Um pneu",
       "ar": "إطار",
       "ja": "タイヤ",
       "ko": "타이어",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Ban"
     },
     {
       "id": 341,
@@ -4769,10 +5109,11 @@
       "it": "Un palo",
       "nl": "Een paal",
       "pt": "Um poste",
+      "ptbr": "Um poste",
       "ar": "عمود",
       "ja": "柱",
       "ko": "기둥",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tiang"
     },
     {
       "id": 342,
@@ -4783,10 +5124,11 @@
       "it": "Una roccia",
       "nl": "Een rots",
       "pt": "Uma rocha",
+      "ptbr": "Uma rocha",
       "ar": "صخرة",
       "ja": "岩",
       "ko": "바위",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Batu besar"
     },
     {
       "id": 343,
@@ -4797,10 +5139,11 @@
       "it": "Un pennello",
       "nl": "Een penseel",
       "pt": "Um pincel",
+      "ptbr": "Um pincel",
       "ar": "فرشاة رسم",
       "ja": "絵筆",
       "ko": "페인트붓",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kuas"
     },
     {
       "id": 344,
@@ -4811,10 +5154,11 @@
       "it": "Una colla",
       "nl": "Een lijm",
       "pt": "Uma cola",
+      "ptbr": "Uma cola",
       "ar": "غراء",
       "ja": "のり",
       "ko": "풀",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Lem"
     },
     {
       "id": 345,
@@ -4824,11 +5168,12 @@
       "de": "Ein Stromzähler",
       "it": "Un contatore elettrico",
       "nl": "Een elektriciteitsmeter",
-      "pt": "Um medidor de eletricidade",
+      "pt": "Um contador elétrico",
+      "ptbr": "Um medidor de eletricidade",
       "ar": "عداد كهرباء",
       "ja": "電気メーター",
       "ko": "전기 계량기",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Meteran listrik"
     },
     {
       "id": 346,
@@ -4839,10 +5184,11 @@
       "it": "Una piuma",
       "nl": "Een veer",
       "pt": "Uma pena",
+      "ptbr": "Uma pena",
       "ar": "ريشة",
       "ja": "羽",
       "ko": "깃털",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bulu"
     },
     {
       "id": 347,
@@ -4852,11 +5198,12 @@
       "de": "Dein Bett",
       "it": "Il tuo letto",
       "nl": "Jouw bed",
-      "pt": "Sua cama",
+      "pt": "A tua cama",
+      "ptbr": "Sua cama",
       "ar": "سريرك",
       "ja": "あなたのベッド",
       "ko": "당신의 침대",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tempat tidurmu"
     },
     {
       "id": 348,
@@ -4866,11 +5213,12 @@
       "de": "Ein Flaschenverschluss",
       "it": "Un tappo",
       "nl": "Een dop",
-      "pt": "Uma tampa",
+      "pt": "Uma rolha",
+      "ptbr": "Uma tampa",
       "ar": "سدادة",
       "ja": "ボトルの栓",
       "ko": "병뚜껑",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sumbat"
     },
     {
       "id": 349,
@@ -4881,10 +5229,11 @@
       "it": "Una goccia d'acqua",
       "nl": "Een druppel water",
       "pt": "Uma gota de água",
+      "ptbr": "Uma gota de água",
       "ar": "قطرة ماء",
       "ja": "水のしずく",
       "ko": "물방울",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tetesan air"
     },
     {
       "id": 350,
@@ -4895,10 +5244,11 @@
       "it": "Una pubblicità",
       "nl": "Een reclame",
       "pt": "Um anúncio",
+      "ptbr": "Um anúncio",
       "ar": "إعلان",
       "ja": "広告",
       "ko": "광고",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Iklan"
     },
     {
       "id": 351,
@@ -4909,10 +5259,11 @@
       "it": "Un'impronta digitale",
       "nl": "Een vingerafdruk",
       "pt": "Uma marca de dedo",
+      "ptbr": "Uma marca de dedo",
       "ar": "أثر بصمة إصبع",
       "ja": "指紋の跡",
       "ko": "지문 자국",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jejak jari"
     },
     {
       "id": 352,
@@ -4923,10 +5274,11 @@
       "it": "Un'etichetta di frutta",
       "nl": "Een fruitetiket",
       "pt": "Uma etiqueta de fruta",
+      "ptbr": "Uma etiqueta de fruta",
       "ar": "ملصق فاكهة",
       "ja": "果物のラベル",
       "ko": "과일 라벨",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Label buah"
     },
     {
       "id": 353,
@@ -4936,11 +5288,12 @@
       "de": "Eine alte Sache bei dir zu Hause",
       "it": "Una cosa vecchia a casa tua",
       "nl": "Een oud ding bij jou thuis",
-      "pt": "Uma coisa velha na sua casa",
+      "pt": "Uma coisa velha na tua casa",
+      "ptbr": "Uma coisa velha na sua casa",
       "ar": "شيء قديم في منزلك",
       "ja": "家にある古いもの",
       "ko": "집에 있는 오래된 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Barang lama di rumahmu"
     },
     {
       "id": 354,
@@ -4950,11 +5303,12 @@
       "de": "Ein Sandwich",
       "it": "Un panino",
       "nl": "Een sandwich",
-      "pt": "Um sanduíche",
+      "pt": "Uma sanduíche",
+      "ptbr": "Um sanduíche",
       "ar": "شطيرة",
       "ja": "サンドイッチ",
       "ko": "샌드위치",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Roti lapis"
     },
     {
       "id": 355,
@@ -4965,10 +5319,11 @@
       "it": "Una cintura",
       "nl": "Een riem",
       "pt": "Um cinto",
+      "ptbr": "Um cinto",
       "ar": "حزام",
       "ja": "ベルト",
       "ko": "벨트",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sabuk"
     },
     {
       "id": 356,
@@ -4978,11 +5333,12 @@
       "de": "Eine Kindheitserinnerung",
       "it": "Un ricordo d'infanzia",
       "nl": "Een jeugdherinnering",
-      "pt": "Uma lembrança de infância",
+      "pt": "Uma recordação de infância",
+      "ptbr": "Uma lembrança de infância",
       "ar": "ذكرى من الطفولة",
       "ja": "子供の頃の思い出",
       "ko": "어린 시절의 추억",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kenangan masa kecil"
     },
     {
       "id": 357,
@@ -4993,10 +5349,11 @@
       "it": "Una scopa",
       "nl": "Een bezem",
       "pt": "Uma vassoura",
+      "ptbr": "Uma vassoura",
       "ar": "مكنسة",
       "ja": "ほうき",
       "ko": "빗자루",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sapu"
     },
     {
       "id": 358,
@@ -5006,11 +5363,12 @@
       "de": "Ein Mülleimer",
       "it": "Un bidone della spazzatura",
       "nl": "Een vuilnisbak",
-      "pt": "Uma lixeira",
+      "pt": "Um caixote do lixo",
+      "ptbr": "Uma lixeira",
       "ar": "سلة مهملات",
       "ja": "ゴミ箱",
       "ko": "쓰레기통",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tempat sampah"
     },
     {
       "id": 359,
@@ -5020,11 +5378,12 @@
       "de": "Ein Spülmittel",
       "it": "Un detersivo per piatti",
       "nl": "Afwasmiddel",
-      "pt": "Um detergente para louça",
+      "pt": "Um detergente da loiça",
+      "ptbr": "Um detergente para louça",
       "ar": "سائل جلي",
       "ja": "食器用洗剤",
       "ko": "주방 세제",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sabun pencuci piring"
     },
     {
       "id": 360,
@@ -5035,10 +5394,11 @@
       "it": "Un piatto sporco",
       "nl": "Een vuile bord",
       "pt": "Um prato sujo",
+      "ptbr": "Um prato sujo",
       "ar": "صحن متسخ",
       "ja": "汚れた皿",
       "ko": "더러운 접시",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Piring kotor"
     },
     {
       "id": 361,
@@ -5049,10 +5409,11 @@
       "it": "Un microonde",
       "nl": "Een magnetron",
       "pt": "Um micro-ondas",
+      "ptbr": "Um micro-ondas",
       "ar": "ميكروويف",
       "ja": "電子レンジ",
       "ko": "전자레인지",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Microwave"
     },
     {
       "id": 362,
@@ -5063,10 +5424,11 @@
       "it": "Un tagliere",
       "nl": "Een snijplank",
       "pt": "Uma tábua de cortar",
+      "ptbr": "Uma tábua de cortar",
       "ar": "لوح تقطيع",
       "ja": "まな板",
       "ko": "도마",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Papan pemotong"
     },
     {
       "id": 363,
@@ -5077,10 +5439,11 @@
       "it": "Una saliera",
       "nl": "Een zoutvaatje",
       "pt": "Um saleiro",
+      "ptbr": "Um saleiro",
       "ar": "مملحة",
       "ja": "塩入れ",
       "ko": "소금통",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tempat garam"
     },
     {
       "id": 364,
@@ -5091,10 +5454,11 @@
       "it": "Una valigia",
       "nl": "Een koffer",
       "pt": "Uma mala",
+      "ptbr": "Uma mala",
       "ar": "حقيبة سفر",
       "ja": "スーツケース",
       "ko": "여행 가방",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Koper"
     },
     {
       "id": 365,
@@ -5104,11 +5468,12 @@
       "de": "Ein Strohhalm",
       "it": "Una cannuccia",
       "nl": "Een rietje",
-      "pt": "Um canudo",
+      "pt": "Uma palhinha",
+      "ptbr": "Um canudo",
       "ar": "قشة",
       "ja": "ストロー",
       "ko": "빨대",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sedotan"
     },
     {
       "id": 366,
@@ -5118,11 +5483,12 @@
       "de": "Ein Recycling-Logo",
       "it": "Un logo di riciclaggio",
       "nl": "Een recyclingslogo",
-      "pt": "Um logotipo de reciclagem",
+      "pt": "Um logótipo de reciclagem",
+      "ptbr": "Um logotipo de reciclagem",
       "ar": "شعار إعادة التدوير",
       "ja": "リサイクルのロゴ",
       "ko": "재활용 로고",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Logo daur ulang"
     },
     {
       "id": 367,
@@ -5133,10 +5499,11 @@
       "it": "Un accendino o dei fiammiferi",
       "nl": "Een aansteker of lucifers",
       "pt": "Um isqueiro ou fósforos",
+      "ptbr": "Um isqueiro ou fósforos",
       "ar": "ولاعة أو أعواد ثقاب",
       "ja": "ライターまたはマッチ",
       "ko": "라이터 또는 성냥",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Korek api atau batang korek"
     },
     {
       "id": 368,
@@ -5146,11 +5513,12 @@
       "de": "Ein Urlaubs- oder Reisesouvenir",
       "it": "Un souvenir di vacanza o di viaggio",
       "nl": "Een vakantie- of reisherinnering",
-      "pt": "Uma lembrança de férias ou de viagem",
+      "pt": "Uma recordação de férias ou viagem",
+      "ptbr": "Uma lembrança de férias ou de viagem",
       "ar": "تذكار من عطلة أو سفر",
       "ja": "旅行や休暇の思い出の品",
       "ko": "휴가나 여행에서의 기념품",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kenangan liburan atau perjalanan"
     },
     {
       "id": 369,
@@ -5161,10 +5529,11 @@
       "it": "Il meteo di oggi",
       "nl": "Het weer van vandaag",
       "pt": "O tempo de hoje",
+      "ptbr": "O tempo de hoje",
       "ar": "طقس اليوم",
       "ja": "今日の天気",
       "ko": "오늘의 날씨",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Cuaca hari ini"
     },
     {
       "id": 370,
@@ -5174,11 +5543,12 @@
       "de": "Eine Sicherheitskamera",
       "it": "Una telecamera di sicurezza",
       "nl": "Een beveiligingscamera",
-      "pt": "Uma câmera de segurança",
+      "pt": "Uma câmara de segurança",
+      "ptbr": "Uma câmera de segurança",
       "ar": "كاميرا مراقبة",
       "ja": "防犯カメラ",
       "ko": "보안 카메라",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kamera keamanan"
     },
     {
       "id": 371,
@@ -5189,10 +5559,11 @@
       "it": "Uno stampo per dolci",
       "nl": "Een cakevorm",
       "pt": "Uma forma de bolo",
+      "ptbr": "Uma forma de bolo",
       "ar": "قالب كعك",
       "ja": "ケーキ型",
       "ko": "케이크 틀",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Cetakan kue"
     },
     {
       "id": 372,
@@ -5203,10 +5574,11 @@
       "it": "Un rubinetto",
       "nl": "Een kraan",
       "pt": "Uma torneira",
+      "ptbr": "Uma torneira",
       "ar": "صنبور",
       "ja": "蛇口",
       "ko": "수도꼭지",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Keran"
     },
     {
       "id": 373,
@@ -5216,11 +5588,12 @@
       "de": "Stromleitungen im Freien",
       "it": "Linee elettriche esterne",
       "nl": "Buitenstroomleidingen",
-      "pt": "Linhas elétricas externas",
+      "pt": "Linhas elétricas exteriores",
+      "ptbr": "Linhas elétricas externas",
       "ar": "خطوط كهرباء خارجية",
       "ja": "屋外の電線",
       "ko": "야외 전선",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jaringan listrik luar"
     },
     {
       "id": 374,
@@ -5230,11 +5603,12 @@
       "de": "Ein Drahtzaun",
       "it": "Una rete metallica",
       "nl": "Een draadomheining",
-      "pt": "Uma cerca de arame",
+      "pt": "Uma vedação de arame",
+      "ptbr": "Uma cerca de arame",
       "ar": "سياج سلكي",
       "ja": "金網フェンス",
       "ko": "철망 울타리",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kawat pagar"
     },
     {
       "id": 375,
@@ -5244,11 +5618,12 @@
       "de": "Ein Rasierer",
       "it": "Un rasoio",
       "nl": "Een scheermes",
-      "pt": "Um barbeador",
+      "pt": "Uma lâmina de barbear",
+      "ptbr": "Um barbeador",
       "ar": "شفرة حلاقة",
       "ja": "かみそり",
       "ko": "면도기",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Alat cukur"
     },
     {
       "id": 376,
@@ -5258,25 +5633,27 @@
       "de": "Eine analoge Uhr",
       "it": "Un orologio analogico",
       "nl": "Een analoog horloge",
-      "pt": "Um relógio analógico",
+      "pt": "Um relógio de ponteiros",
+      "ptbr": "Um relógio analógico",
       "ar": "ساعة بعقارب",
       "ja": "アナログ腕時計",
       "ko": "아날로그 시계",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jam analog"
     },
     {
       "id": 378,
-  "intitule": "Fais un cœur avec tes mains",
-  "en": "Make a heart shape with your hands",
-  "es": "Haz un corazón con tus manos",
-  "de": "Forme mit deinen Händen ein Herz",
-  "it": "Fai un cuore con le mani",
-  "nl": "Maak een hartje met je handen",
-  "pt": "Faz um coração com as mãos",
-  "ar": "اصنع قلبًا بيديك",
-  "ja": "手でハートの形を作って",
-  "ko": "손으로 하트를 만들어봐",
-  "idn": "Buat bentuk hati dengan tanganmu"
+      "intitule": "Fais un cœur avec tes mains",
+      "en": "Make a heart shape with your hands",
+      "es": "Haz un corazón con tus manos",
+      "de": "Forme mit deinen Händen ein Herz",
+      "it": "Fai un cuore con le mani",
+      "nl": "Maak een hartje met je handen",
+      "pt": "Faz um coração com as mãos",
+      "ptbr": "Faz um coração com as mãos",
+      "ar": "اصنع قلبًا بيديك",
+      "ja": "手でハートの形を作って",
+      "ko": "손으로 하트를 만들어봐",
+      "idn": "Buatlah hati dengan tanganmu"
     },
     {
       "id": 379,
@@ -5287,10 +5664,11 @@
       "it": "Un occhio disegnato",
       "nl": "Een getekend oog",
       "pt": "Um olho desenhado",
+      "ptbr": "Um olho desenhado",
       "ar": "عين مرسومة",
       "ja": "描かれた目",
       "ko": "그려진 눈",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Mata yang digambar"
     },
     {
       "id": 380,
@@ -5301,10 +5679,11 @@
       "it": "Un cuore disegnato",
       "nl": "Een getekend hart",
       "pt": "Um coração desenhado",
+      "ptbr": "Um coração desenhado",
       "ar": "قلب مرسوم",
       "ja": "描かれたハート",
       "ko": "그려진 하트",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Hati yang digambar"
     },
     {
       "id": 381,
@@ -5315,10 +5694,11 @@
       "it": "Una penna nera",
       "nl": "Een zwarte pen",
       "pt": "Uma caneta preta",
+      "ptbr": "Uma caneta preta",
       "ar": "قلم أسود",
       "ja": "黒いペン",
       "ko": "검은색 펜",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pulpen hitam"
     },
     {
       "id": 382,
@@ -5329,10 +5709,11 @@
       "it": "Una stazione di servizio",
       "nl": "Een tankstation",
       "pt": "Um posto de gasolina",
+      "ptbr": "Um posto de gasolina",
       "ar": "محطة وقود",
       "ja": "ガソリンスタンド",
       "ko": "주유소",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pom bensin"
     },
     {
       "id": 384,
@@ -5343,10 +5724,11 @@
       "it": "Una pozzanghera",
       "nl": "Een plas",
       "pt": "Uma poça",
+      "ptbr": "Uma poça",
       "ar": "بركة ماء",
       "ja": "水たまり",
       "ko": "물웅덩이",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Genangan air"
     },
     {
       "id": 385,
@@ -5357,10 +5739,11 @@
       "it": "Una porta da garage",
       "nl": "Een garagedeur",
       "pt": "Uma porta de garagem",
+      "ptbr": "Uma porta de garagem",
       "ar": "باب مرآب",
       "ja": "ガレージのドア",
       "ko": "차고 문",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pintu garasi"
     },
     {
       "id": 386,
@@ -5371,10 +5754,11 @@
       "it": "Un ombrello",
       "nl": "Een paraplu",
       "pt": "Um guarda-chuva",
+      "ptbr": "Um guarda-chuva",
       "ar": "مظلة",
       "ja": "傘",
       "ko": "우산",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Payung"
     },
     {
       "id": 387,
@@ -5384,11 +5768,12 @@
       "de": "Eine Getränkedose",
       "it": "Una lattina",
       "nl": "Een blikje",
-      "pt": "Uma latinha",
+      "pt": "Uma lata",
+      "ptbr": "Uma latinha",
       "ar": "علبة مشروب",
       "ja": "飲み物の缶",
       "ko": "음료수 캔",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kaleng minuman"
     },
     {
       "id": 388,
@@ -5398,11 +5783,12 @@
       "de": "Eine Bushaltestelle mit Unterstand",
       "it": "Una pensilina per autobus",
       "nl": "Een bushokje",
-      "pt": "Um abrigo de ônibus",
+      "pt": "Um abrigo de autocarro",
+      "ptbr": "Um abrigo de ônibus",
       "ar": "مأوى حافلات",
       "ja": "バスの待合所",
       "ko": "버스 정류장 쉘터",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Halte bus"
     },
     {
       "id": 389,
@@ -5412,11 +5798,12 @@
       "de": "Eine Außentreppe",
       "it": "Una scala esterna",
       "nl": "Een buitentrap",
-      "pt": "Uma escada externa",
+      "pt": "Uma escada exterior",
+      "ptbr": "Uma escada externa",
       "ar": "سُلَّم خارجي",
       "ja": "屋外の階段",
       "ko": "야외 계단",
-      "idn": "Ambil foto tangga"
+      "idn": "Tangga luar ruangan"
     },
     {
       "id": 390,
@@ -5426,11 +5813,12 @@
       "de": "Eine Blume im Gras",
       "it": "Un fiore nell'erba",
       "nl": "Een bloem in het gras",
-      "pt": "Uma flor na grama",
+      "pt": "Uma flor na relva",
+      "ptbr": "Uma flor na grama",
       "ar": "زهرة في العشب",
       "ja": "草の中の花",
       "ko": "잔디 속의 꽃",
-      "idn": "Ambil foto bunga"
+      "idn": "Bunga di rumput"
     },
     {
       "id": 391,
@@ -5440,11 +5828,12 @@
       "de": "Eine Hecke",
       "it": "Una siepe",
       "nl": "Een haag",
-      "pt": "Uma cerca viva",
+      "pt": "Uma sebe",
+      "ptbr": "Uma cerca viva",
       "ar": "سياج نباتي",
       "ja": "生け垣",
       "ko": "생울타리",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pagar tanaman"
     },
     {
       "id": 392,
@@ -5455,10 +5844,11 @@
       "it": "Una ragnatela",
       "nl": "Een spinnenweb",
       "pt": "Uma teia de aranha",
+      "ptbr": "Uma teia de aranha",
       "ar": "شبكة عنكبوت",
       "ja": "クモの巣",
       "ko": "거미줄",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Jaring laba-laba"
     },
     {
       "id": 393,
@@ -5469,10 +5859,11 @@
       "it": "Una mosca",
       "nl": "Een vlieg",
       "pt": "Uma mosca",
+      "ptbr": "Uma mosca",
       "ar": "ذبابة",
       "ja": "ハエ",
       "ko": "파리",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Lalat"
     },
     {
       "id": 394,
@@ -5483,10 +5874,11 @@
       "it": "Una barca",
       "nl": "Een boot",
       "pt": "Um barco",
+      "ptbr": "Um barco",
       "ar": "قارب",
       "ja": "船",
       "ko": "배",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Perahu"
     },
     {
       "id": 395,
@@ -5497,10 +5889,11 @@
       "it": "Una conchiglia",
       "nl": "Een schelp",
       "pt": "Uma concha",
+      "ptbr": "Uma concha",
       "ar": "صدفة بحرية",
       "ja": "貝殻",
       "ko": "조개껍데기",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kerang"
     },
     {
       "id": 396,
@@ -5511,10 +5904,11 @@
       "it": "Un secchio",
       "nl": "Een emmer",
       "pt": "Um balde",
+      "ptbr": "Um balde",
       "ar": "دلو",
       "ja": "バケツ",
       "ko": "양동이",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Ember"
     },
     {
       "id": 397,
@@ -5525,10 +5919,11 @@
       "it": "Un traliccio elettrico",
       "nl": "Een elektriciteitspylon",
       "pt": "Um poste de eletricidade",
+      "ptbr": "Um poste de eletricidade",
       "ar": "برج كهرباء",
       "ja": "電力鉄塔",
       "ko": "송전탑",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tiang listrik"
     },
     {
       "id": 398,
@@ -5538,11 +5933,12 @@
       "de": "Eine Dachrinne",
       "it": "Una grondaia",
       "nl": "Een dakgoot",
-      "pt": "Uma calha",
+      "pt": "Uma caleira",
+      "ptbr": "Uma calha",
       "ar": "ميزاب المطر",
       "ja": "雨どい",
       "ko": "빗물받이",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Talang air"
     },
     {
       "id": 399,
@@ -5552,11 +5948,12 @@
       "de": "Ein Fuß auf einer Stufe",
       "it": "Un piede su un gradino",
       "nl": "Een voet op een trede",
-      "pt": "Um pé em um degrau",
+      "pt": "Um pé num degrau",
+      "ptbr": "Um pé em um degrau",
       "ar": "قدم على درجة سلم",
       "ja": "段に乗った足",
       "ko": "계단 위에 있는 발",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kaki di atas anak tangga"
     },
     {
       "id": 400,
@@ -5566,11 +5963,12 @@
       "de": "Eine Hand an einem Griff",
       "it": "Una mano su una maniglia",
       "nl": "Een hand op een deurklink",
-      "pt": "Uma mão em uma maçaneta",
+      "pt": "Uma mão numa maçaneta",
+      "ptbr": "Uma mão em uma maçaneta",
       "ar": "يد على مقبض",
       "ja": "取っ手にかけた手",
       "ko": "손잡이를 잡은 손",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tangan di atas gagang"
     },
     {
       "id": 401,
@@ -5580,11 +5978,12 @@
       "de": "Eine Hand, die auf einen Knopf drückt",
       "it": "Una mano che preme un pulsante",
       "nl": "Een hand die op een knop drukt",
-      "pt": "Uma mão pressionando um botão",
+      "pt": "Uma mão a carregar num botão",
+      "ptbr": "Uma mão pressionando um botão",
       "ar": "يد تضغط على زر",
       "ja": "ボタンを押している手",
       "ko": "버튼을 누르고 있는 손",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tangan menekan tombol"
     },
     {
       "id": 402,
@@ -5594,11 +5993,12 @@
       "de": "Ein Schlüssel im Schloss",
       "it": "Una chiave nella serratura",
       "nl": "Een sleutel in een slot",
-      "pt": "Uma chave na fechadura",
+      "pt": "Uma chave numa fechadura",
+      "ptbr": "Uma chave na fechadura",
       "ar": "مفتاح في القفل",
       "ja": "鍵が鍵穴に差さっている",
       "ko": "자물쇠에 꽂힌 열쇠",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kunci di dalam kunci pintu"
     },
     {
       "id": 403,
@@ -5609,10 +6009,11 @@
       "it": "Un frutto tagliato",
       "nl": "Een gesneden stuk fruit",
       "pt": "Uma fruta cortada",
+      "ptbr": "Uma fruta cortada",
       "ar": "فاكهة مقطعة",
       "ja": "カットされた果物",
       "ko": "자른 과일",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Buah yang dipotong"
     },
     {
       "id": 404,
@@ -5622,11 +6023,12 @@
       "de": "Eine schreibende Hand",
       "it": "Una mano che scrive",
       "nl": "Een hand die schrijft",
-      "pt": "Uma mão escrevendo",
+      "pt": "Uma mão a escrever",
+      "ptbr": "Uma mão escrevendo",
       "ar": "يد تكتب",
       "ja": "書いている手",
       "ko": "글을 쓰는 손",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tangan yang sedang menulis"
     },
     {
       "id": 405,
@@ -5637,10 +6039,11 @@
       "it": "Un cucchiaio pieno",
       "nl": "Een volle lepel",
       "pt": "Uma colher cheia",
+      "ptbr": "Uma colher cheia",
       "ar": "ملعقة ممتلئة",
       "ja": "いっぱいのスプーン",
       "ko": "가득 찬 숟가락",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sendok penuh"
     },
     {
       "id": 406,
@@ -5651,10 +6054,11 @@
       "it": "Un oggetto lanciato in aria",
       "nl": "Een object dat in de lucht wordt gegooid",
       "pt": "Um objeto lançado ao ar",
+      "ptbr": "Um objeto lançado ao ar",
       "ar": "جسم يُقذف في الهواء",
       "ja": "空中に投げられた物体",
       "ko": "공중에 던져진 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda yang dilempar ke udara"
     },
     {
       "id": 407,
@@ -5664,11 +6068,12 @@
       "de": "Eine springende Person",
       "it": "Una persona che salta",
       "nl": "Een persoon die springt",
-      "pt": "Uma pessoa pulando",
+      "pt": "Uma pessoa a saltar",
+      "ptbr": "Uma pessoa pulando",
       "ar": "شخص يقفز",
       "ja": "ジャンプしている人",
       "ko": "점프하는 사람",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Seseorang yang melompat"
     },
     {
       "id": 410,
@@ -5679,10 +6084,11 @@
       "it": "Un oggetto di metallo",
       "nl": "Een metalen voorwerp",
       "pt": "Um objeto de metal",
+      "ptbr": "Um objeto de metal",
       "ar": "جسم معدني",
       "ja": "金属製の物",
       "ko": "금속 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda dari logam"
     },
     {
       "id": 411,
@@ -5693,10 +6099,11 @@
       "it": "Un oggetto di legno",
       "nl": "Een houten voorwerp",
       "pt": "Um objeto de madeira",
+      "ptbr": "Um objeto de madeira",
       "ar": "جسم خشبي",
       "ja": "木製の物",
       "ko": "나무 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda dari kayu"
     },
     {
       "id": 412,
@@ -5707,10 +6114,11 @@
       "it": "Un oggetto di plastica",
       "nl": "Een plastic voorwerp",
       "pt": "Um objeto de plástico",
+      "ptbr": "Um objeto de plástico",
       "ar": "جسم بلاستيكي",
       "ja": "プラスチック製の物",
       "ko": "플라스틱 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda dari plastik"
     },
     {
       "id": 413,
@@ -5721,10 +6129,11 @@
       "it": "Un oggetto di vetro",
       "nl": "Een glazen voorwerp",
       "pt": "Um objeto de vidro",
+      "ptbr": "Um objeto de vidro",
       "ar": "جسم زجاجي",
       "ja": "ガラス製の物",
       "ko": "유리 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda dari kaca"
     },
     {
       "id": 414,
@@ -5735,10 +6144,11 @@
       "it": "Un oggetto trasparente",
       "nl": "Een transparant object",
       "pt": "Um objeto transparente",
+      "ptbr": "Um objeto transparente",
       "ar": "جسم شفاف",
       "ja": "透明な物体",
       "ko": "투명한 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda transparan"
     },
     {
       "id": 415,
@@ -5749,10 +6159,11 @@
       "it": "Un oggetto appeso",
       "nl": "Een hangend object",
       "pt": "Um objeto pendurado",
+      "ptbr": "Um objeto pendurado",
       "ar": "جسم معلق",
       "ja": "吊るされた物",
       "ko": "걸려 있는 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda yang digantung"
     },
     {
       "id": 416,
@@ -5762,11 +6173,12 @@
       "de": "Ein zerbrochener Gegenstand",
       "it": "Un oggetto rotto",
       "nl": "Een kapot object",
-      "pt": "Um objeto quebrado",
+      "pt": "Um objeto partido",
+      "ptbr": "Um objeto quebrado",
       "ar": "جسم مكسور",
       "ja": "壊れた物体",
       "ko": "깨진 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda yang rusak"
     },
     {
       "id": 417,
@@ -5776,11 +6188,12 @@
       "de": "Ein rollender Gegenstand",
       "it": "Un oggetto che rotola",
       "nl": "Een rollend object",
-      "pt": "Um objeto rolando",
+      "pt": "Um objeto que rola",
+      "ptbr": "Um objeto rolando",
       "ar": "جسم يتدحرج",
       "ja": "転がる物体",
       "ko": "굴러가는 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda yang bisa menggelinding"
     },
     {
       "id": 418,
@@ -5790,11 +6203,12 @@
       "de": "Ein Objekt in einer Schachtel",
       "it": "Un oggetto in una scatola",
       "nl": "Een object in een doos",
-      "pt": "Um objeto em uma caixa",
+      "pt": "Um objeto numa caixa",
+      "ptbr": "Um objeto em uma caixa",
       "ar": "جسم داخل صندوق",
       "ja": "箱の中の物体",
       "ko": "상자 안의 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda dalam kotak"
     },
     {
       "id": 419,
@@ -5804,11 +6218,12 @@
       "de": "Ein Objekt in einer Tasche",
       "it": "Un oggetto in una borsa",
       "nl": "Een object in een tas",
-      "pt": "Um objeto em uma sacola",
+      "pt": "Um objeto num saco",
+      "ptbr": "Um objeto em uma sacola",
       "ar": "جسم في حقيبة",
       "ja": "バッグの中の物体",
       "ko": "가방 속의 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda dalam tas"
     },
     {
       "id": 420,
@@ -5818,11 +6233,12 @@
       "de": "Ein Objekt auf einem Regal",
       "it": "Un oggetto su uno scaffale",
       "nl": "Een object op een plank",
-      "pt": "Um objeto em uma prateleira",
+      "pt": "Um objeto numa prateleira",
+      "ptbr": "Um objeto em uma prateleira",
       "ar": "جسم على رف",
       "ja": "棚の上の物体",
       "ko": "선반 위의 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda di atas rak"
     },
     {
       "id": 421,
@@ -5833,10 +6249,11 @@
       "it": "Un oggetto sotto una sedia",
       "nl": "Een object onder een stoel",
       "pt": "Um objeto debaixo de uma cadeira",
+      "ptbr": "Um objeto debaixo de uma cadeira",
       "ar": "جسم تحت كرسي",
       "ja": "椅子の下の物体",
       "ko": "의자 아래 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda di bawah kursi"
     },
     {
       "id": 422,
@@ -5847,10 +6264,11 @@
       "it": "Un oggetto tra due altri",
       "nl": "Een object tussen twee andere",
       "pt": "Um objeto entre dois outros",
+      "ptbr": "Um objeto entre dois outros",
       "ar": "جسم بين جسمين",
       "ja": "2つの物の間の物体",
       "ko": "두 물체 사이에 있는 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda di antara dua benda lain"
     },
     {
       "id": 423,
@@ -5860,11 +6278,12 @@
       "de": "Ein Objekt auf einem Kissen",
       "it": "Un oggetto su un cuscino",
       "nl": "Een object op een kussen",
-      "pt": "Um objeto sobre uma almofada",
+      "pt": "Um objeto numa almofada",
+      "ptbr": "Um objeto sobre uma almofada",
       "ar": "جسم فوق وسادة",
       "ja": "クッションの上の物体",
       "ko": "쿠션 위의 물체",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda di atas bantal"
     },
     {
       "id": 424,
@@ -5875,10 +6294,11 @@
       "it": "Una casseruola vuota",
       "nl": "Een lege pan",
       "pt": "Uma panela vazia",
+      "ptbr": "Uma panela vazia",
       "ar": "قدر فارغ",
       "ja": "空の鍋",
       "ko": "빈 냄비",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Panci kosong"
     },
     {
       "id": 425,
@@ -5889,10 +6309,11 @@
       "it": "Una casseruola piena",
       "nl": "Een volle pan",
       "pt": "Uma panela cheia",
+      "ptbr": "Uma panela cheia",
       "ar": "قدر ممتلئ",
       "ja": "中身の入った鍋",
       "ko": "가득 찬 냄비",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Panci penuh"
     },
     {
       "id": 426,
@@ -5902,11 +6323,12 @@
       "de": "Ein Gamecontroller",
       "it": "Un controller di gioco",
       "nl": "Een gamecontroller",
-      "pt": "Um controle de videogame",
+      "pt": "Um comando de jogos",
+      "ptbr": "Um controle de videogame",
       "ar": "وحدة تحكم في الألعاب",
       "ja": "ゲームコントローラー",
       "ko": "게임 컨트롤러",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Stik permainan"
     },
     {
       "id": 427,
@@ -5917,10 +6339,11 @@
       "it": "Un congelatore",
       "nl": "Een vriezer",
       "pt": "Um congelador",
+      "ptbr": "Um congelador",
       "ar": "مجمد",
       "ja": "冷凍庫",
       "ko": "냉동고",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Freezer"
     },
     {
       "id": 428,
@@ -5931,10 +6354,11 @@
       "it": "Un volante dell'auto",
       "nl": "Een autostuur",
       "pt": "Um volante de carro",
+      "ptbr": "Um volante de carro",
       "ar": "عجلة قيادة سيارة",
       "ja": "車のハンドル",
       "ko": "자동차 핸들",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Setir mobil"
     },
     {
       "id": 429,
@@ -5945,10 +6369,11 @@
       "it": "Una portiera dell'auto",
       "nl": "Een autodeur",
       "pt": "Uma porta de carro",
+      "ptbr": "Uma porta de carro",
       "ar": "باب سيارة",
       "ja": "車のドア",
       "ko": "자동차 문",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pintu mobil"
     },
     {
       "id": 430,
@@ -5958,11 +6383,12 @@
       "de": "Ein Kofferraum",
       "it": "Un bagagliaio",
       "nl": "Een kofferbak van een auto",
-      "pt": "Um porta-malas de carro",
+      "pt": "Uma bagageira de carro",
+      "ptbr": "Um porta-malas de carro",
       "ar": "صندوق سيارة",
       "ja": "車のトランク",
       "ko": "자동차 트렁크",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bagasi mobil"
     },
     {
       "id": 431,
@@ -5972,11 +6398,12 @@
       "de": "Ein leerer Kofferraum",
       "it": "Un bagagliaio vuoto",
       "nl": "Een lege kofferbak",
-      "pt": "Um porta-malas vazio",
+      "pt": "Uma bagageira de carro vazia",
+      "ptbr": "Um porta-malas vazio",
       "ar": "صندوق سيارة فارغ",
       "ja": "空のトランク",
       "ko": "빈 자동차 트렁크",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bagasi mobil kosong"
     },
     {
       "id": 432,
@@ -5986,11 +6413,12 @@
       "de": "Ein voller Kofferraum",
       "it": "Un bagagliaio pieno",
       "nl": "Een volle kofferbak",
-      "pt": "Um porta-malas cheio",
+      "pt": "Uma bagageira de carro cheia",
+      "ptbr": "Um porta-malas cheio",
       "ar": "صندوق سيارة ممتلئ",
       "ja": "物が入ったトランク",
       "ko": "가득 찬 자동차 트렁크",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Bagasi mobil penuh"
     },
     {
       "id": 433,
@@ -6000,11 +6428,12 @@
       "de": "Ein Reißverschluss",
       "it": "Una cerniera lampo",
       "nl": "Een rits",
-      "pt": "Um zíper",
+      "pt": "Um fecho éclair",
+      "ptbr": "Um zíper",
       "ar": "سحّاب",
       "ja": "ファスナー",
       "ko": "지퍼",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Ritsleting"
     },
     {
       "id": 434,
@@ -6014,11 +6443,12 @@
       "de": "Socken",
       "it": "Dei calzini",
       "nl": "Sokken",
-      "pt": "Meias",
+      "pt": "Umas meias",
+      "ptbr": "Meias",
       "ar": "جوارب",
       "ja": "靴下",
       "ko": "양말",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kaos kaki"
     },
     {
       "id": 435,
@@ -6028,11 +6458,12 @@
       "de": "Ein Aufkleber",
       "it": "Un adesivo",
       "nl": "Een sticker",
-      "pt": "Um adesivo",
+      "pt": "Um autocolante",
+      "ptbr": "Um adesivo",
       "ar": "ملصق",
       "ja": "ステッカー",
       "ko": "스티커",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Stiker"
     },
     {
       "id": 436,
@@ -6043,10 +6474,11 @@
       "it": "Uno strumento",
       "nl": "Een gereedschap",
       "pt": "Uma ferramenta",
+      "ptbr": "Uma ferramenta",
       "ar": "أداة",
       "ja": "道具",
       "ko": "도구",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Alat"
     },
     {
       "id": 437,
@@ -6057,10 +6489,11 @@
       "it": "Un post-it",
       "nl": "Een plakbriefje",
       "pt": "Um post-it",
+      "ptbr": "Um post-it",
       "ar": "ملاحظة لاصقة",
       "ja": "付箋",
       "ko": "포스트잇",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Post-it"
     },
     {
       "id": 438,
@@ -6071,10 +6504,11 @@
       "it": "Un calendario",
       "nl": "Een kalender",
       "pt": "Um calendário",
+      "ptbr": "Um calendário",
       "ar": "تقويم",
       "ja": "カレンダー",
       "ko": "달력",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Kalender"
     },
     {
       "id": 439,
@@ -6085,10 +6519,11 @@
       "it": "Il cielo stasera",
       "nl": "De lucht vanavond",
       "pt": "O céu esta noite",
+      "ptbr": "O céu esta noite",
       "ar": "السماء هذا المساء",
       "ja": "今夜の空",
       "ko": "오늘 밤 하늘",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Langit malam ini"
     },
     {
       "id": 440,
@@ -6099,10 +6534,11 @@
       "it": "Qualcosa di aperto",
       "nl": "Iets dat open is",
       "pt": "Algo aberto",
+      "ptbr": "Algo aberto",
       "ar": "شيء مفتوح",
       "ja": "開いているもの",
       "ko": "열려 있는 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Sesuatu yang terbuka"
     },
     {
       "id": 441,
@@ -6112,11 +6548,12 @@
       "de": "Dein Lieblingsgegenstand zu Hause",
       "it": "La cosa che preferisci a casa tua",
       "nl": "Je favoriete ding thuis",
-      "pt": "A sua coisa favorita em casa",
+      "pt": "A coisa que mais gostas em tua casa",
+      "ptbr": "A sua coisa favorita em casa",
       "ar": "أكثر شيء تحبه في منزلك",
       "ja": "自分の家で一番好きなもの",
       "ko": "집에서 가장 좋아하는 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Hal yang paling kamu suka di rumah"
     },
     {
       "id": 442,
@@ -6126,11 +6563,12 @@
       "de": "Ein Nagelknipser",
       "it": "Un tagliaunghie",
       "nl": "Een nagelknipper",
-      "pt": "Um cortador de unhas",
+      "pt": "Um corta-unhas",
+      "ptbr": "Um cortador de unhas",
       "ar": "مقص أظافر",
       "ja": "爪切り",
       "ko": "손톱깎이",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Pemotong kuku"
     },
     {
       "id": 443,
@@ -6141,10 +6579,11 @@
       "it": "Una foto da un punto alto",
       "nl": "Een foto vanaf een hoog punt",
       "pt": "Uma foto de um ponto alto",
+      "ptbr": "Uma foto de um ponto alto",
       "ar": "صورة من نقطة مرتفعة",
       "ja": "高い場所からの写真",
       "ko": "높은 곳에서 찍은 사진",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Foto dari tempat yang tinggi"
     },
     {
       "id": 444,
@@ -6155,10 +6594,11 @@
       "it": "Una foto a livello del suolo",
       "nl": "Een foto op grondniveau",
       "pt": "Uma foto ao nível do chão",
+      "ptbr": "Uma foto ao nível do chão",
       "ar": "صورة على مستوى الأرض",
       "ja": "地面すれすれの写真",
       "ko": "지면 가까이에서 찍은 사진",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Foto sejajar tanah"
     },
     {
       "id": 445,
@@ -6168,11 +6608,12 @@
       "de": "Ein auf dem Kopf stehendes Foto",
       "it": "Una foto capovolta",
       "nl": "Een omgekeerde foto",
-      "pt": "Uma foto de cabeça para baixo",
+      "pt": "Uma foto ao contrário",
+      "ptbr": "Uma foto de cabeça para baixo",
       "ar": "صورة مقلوبة",
       "ja": "逆さまの写真",
       "ko": "거꾸로 된 사진",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Foto terbalik"
     },
     {
       "id": 446,
@@ -6183,10 +6624,11 @@
       "it": "Una foto a caso",
       "nl": "Een willekeurige foto",
       "pt": "Uma foto aleatória",
+      "ptbr": "Uma foto aleatória",
       "ar": "صورة عشوائية",
       "ja": "ランダムな写真",
       "ko": "임의의 사진",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Foto secara acak"
     },
     {
       "id": 447,
@@ -6196,11 +6638,12 @@
       "de": "Was gerade vor dir ist",
       "it": "Quello che hai davanti a te in questo momento",
       "nl": "Wat er nu recht voor je ligt",
-      "pt": "O que está bem à sua frente agora",
+      "pt": "O que tens mesmo à tua frente agora",
+      "ptbr": "O que está bem à sua frente agora",
       "ar": "ما هو أمامك الآن مباشرة",
       "ja": "今目の前にあるもの",
       "ko": "지금 바로 앞에 있는 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Apa yang ada di depanmu sekarang"
     },
     {
       "id": 448,
@@ -6210,11 +6653,12 @@
       "de": "Das kleinste Ding, das du zu Hause hast",
       "it": "La cosa più piccola che hai a casa",
       "nl": "Het kleinste ding dat je thuis hebt",
-      "pt": "A menor coisa que você tem em casa",
+      "pt": "A coisa mais pequena que tens em casa",
+      "ptbr": "A menor coisa que você tem em casa",
       "ar": "أصغر شيء لديك في المنزل",
       "ja": "家にある一番小さいもの",
       "ko": "집에 있는 가장 작은 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda terkecil di rumahmu"
     },
     {
       "id": 449,
@@ -6224,11 +6668,12 @@
       "de": "Das größte Ding, das du zu Hause hast",
       "it": "La cosa più grande che hai a casa",
       "nl": "Het grootste ding dat je thuis hebt",
-      "pt": "A maior coisa que você tem em casa",
+      "pt": "A coisa maior que tens em casa",
+      "ptbr": "A maior coisa que você tem em casa",
       "ar": "أكبر شيء لديك في المنزل",
       "ja": "家にある一番大きいもの",
       "ko": "집에 있는 가장 큰 것",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda terbesar di rumahmu"
     },
     {
       "id": 450,
@@ -6239,10 +6684,11 @@
       "it": "Tre oggetti dello stesso colore perfettamente allineati",
       "nl": "Drie objecten van dezelfde kleur perfect op een rij",
       "pt": "Três objetos da mesma cor perfeitamente alinhados",
+      "ptbr": "Três objetos da mesma cor perfeitamente alinhados",
       "ar": "ثلاثة أشياء من نفس اللون مصطفة تمامًا",
       "ja": "同じ色のものが3つ、きれいに並んでいる",
       "ko": "같은 색의 물건 3개가 완벽하게 정렬됨",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tiga benda dengan warna yang sama berjajar rapi"
     },
     {
       "id": 451,
@@ -6252,11 +6698,12 @@
       "de": "Ein ungewöhnlicher Gegenstand",
       "it": "Un oggetto insolito",
       "nl": "Een ongewoon voorwerp",
-      "pt": "Um objeto incomum",
+      "pt": "Um objeto insólito",
+      "ptbr": "Um objeto incomum",
       "ar": "شيء غير مألوف",
       "ja": "珍しいもの",
       "ko": "특이한 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda unik"
     },
     {
       "id": 452,
@@ -6267,10 +6714,11 @@
       "it": "Una presa elettrica",
       "nl": "Een stopcontact",
       "pt": "Uma tomada",
+      "ptbr": "Uma tomada",
       "ar": "مأخذ كهربائي",
       "ja": "コンセント",
       "ko": "콘센트",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Colokan"
     },
     {
       "id": 453,
@@ -6280,11 +6728,12 @@
       "de": "Eine Reihe von Objekten, vom kleinsten bis zum größten geordnet",
       "it": "Una fila di oggetti ordinati dal più piccolo al più grande",
       "nl": "Een rij objecten van klein naar groot gerangschikt",
-      "pt": "Uma fila de objetos do menor ao maior",
+      "pt": "Uma fila de objetos do mais pequeno ao maior",
+      "ptbr": "Uma fila de objetos do menor ao maior",
       "ar": "صف من الأشياء مرتبة من الأصغر إلى الأكبر",
       "ja": "小さい順に並べられた物の列",
       "ko": "작은 것부터 큰 순서대로 정렬된 물건들",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Deretan benda dari yang terkecil hingga terbesar"
     },
     {
       "id": 454,
@@ -6295,10 +6744,11 @@
       "it": "Un’etichetta di abbigliamento",
       "nl": "Een kledinglabel",
       "pt": "Uma etiqueta de roupa",
+      "ptbr": "Uma etiqueta de roupa",
       "ar": "بطاقة ملابس",
       "ja": "衣類のタグ",
       "ko": "옷 라벨",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Label pakaian"
     },
     {
       "id": 455,
@@ -6309,10 +6759,11 @@
       "it": "Tre oggetti dello stesso colore perfettamente allineati",
       "nl": "Drie objecten van dezelfde kleur perfect op een rij",
       "pt": "Três objetos da mesma cor perfeitamente alinhados",
+      "ptbr": "Três objetos da mesma cor perfeitamente alinhados",
       "ar": "ثلاثة أشياء من نفس اللون مصطفة تمامًا",
       "ja": "同じ色のものが3つ、きれいに並んでいる",
       "ko": "같은 색의 물건 3개가 완벽하게 정렬됨",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Tiga benda dengan warna yang sama berjajar rapi"
     },
     {
       "id": 456,
@@ -6322,11 +6773,12 @@
       "de": "Ein ungewöhnlicher Gegenstand",
       "it": "Un oggetto insolito",
       "nl": "Een ongewoon voorwerp",
-      "pt": "Um objeto incomum",
+      "pt": "Um objeto insólito",
+      "ptbr": "Um objeto incomum",
       "ar": "شيء غير مألوف",
       "ja": "珍しいもの",
       "ko": "특이한 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda unik"
     },
     {
       "id": 457,
@@ -6337,10 +6789,11 @@
       "it": "Una presa elettrica",
       "nl": "Een stopcontact",
       "pt": "Uma tomada",
+      "ptbr": "Uma tomada",
       "ar": "مأخذ كهربائي",
       "ja": "コンセント",
       "ko": "콘센트",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Colokan"
     },
     {
       "id": 458,
@@ -6350,27 +6803,29 @@
       "de": "Eine Reihe von Objekten, vom kleinsten bis zum größten geordnet",
       "it": "Una fila di oggetti ordinati dal più piccolo al più grande",
       "nl": "Een rij objecten van klein naar groot gerangschikt",
-      "pt": "Uma fila de objetos do menor ao maior",
+      "pt": "Uma fila de objetos do mais pequeno ao maior",
+      "ptbr": "Uma fila de objetos do menor ao maior",
       "ar": "صف من الأشياء مرتبة من الأصغر إلى الأكبر",
       "ja": "小さい順に並べられた物の列",
       "ko": "작은 것부터 큰 순서대로 정렬된 물건들",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Deretan benda dari yang terkecil hingga terbesar"
     },
     {
       "id": 459,
-    "intitule": "Le chiffre 12",
-  "en": "The number 12",
-  "es": "El número 12",
-  "de": "Die Zahl 12",
-  "it": "Il numero 12",
-  "nl": "Het getal 12",
-  "pt": "O número 12",
-  "ar": "الرقم 12",
-  "ja": "数字の12",
-  "ko": "숫자 12",
-  "idn": "Angka 12"
-},
- {
+      "intitule": "Le chiffre 12",
+      "en": "The number 12",
+      "es": "El número 12",
+      "de": "Die Zahl 12",
+      "it": "Il numero 12",
+      "nl": "Het getal 12",
+      "pt": "O número 12",
+      "ptbr": "O número 12",
+      "ar": "الرقم 12",
+      "ja": "数字の12",
+      "ko": "숫자 12",
+      "idn": "Angka 12"
+    },
+    {
       "id": 460,
       "intitule": "Un objet posé là où il ne devrait pas être",
       "en": "An object placed where it shouldn't be",
@@ -6379,10 +6834,11 @@
       "it": "Un oggetto messo dove non dovrebbe essere",
       "nl": "Een voorwerp dat ligt waar het niet hoort",
       "pt": "Um objeto colocado onde não deveria estar",
+      "ptbr": "Um objeto colocado onde não deveria estar",
       "ar": "غرض موضوع في مكان لا ينبغي أن يكون فيه",
       "ja": "本来置かれるべきでない場所にある物",
       "ko": "원래 있어서는 안 될 곳에 놓인 물건",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Benda yang diletakkan di tempat yang salah"
     },
     {
       "id": 461,
@@ -6392,11 +6848,12 @@
       "de": "Ein Bogen aus Alltagsgegenständen",
       "it": "Un arco fatto di oggetti quotidiani",
       "nl": "Een boog van alledaagse voorwerpen",
-      "pt": "Um arco feito de objetos do dia a dia",
+      "pt": "Um arco de círculo feito de objetos do quotidiano",
+      "ptbr": "Um arco feito de objetos do dia a dia",
       "ar": "قوس مصنوع من أشياء يومية",
       "ja": "日常の物で作られたアーチ",
       "ko": "일상용품으로 만든 아치",
-      "idn": "Ambil foto sesuatu"
+      "idn": "Busur yang terbuat dari benda sehari-hari"
     }
   ]
 }

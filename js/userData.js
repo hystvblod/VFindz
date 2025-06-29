@@ -1,14 +1,7 @@
 const SUPABASE_URL = 'https://swmdepiukfginzhbeccz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI';
 
-// ------- PATCH SÛR POUR CAPACITOR ---------
-if (!window.supabase || !window.supabase.auth) {
-  // On crée le client Supabase sur window (mode CDN ou Capacitor)
-  window.supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-}
-const supabase = window.supabase;
-// ------------------------------------------
-
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let userDataCache = null;
 let userIdCache = null;
