@@ -1,9 +1,18 @@
 const SUPABASE_URL = 'https://swmdepiukfginzhbeccz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI';
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// ------- PATCH SÛR POUR CAPACITOR ---------
+if (!window.supabase || !window.supabase.auth) {
+  // On crée le client Supabase sur window (mode CDN ou Capacitor)
+  window.supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+}
+const supabase = window.supabase;
+// ------------------------------------------
+
 
 let userDataCache = null;
 let userIdCache = null;
+
 
 // POPUP ADMIN
 async function checkAndShowPopup(userId) {
@@ -48,11 +57,14 @@ async function loadUserData(force = false) {
   const isBlocked = await checkBlocageUtilisateur(userIdCache);
   if (isBlocked) throw new Error("Utilisateur bloqué temporairement.");
   if (userDataCache && !force) return userDataCache;
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('users')
     .select('*')
     .eq('id', userIdCache)
-    .single();
+    .maybeSingle();
+  if (error) {
+    console.error("Erreur loadUserData :", error);
+  }
   if (!data) {
     const randomPseudo = "VUser_" + Math.random().toString(36).slice(2, 8);
     userDataCache = {
@@ -82,11 +94,14 @@ async function loadUserData(force = false) {
     const { error: insertError } = await supabase.from('users').insert([userDataCache]);
     if (insertError) {
       if (insertError.code === '23505' || (insertError.message && insertError.message.includes('duplicate'))) {
-        const { data: existing } = await supabase
+        const { data: existing, error: errorExisting } = await supabase
           .from('users')
           .select('*')
           .eq('id', userIdCache)
-          .single();
+          .maybeSingle();
+        if (errorExisting) {
+          console.error("Erreur recherche user existant :", errorExisting);
+        }
         userDataCache = existing;
       } else {
         throw insertError;
@@ -381,11 +396,15 @@ async function voterPourPhoto(photoId) {
   userDataCache.votesConcours[concoursId].votes[dateStr].push(photoId);
   userDataCache.votesConcours[concoursId].lastReset = dateStr;
   await supabase.from('users').update({ votesConcours: userDataCache.votesConcours }).eq('id', userIdCache);
-  const { data: photo } = await supabase
+  const { data: photo, error: errorPhoto } = await supabase
     .from('concoursPhotos')
     .select('*')
     .eq('id', photoId)
-    .single();
+    .maybeSingle();
+  if (errorPhoto) {
+    console.error("Erreur voterPourPhoto :", errorPhoto);
+    return false;
+  }
   let votesTotal = photo?.votesTotal || 0;
   votesTotal += 1;
   await supabase.from('concoursPhotos').update({ votesTotal }).eq('id', photoId);
@@ -477,11 +496,14 @@ async function ajouterDefiHistorique({ defi, type = 'solo', date = null }) {
   await loadUserData();
   const userId = getUserId();
   if (!userId) throw new Error("Utilisateur non connecté");
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('users')
     .select('historique')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
+  if (error) {
+    console.error("Erreur ajouterDefiHistorique :", error);
+  }
   let historique = Array.isArray(data?.historique) ? data.historique : [];
   const dateISO = date || (new Date()).toISOString().slice(0, 10);
   let entry = historique.find(e => e.date === dateISO && e.type === type);
@@ -504,7 +526,7 @@ async function checkBlocageUtilisateur(userId) {
     .from('users')
     .select('banni, ban_date_debut, ban_date_fin, ban_motif')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("Erreur blocage utilisateur :", error.message);
@@ -546,7 +568,11 @@ async function getUserByPseudo(pseudo) {
     .from('users')
     .select('pseudo, premium, id_color')
     .eq('pseudo', pseudo)
-    .single();
+    .maybeSingle();
+  if (error) {
+    console.error("Erreur getUserByPseudo :", error);
+    return null;
+  }
   return data || null;
 }
 // Ajout local d'une photo aimée complète (cadre inclus, limité à 30)

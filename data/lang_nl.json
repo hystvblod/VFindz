@@ -331,6 +331,15 @@
   "button.clearall": "Alles wissen",
   "main.noliked": "Nog geen favoriete foto's.",
   "footer": "© 2025 VFindz",
-  "alert.clearall": "Alle favoriete foto's wissen?"
+  "alert.clearall": "Alle favoriete foto's wissen?",
+  "boutique.button.acheter": "Kopen",
+"boutique.button.achete": "Gekocht",
+"boutique.button.debloque": "Ontgrendeld!",
+"boutique.button.infos": "Info",
+"boutique.button.premium": "Premium vereist",
+"boutique.feedback.success": "✅ Kader gekocht!",
+"boutique.feedback.error": "❌ Niet genoeg munten of fout!",
+"boutique.empty": "Geen kader in deze categorie."
+
 
 }

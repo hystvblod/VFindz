@@ -62,15 +62,21 @@ window.uploadPhotoConcoursWebp = async function(dataUrl, concoursId, userId) {
 
   return publicUrlData.publicUrl;
 };
+
 // --------- OUVERTURE CAMERA UNIFIÉE CAPACITOR + WEB ---------
 window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, cadreId = null) {
-  // Cas mobile natif Capacitor
-  if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) {
+  // Cas mobile natif Capacitor, TEST ultra solide
+  if (
+    window.Capacitor &&
+    window.Capacitor.isNativePlatform &&
+    typeof window.Capacitor.isNativePlatform === "function" &&
+    window.Capacitor.isNativePlatform() &&
+    window.Capacitor.Plugins &&
+    window.Capacitor.Plugins.Camera &&
+    typeof window.Capacitor.Plugins.Camera.getPhoto === "function"
+  ) {
     try {
-      const cameraModule = await import('@capacitor/camera');
-      const Camera = cameraModule.Camera;
-
-      const photo = await Camera.getPhoto({
+      const photo = await window.Capacitor.Plugins.Camera.getPhoto({
         quality: 85,
         allowEditing: false,
         resultType: 'dataUrl',
@@ -78,6 +84,8 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
       });
 
       const dataUrl = photo.dataUrl;
+      // ... (le reste, inchangé)
+
       // Mode duel
       if (mode === "duel") {
         if (!duelId) return alert("Erreur interne : duelId manquant.");
@@ -109,16 +117,16 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
         return dataUrl;
       }
       // Mode concours
-else if (mode === "concours") {
-  try {
-    const userId = await window.getUserId();
-    const urlPhoto = await window.uploadPhotoConcoursWebp(dataUrl, defiId, userId);
-    return urlPhoto;
-  } catch (err) {
-    alert("Erreur upload concours : " + (err.message || err));
-    throw err;
-  }
-}
+      else if (mode === "concours") {
+        try {
+          const userId = await window.getUserId();
+          const urlPhoto = await window.uploadPhotoConcoursWebp(dataUrl, defiId, userId);
+          return urlPhoto;
+        } catch (err) {
+          alert("Erreur upload concours : " + (err.message || err));
+          throw err;
+        }
+      }
 
     } catch (err) {
       alert("Erreur caméra native : " + (err.message || err));
@@ -374,11 +382,11 @@ else if (mode === "concours") {
             result = dataUrl;
           }
           // Mode concours
-     else if (mode === "concours") {
-  const userId = await window.getUserId();
-  const urlPhoto = await window.uploadPhotoConcoursWebp(dataUrl, defiId, userId);
-  result = urlPhoto;
-}
+          else if (mode === "concours") {
+            const userId = await window.getUserId();
+            const urlPhoto = await window.uploadPhotoConcoursWebp(dataUrl, defiId, userId);
+            result = urlPhoto;
+          }
 
         } catch (err) {
           alert("Erreur upload : " + (err.message || err));

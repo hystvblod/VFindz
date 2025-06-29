@@ -323,5 +323,14 @@
   "solo.frame.title": "Wähle einen Rahmen für dieses Foto",
   "solo.fav.limit": "Limit von 30 Fotos erreicht.",
   "solo.fav.added": "Foto zu Favoriten hinzugefügt!",
-  "solo.fav.already": "Foto bereits zu Favoriten hinzugefügt."
+  "solo.fav.already": "Foto bereits zu Favoriten hinzugefügt.",
+  "boutique.button.acheter": "Kaufen",
+"boutique.button.achete": "Gekauft",
+"boutique.button.debloque": "Freigeschaltet!",
+"boutique.button.infos": "Infos",
+"boutique.button.premium": "Premium erforderlich",
+"boutique.feedback.success": "✅ Rahmen gekauft!",
+"boutique.feedback.error": "❌ Nicht genug Münzen oder Fehler!",
+"boutique.empty": "Kein Rahmen in dieser Kategorie."
+
 }

@@ -92,3 +92,8 @@ window.setLang = async function(newLang) {
   await window.loadI18nLang(true);
   window.i18nTranslateAll();
 };
+window.t = function(key, fallback) {
+  const txt = window.i18nGet ? window.i18nGet(key) : undefined;
+  if (txt && txt !== key) return txt;
+  return fallback || key;
+};

@@ -331,5 +331,14 @@
   "button.clearall": "Cancella tutto",
   "main.noliked": "Nessuna foto preferita al momento.",
   "footer": "© 2025 VFindz",
-  "alert.clearall": "Cancellare tutte le foto preferite?"
+  "alert.clearall": "Cancellare tutte le foto preferite?",
+  "boutique.button.acheter": "Acquista",
+"boutique.button.achete": "Acquistato",
+"boutique.button.debloque": "Sbloccato!",
+"boutique.button.infos": "Info",
+"boutique.button.premium": "Richiesto Premium",
+"boutique.feedback.success": "✅ Cornice acquistata!",
+"boutique.feedback.error": "❌ Monete insufficienti o errore!",
+"boutique.empty": "Nessuna cornice in questa categoria."
+
 }

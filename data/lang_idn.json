@@ -331,6 +331,15 @@
   "button.clearall": "Hapus semua",
   "main.noliked": "Belum ada foto yang disukai.",
   "footer": "© 2025 VFindz",
-  "alert.clearall": "Hapus semua foto yang disukai?"
+  "alert.clearall": "Hapus semua foto yang disukai?",
+  "boutique.button.acheter": "Beli",
+"boutique.button.achete": "Dibeli",
+"boutique.button.debloque": "Dibuka!",
+"boutique.button.infos": "Info",
+"boutique.button.premium": "Memerlukan Premium",
+"boutique.feedback.success": "✅ Bingkai telah dibeli!",
+"boutique.feedback.error": "❌ Koin tidak cukup atau terjadi kesalahan!",
+"boutique.empty": "Tidak ada bingkai dalam kategori ini."
+
 
 }

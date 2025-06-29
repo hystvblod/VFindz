@@ -1,5 +1,11 @@
 // === Dépendances : userData.js doit être chargé AVANT ce fichier ===
 
+// Fonctions i18n requises AVANT ce script
+// Exemple minimal à avoir globalement :
+// const translations = { fr: {...}, en: {...}, ... };
+// const currentLang = localStorage.getItem("lang") || "fr";
+// function t(key, fallback) { return translations?.[currentLang]?.[key] || fallback || key; }
+
 const BOUTIQUE_DB_NAME = 'VFindBoutiqueCache';
 const BOUTIQUE_STORE = 'boutiqueData';
 
@@ -38,45 +44,45 @@ async function checkCadreUnlock(cadre) {
   if (!cadre.condition) return { unlocked: true };
   switch (cadre.condition.type) {
     case "premium":
-      return { unlocked: await window.isPremium(), texte: cadre.condition.texte || "Compte premium requis" };
+      return { unlocked: await window.isPremium(), texte: cadre.condition.texte || t("boutique.button.premium", "Compte premium requis") };
     case "jours_defis":
       if (typeof window.getJoursDefisRealises === "function") {
         const nb = await window.getJoursDefisRealises();
         return {
           unlocked: nb >= (cadre.condition.nombre || 0),
-          texte: cadre.unlock || `Fais ${cadre.condition.nombre} jours de défis pour débloquer`
+          texte: cadre.unlock || t("boutique.unlock.days", `Fais ${cadre.condition.nombre} jours de défis pour débloquer`)
         };
       }
-      return { unlocked: false, texte: "Fonction de check non dispo" };
+      return { unlocked: false, texte: t("boutique.unlock.nofunc", "Fonction de check non dispo") };
     case "inviter_amis":
       if (typeof window.getNbAmisInvites === "function") {
         const nb = await window.getNbAmisInvites();
         return {
           unlocked: nb >= (cadre.condition.nombre || 0),
-          texte: cadre.unlock || `Invite ${cadre.condition.nombre} amis`
+          texte: cadre.unlock || t("boutique.unlock.invite", `Invite ${cadre.condition.nombre} amis`)
         };
       }
-      return { unlocked: false, texte: "Fonction de check non dispo" };
+      return { unlocked: false, texte: t("boutique.unlock.nofunc", "Fonction de check non dispo") };
     case "participation_concours":
       if (typeof window.getConcoursParticipationStatus === "function") {
         const ok = await window.getConcoursParticipationStatus();
         return {
           unlocked: ok,
-          texte: cadre.unlock || "Participe à un concours et vote au moins 3 jours"
+          texte: cadre.unlock || t("boutique.unlock.concours", "Participe à un concours et vote au moins 3 jours")
         };
       }
-      return { unlocked: false, texte: "Fonction de check non dispo" };
+      return { unlocked: false, texte: t("boutique.unlock.nofunc", "Fonction de check non dispo") };
     case "telechargement_vzone":
       if (typeof window.hasDownloadedVZone === "function") {
         const ok = await window.hasDownloadedVZone();
         return {
           unlocked: ok,
-          texte: cadre.unlock || "Télécharge le jeu VZone pour débloquer ce cadre."
+          texte: cadre.unlock || t("boutique.unlock.vzone", "Télécharge le jeu VZone pour débloquer ce cadre.")
         };
       }
-      return { unlocked: false, texte: "Fonction de check non dispo" };
+      return { unlocked: false, texte: t("boutique.unlock.nofunc", "Fonction de check non dispo") };
     default:
-      return { unlocked: false, texte: cadre.unlock || "Condition inconnue" };
+      return { unlocked: false, texte: cadre.unlock || t("boutique.unlock.unknown", "Condition inconnue") };
   }
 }
 
@@ -95,11 +101,12 @@ function showFeedback(text) {
 
 // --- Acheter cadre depuis boutique (cloud & local) ---
 async function acheterCadreBoutique(id, prix) {
+  console.log(">>> acheterCadreBoutique", id, prix);
   await window.loadUserData(true); // force reload données utilisateur !
   const { data, error } = await window.supabase.rpc('secure_remove_points', { nb: prix });
-  console.log("DEBUG ACHAT", { data, error });
+  console.log(">>> acheterCadreBoutique: rpc result", data, error);
   if (error || !data || data.success !== true) {
-    alert("❌ Pas assez de pièces ou erreur !");
+    alert(t("boutique.feedback.error", "❌ Pas assez de pièces ou erreur !"));
     return;
   }
   await window.acheterCadre(id);
@@ -116,15 +123,14 @@ async function acheterCadreBoutique(id, prix) {
       reader.readAsDataURL(blob);
     });
   } catch (e) {
-    console.error("Erreur chargement cadre base64 :", e);
-    alert("Erreur lors de l'enregistrement du cadre. Vérifie ta connexion.");
+    alert(t("boutique.feedback.base64error", "Erreur lors de l'enregistrement du cadre. Vérifie ta connexion."));
     return;
   }
   localStorage.setItem('lastCadresUpdate', Date.now().toString());
   await window.getOwnedFrames(true);
   await updatePointsDisplay();
-  await updateJetonsDisplay(); // <-- Ajouté si jamais jetons impactés
-  alert("✅ Cadre acheté !");
+  await updateJetonsDisplay();
+  alert(t("boutique.feedback.success", "✅ Cadre acheté !"));
   await renderBoutique(currentCategory);
 }
 
@@ -149,7 +155,7 @@ function showUnlockPopup(nom, message) {
     <div class="popup-inner">
       <button id="close-popup" onclick="document.body.removeChild(this.parentNode.parentNode)">✖</button>
       <h2 style="font-size:1.4em;">${nom}</h2>
-      <div style="margin:1em 0 0.5em 0;font-size:1.1em;text-align:center;">${message || "Aucune information."}</div>
+      <div style="margin:1em 0 0.5em 0;font-size:1.1em;text-align:center;">${message || t("boutique.unlock.none", "Aucune information.")}</div>
     </div>
   `;
   document.body.appendChild(popup);
@@ -157,6 +163,7 @@ function showUnlockPopup(nom, message) {
 
 // Gagne des pièces via pub simulée
 async function watchAd() {
+  console.log(">>> watchAd");
   await window.supabase.rpc('secure_add_points', { nb: 100 });
   await updatePointsDisplay();
   showFeedback("+100 💰");
@@ -165,6 +172,7 @@ async function watchAd() {
 
 // --- Popup achat jetons ---
 function ouvrirPopupJetonBoutique() {
+  console.log(">>> ouvrirPopupJetonBoutique");
   const popup = document.getElementById("popup-achat-jeton");
   if (popup) popup.classList.remove("hidden");
 }
@@ -173,43 +181,48 @@ function fermerPopupJetonBoutique() {
   if (popup) popup.classList.add("hidden");
 }
 async function acheterJetonsAvecPieces() {
+  console.log(">>> acheterJetonsAvecPieces");
   await window.loadUserData(true); // Sécurité anti-cache
   const { data, error } = await window.supabase.rpc('secure_remove_points', { nb: 100 });
+  console.log(">>> acheterJetonsAvecPieces: rpc", data, error);
   if (error || !data || data.success !== true) {
-    alert("❌ Pas assez de pièces.");
+    alert(t("boutique.feedback.error", "❌ Pas assez de pièces."));
     return;
   }
   await window.supabase.rpc('secure_add_jetons', { nb: 3 });
-  alert("✅ 3 jetons ajoutés !");
+  alert(t("boutique.feedback.jetons", "✅ 3 jetons ajoutés !"));
   await updatePointsDisplay();
   await updateJetonsDisplay();
   fermerPopupJetonBoutique();
 }
 async function acheterJetonsAvecPub() {
-  alert("📺 Simulation de pub regardée !");
+  alert(t("boutique.feedback.simupub", " Simulation de pub regardée !"));
   setTimeout(async () => {
     await window.supabase.rpc('secure_add_jetons', { nb: 3 });
-    alert("✅ 3 jetons ajoutés !");
+    alert(t("boutique.feedback.jetons", "✅ 3 jetons ajoutés !"));
     await updateJetonsDisplay();
     fermerPopupJetonBoutique();
   }, 3000);
 }
 
 // --- Affichage points/jetons ---
-// 🔥 PATCH : Toujours reload les données à jour depuis Supabase !
 async function updatePointsDisplay() {
-  await window.loadUserData(true); // FORCE reload à chaque update affichage
+  console.log(">>> updatePointsDisplay");
+  await window.loadUserData(true);
   const pointsDisplay = document.getElementById("points");
   if (pointsDisplay) {
     const profil = await window.getUserDataCloud();
+    console.log(">>> updatePointsDisplay: profil", profil);
     pointsDisplay.textContent = profil.points || 0;
   }
 }
 async function updateJetonsDisplay() {
-  await window.loadUserData(true); // FORCE reload à chaque update affichage
+  console.log(">>> updateJetonsDisplay");
+  await window.loadUserData(true);
   const jetonsSpan = document.getElementById("jetons");
   if (jetonsSpan) {
     const profil = await window.getUserDataCloud();
+    console.log(">>> updateJetonsDisplay: profil", profil);
     jetonsSpan.textContent = profil.jetons || 0;
   }
 }
@@ -263,7 +276,7 @@ async function afficherPhotosSauvegardees(photosMap) {
 
       const fond = document.createElement("img");
       fond.className = "photo-cadre";
-     fond.src = window.getCadreUrl(cadreActuel);
+      fond.src = window.getCadreUrl(cadreActuel);
 
       const photo = document.createElement("img");
       photo.className = "photo-user";
@@ -283,23 +296,29 @@ let CADRES_DATA = [];
 let currentCategory = 'classique';
 
 async function fetchCadres(force = false) {
+  console.log(">>> fetchCadres: start", force);
   if (!force) {
     const cached = await getBoutiqueCache();
+    console.log(">>> fetchCadres: cache", cached);
     if (cached) {
       CADRES_DATA = cached;
       return;
     }
   }
+  console.log(">>> fetchCadres: querying supabase...");
   const { data, error } = await window.supabase.from('cadres').select('*');
+  console.log(">>> fetchCadres: supabase data", data, error);
   if (error || !data) {
     console.error("Erreur chargement Supabase :", error);
     return;
   }
   CADRES_DATA = data;
   await setBoutiqueCache(data);
+  console.log(">>> fetchCadres: data ready, count =", data.length);
 }
 
 async function renderBoutique(categoryKey) {
+  console.log(">>> renderBoutique", CADRES_DATA, categoryKey);
   const catBarContainer = document.getElementById("boutique-categories");
   const boutiqueContainer = document.getElementById("boutique-container");
 
@@ -323,12 +342,21 @@ async function renderBoutique(categoryKey) {
   const grid = document.createElement("div");
   grid.className = "grid-cadres";
 
+  console.log(">>> renderBoutique: filtering for category", categoryKey);
   const cadresCat = CADRES_DATA.filter(cadre => getCategorie(cadre.id) === categoryKey);
-  let ownedFrames = await window.getOwnedFrames();
+  console.log(">>> renderBoutique: cadresCat", cadresCat);
+
+  let ownedFrames = [];
+  if (typeof window.getOwnedFrames === "function") {
+    ownedFrames = await window.getOwnedFrames();
+    console.log(">>> renderBoutique: ownedFrames", ownedFrames);
+  } else {
+    console.log(">>> renderBoutique: window.getOwnedFrames is not a function");
+  }
 
   if (!cadresCat.length) {
     const empty = document.createElement("p");
-    empty.textContent = "Aucun cadre dans cette catégorie.";
+    empty.textContent = t("boutique.empty", "Aucun cadre dans cette catégorie.");
     grid.appendChild(empty);
   } else {
     for (const cadre of cadresCat) {
@@ -375,7 +403,7 @@ async function renderBoutique(categoryKey) {
       title.textContent = cadre.nom;
 
       const price = document.createElement("p");
-      price.textContent = `${cadre.prix ? cadre.prix + " pièces" : ""}`;
+      price.textContent = `${cadre.prix ? cadre.prix + " " + t("label.pieces", "pièces") : ""}`;
 
       const button = document.createElement("button");
 
@@ -386,9 +414,9 @@ async function renderBoutique(categoryKey) {
             if (!cadre.prix) {
               await window.acheterCadre(cadre.id);
               ownedFrames = await window.getOwnedFrames(true);
-              showFeedback("🎉 Cadre débloqué !");
+              showFeedback("🎉 " + t("boutique.button.debloque", "Cadre débloqué !"));
             }
-            button.textContent = cadre.prix ? "Acheter" : "Débloqué !";
+            button.textContent = cadre.prix ? t("boutique.button.acheter", "Acheter") : t("boutique.button.debloque", "Débloqué !");
             button.disabled = !!cadre.prix ? false : true;
             if (cadre.prix) {
               button.addEventListener("click", () => acheterCadreBoutique(cadre.id, cadre.prix));
@@ -396,26 +424,26 @@ async function renderBoutique(categoryKey) {
               button.classList.add("btn-success");
             }
           } else {
-            button.textContent = "Débloqué !";
+            button.textContent = t("boutique.button.debloque", "Débloqué !");
             button.disabled = true;
             button.classList.add("btn-success");
           }
         } else {
-          button.textContent = "Infos";
+          button.textContent = t("boutique.button.infos", "Infos");
           button.disabled = false;
           button.classList.add("btn-info");
           button.onclick = () => showUnlockPopup(cadre.nom, unlockInfo.texte);
         }
       } else if (categoryKey === "premium" && !(await window.isPremium())) {
-        button.textContent = "Premium requis";
+        button.textContent = t("boutique.button.premium", "Premium requis");
         button.disabled = true;
         button.classList.add("disabled-premium");
-        button.title = "Ce cadre nécessite un compte premium";
+        button.title = t("boutique.button.premium", "Ce cadre nécessite un compte premium");
       } else if (ownedFrames.includes(cadre.id)) {
-        button.textContent = "Acheté";
+        button.textContent = t("boutique.button.achete", "Acheté");
         button.disabled = true;
       } else {
-        button.textContent = "Acheter";
+        button.textContent = t("boutique.button.acheter", "Acheter");
         button.addEventListener("click", () => acheterCadreBoutique(cadre.id, cadre.prix));
       }
 
@@ -444,7 +472,7 @@ const PREMIUM_PRODUCT_ID = "premium_upgrade";
 async function chargerProduits() {
   return new Promise((resolve, reject) => {
     if (!window.Cordova || !window.Cordova.plugins || !window.Cordova.plugins.purchase) {
-      alert("Achat non supporté sur ce device.");
+      alert(t("boutique.feedback.nosupport", "Achat non supporté sur ce device."));
       return reject("Plugin non dispo");
     }
     window.Cordova.plugins.purchase.getProducts([PREMIUM_PRODUCT_ID], function(products) {
@@ -460,13 +488,13 @@ async function acheterPremium() {
     await chargerProduits();
     window.Cordova.plugins.purchase.buy(PREMIUM_PRODUCT_ID, 1, function (data) {
       window.updateUserData({ premium: true });
-      alert("✨ Bravo, tu es maintenant Premium !");
+      alert(t("boutique.feedback.premium", " Bravo, tu es maintenant Premium !"));
       window.location.reload();
     }, function (err) {
-      alert("Erreur achat Premium : " + JSON.stringify(err));
+      alert(t("boutique.feedback.premiumerror", "Erreur achat Premium : ") + JSON.stringify(err));
     });
   } catch (e) {
-    alert("Achat non disponible : " + e);
+    alert(t("boutique.feedback.nodisponible", "Achat non disponible : ") + e);
   }
 }
 
@@ -492,8 +520,14 @@ window.acheterPremium = acheterPremium;
 
 // INIT
 document.addEventListener('DOMContentLoaded', async () => {
-  await fetchCadres();
-  await renderBoutique('classique');
-  await updatePointsDisplay();
-  await updateJetonsDisplay();
+  console.log(">>> BOUTIQUE: DOMContentLoaded, launch main sequence");
+  await window.loadUserData(true);   // 1️⃣ FORCE la synchro cloud (et vide le cache)
+  console.log(">>> BOUTIQUE: loaded user data");
+  await fetchCadres(true);           // 2️⃣ FORCE le fetch cloud pour les cadres (pas le cache local)
+  console.log(">>> BOUTIQUE: fetched cadres");
+  await renderBoutique('classique'); // 3️⃣ Affiche la boutique avec la vraie data
+  console.log(">>> BOUTIQUE: rendered boutique classique");
+  await updatePointsDisplay();       // 4️⃣ Recharge pièces à jour depuis cloud
+  await updateJetonsDisplay();       // 5️⃣ Recharge jetons à jour depuis cloud
+  console.log(">>> BOUTIQUE: displays updated (points, jetons)");
 });

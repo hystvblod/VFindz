@@ -331,5 +331,14 @@
   "button.clearall": "Vider la liste",
   "main.noliked": "Aucune photo aimée pour l’instant.",
   "footer": "© 2025 VFindz",
-  "alert.clearall": "Vider toutes les photos aimées ?"
+  "alert.clearall": "Vider toutes les photos aimées ?",
+  "boutique.button.acheter": "Acheter",
+"boutique.button.achete": "Acheté",
+"boutique.button.debloque": "Débloqué !",
+"boutique.button.infos": "Infos",
+"boutique.button.premium": "Premium requis",
+"boutique.feedback.success": "✅ Cadre acheté !",
+"boutique.feedback.error": "❌ Pas assez de pièces ou erreur !",
+"boutique.empty": "Aucun cadre dans cette catégorie."
+
 }

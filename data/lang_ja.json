@@ -331,6 +331,15 @@
   "button.clearall": "すべて削除",
   "main.noliked": "まだお気に入りの写真はありません。",
   "footer": "© 2025 VFindz",
-  "alert.clearall": "すべてのお気に入り写真を削除しますか？"
+  "alert.clearall": "すべてのお気に入り写真を削除しますか？",
+  "boutique.button.acheter": "購入",
+"boutique.button.achete": "購入済み",
+"boutique.button.debloque": "アンロック！",
+"boutique.button.infos": "情報",
+"boutique.button.premium": "プレミアム必須",
+"boutique.feedback.success": "✅ フレームを購入しました！",
+"boutique.feedback.error": "❌ コインが足りないかエラーが発生しました！",
+"boutique.empty": "このカテゴリにはフレームがありません。"
+
 
 }

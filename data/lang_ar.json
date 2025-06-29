@@ -309,6 +309,14 @@
   "button.clearall": "مسح الكل",
   "main.noliked": "لا توجد صور مفضلة حتى الآن.",
   "footer": "© 2025 VFindz",
-  "alert.clearall": "مسح جميع الصور المفضلة؟"
+  "alert.clearall": "مسح جميع الصور المفضلة؟",
+"boutique.button.acheter": "شراء",
+"boutique.button.achete": "تم الشراء",
+"boutique.button.debloque": "تم الفتح!",
+"boutique.button.infos": "معلومات",
+"boutique.button.premium": "يتطلب بريميوم",
+"boutique.feedback.success": "✅ تم شراء الإطار!",
+"boutique.feedback.error": "❌ لا توجد عملات كافية أو خطأ!",
+"boutique.empty": "لا يوجد إطار في هذه الفئة."
 
 }

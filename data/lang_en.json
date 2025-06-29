@@ -331,6 +331,15 @@
   "button.clearall": "Clear all",
   "main.noliked": "No liked photos yet.",
   "footer": "© 2025 VFindz",
-  "alert.clearall": "Clear all liked photos?"
+  "alert.clearall": "Clear all liked photos?",
+  "boutique.button.acheter": "Buy",
+"boutique.button.achete": "Bought",
+"boutique.button.debloque": "Unlocked!",
+"boutique.button.infos": "Info",
+"boutique.button.premium": "Premium required",
+"boutique.feedback.success": "✅ Frame purchased!",
+"boutique.feedback.error": "❌ Not enough coins or error!",
+"boutique.empty": "No frame in this category."
+
 }
 

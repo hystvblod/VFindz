@@ -14,11 +14,9 @@ function getCadreUrl(id) {
     if (key.startsWith("photo_defi_") && !key.endsWith("_date")) {
       let value = localStorage.getItem(key);
       if (typeof value === "string" && value.startsWith("data:image")) {
-        // PATCH : convertit en nouvel objet {photo, cadre}
         const cadre = "polaroid_01";
         localStorage.setItem(key, JSON.stringify({ photo: value, cadre }));
       }
-      // Patch jeton, qui peut avoir l’ancienne image string aussi
       if (typeof value === "string" && value.endsWith("jetonpp.webp")) {
         localStorage.setItem(key, JSON.stringify({ photo: value, cadre: "polaroid_01" }));
       }
@@ -96,8 +94,10 @@ function retirerPhotoAimee(defiId) {
 
 // ----------- MAJ SOLDE POINTS/JETONS -------------
 function majSolde() {
-  if (document.getElementById("points")) document.getElementById("points").textContent = userData.points || 0;
-  if (document.getElementById("jetons")) document.getElementById("jetons").textContent = userData.jetons || 0;
+  const pts = document.getElementById("points");
+  const jts = document.getElementById("jetons");
+  if (pts) pts.textContent = userData?.points || 0;
+  if (jts) jts.textContent = userData?.jetons || 0;
 }
 
 // ----------- LOGIQUE JEU -------------
@@ -107,7 +107,6 @@ async function initSoloGame() {
   let defiActifs = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
   let defiTimer = parseInt(localStorage.getItem(SOLO_TIMER_KEY) || "0");
 
-  // Partie en cours (défis non terminés OU terminés mais timer pas fini)
   if (
     defiActifs.length > 0 &&
     defiTimer &&
@@ -119,7 +118,6 @@ async function initSoloGame() {
     return;
   }
 
-  // Timer terminé (fin de partie)
   if (
     defiActifs.length > 0 &&
     defiTimer &&
@@ -129,7 +127,6 @@ async function initSoloGame() {
     return;
   }
 
-  // Pas de partie active → nouvelle partie
   await startGame();
 }
 
@@ -172,9 +169,12 @@ function getRandomDefis(n) {
 }
 
 function showGame() {
-  if (document.getElementById("pre-game")) document.getElementById("pre-game").remove();
-  document.getElementById("end-section").classList.add("hidden");
-  document.getElementById("game-section").classList.remove("hidden");
+  const pre = document.getElementById("pre-game");
+  if (pre) pre.remove();
+  const end = document.getElementById("end-section");
+  if (end) end.classList.add("hidden");
+  const game = document.getElementById("game-section");
+  if (game) game.classList.remove("hidden");
   const soldeContainer = document.getElementById("solde-container");
   if (soldeContainer) soldeContainer.style.display = "flex";
 }
@@ -194,7 +194,7 @@ function updateTimer() {
     const h = Math.floor(diff / (1000 * 60 * 60));
     const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const s = Math.floor((diff % (1000 * 60)) / 1000);
-    timerDisplay.textContent = `${h}h ${m}m ${s}s`;
+    if (timerDisplay) timerDisplay.textContent = `${h}h ${m}m ${s}s`;
   }, 1000);
 }
 
@@ -202,6 +202,7 @@ function updateTimer() {
 async function loadDefis() {
   let defis = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
   const defiList = document.getElementById("defi-list");
+  if (!defiList) return;
   if (!defis || !Array.isArray(defis) || defis.length === 0) {
     defiList.innerHTML = '<li class="defi-vide">Aucun défi en cours.</li>';
     return;
@@ -249,7 +250,6 @@ async function loadDefis() {
     defiList.appendChild(li);
   }
 
-  // --- PATCH : forcer affichage photos après le DOM (fix tous navigateurs) ---
   setTimeout(() => {
     for (const defiId in photosMap) {
       if (photosMap[defiId]) {
@@ -259,7 +259,7 @@ async function loadDefis() {
   }, 15);
 }
 
-// ----------- FONCTION CLE SOLO : VALIDATION AVEC JETON (adapté DUEL) -----------
+// ----------- FONCTION CLE SOLO : VALIDATION AVEC JETON -----------
 async function validerDefiAvecJeton(index) {
   let defis = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
   let defi = defis[index];
@@ -298,18 +298,24 @@ window.gererPrisePhoto = function(defiId, index) {
       popup.classList.remove("hidden");
       popup.classList.add("show");
 
-      document.getElementById("btnPubReprise").onclick = function() {
-        popup.classList.add("hidden");
-        popup.classList.remove("show");
-        canRetakePhoto = true;
-        retakeDefiId = defiId;
-        window.ouvrirCameraPour(defiId);
-        window.pubAfterPhoto = true;
-      };
-      document.getElementById("btnAnnulerReprise").onclick = function() {
-        popup.classList.add("hidden");
-        popup.classList.remove("show");
-      };
+      const btnPub = document.getElementById("btnPubReprise");
+      const btnAnnul = document.getElementById("btnAnnulerReprise");
+      if (btnPub) {
+        btnPub.onclick = function() {
+          popup.classList.add("hidden");
+          popup.classList.remove("show");
+          canRetakePhoto = true;
+          retakeDefiId = defiId;
+          window.ouvrirCameraPour(defiId);
+          window.pubAfterPhoto = true;
+        };
+      }
+      if (btnAnnul) {
+        btnAnnul.onclick = function() {
+          popup.classList.add("hidden");
+          popup.classList.remove("show");
+        };
+      }
     }
     return;
   } else {
@@ -318,10 +324,6 @@ window.gererPrisePhoto = function(defiId, index) {
     window.ouvrirCameraPour(defiId);
   }
 };
-
-// ... [reste du fichier inchangé, à partir de window.afficherPhotoDansCadreSolo, etc.]
-
-
 
 // ----------- PHOTO DANS CADRE & LOGIQUE PUB/PREMIUM -----------
 window.afficherPhotoDansCadreSolo = async function(defiId, dataUrl) {
@@ -347,17 +349,13 @@ window.afficherPhotoDansCadreSolo = async function(defiId, dataUrl) {
   canRetakePhoto = false;
   retakeDefiId = null;
 
-  // ------ Ajout automatique de la validation ------
   if (!defi.done) {
     defi.done = true;
     defis[index] = defi;
     localStorage.setItem(SOLO_DEFIS_KEY, JSON.stringify(defis));
   }
-  // ------------------------------------------------
 
   await loadDefis();
-
-  // PAS de fin de partie ici : le timer gère la fin !
 
   if (window.pubAfterPhoto) {
     window.pubAfterPhoto = false;
@@ -386,12 +384,14 @@ window.renderPhotoCadreSolo = async function(defiId) {
       </div>
     `;
     const photoImg = container.querySelector('.photo-user');
-    photoImg.oncontextmenu = (e) => { e.preventDefault(); window.ouvrirPopupChoixCadreSolo(defiId); };
-    photoImg.ontouchstart = function() {
-      this._touchTimer = setTimeout(() => { window.ouvrirPopupChoixCadreSolo(defiId); }, 500);
-    };
-    photoImg.ontouchend = function() { clearTimeout(this._touchTimer); };
-    photoImg.onclick = () => window.agrandirPhoto(photoUrl, defiId);
+    if (photoImg) {
+      photoImg.oncontextmenu = (e) => { e.preventDefault(); window.ouvrirPopupChoixCadreSolo(defiId); };
+      photoImg.ontouchstart = function() {
+        this._touchTimer = setTimeout(() => { window.ouvrirPopupChoixCadreSolo(defiId); }, 500);
+      };
+      photoImg.ontouchend = function() { clearTimeout(this._touchTimer); };
+      photoImg.onclick = () => window.agrandirPhoto(photoUrl, defiId);
+    }
   } else {
     container.innerHTML = "";
   }
@@ -408,8 +408,6 @@ window.ouvrirPopupChoixCadreSolo = async function(defiId) {
     photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`));
   } catch (e) {}
   const actuel = photoData?.cadre || (await window.getCadreSelectionne()) || "polaroid_01";
-  const photoUrl = photoData?.photo || "";
-
   const list = document.getElementById("list-cadres-popup-solo");
   if (!list) return;
 
@@ -432,12 +430,15 @@ window.ouvrirPopupChoixCadreSolo = async function(defiId) {
     list.appendChild(el);
   });
 
-  document.getElementById("popup-cadre-solo").classList.remove("hidden");
+  const popup = document.getElementById("popup-cadre-solo");
+  if (popup) popup.classList.remove("hidden");
 };
 
 window.fermerPopupCadreSolo = function() {
-  document.getElementById("popup-cadre-solo").classList.add("hidden");
+  const popup = document.getElementById("popup-cadre-solo");
+  if (popup) popup.classList.add("hidden");
 };
+
 // ----------- ZOOM PHOTO / POPUP -----------
 window.agrandirPhoto = async function(dataUrl, defiId) {
   const cadre = document.getElementById("cadre-affiche");
@@ -459,7 +460,6 @@ window.agrandirPhoto = async function(dataUrl, defiId) {
     popup.classList.add("show");
   }
 
-  // === BOUTON CŒUR ===
   const btnAimer = document.getElementById("btn-aimer-photo");
   if (btnAimer) {
     btnAimer.onclick = () => {
@@ -475,7 +475,6 @@ window.agrandirPhoto = async function(dataUrl, defiId) {
       }
     };
 
-    // Affiche l’état aimé
     let photosAimees = JSON.parse(localStorage.getItem("photos_aimees") || "[]");
     if (photosAimees.includes(defiId)) {
       btnAimer.classList.add("active");
@@ -484,7 +483,6 @@ window.agrandirPhoto = async function(dataUrl, defiId) {
     }
   }
 };
-
 
 // ----------- VALIDATION DÉFI AVEC JETON OU PHOTO -----------
 window.validerDefi = async function(index) {
@@ -506,14 +504,13 @@ window.ouvrirPopupJeton = async function(index) {
   const jetons = await window.getJetons();
   if (jetons > 0) {
     if (confirm("Valider ce défi avec un jeton ?")) {
-      // Appelle la fonction sécurisée Supabase
       const { data, error } = await window.supabase.rpc('secure_remove_jeton', { nb: 1 });
       if (error || !data || data.success !== true) {
         alert("Erreur lors de la soustraction du jeton ou plus de jetons dispo !");
         return;
       }
       await validerDefiAvecJeton(index);
-      majSolde?.(); // Optionnel : maj affichage jetons/pièces
+      majSolde?.();
     }
   } else {
     if (confirm("Plus de jeton disponible. Regarder une pub pour gagner 3 jetons ?")) {
@@ -539,35 +536,45 @@ window.endGameAuto = async function() {
   historique.push({ date, defi: defis.map(d => d.id) });
   await window.updateUserData({ points: newPoints, historique });
 
-  // Nettoie la partie solo
   localStorage.removeItem(SOLO_DEFIS_KEY);
   localStorage.removeItem(SOLO_TIMER_KEY);
 
-  // Popup fin de partie
-  document.getElementById("end-message").textContent =
-    `Partie terminée ! Tu as validé ${nbFaits}/3 défis.`;
-  document.getElementById("gain-message").textContent =
-    `+${gain} pièces (${nbFaits} défi${nbFaits>1?"s":""} x10${nbFaits===3?" +10 bonus":""})`;
+  const endMsg = document.getElementById("end-message");
+  if (endMsg) endMsg.textContent = `Partie terminée ! Tu as validé ${nbFaits}/3 défis.`;
 
-  document.getElementById("popup-end").classList.remove("hidden");
-  document.getElementById("popup-end").classList.add("show");
+  const gainMsg = document.getElementById("gain-message");
+  if (gainMsg) gainMsg.textContent = `+${gain} pièces (${nbFaits} défi${nbFaits>1?"s":""} x10${nbFaits===3?" +10 bonus":""})`;
+
+  const popupEnd = document.getElementById("popup-end");
+  if (popupEnd) {
+    popupEnd.classList.remove("hidden");
+    popupEnd.classList.add("show");
+  }
+
   majSolde();
-  document.getElementById("replayBtnEnd").onclick = async function() {
-    document.getElementById("popup-end").classList.add("hidden");
-    document.getElementById("popup-end").classList.remove("show");
-    await startGame();
-  };
-  document.getElementById("returnBtnEnd").onclick = function() {
-    window.location.href = "index.html";
-  };
+
+  const replayBtnEnd = document.getElementById("replayBtnEnd");
+  if (replayBtnEnd && popupEnd) {
+    replayBtnEnd.onclick = async function() {
+      popupEnd.classList.add("hidden");
+      popupEnd.classList.remove("show");
+      await startGame();
+    };
+  }
+
+  const returnBtnEnd = document.getElementById("returnBtnEnd");
+  if (returnBtnEnd) {
+    returnBtnEnd.onclick = function() {
+      window.location.href = "index.html";
+    };
+  }
 };
 
-// === Ajout : fermeture croix popup + nettoyage du bouton cœur ===
+// ----------- DOMContentLoaded PRINCIPAL -----------
 document.addEventListener("DOMContentLoaded", () => {
   nettoyerPhotosDefis();
   chargerUserData(true).then(majSolde);
-  // Lancement direct sans pré-game
- initSoloGame();
+  initSoloGame();
 
   document.querySelectorAll('.close-btn, #close-popup').forEach(btn => {
     btn.onclick = function() {
@@ -578,17 +585,39 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
   });
+
+  // ----------- BONUS : BOUTONS POPUP REPRISE SOLO -----------
+  const btnPubRepriseSolo = document.getElementById("btnReprisePubSolo");
+  const btnAnnulerRepriseSolo = document.getElementById("btnAnnulerRepriseSolo");
+  const btnPremiumSolo = document.getElementById("btnReprisePremiumSolo");
+  const popupRepriseSolo = document.getElementById("popup-reprise-photo-solo");
+
+  if (btnPubRepriseSolo && btnAnnulerRepriseSolo && btnPremiumSolo && popupRepriseSolo) {
+    btnPubRepriseSolo.addEventListener("click", async () => {
+      await window.showRewardedAd("rewarded");
+      popupRepriseSolo.classList.add("hidden");
+      // Optionnel : rappeler la caméra ici si besoin
+    });
+
+    btnAnnulerRepriseSolo.addEventListener("click", () => {
+      popupRepriseSolo.classList.add("hidden");
+    });
+
+    btnPremiumSolo.addEventListener("click", () => {
+      window.location.href = "premium.html";
+    });
+  }
 });
 
-// ----------- EXEMPLE : fonction reward à compléter selon ta régie pub -----------
+// ----------- SIMULATION PUB (à remplacer par ta régie) -----------
 window.showRewardedAd = async function() {
   return new Promise((resolve) => {
     alert("SIMULATION PUB : regarde ta vidéo ici…");
     setTimeout(() => { resolve(); }, 3200);
   });
-}
+};
 
-// Affiche toutes les photos aimées dans le container #photos-aimees-list
+// ----------- PHOTOS AIMÉES SOLO -----------
 window.afficherPhotosAimees = async function() {
   const container = document.getElementById("photos-aimees-list");
   if (!container) return;
@@ -601,13 +630,11 @@ window.afficherPhotosAimees = async function() {
   }
 
   for (let defiId of photosAimees) {
-    // Essaie de trouver la photo en solo
     let photoData = null;
     try {
       photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`));
     } catch (e) {}
 
-    // Ajoute une miniature seulement si elle existe
     if (photoData && photoData.photo) {
       let cadre = photoData.cadre || "polaroid_01";
       let el = document.createElement("div");
@@ -618,33 +645,8 @@ window.afficherPhotosAimees = async function() {
           <img class="photo-user" src="${photoData.photo}">
         </div>
       `;
-      // Au clic, on peut agrandir (si tu veux)
       el.onclick = () => window.agrandirPhoto(photoData.photo, defiId);
       container.appendChild(el);
     }
   }
 };
-
-// ---------- BONUS : BOUTONS POPUP REPRISE SOLO ----------
-document.addEventListener("DOMContentLoaded", () => {
-  const btnPubRepriseSolo = document.getElementById("btnReprisePubSolo");
-  const btnAnnulerRepriseSolo = document.getElementById("btnAnnulerRepriseSolo");
-  const btnPremiumSolo = document.getElementById("btnReprisePremiumSolo");
-  const popupRepriseSolo = document.getElementById("popup-reprise-photo-solo");
-
-  if (btnPubRepriseSolo && btnAnnulerRepriseSolo && btnPremiumSolo && popupRepriseSolo) {
-    btnPubRepriseSolo.addEventListener("click", async () => {
-      await window.showRewardedAd("rewarded");
-      popupRepriseSolo.classList.add("hidden");
-      // Ici tu peux rappeler la caméra si besoin
-    });
-
-    btnAnnulerRepriseSolo.addEventListener("click", () => {
-      popupRepriseSolo.classList.add("hidden");
-    });
-
-    btnPremiumSolo.addEventListener("click", () => {
-      window.location.href = "premium.html";
-    });
-  }
-});

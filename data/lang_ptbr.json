@@ -309,5 +309,14 @@
   "button.clearall": "Limpar tudo",
   "main.noliked": "Ainda não há fotos curtidas.",
   "footer": "© 2025 VFindz",
-  "alert.clearall": "Limpar todas as fotos curtidas?"
+  "alert.clearall": "Limpar todas as fotos curtidas?",
+  "boutique.button.acheter": "Comprar",
+"boutique.button.achete": "Comprado",
+"boutique.button.debloque": "Desbloqueado!",
+"boutique.button.infos": "Informação",
+"boutique.button.premium": "Requer Premium",
+"boutique.feedback.success": "✅ Moldura comprada!",
+"boutique.feedback.error": "❌ Moedas insuficientes ou erro!",
+"boutique.empty": "Nenhuma moldura nesta categoria."
+
 }

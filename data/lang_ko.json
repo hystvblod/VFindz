@@ -331,6 +331,15 @@
   "button.clearall": "전체 삭제",
   "main.noliked": "아직 좋아하는 사진이 없습니다.",
   "footer": "© 2025 VFindz",
-  "alert.clearall": "좋아하는 사진을 모두 삭제하시겠습니까?"
+  "alert.clearall": "좋아하는 사진을 모두 삭제하시겠습니까?",
+  "boutique.button.acheter": "구매",
+"boutique.button.achete": "구매 완료",
+"boutique.button.debloque": "해제됨!",
+"boutique.button.infos": "정보",
+"boutique.button.premium": "프리미엄 필요",
+"boutique.feedback.success": "✅ 프레임이 구매되었습니다!",
+"boutique.feedback.error": "❌ 코인이 부족하거나 오류가 발생했습니다!",
+"boutique.empty": "이 카테고리에 프레임이 없습니다."
+
 
 }
