@@ -650,3 +650,34 @@ window.afficherPhotosAimees = async function() {
     }
   }
 };
+// === PATCH TIMER SOLO CAPACITOR ===
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    // 1. On vérifie si le timer n'est PAS déjà posé
+    if (!localStorage.getItem("solo_defiTimer")) {
+      // 2. On crée une partie solo de secours (3 défis random, timer 24h)
+      fetch('data/defis.json') // <--- chemin corrigé
+        .then(res => res.json())
+        .then(listeDefis => {
+          // On prend 3 défis au hasard
+          const shuffled = [...listeDefis].sort(() => 0.5 - Math.random());
+          const newDefis = shuffled.slice(0, 3).map(defi => ({
+            ...defi, done: false, byJeton: false, canRetake: true, photoCount: 0
+          }));
+          localStorage.setItem("solo_defiActifs", JSON.stringify(newDefis));
+          const endTime = Date.now() + 24 * 60 * 60 * 1000;
+          localStorage.setItem("solo_defiTimer", endTime.toString());
+          // 3. On affiche la partie et le timer
+          document.getElementById("game-section").classList.remove("hidden");
+          if (typeof updateTimer === "function") updateTimer();
+          if (typeof loadDefis === "function") loadDefis();
+        });
+    } else {
+      // Si le timer existe déjà, on affiche direct le jeu
+      document.getElementById("game-section").classList.remove("hidden");
+      if (typeof updateTimer === "function") updateTimer();
+      if (typeof loadDefis === "function") loadDefis();
+    }
+  }, 600); // laisse le temps au DOM de charger
+});
+

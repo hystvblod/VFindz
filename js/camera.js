@@ -107,15 +107,24 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
         }
       }
       // Mode solo
-      else if (mode === "solo") {
-        const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
-        const obj = { photo: dataUrl, cadre };
-        localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(obj));
-        if (window.afficherPhotoDansCadreSolo) {
-          window.afficherPhotoDansCadreSolo(defiId, dataUrl);
-        }
-        return dataUrl;
+else if (mode === "solo") {
+  const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
+  // Redimensionne et colle le cadre avant stockage !
+  return await window.genererImageConcoursAvecCadre(dataUrl)
+    .then(redimDataUrl => {
+      const obj = { photo: redimDataUrl, cadre };
+      localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(obj));
+      if (window.afficherPhotoDansCadreSolo) {
+        window.afficherPhotoDansCadreSolo(defiId, redimDataUrl);
       }
+      return redimDataUrl;
+    })
+    .catch(err => {
+      alert("Erreur lors du redimensionnement de la photo : " + (err.message || err));
+      return null;
+    });
+}
+
       // Mode concours
       else if (mode === "concours") {
         try {
@@ -372,15 +381,25 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
             result = urlPhoto;
           }
           // Mode solo
-          else if (mode === "solo") {
-            const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
-            const obj = { photo: dataUrl, cadre };
-            localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(obj));
-            if (window.afficherPhotoDansCadreSolo) {
-              window.afficherPhotoDansCadreSolo(defiId, dataUrl);
-            }
-            result = dataUrl;
-          }
+         else if (mode === "solo") {
+  const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
+  // Passe la photo par le canvas de collage/resize AVANT stockage :
+  await window.genererImageConcoursAvecCadre(dataUrl)
+    .then(redimDataUrl => {
+      const obj = { photo: redimDataUrl, cadre };
+      localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(obj));
+      if (window.afficherPhotoDansCadreSolo) {
+        window.afficherPhotoDansCadreSolo(defiId, redimDataUrl);
+      }
+      result = redimDataUrl;
+    })
+    .catch(err => {
+      alert("Erreur lors du redimensionnement de la photo : " + (err.message || err));
+      result = null;
+    });
+  return; // On stoppe ici, car le .then gère tout
+}
+
           // Mode concours
           else if (mode === "concours") {
             const userId = await window.getUserId();

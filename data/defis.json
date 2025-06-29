@@ -58,7 +58,7 @@
       "ar": "طائر في الخارج",
       "ja": "外にいる鳥",
       "ko": "밖에 있는 새",
-      "idn": "Seekor burung di luar ruangan"
+      "idn": "Burung di lua"
     },
     {
       "id": "05",
@@ -868,7 +868,7 @@
       "ar": "يد",
       "ja": "手",
       "ko": "손",
-      "idn": "Sebuah tangan"
+      "idn": "Tangan"
     },
     {
       "id": 59,
@@ -1258,7 +1258,7 @@
       "ar": "ارتفاع كبير",
       "ja": "高い場所",
       "ko": "매우 높은 곳",
-      "idn": "Ketinggian besar"
+      "idn": "Tempat yang tinggi"
     },
     {
       "id": 85,
