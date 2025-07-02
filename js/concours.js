@@ -1,12 +1,15 @@
 // ========= DÉBUT : Variables et Protection globales ===========
-
-// Sécurise les variables globales pour éviter undefined
 window.showAd = window.showAd || (() => Promise.resolve());
 window.userIsPremium = window.userIsPremium || false;
 window.userId = window.userId || null;
 
 const URL_CONCOURS = "https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/concours//concours.json";
 const PAGE_SIZE = 30;
+
+let loadedCount = 0;
+let loadingMore = false;
+let endOfPhotos = false;
+let scrollPhotos = []; // Liste filtrée pour scroll infini
 
 // ----------- SYSTEME ACCES/REWARD/VOTES -----------
 const VOTES_PAR_REWARD = () => (window.userIsPremium ? 6 : 3);
@@ -116,7 +119,6 @@ async function chargerInfosConcours() {
     console.error("Erreur chargement infos concours", e);
   }
 }
-
 function majTimerConcours(finIso) {
   let timerElt = document.getElementById("timer-concours");
   if (!timerElt) {
@@ -160,7 +162,7 @@ function getConcoursId() {
   return `${week}-${year}`;
 }
 
-// ----------- PHOTOS CONCOURS, TRI ET PAGINATION + CACHE -----------
+// ----------- PHOTOS CONCOURS, TRI ET CACHE -----------
 async function getPhotosAPaginer(forceReload = false) {
   const concoursId = getConcoursId();
   let allPhotos;
@@ -209,12 +211,6 @@ async function getPseudoMapFromPhotos(photos) {
   return map;
 }
 
-// ----------- GÉNÉRATION PAGINATION -----------
-function getPagePhotos(orderedPhotos, page = 1, pageSize = PAGE_SIZE) {
-  const start = (page - 1) * pageSize;
-  return orderedPhotos.slice(start, start + pageSize);
-}
-
 // ----------- FILTRAGE RECHERCHE PSEUDO -----------
 function filtrerPhotosParPseudo(photos, search, pseudoMap = {}) {
   if (!search) return photos;
@@ -222,11 +218,8 @@ function filtrerPhotosParPseudo(photos, search, pseudoMap = {}) {
   return photos.filter(p => (pseudoMap[p.user_id] || p.pseudo || p.user || "").toLowerCase().includes(query));
 }
 
-let currentPage = 1;
-
 // ============ AFFICHAGE PRINCIPAL =============
 window.afficherGalerieConcours = async function(forceReload = false) {
-  // Protection : ACCES seulement si pub reward faite ce jour
   if (!isRewardDone()) {
     await showConcoursRewardPopup();
     return;
@@ -237,13 +230,11 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 
   let { allPhotos, orderedPhotos } = await getPhotosAPaginer(forceReload);
 
-  // Votes
   const concoursId = getConcoursId();
   const votesData = await getVotesConcoursFromCacheOrDB(concoursId);
   const votesMap = {};
   votesData.forEach(v => votesMap[v.id] = v.votes_total);
 
-  // Pseudos dynamiques (toujours à jour)
   const pseudoMap = await getPseudoMapFromPhotos(orderedPhotos);
 
   // Recherche dynamique avec pseudoMap
@@ -252,31 +243,32 @@ window.afficherGalerieConcours = async function(forceReload = false) {
   let search = (inputSearch && inputSearch.value) || "";
   let filteredOrderedPhotos = filtrerPhotosParPseudo(orderedPhotos, search, pseudoMap);
 
-  // Pagination
-  const paginatedPhotos = getPagePhotos(filteredOrderedPhotos, currentPage, PAGE_SIZE);
+  // ----------- INIT SCROLL INFINI -----------
+  loadedCount = 0;
+  endOfPhotos = false;
+  scrollPhotos = filteredOrderedPhotos;
 
-  // Affichage grille
-  let html = `<div class="grid-photos-concours">`;
-  const user = await window.supabase.auth.getUser();
-  const userId = user.data?.user?.id;
-  for (const photo of paginatedPhotos) {
-    html += creerCartePhotoHTML(photo, pseudoMap[photo.user_id] || "?", photo.user_id === userId, votesMap[photo.id] ?? photo.votes_total);
+  // Vide la galerie et ajoute la grille
+  galerie.innerHTML = `<div class="grid-photos-concours"></div>`;
+
+  // Charge la première "page"
+  await renderConcoursPhotosPage(votesMap, pseudoMap);
+
+  // Scroll infini (une seule fois)
+  const grid = galerie.querySelector('.grid-photos-concours');
+  if (!galerie._scrollListenerAdded) {
+    galerie.addEventListener('scroll', async function() {
+      if (endOfPhotos || loadingMore) return;
+      if (galerie.scrollTop + galerie.clientHeight >= galerie.scrollHeight - 40) {
+        await renderConcoursPhotosPage(votesMap, pseudoMap);
+      }
+    });
+    galerie._scrollListenerAdded = true;
   }
-  html += `</div>`;
 
-  // Pagination
-  const totalPages = Math.ceil(filteredOrderedPhotos.length / PAGE_SIZE);
-  html += `<div style="text-align:center;margin-bottom:20px;">`;
-  if (currentPage > 1)
-    html += `<button id="btn-prev" class="main-button" style="margin-right:16px;">&larr; Précédent</button>`;
-  html += `<span style="font-size:1.02em;">Page ${currentPage} / ${totalPages}</span>`;
-  if (currentPage < totalPages)
-    html += `<button id="btn-next" class="main-button" style="margin-left:16px;">Suivant &rarr;</button>`;
-  html += `</div>`;
-
-  // Bloc recharge votes
+  // Bloc recharge votes (toujours en bas)
   const votesLeft = getVotesLeft();
-  html += `
+  let rechargeHtml = `
     <div style="text-align:center;margin:16px 0;">
       <span style="font-size:1.04em;color:#444;font-weight:500;">
         Votes restants : <b>${votesLeft}</b> / ${VOTES_PAR_REWARD()}
@@ -288,19 +280,11 @@ window.afficherGalerieConcours = async function(forceReload = false) {
       </button>
     </div>
   `;
+  galerie.insertAdjacentHTML('beforeend', rechargeHtml);
 
+  // Résultats recherche
   if (resultatsElt)
     resultatsElt.textContent = `(${filteredOrderedPhotos.length} résultat${filteredOrderedPhotos.length > 1 ? 's' : ''})`;
-
-  galerie.innerHTML = html;
-
-  majVotesConcoursAffichage(votesData);
-
-  // Pagination events
-  if (document.getElementById('btn-prev'))
-    document.getElementById('btn-prev').onclick = () => { currentPage--; window.afficherGalerieConcours(); }
-  if (document.getElementById('btn-next'))
-    document.getElementById('btn-next').onclick = () => { currentPage++; window.afficherGalerieConcours(); }
 
   // Recharge votes event
   const btnRecharge = document.getElementById('btn-recharge-votes');
@@ -314,21 +298,42 @@ window.afficherGalerieConcours = async function(forceReload = false) {
       }
     }
   }
+}
 
-  // Events zoom/vote popup (photo-cadre clique)
-// Events zoom/vote popup (photo-cadre clique)
-Array.from(document.querySelectorAll('.cadre-item[data-photoid]')).forEach(div => {
-  div.onclick = function() {
-    const photoId = this.dataset.photoid;
-    const photo = allPhotos.find(p => p.id == photoId);
-    if (photo) ouvrirPopupZoomConcours(photo, pseudoMap[photo.user_id] || "?", votesMap[photo.id] ?? photo.votes_total);
-  };
-});
+// ----------- Affiche 30 photos de plus à chaque appel -----------
+async function renderConcoursPhotosPage(votesMap, pseudoMap) {
+  const grid = document.querySelector("#galerie-concours .grid-photos-concours");
+  if (!grid) return;
+  loadingMore = true;
+  const user = await window.supabase.auth.getUser();
+  const userId = user.data?.user?.id;
+  const start = loadedCount;
+  const end = Math.min(start + PAGE_SIZE, scrollPhotos.length);
 
-};
+  for (let i = start; i < end; i++) {
+    const photo = scrollPhotos[i];
+    const html = creerCartePhotoHTML(
+      photo,
+      pseudoMap[photo.user_id] || "?",
+      photo.user_id === userId,
+      votesMap[photo.id] ?? photo.votes_total
+    );
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    div.firstElementChild.onclick = function() {
+      ouvrirPopupZoomConcours(photo, pseudoMap[photo.user_id] || "?", votesMap[photo.id] ?? photo.votes_total);
+    }
+    grid.appendChild(div.firstElementChild);
+  }
+  loadedCount = end;
+  if (loadedCount >= scrollPhotos.length) endOfPhotos = true;
+  loadingMore = false;
+
+  // Rafraîchit le nombre de votes affiché (si nouveaux votes)
+  majVotesConcoursAffichage(Object.values(votesMap));
+}
 
 // ----------- GÉNÈRE UNE CARTE HTML (polaroïd, pseudo dynamique) -----------
-// Remplace TOUTE ta fonction creerCartePhotoHTML par ça :
 function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
   const cadreId = photo.cadre_id || "polaroid_01";
   let cadreUrl = cadreId.startsWith("http")
@@ -349,16 +354,6 @@ function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
     </div>
   `;
 }
-
-
-
-
-
-
-
-
-
-
 
 // ----------- POPUP ZOOM STYLE DUEL, pseudo dynamique -----------
 async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
@@ -414,8 +409,6 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
   }
 }
 
-
-
 // ----------- VOTE POUR PHOTO (max votes par cycle, sécurisé RPC) -----------
 async function votePourPhoto(photoId) {
   let left = getVotesLeft();
@@ -423,11 +416,10 @@ async function votePourPhoto(photoId) {
     alert("Plus de votes aujourd'hui. Recharge pour en avoir d'autres !");
     return;
   }
-  // Exécute la procédure stockée sécurisée (exemple : concours_vote)
   const { error } = await window.supabase.rpc("concours_vote", {
     p_user_id: window.userId,
     p_photo_id: photoId,
-    p_cycle: 1 // ou autre si besoin : pour support recharge, voir plus bas
+    p_cycle: 1
   });
   if (error) {
     alert("Erreur lors du vote");
@@ -435,7 +427,7 @@ async function votePourPhoto(photoId) {
   }
   left -= 1;
   setVotesLeft(left);
-  setConcoursPhotosCache(getConcoursId(), []); // Vide le cache photos pour forcer reload avec votes à jour
+  setConcoursPhotosCache(getConcoursId(), []);
 }
 
 // ----------- PARTICIPATION PHOTO -----------
@@ -487,7 +479,7 @@ async function showConcoursRewardPopup() {
     `;
     document.body.appendChild(popup);
     popup.querySelector("#btnRewardConcours").onclick = async () => {
-      await window.showAd(); // Reward pub
+      await window.showAd();
       resetVotesCycle();
       popup.remove();
       resolve();
@@ -496,11 +488,9 @@ async function showConcoursRewardPopup() {
 }
 
 // ----------- INITIALISATION : set userId/premium -----------
-
 document.addEventListener("DOMContentLoaded", async () => {
   await chargerInfosConcours();
 
-  // Récupération de l'utilisateur connecté dès le début (pour sécurité RPC)
   const user = await window.supabase.auth.getUser();
   window.userId = user.data?.user?.id || null;
   window.userIsPremium = !!user.data?.user?.user_metadata?.premium;
@@ -519,7 +509,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (participerBtn) {
     participerBtn.addEventListener("click", async () => {
       await window.ajouterPhotoConcours();
-      currentPage = 1;
       window.afficherGalerieConcours(true);
     });
   }
@@ -527,7 +516,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const inputSearch = document.getElementById("recherche-pseudo-concours");
   if (inputSearch) {
     inputSearch.addEventListener("input", () => {
-      currentPage = 1;
       window.afficherGalerieConcours();
     });
   }

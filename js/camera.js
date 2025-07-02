@@ -1,35 +1,72 @@
 // ==== Fonctions accessibles globalement ====
 
-// Nécessite que window.supabase, window.uploadPhotoDuelWebp, window.savePhotoDuel, window.getUserId, window.getCadreSelectionne soient déjà chargés dans le scope global !
+// Fonction de normalisation mobile, AJOUTE-LA TOUT EN HAUT
+window.normaliserPhotoMobile = function(base64Image) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = function () {
+      const canvas = document.createElement('canvas');
+      const sizeW = 500, sizeH = 550;
+      const destRatio = sizeW / sizeH;
+      let sx = 0, sy = 0, sw = img.width, sh = img.height;
+      const srcRatio = img.width / img.height;
+      if (srcRatio > destRatio) {
+        sw = img.height * destRatio;
+        sx = (img.width - sw) / 2;
+      } else {
+        sh = img.width / destRatio;
+        sy = (img.height - sh) / 2;
+      }
+      canvas.width = sizeW;
+      canvas.height = sizeH;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sizeW, sizeH);
+      resolve(canvas.toDataURL("image/webp", 0.93));
+    };
+    img.onerror = reject;
+    img.src = base64Image;
+  });
+}
+
 // Générer image + cadre concours (inchangé, version Promise, sur window)
 window.genererImageConcoursAvecCadre = function(base64Image) {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.onload = () => {
-      const sizeW = 500;
-      const sizeH = 550;
       const canvas = document.createElement('canvas');
+      const sizeW = 500, sizeH = 550;
       canvas.width = sizeW;
       canvas.height = sizeH;
       const ctx = canvas.getContext('2d');
       ctx.fillStyle = "#fff";
       ctx.fillRect(0, 0, sizeW, sizeH);
 
-      // Respect ratio, jamais agrandir
-      let w = img.width, h = img.height;
-      let scale = Math.max(sizeW / w, sizeH / h, 1);
-      let nw = w * Math.min(1, sizeW / w);
-      let nh = h * Math.min(1, sizeH / h);
-      let nx = (sizeW - nw) / 2, ny = (sizeH - nh) / 2;
-      ctx.drawImage(img, nx, ny, nw, nh);
+      // CROP AU BON RATIO SANS ÉTIREMENT
+      const destRatio = sizeW / sizeH; // 0.909
 
+      let sx = 0, sy = 0, sw = img.width, sh = img.height;
+      const srcRatio = img.width / img.height;
+
+      if (srcRatio > destRatio) {
+        // Image trop large : crop sur les côtés
+        sw = img.height * destRatio;
+        sx = (img.width - sw) / 2;
+      } else {
+        // Image trop haute : crop en haut et en bas
+        sh = img.width / destRatio;
+        sy = (img.height - sh) / 2;
+      }
+
+      // On colle l'image recadrée pile au ratio polaroid
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sizeW, sizeH);
+
+      // Ajoute le cadre polaroid au-dessus
       const cadre = new Image();
       cadre.onload = () => {
         ctx.drawImage(cadre, 0, 0, sizeW, sizeH);
         resolve(canvas.toDataURL("image/webp", 0.93));
       };
       cadre.onerror = () => reject("Erreur chargement cadre concours !");
-      // Prend le cadre polaroid_01 via le cache local OU Supabase, comme partout :
       cadre.src = window.getCadreUrl ? window.getCadreUrl("polaroid_01") : "https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/polaroid_01.webp";
     };
     img.onerror = () => reject("Erreur chargement photo !");
@@ -84,14 +121,14 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
       });
 
       const dataUrl = photo.dataUrl;
-      // ... (le reste, inchangé)
+      const dataUrlNormalise = await window.normaliserPhotoMobile(dataUrl);
 
       // Mode duel
       if (mode === "duel") {
         if (!duelId) return alert("Erreur interne : duelId manquant.");
         if (!cadreId) cadreId = "polaroid_01";
         try {
-          const urlPhoto = await window.uploadPhotoDuelWebp(dataUrl, duelId, defiId, cadreId);
+          const urlPhoto = await window.uploadPhotoDuelWebp(dataUrlNormalise, duelId, defiId, cadreId);
           const userId = await window.getUserId();
           localStorage.setItem(`photo_duel_${duelId}_${userId}`, urlPhoto);
           await window.savePhotoDuel(defiId, urlPhoto, cadreId);
@@ -107,29 +144,20 @@ window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, c
         }
       }
       // Mode solo
-else if (mode === "solo") {
-  const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
-  // Redimensionne et colle le cadre avant stockage !
-  return await window.genererImageConcoursAvecCadre(dataUrl)
-    .then(redimDataUrl => {
-      const obj = { photo: redimDataUrl, cadre };
-      localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(obj));
-      if (window.afficherPhotoDansCadreSolo) {
-        window.afficherPhotoDansCadreSolo(defiId, redimDataUrl);
+      else if (mode === "solo") {
+        const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
+        const obj = { photo: dataUrlNormalise, cadre };
+        localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(obj));
+        if (window.afficherPhotoDansCadreSolo) {
+          window.afficherPhotoDansCadreSolo(defiId, dataUrlNormalise);
+        }
+        return dataUrlNormalise;
       }
-      return redimDataUrl;
-    })
-    .catch(err => {
-      alert("Erreur lors du redimensionnement de la photo : " + (err.message || err));
-      return null;
-    });
-}
-
       // Mode concours
       else if (mode === "concours") {
         try {
           const userId = await window.getUserId();
-          const urlPhoto = await window.uploadPhotoConcoursWebp(dataUrl, defiId, userId);
+          const urlPhoto = await window.uploadPhotoConcoursWebp(dataUrlNormalise, defiId, userId);
           return urlPhoto;
         } catch (err) {
           alert("Erreur upload concours : " + (err.message || err));
@@ -381,25 +409,15 @@ else if (mode === "solo") {
             result = urlPhoto;
           }
           // Mode solo
-         else if (mode === "solo") {
-  const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
-  // Passe la photo par le canvas de collage/resize AVANT stockage :
-  await window.genererImageConcoursAvecCadre(dataUrl)
-    .then(redimDataUrl => {
-      const obj = { photo: redimDataUrl, cadre };
-      localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(obj));
-      if (window.afficherPhotoDansCadreSolo) {
-        window.afficherPhotoDansCadreSolo(defiId, redimDataUrl);
-      }
-      result = redimDataUrl;
-    })
-    .catch(err => {
-      alert("Erreur lors du redimensionnement de la photo : " + (err.message || err));
-      result = null;
-    });
-  return; // On stoppe ici, car le .then gère tout
-}
-
+          else if (mode === "solo") {
+            const cadre = (await window.getCadreSelectionne?.()) || "polaroid_01";
+            const obj = { photo: dataUrl, cadre };
+            localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(obj));
+            if (window.afficherPhotoDansCadreSolo) {
+              window.afficherPhotoDansCadreSolo(defiId, dataUrl);
+            }
+            result = dataUrl;
+          }
           // Mode concours
           else if (mode === "concours") {
             const userId = await window.getUserId();
