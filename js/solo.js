@@ -191,30 +191,34 @@ function showGame() {
 }
 
 function updateTimer() {
-  try {
-    console.log('[SOLO] updateTimer called');
-    const timerDisplay = document.getElementById("timer");
-    if (!timerDisplay) console.log("[SOLO] Alerte : #timer absent du DOM !");
-  } catch (e) {
-    console.log("[SOLO] Erreur dans updateTimer", e);
-  }
+  console.log('[SOLO] updateTimer called');
   const timerDisplay = document.getElementById("timer");
+  if (!timerDisplay) {
+    console.warn("[SOLO] #timer manquant, pas de timer lancé !");
+    return;
+  }
+
   let defiTimer = parseInt(localStorage.getItem(SOLO_TIMER_KEY) || "0");
-  const interval = setInterval(() => {
+
+  if (window.soloTimerInterval) clearInterval(window.soloTimerInterval);
+
+  window.soloTimerInterval = setInterval(() => {
     defiTimer = parseInt(localStorage.getItem(SOLO_TIMER_KEY) || "0");
     const now = Date.now();
     const diff = defiTimer - now;
     if (diff <= 0) {
-      clearInterval(interval);
+      clearInterval(window.soloTimerInterval);
       endGameAuto();
       return;
     }
     const h = Math.floor(diff / (1000 * 60 * 60));
     const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const s = Math.floor((diff % (1000 * 60)) / 1000);
-    if (timerDisplay) timerDisplay.textContent = `${h}h ${m}m ${s}s`;
+    timerDisplay.textContent = `${h}h ${m}m ${s}s`;
+    console.log(`[SOLO] Tick timer: ${h}h ${m}m ${s}s`);
   }, 1000);
 }
+
 
 // ----------- CHARGEMENT DES DÉFIS À AFFICHER -----------
 async function loadDefis() {
@@ -352,7 +356,7 @@ window.afficherPhotoDansCadreSolo = async function(defiId, dataUrl) {
   const cadreId = oldData.cadre || cadreGlobal || "polaroid_01";
   console.log(`[SOLO] Cadre utilisé pour defi ${defiId}:`, cadreId);
 
-  // On normalise la photo AVANT stockage/affichage
+  // ✅ On normalise la photo AVANT stockage/affichage
   try {
     const photoNormalisee = await window.genererImageConcoursAvecCadre(dataUrl);
     console.log(`[SOLO] Photo normalisée OK (taille base64: ${photoNormalisee?.length || 0})`);
@@ -379,12 +383,15 @@ window.afficherPhotoDansCadreSolo = async function(defiId, dataUrl) {
     console.log(`[SOLO] Défi ${defiId} marqué comme fait`);
   }
 
-  await loadDefis();
-
   if (window.pubAfterPhoto) {
     window.pubAfterPhoto = false;
     await showRewardedAd();
   }
+
+  await loadDefis();
+
+  // ✅ Recharge la page UNIQUEMENT après tout le stockage
+  window.location.reload();
 };
 
 // ----------- RENDU MINIATURES + CHANGEMENT DE CADRE SOLO -----------
@@ -542,6 +549,7 @@ window.ouvrirPopupJeton = async function(index) {
       }
       await validerDefiAvecJeton(index);
       majSolde?.();
+      window.location.reload();  // ✅ Recharge après validé
     }
   } else {
     if (confirm("Plus de jeton disponible. Regarder une pub pour gagner 3 jetons ?")) {
@@ -551,6 +559,7 @@ window.ouvrirPopupJeton = async function(index) {
     }
   }
 };
+
 
 // ----------- FIN DE PARTIE AUTOMATIQUE -----------
 window.endGameAuto = async function() {
