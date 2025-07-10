@@ -562,3 +562,27 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 4. C’EST SEULEMENT MAINTENANT qu’on affiche la galerie
   window.afficherGalerieConcours();
 });
+function fitPseudoToWidth(className = "pseudo-miniature", minSize = 0.65) {
+  document.querySelectorAll(`.${className}`).forEach(el => {
+    let fontSize = 1.13; // taille em de base
+    el.style.fontSize = fontSize + "em";
+    el.style.whiteSpace = "nowrap";
+    el.style.overflow = "hidden";
+    el.style.textOverflow = "ellipsis";
+    el.style.maxWidth = "100%";
+
+    // Réduit la taille de la police jusqu'à ce que ça tienne
+    while (
+      el.scrollWidth > el.offsetWidth &&
+      fontSize > minSize
+    ) {
+      fontSize -= 0.05;
+      el.style.fontSize = fontSize + "em";
+    }
+  });
+}
+
+// Appelle cette fonction après chaque rendu de la galerie
+window.addEventListener("DOMContentLoaded", () => fitPseudoToWidth());
+window.addEventListener("resize", () => fitPseudoToWidth());
+setTimeout(() => fitPseudoToWidth(), 200);
