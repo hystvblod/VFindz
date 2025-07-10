@@ -23,12 +23,18 @@
     .btn-accepter:active { background: #32d132; }
     .btn-refuser:active { background: #de3a3a; }
     .aucune-demande { color: #bdbdc8; text-align: center; font-size: 1.01em; margin: 0.3em 0 0.8em 0;}
-    @media (max-width: 600px) {.duel-main { max-width: 98vw; padding: 1.1em 0.5em; } .ami-nom { max-width: 110px; } .demande-nom { max-width: 90px; }}
+    #popup-defi-premium { position:fixed; z-index:1500; left:0; top:0; width:100vw; height:100vh; background:rgba(30,32,48,0.84); display:flex; align-items:center; justify-content:center; }
+    #popup-defi-premium.hidden { display:none; }
+    .popup-inner.popup-premium-pro { background:#232435; border-radius:1.23em; padding:2.1em 1.2em 1.6em 1.2em; max-width:94vw; width:100%; box-shadow:0 8px 28px #0007; }
+    .premium-badge { border-radius:7px; padding:4px 13px 4px 13px; font-size:1.04em; display:inline-block; font-weight:bold; margin-bottom:8px; }
+    .popup-premium-title { font-size:1.21em; font-weight:bold; color:#ffe04a; margin-bottom:0.4em; }
+    .popup-premium-input { width:100%; border-radius:7px; padding:8px; margin-bottom:10px; border:1.5px solid #ffe04a; font-size:1.08em; }
+    .btn-premium-pro { background:#ffe04a; color:#232323; font-weight:bold; border:none; border-radius:9px; padding:8px 23px; font-size:1.04em; box-shadow:0 2px 8px #0002; cursor:pointer; }
+    .btn-annuler-premium-pro { background:#dddbe2; color:#222; border:none; border-radius:9px; padding:8px 23px; font-size:1.04em; font-weight:normal; }
+    @media (max-width:600px){.duel-main{max-width:98vw;padding:1.1em 0.5em;} .ami-nom{max-width:110px;} .demande-nom{max-width:90px;}}
   </style>
 </head>
 <body class="duel-container">
-
-  <!-- HEADER identique -->
 
   <header class="header-solo">
     <div class="header-row">
@@ -44,8 +50,6 @@
           <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings" />
         </a>
       </div>
-    </div>
-
     </div>
     <div class="solde-container solde-solo" id="solde-container">
       <div class="solde-item">
@@ -68,10 +72,8 @@
       <div id="premium-alert" style="display:none;color:#f36d6d;text-align:center;margin-bottom:1.1em;font-weight:bold;" data-i18n="alert.premium_only"></div>
       <div class="section-titre" data-i18n="section.friends">Mes amis</div>
       <div id="liste-amis" class="amis-list"></div>
-
       <div class="section-titre" style="margin-top:2.4em;" data-i18n="section.received">Demandes de duel premium reçues</div>
       <div id="demandes-recue" class="duel-demandes-list"></div>
-
       <div class="section-titre" style="margin-top:2.4em;" data-i18n="section.sent">Demandes de duel premium envoyées</div>
       <div id="demandes-envoyees" class="duel-demandes-list"></div>
     </div>
@@ -211,7 +213,7 @@ async function accepterDuelPremium(amiPseudo) {
     createdat: Date.now(),
     type: "amis_premium",
     premium1: true,
-    premium2: null,
+    premium2: true,
     defis_player1: null,
     defis_player2: null,
     defis_final: null,
@@ -235,8 +237,8 @@ async function accepterDuelPremium(amiPseudo) {
   await loadProfil();
   afficherDemandesDuel();
 
-  if (data && data.length) {
-    window.location.href = `duel_amis_premium_room.html?room=${data[0].id}`;
+  if (data && data.length && data[0].id) {
+    window.location.href = `duel_game.html?room=${data[0].id}`;
   }
 }
 
@@ -255,11 +257,29 @@ async function refuserDuelPremium(amiPseudo) {
   await loadProfil();
   afficherDemandesDuel();
 }
+
+// POPUP PREMIUM DÉFIS
+function fermerPopupDefiPremium() {
+  document.getElementById("popup-defi-premium").classList.add("hidden");
+}
   </script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       if (window.afficherSolde) window.afficherSolde();
     });
   </script>
+
+  <!-- POPUP PREMIUM DÉFIS -->
+  <div id="popup-defi-premium" class="hidden">
+    <div class="popup-inner popup-premium-pro">
+      <div class="premium-badge" style="background:#ffe04a;color:#232323;margin-bottom:10px;">DUEL PREMIUM</div>
+      <div class="popup-premium-title" id="popup-defi-title" style="margin-bottom:12px;text-align:center"></div>
+      <div id="popup-defi-fields"></div>
+      <div style="margin-top:24px;display:flex;gap:10px;justify-content:center;">
+        <button class="btn-premium-pro" id="btn-valider-defi">Valider</button>
+        <button class="btn-annuler-premium-pro" onclick="fermerPopupDefiPremium()">Annuler</button>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
