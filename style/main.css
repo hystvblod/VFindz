@@ -2611,7 +2611,7 @@ overflow-y: auto;
 .grid-photos-concours {
   display: grid;
   grid-template-columns: repeat(3, 1fr); /* 3 colonnes desktop */
-  gap: 20px 14px;
+  gap: 20px;
   padding: 20px;
   justify-items: center;
   width: 100%;
