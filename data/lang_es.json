@@ -2,6 +2,7 @@
   "header.title.achat": "Obtener monedas",
   "button.back": "Volver",
   "button.profile": "Perfil",
+  "alert.premium_only": "Este modo es solo para usuarios Premium.",
   "button.settings": "Ajustes",
   "button.ad": "Ver un anuncio",
   "desc.ad": "+100 monedas",

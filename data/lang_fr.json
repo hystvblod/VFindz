@@ -339,6 +339,8 @@
 "boutique.button.premium": "Premium requis",
 "boutique.feedback.success": "✅ Cadre acheté !",
 "boutique.feedback.error": "❌ Pas assez de pièces ou erreur !",
-"boutique.empty": "Aucun cadre dans cette catégorie."
+"boutique.empty": "Aucun cadre dans cette catégorie.",
+"alert.premium_only": "Ce mode est réservé aux Premium."
+
 
 }
