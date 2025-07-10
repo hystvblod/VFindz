@@ -2541,7 +2541,14 @@ overflow-y: auto;
     font-size: 1em;
   }
 }
-
+.grid-photos-concours {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(138px, 1fr));
+  gap: 24px 19px;
+  margin-bottom: 24px;
+  margin-top: 12px;
+  justify-items: center;
+}
 
 .photo-concours-item {
   background: #fff;
@@ -2610,21 +2617,21 @@ overflow-y: auto;
 
 .grid-photos-concours {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* 3 colonnes desktop */
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);   /* 3 colonnes par défaut */
+  gap: 20px 14px;
   padding: 20px;
-  justify-items: center;
   width: 100%;
   box-sizing: border-box;
 }
 
-@media (max-width: 820px) {
+@media (max-width: 700px) {
   .grid-photos-concours {
-    grid-template-columns: repeat(2, 1fr); /* 2 colonnes tablette/mobile large */
+    grid-template-columns: repeat(2, 1fr);   /* 2 colonnes sur petit écran */
   }
 }
-@media (max-width: 540px) {
+@media (max-width: 400px) {
   .grid-photos-concours {
-    grid-template-columns: 1fr; /* 1 colonne mobile étroit */
+    grid-template-columns: 1fr;              /* 1 colonne sur mobile */
+    padding: 8px;
   }
 }
