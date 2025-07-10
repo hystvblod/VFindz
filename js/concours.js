@@ -404,15 +404,29 @@ async function votePourPhoto(photoId) {
     alert("Plus de votes aujourd'hui. Recharge pour en avoir d'autres !");
     return;
   }
-  const { error } = await window.supabase.rpc("concours_vote", {
+
+  // LOG AVANT L'APPEL
+  console.log("DEBUG VOTE", {
+    userId: window.userId,
+    photoId: photoId,
+    cycle: 1
+  });
+
+  // STOCKE LE RESULTAT DANS UNE VARIABLE POUR LE LOG
+  const res = await window.supabase.rpc("concours_vote", {
     p_user_id: window.userId,
     p_photo_id: photoId,
     p_cycle: 1
   });
-  if (error) {
+
+  // LOG LE RESULTAT COMPLET
+  console.log("ERREUR VOTE", res.error, res.data);
+
+  if (res.error) {
     alert("Erreur lors du vote");
     return;
   }
+
   left -= 1;
   setVotesLeft(left);
   setConcoursPhotosCache(getConcoursId(), []);
