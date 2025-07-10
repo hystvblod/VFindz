@@ -115,7 +115,7 @@
   { code: "pt", label: "Português", flag: `<svg class="flag" viewBox="0 0 22 16"><rect width="22" height="16" fill="#3eae47"/><ellipse cx="11" cy="8" rx="8" ry="6" fill="#ffcc29"/><circle cx="11" cy="8" r="4" fill="#3e4095"/><path d="M8.3 8.4a3 3 0 0 1 5.4 0" stroke="#fff" stroke-width=".8" fill="none"/></svg>` },
   { code: "ptbr", label: "Português (BR)", flag: `<svg class="flag" viewBox="0 0 22 16"><rect width="22" height="16" fill="#3eae47"/><ellipse cx="11" cy="8" rx="8" ry="6" fill="#ffcc29"/><circle cx="11" cy="8" r="4" fill="#3e4095"/><path d="M8.3 8.4a3 3 0 0 1 5.4 0" stroke="#fff" stroke-width=".8" fill="none"/><text x="11" y="10.5" font-size="3.3" fill="#fff" text-anchor="middle" alignment-baseline="middle" font-family="Arial">BR</text></svg>` },
   { code: "ar", label: "العربية", flag: `<svg class="flag" viewBox="0 0 22 16"><rect width="22" height="16" fill="#fff"/><rect width="22" height="8" y="0" fill="#198754"/><polygon points="5,8 13,4 13,12" fill="#fff"/><circle cx="16" cy="8" r="3" fill="#198754"/></svg>` },
-  { code: "id", label: "Bahasa Indonesia", flag: `<svg class="flag" viewBox="0 0 22 16"><rect width="22" height="8" y="0" fill="#ff0000"/><rect width="22" height="8" y="8" fill="#fff"/></svg>` },
+  { code: "idn", label: "Bahasa Indonesia", flag: `<svg class="flag" viewBox="0 0 22 16"><rect width="22" height="8" y="0" fill="#ff0000"/><rect width="22" height="8" y="8" fill="#fff"/></svg>` },
   { code: "ja", label: "日本語", flag: `<svg class="flag" viewBox="0 0 22 16"><rect width="22" height="16" fill="#fff"/><circle cx="11" cy="8" r="4" fill="#bc002d"/></svg>` },
   { code: "ko", label: "한국어", flag: `<svg class="flag" viewBox="0 0 22 16"><rect width="22" height="16" fill="#fff"/><circle cx="11" cy="8" r="4" fill="#003478"/><circle cx="11" cy="8" r="2.5" fill="#c60c30"/></svg>` }
 
@@ -133,12 +133,15 @@
       const opt = document.createElement('div');
       opt.className = 'lang-option' + (l.code === currentLang ? ' selected' : '');
       opt.innerHTML = l.flag + l.label;
-      opt.onclick = () => {
-        localStorage.setItem("langue", l.code);
-        document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('selected'));
-        opt.classList.add('selected');
-        setTimeout(() => location.reload(), 350); // reload pour appliquer partout
-      };
+opt.onclick = () => {
+  localStorage.setItem("langue", l.code); // correction ici
+  localStorage.setItem("lang", l.code); // optionnel, pour compat future
+  document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('selected'));
+  opt.classList.add('selected');
+  if (window.setLang) window.setLang(l.code); // application immédiate sur toute l'UI
+};
+
+
       langueSelect.appendChild(opt);
     });
 

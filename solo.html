@@ -11,7 +11,6 @@
 <!-- ✅ Popup photo avec cœur et croix alignés sans fond -->
 <div id="popup-photo" class="popup hidden">
   <div class="popup-inner">
-    <!-- Boutons croix + cœur -->
     <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
       <button id="btn-aimer-photo" style="background: none; border: none; padding: 0;" title="Aimer" data-i18n-title="button.like">
         <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" alt="Aimer" data-i18n-alt="button.like" />
@@ -20,7 +19,6 @@
         <img src="assets/icons/croix.svg" alt="Fermer" data-i18n-alt="button.close" style="width: 32px; height: 32px;margin-top:-5px;" />
       </button>
     </div>
-    <!-- Contenu photo -->
     <div class="cadre-preview cadre-popup boutique-style">
       <img id="cadre-affiche" class="photo-cadre" src="" />
       <img id="photo-affichee" class="photo-user" src="" />
@@ -79,21 +77,19 @@
 </div>
 
 <!-- ✅ Header -->
-
-  <header class="header-solo">
-    <div class="header-row">
-      <a href="index.html" class="back-btn" title="Retour" data-i18n-title="header.back">
-        <img src="assets/icons/arrow_back.svg" alt="Retour" data-i18n-alt="header.back"/>
+<header class="header-solo">
+  <div class="header-row">
+    <a href="index.html" class="back-btn" title="Retour" data-i18n-title="header.back">
+      <img src="assets/icons/arrow_back.svg" alt="Retour" data-i18n-alt="header.back"/>
+    </a>
+    <h1 data-i18n="header.title.solo">Mode Solo</h1>
+    <div class="top-buttons">
+      <a href="index.html" class="btn-icon">
+        <img src="assets/icons/user.svg" alt="Profil" />
       </a>
-      <h1 data-i18n="header.title.solo">Mode Solo</h1>
-      <div class="top-buttons">
-        <a href="index.html" class="btn-icon">
-          <img src="assets/icons/user.svg" alt="Profil" />
-        </a>
-        <a href="parametres.html" class="btn-icon">
-          <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings" />
-        </a>
-      </div>
+      <a href="parametres.html" class="btn-icon">
+        <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings" />
+      </a>
     </div>
   </div>
   <div class="solde-container solde-solo" id="solde-container">
@@ -112,13 +108,14 @@
   </div>
 </header>
 
+<!-- ✅ TIMER SOLO BIEN PLACÉ -->
+<div style="text-align:center; margin-top:18px;">
+  <span id="timer" style="font-size:1.4em;font-weight:bold;color:#4A90E2;">Temps restant : --</span>
+</div>
+
 <!-- ✅ Contenu principal -->
 <main class="solo-container">
   <section id="game-section" class="hidden">
-    <div class="timer-box">
-      <img src="assets/icons/clock.svg" alt="Horloge" class="icon-svg" />
-      <span class="timer-text" data-i18n="solo.timer.label">Temps restant&nbsp;: <span id="timer">--:--:--</span></span>
-    </div>
     <ul id="defi-list" class="defi-list"></ul>
   </section>
 
@@ -139,7 +136,6 @@
 </div>
 
 <!-- ✅ Scripts -->
-<!-- CDN officiel de Supabase, charge AVANT userData.js ! -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script src="js/userData.js"></script>
 <script src="js/camera.js"></script>

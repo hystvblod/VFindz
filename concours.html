@@ -6,7 +6,6 @@
   <title data-i18n="header.title.concours">Concours</title>
   <link rel="stylesheet" href="style/main.css" />
   <style>
-    /* Optionnel : patche le rendu popup zoom pour pseudo */
     .pseudo-solo {
       color: #ffe04a;
       font-size: 1.09em;
@@ -16,7 +15,20 @@
       text-align: center;
       letter-spacing: 0.2px;
     }
-
+    #votes-restants {
+      color: #fff;
+      font-size: 1.08em;
+      font-weight: 500;
+      text-shadow: 0 1px 6px #000a;
+      margin-top: 7px;
+      margin-bottom: 4px;
+      text-align: center;
+    }
+    #timer-concours {
+      font-size: 1.19em;
+      font-weight: 600;
+      text-align: center;
+    }
   </style>
 </head>
 <body class="page-container">
@@ -47,6 +59,13 @@
     <h2 class="titre-concours" style="margin-top:22px; margin-bottom:16px; text-align:center;" data-i18n="concours.title">
       Titre du défi concours ici
     </h2>
+
+    <!-- Bloc Timer + Votes Restants -->
+    <div id="concours-timer-block" style="text-align:center;margin:18px 0 10px 0;">
+      <div id="timer-concours"></div>
+      <div id="votes-restants"></div>
+    </div>
+
     <button id="participerBtn" class="main-button" style="width:90%;margin:0 auto 26px auto;display:flex;align-items:center;justify-content:center;gap:12px;" data-i18n="button.participer">
       <img src="assets/icons/photo.svg" alt="" data-i18n="button.photo.alt" style="height:28px;width:28px;vertical-align:middle;" />
       <span data-i18n="button.participer">Participer</span>

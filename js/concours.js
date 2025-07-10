@@ -121,19 +121,16 @@ async function chargerInfosConcours() {
 }
 function majTimerConcours(finIso) {
   let timerElt = document.getElementById("timer-concours");
-  if (!timerElt) {
-    timerElt = document.createElement("div");
-    timerElt.id = "timer-concours";
-    timerElt.style = "text-align:center;font-size:1.13em;color:#fff;padding:7px 0;font-weight:600;";
-    const main = document.querySelector("main");
-    main.insertBefore(timerElt, main.children[2]);
-  }
+  let votesElt = document.getElementById("votes-restants");
+  if (!timerElt || !votesElt) return;
+
   function update() {
     const now = new Date();
     const fin = new Date(finIso);
     let diff = Math.floor((fin - now) / 1000);
     if (diff < 0) {
       timerElt.textContent = "Concours terminé !";
+      votesElt.textContent = "";
       clearInterval(timerElt._timer);
       return;
     }
@@ -146,6 +143,9 @@ function majTimerConcours(finIso) {
       (heures < 10 ? "0" : "") + heures + "h " +
       (minutes < 10 ? "0" : "") + minutes + "m " +
       (secondes < 10 ? "0" : "") + secondes + "s";
+    // ➡️ Affiche les votes restants
+    const votesLeft = getVotesLeft();
+    votesElt.textContent = `Votes restants : ${votesLeft} / ${VOTES_PAR_REWARD()}`;
   }
   update();
   timerElt._timer && clearInterval(timerElt._timer);
@@ -266,21 +266,7 @@ window.afficherGalerieConcours = async function(forceReload = false) {
     galerie._scrollListenerAdded = true;
   }
 
-  // Bloc recharge votes (toujours en bas)
-  const votesLeft = getVotesLeft();
-  let rechargeHtml = `
-    <div style="text-align:center;margin:16px 0;">
-      <span style="font-size:1.04em;color:#444;font-weight:500;">
-        Votes restants : <b>${votesLeft}</b> / ${VOTES_PAR_REWARD()}
-      </span>
-      <br>
-      <button id="btn-recharge-votes" class="main-button" style="margin-top:10px;${(votesLeft>0||isRechargeDone())?"display:none;":""}">
-        <img src="assets/icons/reward.svg" style="height: 22px; margin-right: 7px;">
-        Regarder une pub pour recharger les votes
-      </button>
-    </div>
-  `;
-  galerie.insertAdjacentHTML('beforeend', rechargeHtml);
+  // ======= ANCIEN BLOC VOTES RESTANTS SUPPRIMÉ ICI =======
 
   // Résultats recherche
   if (resultatsElt)
@@ -356,7 +342,8 @@ function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
 }
 
 // ----------- POPUP ZOOM STYLE DUEL, pseudo dynamique -----------
-async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
+// Signature adaptée pour recevoir le pseudo (nickel pour tout afficher propre)
+async function ouvrirPopupZoomConcours(photo, pseudo = "?", votesTotal = 0) {
   let old = document.getElementById("popup-photo");
   if (old) old.remove();
 
@@ -381,16 +368,16 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
           <img src="assets/icons/croix.svg" alt="Fermer" data-i18n-alt="button.close" style="width: 32px; height: 32px;margin-top:-5px;" />
         </button>
       </div>
-     <div class="cadre-preview cadre-popup boutique-style" data-photoid="...">
-
+      <div class="cadre-preview cadre-popup boutique-style" data-photoid="...">
         <img class="photo-cadre" src="${cadreUrl}">
         <img class="photo-user" src="${photo.photo_url}">
       </div>
-      <div class="pseudo-solo" style="margin:18px 0 2px 0; color:#ffe04a; font-size:1.09em; font-weight:500; text-align:center;">
-        ${photo.pseudo || photo.user || "?"}
-      </div>
-      <div class="nbvotes" style="text-align:center; font-size:1.03em; color:#ffe04a; font-weight:700; margin-bottom:5px;">
-        ${votesTotal} votes
+      <div style="margin:18px 0 2px 0; color:#ffe04a; font-size:1.09em; font-weight:500; text-align:center; display:flex; justify-content:center; align-items:center; gap:12px;">
+        <span class="pseudo-solo">${pseudo}</span>
+        <span class="nbvotes" style="color:#ffe04a; font-weight:700; font-size:1em; background:#48307033; border-radius:7px; padding:2px 9px 2px 7px; margin-left:4px; display:flex; align-items:center;">
+          <img src="assets/icons/coeur.svg" style="width:16px;height:16px;margin-right:4px;vertical-align:middle;" />
+          ${votesTotal}
+        </span>
       </div>
       <div style="margin-top:7px;color:#aaa;font-size:0.97em;text-align:center;">
         Votes restants aujourd'hui&nbsp;: <b>${votesLeft}</b> / ${VOTES_PAR_REWARD()}
@@ -408,6 +395,7 @@ async function ouvrirPopupZoomConcours(photo, votesTotal = 0) {
     };
   }
 }
+
 
 // ----------- VOTE POUR PHOTO (max votes par cycle, sécurisé RPC) -----------
 async function votePourPhoto(photoId) {
@@ -467,20 +455,19 @@ async function showConcoursRewardPopup() {
   return new Promise(resolve => {
     const popup = document.createElement("div");
     popup.className = "popup show";
-    popup.innerHTML = `
-      <div style="background:#fff;border-radius:18px;padding:36px 24px 32px 24px;max-width:340px;margin:auto;text-align:center;">
-        <img src="assets/icons/gift.svg" style="width:62px;margin-bottom:18px;" />
-        <div style="font-size:1.23em;font-weight:bold;margin-bottom:16px;">Concours Photo</div>
-        <div style="color:#555;margin-bottom:19px;">
-          Pour accéder au concours, merci de regarder une pub. Ça finance le lot et te donne <span style="color:#f90">${VOTES_PAR_REWARD()} votes</span> à utiliser aujourd’hui${window.userIsPremium ? " (x2 si premium)" : ""}.
-        </div>
-        <button id="btnRewardConcours" class="main-button" style="margin-top:12px;">Regarder une pub</button>
-      </div>
-    `;
+popup.innerHTML = `
+  <div style="background:#fff;border-radius:18px;padding:36px 24px 32px 24px;max-width:340px;margin:auto;text-align:center;">
+    <div style="font-size:1.23em;font-weight:bold;margin-bottom:16px;">Concours Photo</div>
+    <div style="color:#555;margin-bottom:19px;">
+      Pour accéder au concours, regarde une pub pour débloquer <span style="color:#f90">${VOTES_PAR_REWARD()} votes</span> aujourd’hui${window.userIsPremium ? " (x2 si premium)" : ""}.
+    </div>
+    <button id="btnRewardConcours" class="main-button" style="margin-top:12px;">Regarder une pub</button>
+  </div>
+`;
     document.body.appendChild(popup);
     popup.querySelector("#btnRewardConcours").onclick = async () => {
-      await window.showAd();
-      resetVotesCycle();
+      await window.showAd();       // ← affiche la pub rewarded (branché sur AppLovin via pub.js)
+      resetVotesCycle();           // ← débloque les votes
       popup.remove();
       resolve();
     };

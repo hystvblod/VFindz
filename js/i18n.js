@@ -1,7 +1,7 @@
 // i18n.js — Système multilingue PRO VFindz
 
 // Liste des langues supportées
-const SUPPORTED_LANGS = ["fr", "en", "es", "de", "it", "nl", "pt", "ptbr", "ar", "id", "ja", "ko"];
+const SUPPORTED_LANGS = ["fr", "en", "es", "de", "it", "nl", "pt", "ptbr", "ar", "idn", "ja", "ko"];
 
 // Version du fichier de langue (à incrémenter si tu changes les textes)
 const I18N_VER = "1.0.0";

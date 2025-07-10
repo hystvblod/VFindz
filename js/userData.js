@@ -112,6 +112,7 @@ async function loadUserData(force = false) {
     userDataCache.demandesEnvoyees = Array.isArray(userDataCache.demandesEnvoyees) ? userDataCache.demandesEnvoyees : [];
   }
   setCachedOwnedFrames(userDataCache.cadres || []);
+  await setLangIfNeeded();
   return userDataCache;
 }
 
@@ -578,6 +579,19 @@ window.ajouterPhotoAimeeComplete = function(defiId, imageDataUrl, cadreId) {
   aimes.push({ defiId, imageDataUrl, cadreId, date: Date.now() });
   localStorage.setItem("photos_aimees_obj", JSON.stringify(aimes));
 };
+// Ajoute ça en bas du fichier, AVANT la globalisation window
+async function setLangIfNeeded() {
+  await ensureAuth();
+  // Si la langue n'est pas définie (ou valeur vide/incorrecte), la détecter
+  if (!userDataCache?.lang || userDataCache.lang.length < 2) {
+    let lang = (navigator.language || navigator.userLanguage || 'fr').slice(0,2);
+    // Garde que les langues supportées
+    if (!['fr','en','es','de','it','nl','pt','ar'].includes(lang)) lang = 'fr';
+    userDataCache.lang = lang;
+    await supabase.from('users').update({ lang }).eq('id', userIdCache);
+  }
+}
+window.setLangIfNeeded = setLangIfNeeded;
 
 // ========== GLOBALISATION DES FONCTIONS ==========
 window.supabase = supabase;

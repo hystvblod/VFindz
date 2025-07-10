@@ -92,19 +92,37 @@ function nettoyerPhotosDefis() {
 
 // ----------- STOCKAGE PHOTO AIMEE -------------
 function aimerPhoto(defiId) {
-  let photosAimees = JSON.parse(localStorage.getItem("photos_aimees") || "[]");
-  if (!photosAimees.includes(defiId)) {
-    photosAimees.push(defiId);
-    localStorage.setItem("photos_aimees", JSON.stringify(photosAimees));
-    console.log("[SOLO] Photo aimée ajoutée", defiId);
-  }
+  // Récupère le snapshot encadré déjà enregistré pour ce défi
+  let obj = {};
+  try { obj = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`) || "{}"); } catch {}
+  if (!obj.photo) return alert("Photo introuvable pour ce défi.");
+
+  let photosAimees = [];
+  try { photosAimees = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]"); } catch {}
+
+  // Ne pas ajouter deux fois le même defiId
+  if (photosAimees.some(x => x.defiId === defiId)) return;
+
+  photosAimees.push({
+    defiId,
+    imageDataUrl: obj.photo,
+    cadre: obj.cadre || "polaroid_01",
+    date: Date.now()
+  });
+  localStorage.setItem("photos_aimees_obj", JSON.stringify(photosAimees));
+  console.log("[SOLO] Photo aimée sauvegardée offline (img + cadre) :", defiId);
 }
+
 function retirerPhotoAimee(defiId) {
-  let photosAimees = JSON.parse(localStorage.getItem("photos_aimees") || "[]");
-  photosAimees = photosAimees.filter(id => id !== defiId);
-  localStorage.setItem("photos_aimees", JSON.stringify(photosAimees));
-  console.log("[SOLO] Photo aimée retirée", defiId);
+  let photosAimees = [];
+  try { photosAimees = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]"); } catch {}
+  photosAimees = photosAimees.filter(obj => obj.defiId !== defiId);
+  localStorage.setItem("photos_aimees_obj", JSON.stringify(photosAimees));
+  console.log("[SOLO] Photo aimée retirée :", defiId);
 }
+window.aimerPhoto = aimerPhoto;
+window.retirerPhotoAimee = retirerPhotoAimee;
+
 
 // ----------- MAJ SOLDE POINTS/JETONS -------------
 function majSolde() {
@@ -689,4 +707,24 @@ window.afficherPhotosAimees = async function() {
       container.appendChild(el);
     }
   }
+};
+window.refreshDefisLangueSolo = async function() {
+  const lang = window.getCurrentLang ? window.getCurrentLang() : (localStorage.getItem("langue") || "fr");
+  allDefis = await window.getDefisFromSupabase(lang);
+  localStorage.setItem("vfind_defis_cache", JSON.stringify(allDefis));
+  localStorage.setItem("vfind_defis_cache_date", Date.now().toString());
+
+// Recharge la partie en cours (si partie en cours)
+let defis = JSON.parse(localStorage.getItem("solo_defiActifs") || "[]");
+if (defis && defis.length > 0) {
+  // Mets à jour le texte des défis affichés
+  for (let i = 0; i < defis.length; i++) {
+    const defiId = defis[i].id;
+    // Récupère la version dans la nouvelle langue (champ .texte préparé par getDefisFromSupabase)
+    let defiLang = allDefis.find(d => d.id === defiId);
+    defis[i].texte = defiLang?.texte || defis[i].texte;
+  }
+  localStorage.setItem("solo_defiActifs", JSON.stringify(defis));
+  await loadDefis();
+}
 };

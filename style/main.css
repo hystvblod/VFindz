@@ -2434,6 +2434,11 @@ overflow-y: auto;
   font-weight: bold;
   cursor: pointer;
 }
+#popupCustomMessage {
+  font-size: 1.35em; /* ou plus gros si tu veux */
+  line-height: 1.4;
+}
+
 @keyframes popfade {
   from { transform: translateY(22px) scale(.96); opacity:0;}
   to   { transform: none; opacity:1;}

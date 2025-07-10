@@ -74,7 +74,6 @@ window.genererImageConcoursAvecCadre = function(base64Image) {
   });
 };
 
-// Upload d'une image webp dans le bucket concours, version globale
 window.uploadPhotoConcoursWebp = async function(dataUrl, concoursId, userId) {
   const arr = dataUrl.split(',');
   const mime = arr[0].match(/:(.*?);/)[1];
@@ -83,7 +82,19 @@ window.uploadPhotoConcoursWebp = async function(dataUrl, concoursId, userId) {
   const u8arr = new Uint8Array(n);
   while (n--) u8arr[n] = bstr.charCodeAt(n);
   const blob = new Blob([u8arr], { type: mime });
-  const fileName = `${userId}_${Date.now()}.webp`;
+
+  // --------- Ajout d'une vraie date dans le nom du fichier -----------
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const hh = String(now.getHours()).padStart(2, '0');
+  const min = String(now.getMinutes()).padStart(2, '0');
+  const ss = String(now.getSeconds()).padStart(2, '0');
+  const rand = Math.random().toString(36).slice(2,8);
+
+  // Format: 20240709_181650_xyz123_userid.webp
+  const fileName = `${yyyy}${mm}${dd}_${hh}${min}${ss}_${rand}_${userId}.webp`;
 
   const { data: uploadData, error: uploadError } = await window.supabase
     .storage
@@ -99,6 +110,7 @@ window.uploadPhotoConcoursWebp = async function(dataUrl, concoursId, userId) {
 
   return publicUrlData.publicUrl;
 };
+
 
 // --------- OUVERTURE CAMERA UNIFIÉE CAPACITOR + WEB ---------
 window.ouvrirCameraPour = async function(defiId, mode = "solo", duelId = null, cadreId = null) {

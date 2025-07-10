@@ -126,7 +126,7 @@ function dataURLtoBlob(dataurl) {
   console.log("✅ Room récupérée :", room);
 
   const pseudo = await window.getPseudo();
-  const champ = (room.player1_pseudo === pseudo) ? 'photosa' : 'photosb';
+  const champ = (room.player1_id === userId) ? 'photosa' : 'photosb'
   let photos = room[champ] || {};
   photos[idx] = { url, cadre: cadreId };
   await window.supabase.from('duels').update({ [champ]: photos }).eq('id', duelId);
@@ -141,21 +141,38 @@ function dataURLtoBlob(dataurl) {
 };
 
 // --------- Fonctions COEURS LOCAUX (photos aimées DUEL) ---------
-window.getPhotosAimeesDuel = function() {
-  return JSON.parse(localStorage.getItem("photos_aimees_duel") || "[]");
-};
-window.aimerPhotoDuel = function(defiId) {
-  let aimes = window.getPhotosAimeesDuel();
-  if (!aimes.includes(defiId)) {
-    aimes.push(defiId);
-    localStorage.setItem("photos_aimees_duel", JSON.stringify(aimes));
-  }
-};
-window.retirerPhotoAimeeDuel = function(defiId) {
-  let aimes = window.getPhotosAimeesDuel();
-  aimes = aimes.filter(id => id !== defiId);
-  localStorage.setItem("photos_aimees_duel", JSON.stringify(aimes));
-};
+function aimerPhoto(defiId) {
+  // Récupère le snapshot encadré déjà enregistré pour ce défi
+  let obj = {};
+  try { obj = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`) || "{}"); } catch {}
+  if (!obj.photo) return alert("Photo introuvable pour ce défi.");
+
+  let photosAimees = [];
+  try { photosAimees = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]"); } catch {}
+
+  // Ne pas ajouter deux fois le même defiId
+  if (photosAimees.some(x => x.defiId === defiId)) return;
+
+  photosAimees.push({
+    defiId,
+    imageDataUrl: obj.photo,
+    cadre: obj.cadre || "polaroid_01",
+    date: Date.now()
+  });
+  localStorage.setItem("photos_aimees_obj", JSON.stringify(photosAimees));
+  console.log("[SOLO] Photo aimée sauvegardée offline (img + cadre) :", defiId);
+}
+
+function retirerPhotoAimee(defiId) {
+  let photosAimees = [];
+  try { photosAimees = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]"); } catch {}
+  photosAimees = photosAimees.filter(obj => obj.defiId !== defiId);
+  localStorage.setItem("photos_aimees_obj", JSON.stringify(photosAimees));
+  console.log("[SOLO] Photo aimée retirée :", defiId);
+}
+window.aimerPhoto = aimerPhoto;
+window.retirerPhotoAimee = retirerPhotoAimee;
+
 
 // --------- Variables globales ---------
 window.currentRoomId = null;
@@ -175,22 +192,59 @@ const path = window.location.pathname;
 
 // ==================== PATCH ANTI-MULTI =====================
 window.checkAlreadyInDuel = async function() {
-  const pseudo = await window.getPseudo();
+  const userId = window.getUserId();
+  // LOG : début check
+  console.log("[Duel] Vérification des rooms actives pour", userId);
+
   const { data: duelsEnCours, error } = await window.supabase
     .from('duels')
-    .select('id, status, player1_pseudo, player2_pseudo')
+    .select('id, status, player1_id, player2_id')
     .in('status', ['waiting', 'playing'])
-    .or(`player1_pseudo.eq.${pseudo},player2_pseudo.eq.${pseudo}`);
-  if (error) return false;
-  if (duelsEnCours && duelsEnCours.length > 0) {
-    const room = duelsEnCours[0];
+    .or(`player1_id.eq.${userId},player2_id.eq.${userId}`);
+
+  if (error) {
+    console.error("[Duel] Erreur requête checkAlreadyInDuel :", error);
+    return false;
+  }
+  // LOG : résultat brut
+  console.log("[Duel] Rooms actives trouvées :", duelsEnCours);
+
+  let room = duelsEnCours.find(d =>
+    (d.player1_id === userId || d.player2_id === userId) && d.status === "playing"
+  );
+  if (room) {
+    console.warn("[Duel] Déjà dans une room en cours (playing):", room.id);
+  }
+  if (!room) {
+    room = duelsEnCours.find(d =>
+      d.player1_id === userId && d.status === "waiting"
+    );
+    if (room) console.warn("[Duel] Room waiting trouvée où je suis player1 :", room.id);
+  }
+  if (!room) {
+    room = duelsEnCours.find(d =>
+      d.player2_id === userId && d.status === "waiting"
+    );
+    if (room) console.warn("[Duel] Room waiting trouvée où je suis player2 :", room.id);
+  }
+  if (room) {
+    // LOG : redirection
+    console.log("[Duel] Redirection vers room déjà existante :", room.id);
+    localStorage.setItem("duel_random_room", room.id);
+    const isP1 = (room.player1_id === userId);
+    localStorage.setItem("duel_is_player1", isP1 ? "1" : "0");
     setTimeout(() => {
       window.location.href = `duel_game.html?room=${room.id}`;
     }, 200);
     return true;
   }
+  // LOG : aucun duel actif
+  console.log("[Duel] Aucun duel actif trouvé pour", userId);
   return false;
 };
+
+
+
 
 // ================= FIN PATCH ANTI-MULTI ===================
 // ============ FULL LOCAL DEFIS =============
@@ -215,50 +269,46 @@ window.getDefisLocal = async function(n = 3, forceLang = null) {
 };
 
 window.findOrCreateRoom = async function() {
-  if (await window.checkAlreadyInDuel()) return;
+  if (await window.checkAlreadyInDuel()) {
+    console.warn("[Duel] Joueur déjà dans une room active, on stoppe !");
+    return;
+  }
+
   localStorage.removeItem("duel_random_room");
   localStorage.removeItem("duel_is_player1");
-  const pseudo = await window.getPseudo();
+  const userId = window.getUserId();
+  const userPseudo = await window.getPseudo();
 
   for (let i = 0; i < 5; i++) {
-let { data: rooms } = await window.supabase
-  .from('duels')
-  .select('*')
-  .eq('status', 'waiting')
-  .neq('player1_pseudo', pseudo)
-  .order('createdat', { ascending: true }) // prend la plus ancienne
-  .limit(1); // empêche plusieurs joueurs d'en prendre plusieurs
-
+    console.log(`[Duel] Recherche d'une room waiting dispo (tentative ${i+1})`);
+    let { data: rooms } = await window.supabase
+      .from('duels')
+      .select('*')
+      .eq('status', 'waiting')
+      .neq('player1_id', userId)
+      .order('createdat', { ascending: true })
+      .limit(1);
 
     if (rooms && rooms.length > 0) {
       const room = rooms[0];
-      const player2_id = await window.getUserId();
-      const pseudo2 = await window.getPseudo();
+      console.log("[Duel] Room waiting trouvée :", room.id, "Tentative de join...");
 
-      console.log("Tentative d'update room:", room.id, pseudo2, player2_id);
+      const { data: updated, error: updError } = await window.supabase.from('duels').update({
+        player2_id: userId,
+        player2_pseudo: userPseudo,
+        status: 'playing',
+        starttime: Date.now()
+      })
+        .eq('id', room.id)
+        .eq('status', 'waiting')
+        .select();
 
- const { data: updated, error: updError } = await window.supabase.from('duels').update({
-  player2_id: player2_id,
-  player2_pseudo: pseudo2,
-  status: 'playing',
-  starttime: Date.now()
-})
-.eq('id', room.id)
-.eq('status', 'waiting') // ✅ ne modifie que si elle n’a pas été prise entre-temps
-.select();
-
-if (updError || !updated || updated.length === 0) {
-  console.warn("Room déjà prise ou erreur. Nouvelle tentative...");
-  continue; // relance la boucle
-}
-
-
-      if (updError) {
-        console.error("⚠️ Erreur lors de l'update du joueur 2 :", updError.message);
-      } else {
-        console.log("✅ Update joueur 2 OK pour room:", room.id);
+      if (updError || !updated || updated.length === 0) {
+        console.warn("[Duel] Room join échoué (déjà prise?):", updError);
+        continue; // Room déjà prise, next loop
       }
 
+      console.log("[Duel] Joueur rejoint la room :", room.id, "en tant que player2");
       localStorage.setItem("duel_random_room", room.id);
       localStorage.setItem("duel_is_player1", "0");
       setTimeout(() => {
@@ -269,14 +319,20 @@ if (updError || !updated || updated.length === 0) {
     await new Promise(r => setTimeout(r, 1200));
   }
 
-  const player1Id = await window.getUserId();
-  const player1Pseudo = await window.getPseudo();
-  const defis = await window.getDefisDuelFromSupabase(3);
+  // DOUBLE CHECK anti-multi
+  if (await window.checkAlreadyInDuel()) {
+    console.error("[Duel] PROTECTION DOUBLE : déjà dans un duel après tentative de création. Abort !");
+    return;
+  }
 
+  // LOG création room
+  console.log("[Duel] Création d'une nouvelle room, aucun adversaire dispo. userId:", userId);
+
+  const defis = await window.getDefisDuelFromSupabase(3);
   const roomObj = {
-    player1_id: player1Id,
+    player1_id: userId,
     player2_id: null,
-    player1_pseudo: player1Pseudo,
+    player1_pseudo: userPseudo,
     player2_pseudo: null,
     score1: 0,
     score2: 0,
@@ -288,18 +344,22 @@ if (updError || !updated || updated.length === 0) {
     photosb: {},
     type: 'random'
   };
-
   const { data, error } = await window.supabase.from('duels').insert([roomObj]).select();
   if (error) {
+    console.error("[Duel] Erreur création duel :", error.message);
     alert("Erreur création duel : " + error.message);
     return;
   }
+  console.log("[Duel] Nouvelle room créée :", data[0].id);
+
   localStorage.setItem("duel_random_room", data[0].id);
   localStorage.setItem("duel_is_player1", "1");
   setTimeout(() => {
     waitRoom(data[0].id);
   }, 200);
 };
+
+
 
 function waitRoom(roomId) {
   const poll = async () => {
@@ -331,7 +391,9 @@ window.initDuelGame = async function() {
   window.currentRoomId = roomId;
   const pseudo = await window.getPseudo();
   const room = await window.getRoom(roomId);
-  window.isPlayer1 = (room.player1_pseudo === pseudo);
+ const userId = window.getUserId();
+window.isPlayer1 = (room.player1_id === userId);
+
 
   subscribeRoom(roomId, (data) => {
     window.roomData = data;
@@ -605,17 +667,20 @@ window.renderDefis = async function({ myID, advID }) {
 // =================== POPUP FIN DE DUEL ===================
 window.afficherPopupFinDuel = async function(room) {
   const pseudo = await window.getPseudo();
-  const isP1 = room.player1 === pseudo;
-  const myChamp = isP1 ? 'photosa' : 'photosb';
-  const advChamp = isP1 ? 'photosb' : 'photosa';
-  const myID = isP1 ? room.player1 : room.player2;
-  const advID = isP1 ? room.player2 : room.player1;
+  // Utilise bien player1_pseudo/player2_pseudo partout pour l'affichage !
+const userId = window.getUserId(); // correction sécurisée
+const isP1 = room.player1_id === userId;
+const myChamp = isP1 ? 'photosa' : 'photosb';
+const advChamp = isP1 ? 'photosb' : 'photosa';
+const myPseudo = isP1 ? room.player1_pseudo : room.player2_pseudo;
+const advPseudo = isP1 ? room.player2_pseudo : room.player1_pseudo;
+
 
   const nbDefis = (room.defis || []).length;
   const photosMy = room[myChamp] || {};
   const photosAdv = room[advChamp] || {};
 
-  let html = '<table class="fin-defis-table"><tr><th>Défi</th><th>Moi</th><th>' + (advID || "Adversaire") + '</th></tr>';
+  let html = '<table class="fin-defis-table"><tr><th>Défi</th><th>Moi</th><th>' + (advPseudo || "Adversaire") + '</th></tr>';
   for (let i = 0; i < nbDefis; i++) {
     const defi = room.defis[i] || "-";
     const okMe = photosMy[i] && photosMy[i].url ? "✅" : "❌";
@@ -626,9 +691,9 @@ window.afficherPopupFinDuel = async function(room) {
 
   $("fin-faceaface").innerHTML = `
     <div class="fin-faceaface-row">
-      <span><b>${myID || "Moi"}</b> (toi)</span>
+      <span><b>${myPseudo || "Moi"}</b> (toi)</span>
       <span>vs</span>
-      <span><b>${advID || "Adversaire"}</b></span>
+      <span><b>${advPseudo || "Adversaire"}</b></span>
     </div>
   `;
   $("fin-details").innerHTML = html;
@@ -637,7 +702,7 @@ window.afficherPopupFinDuel = async function(room) {
   let gain = nbFaits * 10;
   if (nbFaits === nbDefis) gain += 10;
 
-  let gainFlag = "gain_duel_" + room.id + "_" + myID;
+  let gainFlag = "gain_duel_" + room.id + "_" + myPseudo;
   if (!localStorage.getItem(gainFlag)) {
     await window.supabase.rpc('secure_add_points', { nb: gain });
     localStorage.setItem(gainFlag, "1");
@@ -662,6 +727,7 @@ window.afficherPopupFinDuel = async function(room) {
     $("popup-fin-duel").classList.remove("show");
   };
 };
+
 
 // ============ LOGIQUE FIN DE DUEL + POPUP ==============
 window.checkFinDuel = async function() {
@@ -758,7 +824,7 @@ window.validerDefiAvecJeton = async function(idx) {
   if (!duelId) duelId = (new URLSearchParams(window.location.search)).get("room");
   const pseudo = await window.getPseudo();
   const room = await window.getRoom(duelId);
-  const myChamp = (room.player1_pseudo === pseudo) ? 'photosa' : 'photosb';
+  const myChamp = (room.player1_id === userId) ? 'photosa' : 'photosb'
 
   // Chemin local de l'image "jeton validé"
   const urlJeton = "assets/img/jeton_pp.jpg"; // (mets ton image stylée ici)
@@ -1034,7 +1100,8 @@ window.validerDefiAvecJeton = async function(idx) {
   let duelId = window.currentRoomId || (new URLSearchParams(window.location.search)).get("room");
   const pseudo = await window.getPseudo();
   const room = await window.getRoom(duelId);
-  const myChamp = (room.player1_pseudo === pseudo) ? 'photosa' : 'photosb';
+  const myChamp = (room.player1_id === userId) ? 'photosa' : 'photosb'
+
 
   const urlJeton = "assets/img/jeton_pp.jpg"; // Mets l'image de ton jeton ici
   const cadreId = window.getCadreDuel ? window.getCadreDuel(duelId, idx) : "polaroid_01";
@@ -1062,6 +1129,7 @@ window.validerDefiAvecJeton = async function(idx) {
 if (path.includes("duel_random.html")) {
   const existingRoomId = localStorage.getItem("duel_random_room");
   if (existingRoomId) {
+       console.log("[Duel] Reprise de room en cours :", existingRoomId);
     window.supabase
       .from('duels')
       .select('id, status')
@@ -1088,3 +1156,19 @@ async function updateSoldeAffichage() {
   document.getElementById("points").textContent = points;
   document.getElementById("jetons").textContent = jetons;
 }
+window.refreshDefisLangueDuel = async function() {
+  const lang = window.getCurrentLang ? window.getCurrentLang() : (localStorage.getItem("langue") || "fr");
+  // Recharge le pool de défis dans la nouvelle langue pour la création des nouveaux duels
+  if (window._allDefis) {
+    window._allDefis = null;
+  }
+  // Recharge à la prochaine partie (ou force le rechargement ici si tu veux une preview en live)
+  if (typeof window.chargerDefisLocal === "function") {
+    await window.chargerDefisLocal(lang);
+  }
+  // Tu peux aussi forcer un rafraîchissement de l'UI si besoin, par exemple :
+  if (typeof window.renderDefisAccueil === "function") {
+    window.renderDefisAccueil();
+  }
+};
+

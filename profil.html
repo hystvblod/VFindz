@@ -20,6 +20,64 @@ body { visibility: hidden; }
       transition: color 0.15s;
     }
     .id-user:hover { color: #ffe04a; }
+
+    /* ============ DEGRADÉS ANIMÉS PREMIUM ============ */
+    .id-user.gradient_rainbow {
+      background: linear-gradient(270deg,#ff2d55,#ffde3b,#51ffb0,#338aff,#a259ff,#ff2d55);
+      background-size: 1200% 1200%;
+      background-clip: text; -webkit-background-clip: text;
+      color: transparent !important; -webkit-text-fill-color: transparent;
+      animation: rainbowflow 6s linear infinite;
+      font-weight: bold; text-decoration: underline;
+    }
+    @keyframes rainbowflow { 0% {background-position:0% 50%} 100%{background-position:100% 50%} }
+
+    .id-user.gradient_fire {
+      background: linear-gradient(270deg,#fd5a36,#fbbf24,#f59e42,#fd5a36 70%);
+      background-size: 800% 800%;
+      background-clip: text; -webkit-background-clip: text;
+      color: transparent !important; -webkit-text-fill-color: transparent;
+      animation: fireflow 3.5s linear infinite;
+    }
+    @keyframes fireflow { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
+
+    .id-user.gradient_ocean {
+      background: linear-gradient(90deg,#009ffd,#2af598,#6a82fb,#fc5c7d);
+      background-size: 800% 800%;
+      background-clip: text; -webkit-background-clip: text;
+      color: transparent !important; -webkit-text-fill-color: transparent;
+      animation: oceanflow 7s linear infinite;
+    }
+    @keyframes oceanflow { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
+
+    .id-user.gradient_candy {
+      background: linear-gradient(90deg,#ffb6f9,#8fd3f4,#b2f7ef,#ffe4f3,#ffb6f9);
+      background-size: 800% 800%;
+      background-clip: text; -webkit-background-clip: text;
+      color: transparent !important; -webkit-text-fill-color: transparent;
+      animation: candyflow 10s linear infinite;
+    }
+    @keyframes candyflow { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
+
+    .id-user.gradient_sunburst {
+      background: linear-gradient(270deg,#ffe259,#ffa751,#ffef8e,#ffd96a,#ffa751,#ffe259);
+      background-size: 900% 900%;
+      background-clip: text; -webkit-background-clip: text;
+      color: transparent !important; -webkit-text-fill-color: transparent;
+      animation: sunburstflow 5s linear infinite;
+    }
+    @keyframes sunburstflow { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
+
+    .id-user.gradient_ice {
+      background: linear-gradient(270deg,#e0eafc,#cfdef3,#a1c4fd,#e0eafc);
+      background-size: 700% 700%;
+      background-clip: text; -webkit-background-clip: text;
+      color: transparent !important; -webkit-text-fill-color: transparent;
+      animation: iceflow 8s linear infinite;
+    }
+    @keyframes iceflow { 0%{background-position:0% 50%} 100%{background-position:100% 50%} }
+
+    /* ============ POPUP/BASE ============ */
     .popChangementID-bg {
       display: none; position: fixed; inset: 0; background: rgba(30,30,40,0.44);
       justify-content: center; align-items: center; z-index: 2000; transition: background .16s;
@@ -54,8 +112,29 @@ body { visibility: hidden; }
     #list-color-popup .color-choix {
       width:44px;height:44px;border-radius:12px;border:2px solid #ccc;cursor:pointer;
       box-shadow:0 2px 7px #1114;transition:all .15s;outline: none;display:inline-block;
+      background-size: 120% 120%;
     }
     #list-color-popup .color-choix.selected { border: 3px solid #222; }
+    /* Dégradés visibles dans le color picker */
+    #list-color-popup .color-choix[data-color="gradient_rainbow"] {
+      background: linear-gradient(270deg,#ff2d55,#ffde3b,#51ffb0,#338aff,#a259ff,#ff2d55);
+      background-size: 400% 400%;
+    }
+    #list-color-popup .color-choix[data-color="gradient_fire"] {
+      background: linear-gradient(270deg,#fd5a36,#fbbf24,#f59e42,#fd5a36 70%);
+    }
+    #list-color-popup .color-choix[data-color="gradient_ocean"] {
+      background: linear-gradient(90deg,#009ffd,#2af598,#6a82fb,#fc5c7d);
+    }
+    #list-color-popup .color-choix[data-color="gradient_candy"] {
+      background: linear-gradient(90deg,#ffb6f9,#8fd3f4,#b2f7ef,#ffe4f3,#ffb6f9);
+    }
+    #list-color-popup .color-choix[data-color="gradient_sunburst"] {
+      background: linear-gradient(270deg,#ffe259,#ffa751,#ffef8e,#ffd96a,#ffa751,#ffe259);
+    }
+    #list-color-popup .color-choix[data-color="gradient_ice"] {
+      background: linear-gradient(270deg,#e0eafc,#cfdef3,#a1c4fd,#e0eafc);
+    }
     @media (max-width: 490px) {
       .popChangementID { padding: 1.2rem 0.4rem 1.1rem 0.4rem; }
       .popChangementID input { width: 95%; font-size: 1em; }
@@ -152,8 +231,13 @@ async function getProfile() {
 async function refreshProfilDisplay() {
   const profil = await getProfile();
   const pseudo = profil?.pseudo || "???";
-  // === Correction ici : affichage du pseudo stylisé (plus de window.i18nTr sur l'ID)
-  document.getElementById("idUserDisplay").innerHTML = "ID : " + window.renderID(pseudo, profil?.id_color, profil?.premium);
+  // ==== Ici on applique la classe si c'est un dégradé ====
+  const color = profil?.id_color;
+  const idDiv = document.getElementById("idUserDisplay");
+  let colorClass = "";
+  if (color && color.startsWith("gradient_")) colorClass = color;
+  idDiv.className = "id-user" + (colorClass ? " " + colorClass : "");
+  idDiv.innerHTML = "ID : " + window.renderID(pseudo, profil?.id_color, profil?.premium);
   document.getElementById("vcoins").textContent = profil?.points || 0;
   document.getElementById("jetons").textContent = profil?.jetons || 0;
 }
@@ -190,14 +274,23 @@ async function setupProfile() {
       err.textContent = e.message || window.i18nTr("id.popup.unknown");
     }
   };
-  // --- Gestion couleur ID premium ---
+  // --- Gestion couleur ID premium + dégradés ---
   const colorOptions = [
     "#FFD700", "#FFFFFF", "#111111", "#F76C6C", "#56E39F",
     "#5F6FFF", "#FF8CFF", "#FFBB54", "#F5C6AA", "#A7C7E7",
+    "gradient_rainbow", "gradient_fire", "gradient_ocean", "gradient_candy", "gradient_sunburst", "gradient_ice"
   ];
   let selectedColor = null;
   let mouseDownTimer = null;
   const idEl = document.getElementById("idUserDisplay");
+  idEl.addEventListener("click", () => {
+  document.getElementById("popChangementID-bg").classList.add("active");
+  document.getElementById("popNewIdInput").value = "";
+  document.getElementById("popIdError").textContent = "";
+  document.getElementById("popIdError").classList.remove("valid");
+  setTimeout(()=>document.getElementById("popNewIdInput").focus(), 120);
+});
+
   idEl.addEventListener("mousedown", async (e) => {
     const profil = await getProfile();
     if (profil?.premium) {
@@ -238,7 +331,13 @@ async function setupProfile() {
       colorOptions.forEach((col) => {
         const item = document.createElement("div");
         item.className = "color-choix";
-        item.style.background = col;
+        // Dégradé ou couleur unie
+        if (typeof col === "string" && col.startsWith("gradient_")) {
+          item.setAttribute("data-color", col);
+        } else {
+          item.style.background = col;
+        }
+        // Visuel select
         if ((selectedColor && selectedColor === col) || (!selectedColor && currentColor === col)) {
           item.classList.add("selected");
         }
