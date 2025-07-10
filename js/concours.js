@@ -525,6 +525,7 @@ async function showConcoursRewardPopup() {
 // ----------- INITIALISATION : set userId/premium -----------
 document.addEventListener("DOMContentLoaded", async () => {
   // 1. Charger infos du concours = récupère le bon ID
+   await window.loadI18nLang();
   await chargerInfosConcours(); // Définit concoursIdGlobal
 
   // 2. Charger infos user après
