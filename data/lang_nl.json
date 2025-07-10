@@ -340,7 +340,15 @@
 "boutique.button.premium": "Premium vereist",
 "boutique.feedback.success": "✅ Kader gekocht!",
 "boutique.feedback.error": "❌ Niet genoeg munten of fout!",
-"boutique.empty": "Geen kader in deze categorie."
-
+"boutique.empty": "Geen kader in deze categorie.",
+  "concours.participation_une_fois": "Je hebt al aan deze wedstrijd deelgenomen!",
+  "concours.popup_replace_photo": "Je hebt al een foto voor deze wedstrijd. Een nieuwe toevoegen zal de vorige verwijderen (stemmen verloren). Doorgaan?",
+  "concours.erreur_ajout_photo": "Fout bij het toevoegen van de foto aan de wedstrijd.",
+  "concours.plus_de_votes": "Geen stemmen meer vandaag. Herlaad om er meer te krijgen!",
+  "concours.deja_vote_auj": "Je hebt vandaag al op deze foto gestemd! (Bekijk een advertentie om opnieuw te stemmen)",
+  "concours.erreur_vote": "Fout tijdens het stemmen",
+  "concours.popup_pub": "Om deel te nemen aan de wedstrijd, bekijk een advertentie om te ontgrendelen",
+  "concours.popup_aujourdhui": "stemmen vandaag",
+  "concours.btn_regarder_pub": "Bekijk een advertentie"
 
 }

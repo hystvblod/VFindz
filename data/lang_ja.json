@@ -340,7 +340,15 @@
 "boutique.button.premium": "プレミアム必須",
 "boutique.feedback.success": "✅ フレームを購入しました！",
 "boutique.feedback.error": "❌ コインが足りないかエラーが発生しました！",
-"boutique.empty": "このカテゴリにはフレームがありません。"
-
+"boutique.empty": "このカテゴリにはフレームがありません。",
+  "concours.participation_une_fois": "このコンテストにはすでに参加しています！",
+  "concours.popup_replace_photo": "このコンテストにはすでに写真があります。新しい写真を追加すると前の写真（投票数も含む）が削除されます。続けますか？",
+  "concours.erreur_ajout_photo": "コンテストに写真を追加する際にエラーが発生しました。",
+  "concours.plus_de_votes": "今日はこれ以上投票できません。広告を見て投票を補充してください！",
+  "concours.deja_vote_auj": "今日はすでにこの写真に投票しました！（広告を見て再度投票可能）",
+  "concours.erreur_vote": "投票中にエラーが発生しました",
+  "concours.popup_pub": "コンテストに参加するには、広告を見てアンロックしてください",
+  "concours.popup_aujourdhui": "今日の投票数",
+  "concours.btn_regarder_pub": "広告を見る"
 
 }

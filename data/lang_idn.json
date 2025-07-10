@@ -340,7 +340,15 @@
 "boutique.button.premium": "Memerlukan Premium",
 "boutique.feedback.success": "✅ Bingkai telah dibeli!",
 "boutique.feedback.error": "❌ Koin tidak cukup atau terjadi kesalahan!",
-"boutique.empty": "Tidak ada bingkai dalam kategori ini."
-
+"boutique.empty": "Tidak ada bingkai dalam kategori ini.",
+  "concours.participation_une_fois": "Kamu sudah pernah ikut kontes ini!",
+  "concours.popup_replace_photo": "Kamu sudah mengunggah foto untuk kontes ini. Menambahkan foto baru akan menghapus foto sebelumnya (suara juga hilang). Lanjutkan?",
+  "concours.erreur_ajout_photo": "Terjadi kesalahan saat menambahkan foto ke kontes.",
+  "concours.plus_de_votes": "Tidak ada suara lagi hari ini. Isi ulang untuk mendapatkan lebih banyak!",
+  "concours.deja_vote_auj": "Kamu sudah memilih foto ini hari ini! (Tonton iklan untuk mengisi ulang dan memilih lagi)",
+  "concours.erreur_vote": "Terjadi kesalahan saat memberikan suara",
+  "concours.popup_pub": "Untuk mengikuti kontes, tonton iklan untuk membuka akses",
+  "concours.popup_aujourdhui": "suara hari ini",
+  "concours.btn_regarder_pub": "Tonton iklan"
 
 }

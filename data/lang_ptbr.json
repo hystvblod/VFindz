@@ -319,6 +319,15 @@
 "boutique.button.premium": "Requer Premium",
 "boutique.feedback.success": "✅ Moldura comprada!",
 "boutique.feedback.error": "❌ Moedas insuficientes ou erro!",
-"boutique.empty": "Nenhuma moldura nesta categoria."
+"boutique.empty": "Nenhuma moldura nesta categoria.",
+  "concours.participation_une_fois": "Você já participou deste concurso!",
+  "concours.popup_replace_photo": "Você já tem uma foto para este concurso. Adicionar uma nova irá apagar a anterior (votos perdidos). Continuar?",
+  "concours.erreur_ajout_photo": "Erro ao adicionar a foto ao concurso.",
+  "concours.plus_de_votes": "Não há mais votos hoje. Recarregue para obter mais!",
+  "concours.deja_vote_auj": "Você já votou nesta foto hoje! (Veja um anúncio para recarregar e votar novamente)",
+  "concours.erreur_vote": "Erro ao votar",
+  "concours.popup_pub": "Para acessar o concurso, veja um anúncio para desbloquear",
+  "concours.popup_aujourdhui": "votos hoje",
+  "concours.btn_regarder_pub": "Ver um anúncio"
 
 }

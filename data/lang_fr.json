@@ -340,7 +340,18 @@
 "boutique.feedback.success": "✅ Cadre acheté !",
 "boutique.feedback.error": "❌ Pas assez de pièces ou erreur !",
 "boutique.empty": "Aucun cadre dans cette catégorie.",
-"alert.premium_only": "Ce mode est réservé aux Premium."
-
-
+"alert.premium_only": "Ce mode est réservé aux Premium.",
+  "concours.participation_une_fois": "Tu as déjà participé à ce concours !",
+  "concours.popup_replace_photo": "Tu as déjà une photo pour ce concours. En ajouter une nouvelle va supprimer l'ancienne (votes perdus). Continuer ?",
+  "concours.erreur_ajout_photo": "Erreur lors de l'ajout de la photo au concours.",
+  "concours.plus_de_votes": "Plus de votes aujourd'hui. Recharge pour en avoir d'autres !",
+  "concours.deja_vote_auj": "Tu as déjà voté pour cette photo aujourd'hui ! (Recharge les votes via pub pour pouvoir revoter)",
+  "concours.erreur_vote": "Erreur lors du vote",
+  "concours.popup_pub": "Pour accéder au concours, regarde une pub pour débloquer",
+  "concours.popup_aujourdhui": "votes aujourd’hui",
+  "concours.btn_regarder_pub": "Regarder une pub"
 }
+
+
+
+

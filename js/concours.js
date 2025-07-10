@@ -10,10 +10,11 @@ let loadedCount = 0;
 let loadingMore = false;
 let endOfPhotos = false;
 let scrollPhotos = []; // Liste filtrée pour scroll infini
+let concoursIdGlobal = null; // ID unique du concours
 
 // ----------- SYSTEME ACCES/REWARD/VOTES -----------
 const VOTES_PAR_REWARD = () => (window.userIsPremium ? 6 : 3);
-function getVotesCycleKey() { return 'concours_vote_cycle_' + getConcoursDateStr(); }
+function getVotesCycleKey() { return 'concours_vote_cycle_' + (concoursIdGlobal || ""); }
 function getVotesLeft() {
   const d = JSON.parse(localStorage.getItem(getVotesCycleKey()) || '{}');
   return d?.left ?? 0;
@@ -23,17 +24,17 @@ function setVotesLeft(left) {
 }
 function resetVotesCycle() {
   setVotesLeft(VOTES_PAR_REWARD());
-  localStorage.setItem('concours_reward_done_' + getConcoursDateStr(), '1');
-  localStorage.setItem('concours_recharge_done_' + getConcoursDateStr(), '0');
+  localStorage.setItem('concours_reward_done_' + (concoursIdGlobal || ""), '1');
+  localStorage.setItem('concours_recharge_done_' + (concoursIdGlobal || ""), '0');
 }
 function isRewardDone() {
-  return localStorage.getItem('concours_reward_done_' + getConcoursDateStr()) === '1';
+  return localStorage.getItem('concours_reward_done_' + (concoursIdGlobal || "")) === '1';
 }
 function isRechargeDone() {
-  return localStorage.getItem('concours_recharge_done_' + getConcoursDateStr()) === '1';
+  return localStorage.getItem('concours_recharge_done_' + (concoursIdGlobal || "")) === '1';
 }
 function setRechargeDone() {
-  localStorage.setItem('concours_recharge_done_' + getConcoursDateStr(), '1');
+  localStorage.setItem('concours_recharge_done_' + (concoursIdGlobal || ""), '1');
 }
 
 // ----------- UTILS DATE/TOP 6 LOCAL -----------
@@ -41,7 +42,7 @@ function getConcoursDateStr() {
   return new Date().toISOString().slice(0, 10);
 }
 function getTop6CacheKey() {
-  return 'top6_concours_' + getConcoursDateStr();
+  return 'top6_concours_' + (concoursIdGlobal || "");
 }
 
 // ----------- CACHE LOCAL DES PHOTOS -----------
@@ -58,13 +59,12 @@ function setConcoursPhotosCache(concoursId, data) {
 
 // ----------- TOP 6 STOCKAGE LOCAL -----------
 async function fetchAndCacheTop6() {
-  const concoursId = getConcoursId();
+  const concoursId = concoursIdGlobal;
   const { data, error } = await window.supabase
     .from('photosconcours')
     .select('id')
     .eq('concours_id', concoursId);
   if (error || !data) return [];
-  // Utilise votes réels dans un vrai système
   const votesCountMap = await getVotesCountMapFromCacheOrDB(concoursId);
   data.sort((a, b) => (votesCountMap[b.id] || 0) - (votesCountMap[a.id] || 0));
   const top6 = data.slice(0, 6).map(d => d.id);
@@ -88,8 +88,6 @@ async function getVotesCountMapFromCacheOrDB(concoursId, force = false) {
   if (!force && cacheData && cacheTime && now - cacheTime < VOTES_COUNT_CACHE_DURATION) {
     return JSON.parse(cacheData);
   }
-
-  // Récupère tous les votes pour ce concours (une ligne par vote)
   const { data: allVotes, error } = await window.supabase
     .from('concours_votes')
     .select('photo_id')
@@ -100,7 +98,6 @@ async function getVotesCountMapFromCacheOrDB(concoursId, force = false) {
     return {};
   }
 
-  // Compte le nombre de votes par photo
   const voteCountMap = {};
   (allVotes || []).forEach(v => {
     voteCountMap[v.photo_id] = (voteCountMap[v.photo_id] || 0) + 1;
@@ -108,7 +105,6 @@ async function getVotesCountMapFromCacheOrDB(concoursId, force = false) {
 
   localStorage.setItem(VOTES_COUNT_CACHE_KEY, JSON.stringify(voteCountMap));
   localStorage.setItem(VOTES_COUNT_CACHE_TIME_KEY, now.toString());
-
   return voteCountMap;
 }
 
@@ -117,6 +113,7 @@ async function chargerInfosConcours() {
   try {
     const res = await fetch(URL_CONCOURS + "?t=" + Date.now());
     const data = await res.json();
+    concoursIdGlobal = data.id; // <-- ID du concours actif (champ id dans le JSON)
     const titreElt = document.querySelector('.titre-concours');
     if (titreElt && data.titre) titreElt.textContent = data.titre;
     const lotElt = document.getElementById('lot-concours');
@@ -159,19 +156,9 @@ function majTimerConcours(finIso) {
   timerElt._timer = setInterval(update, 1000);
 }
 
-// ----------- ID DE CONCOURS (par semaine) -----------
-function getConcoursId() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const firstJan = new Date(year, 0, 1);
-  const days = Math.floor((now - firstJan) / 86400000);
-  const week = Math.ceil((days + firstJan.getDay() + 1) / 7);
-  return `${week}-${year}`;
-}
-
 // ----------- PHOTOS CONCOURS, TRI ET CACHE -----------
 async function getPhotosAPaginer(forceReload = false) {
-  const concoursId = getConcoursId();
+  const concoursId = concoursIdGlobal;
   let allPhotos;
   if (!forceReload) {
     allPhotos = getConcoursPhotosCache(concoursId);
@@ -237,7 +224,7 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 
   let { allPhotos, orderedPhotos } = await getPhotosAPaginer(forceReload);
 
-  const concoursId = getConcoursId();
+  const concoursId = concoursIdGlobal;
   const votesCountMap = await getVotesCountMapFromCacheOrDB(concoursId, forceReload);
   const pseudoMap = await getPseudoMapFromPhotos(orderedPhotos);
 
@@ -399,9 +386,27 @@ async function ouvrirPopupZoomConcours(photo, pseudo = "?", votesTotal = 0) {
 async function votePourPhoto(photoId) {
   let left = getVotesLeft();
   if (left <= 0) {
-    alert("Plus de votes aujourd'hui. Recharge pour en avoir d'autres !");
+    alert(window.tr('concours.plus_de_votes'));
     return;
   }
+
+  const concoursId = concoursIdGlobal;
+  const today = new Date().toISOString().slice(0, 10);
+
+  // Vérifie si déjà voté aujourd'hui pour cette photo
+  const { data: dejaVote, error } = await window.supabase
+    .from('concours_votes')
+    .select('id, created_at')
+    .eq('user_id', window.userId)
+    .eq('photo_id', photoId)
+    .eq('concours_id', concoursId)
+    .gte('vote_date', today);
+
+  if (!isRechargeDone() && dejaVote && dejaVote.length > 0) {
+    alert(window.tr('concours.deja_vote_auj'));
+    return;
+  }
+  // Si recharge active (pub vue), on autorise un deuxième vote
 
   // LOG AVANT L'APPEL
   console.log("DEBUG VOTE", {
@@ -410,36 +415,65 @@ async function votePourPhoto(photoId) {
     cycle: 1
   });
 
-  // STOCKE LE RESULTAT DANS UNE VARIABLE POUR LE LOG
   const res = await window.supabase.rpc("concours_vote", {
     p_user_id: window.userId,
     p_photo_id: photoId,
     p_cycle: 1
   });
 
-  // LOG LE RESULTAT COMPLET
   console.log("ERREUR VOTE", res.error, res.data);
 
   if (res.error) {
-    alert("Erreur lors du vote");
+    alert(window.tr('concours.erreur_vote'));
     return;
   }
 
   left -= 1;
   setVotesLeft(left);
-  setConcoursPhotosCache(getConcoursId(), []);
+  setConcoursPhotosCache(concoursId, []);
   localStorage.removeItem(VOTES_COUNT_CACHE_KEY);
   localStorage.removeItem(VOTES_COUNT_CACHE_TIME_KEY);
+  window.afficherGalerieConcours(true); // Refresh!
 }
 
-// ----------- PARTICIPATION PHOTO -----------
+// ----------- PARTICIPATION PHOTO (1 par concours, premium remplace) -----------
 window.ajouterPhotoConcours = async function() {
-  const concoursId = getConcoursId();
+  const concoursId = concoursIdGlobal;
   const user = await window.supabase.auth.getUser();
   const userId = user.data?.user?.id || "Inconnu";
   const pseudo = user.data?.user?.user_metadata?.pseudo || userId;
   const premium = user.data?.user?.user_metadata?.premium || false;
   const cadre_id = await window.getCadreSelectionne ? await window.getCadreSelectionne() : "polaroid_01";
+
+  // Vérifie si déjà une photo pour ce concours et cet utilisateur
+  const { data: dejaPhoto, error: errCheck } = await window.supabase
+    .from('photosconcours')
+    .select('*')
+    .eq('concours_id', concoursId)
+    .eq('user_id', userId);
+
+  if (dejaPhoto && dejaPhoto.length > 0) {
+    if (!premium) {
+      alert(window.tr('concours.participation_une_fois')); // i18n: "Tu as déjà participé à ce concours !"
+      return;
+    } else {
+      // Si premium, propose de remplacer
+      if (!confirm(window.tr('concours.popup_replace_photo'))) { // i18n: "...va supprimer l'ancienne..."
+        return;
+      }
+      // Supprime ancienne photo du bucket Supabase
+      const oldPhoto = dejaPhoto[0];
+      if (oldPhoto.photo_url && oldPhoto.photo_url.includes("/storage/v1/object/public/")) {
+        const path = oldPhoto.photo_url.split("/storage/v1/object/public/")[1];
+        try {
+          await window.supabase.storage.from('photosconcours').remove([path]);
+        } catch (err) {
+          console.warn("Suppression bucket échouée :", err);
+        }
+      }
+      await window.supabase.from('photosconcours').delete().eq('id', oldPhoto.id);
+    }
+  }
 
   const photo_url = await window.ouvrirCameraPour(concoursId, "concours");
   if (!photo_url) return;
@@ -459,7 +493,7 @@ window.ajouterPhotoConcours = async function() {
     if (error) throw error;
     setConcoursPhotosCache(concoursId, []);
   } catch (e) {
-    alert("Erreur lors de l'ajout de la photo au concours.");
+    alert(window.tr('concours.erreur_ajout_photo')); // i18n
     console.error(e);
   }
 }
@@ -473,15 +507,15 @@ async function showConcoursRewardPopup() {
       <div style="background:#fff;border-radius:18px;padding:36px 24px 32px 24px;max-width:340px;margin:auto;text-align:center;">
         <div style="font-size:1.23em;font-weight:bold;margin-bottom:16px;">Concours Photo</div>
         <div style="color:#555;margin-bottom:19px;">
-          Pour accéder au concours, regarde une pub pour débloquer <span style="color:#f90">${VOTES_PAR_REWARD()} votes</span> aujourd’hui${window.userIsPremium ? " (x2 si premium)" : ""}.
+          ${window.tr('concours.popup_pub')} <span style="color:#f90">${VOTES_PAR_REWARD()} votes</span> ${window.tr('concours.popup_aujourdhui')}${window.userIsPremium ? " (x2 si premium)" : ""}.
         </div>
-        <button id="btnRewardConcours" class="main-button" style="margin-top:12px;">Regarder une pub</button>
+        <button id="btnRewardConcours" class="main-button" style="margin-top:12px;">${window.tr('concours.btn_regarder_pub')}</button>
       </div>
     `;
     document.body.appendChild(popup);
     popup.querySelector("#btnRewardConcours").onclick = async () => {
-      await window.showAd();       // ← affiche la pub rewarded (branché sur AppLovin via pub.js)
-      resetVotesCycle();           // ← débloque les votes
+      await window.showAd();
+      resetVotesCycle();
       popup.remove();
       resolve();
     };

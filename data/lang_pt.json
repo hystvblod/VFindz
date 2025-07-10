@@ -340,7 +340,25 @@
 "boutique.button.premium": "Se requiere Premium",
 "boutique.feedback.success": "✅ ¡Marco comprado!",
 "boutique.feedback.error": "❌ ¡No hay suficientes monedas o error!",
-"boutique.empty": "No hay marco en esta categoría."
+"boutique.empty": "No hay marco en esta categoría.",
+  "concours.participation_une_fois": "Du hast bereits an diesem Wettbewerb teilgenommen!",
+  "concours.popup_replace_photo": "Du hast bereits ein Foto für diesen Wettbewerb. Ein neues Foto wird das alte ersetzen (Stimmen verloren). Fortfahren?",
+  "concours.erreur_ajout_photo": "Fehler beim Hinzufügen des Fotos zum Wettbewerb.",
+  "concours.plus_de_votes": "Heute keine weiteren Stimmen mehr. Lade auf, um mehr zu bekommen!",
+  "concours.deja_vote_auj": "Du hast heute bereits für dieses Foto abgestimmt! (Schau dir eine Werbung an, um erneut abzustimmen)",
+  "concours.erreur_vote": "Fehler beim Abstimmen",
+  "concours.popup_pub": "Um am Wettbewerb teilzunehmen, sieh dir eine Werbung an, um freizuschalten",
+  "concours.popup_aujourdhui": "Stimmen heute",
+  "concours.btn_regarder_pub": "Werbung ansehen",
+  "concours.participation_une_fois": "Já participaste neste concurso!",
+  "concours.popup_replace_photo": "Já tens uma foto para este concurso. Adicionar uma nova irá eliminar a anterior (votos perdidos). Continuar?",
+  "concours.erreur_ajout_photo": "Erro ao adicionar a foto ao concurso.",
+  "concours.plus_de_votes": "Não há mais votos hoje. Recarrega para obter mais!",
+  "concours.deja_vote_auj": "Já votaste nesta foto hoje! (Vê um anúncio para recarregar e votar novamente)",
+  "concours.erreur_vote": "Erro ao votar",
+  "concours.popup_pub": "Para aceder ao concurso, vê um anúncio para desbloquear",
+  "concours.popup_aujourdhui": "votos hoje",
+  "concours.btn_regarder_pub": "Ver um anúncio"
 
 
 }

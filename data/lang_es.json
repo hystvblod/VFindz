@@ -340,7 +340,17 @@
 "boutique.button.premium": "Se requiere Premium",
 "boutique.feedback.success": "✅ ¡Marco comprado!",
 "boutique.feedback.error": "❌ ¡No hay suficientes monedas o error!",
-"boutique.empty": "No hay marco en esta categoría."
+"boutique.empty": "No hay marco en esta categoría.",
+  "concours.participation_une_fois": "¡Ya has participado en este concurso!",
+  "concours.popup_replace_photo": "Ya tienes una foto para este concurso. Añadir una nueva eliminará la anterior (votos perdidos). ¿Continuar?",
+  "concours.erreur_ajout_photo": "Error al añadir la foto al concurso.",
+  "concours.plus_de_votes": "¡No hay más votos hoy. Recarga para obtener más!",
+  "concours.deja_vote_auj": "¡Ya has votado por esta foto hoy! (Mira un anuncio para recargar y votar de nuevo)",
+  "concours.erreur_vote": "Error durante la votación",
+  "concours.popup_pub": "Para acceder al concurso, mira un anuncio para desbloquear",
+  "concours.popup_aujourdhui": "votos hoy",
+  "concours.btn_regarder_pub": "Ver un anuncio"
+
 
 
 }

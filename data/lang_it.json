@@ -340,6 +340,15 @@
 "boutique.button.premium": "Richiesto Premium",
 "boutique.feedback.success": "✅ Cornice acquistata!",
 "boutique.feedback.error": "❌ Monete insufficienti o errore!",
-"boutique.empty": "Nessuna cornice in questa categoria."
+"boutique.empty": "Nessuna cornice in questa categoria.",
+  "concours.participation_une_fois": "Hai già partecipato a questo concorso!",
+  "concours.popup_replace_photo": "Hai già una foto per questo concorso. Aggiungerne una nuova cancellerà la precedente (voti persi). Continuare?",
+  "concours.erreur_ajout_photo": "Errore durante l'aggiunta della foto al concorso.",
+  "concours.plus_de_votes": "Nessun altro voto oggi. Ricarica per averne altri!",
+  "concours.deja_vote_auj": "Hai già votato per questa foto oggi! (Guarda un annuncio per ricaricare e votare di nuovo)",
+  "concours.erreur_vote": "Errore durante il voto",
+  "concours.popup_pub": "Per accedere al concorso, guarda un annuncio per sbloccare",
+  "concours.popup_aujourdhui": "voti oggi",
+  "concours.btn_regarder_pub": "Guarda un annuncio"
 
 }

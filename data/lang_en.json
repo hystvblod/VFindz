@@ -340,7 +340,16 @@
 "boutique.button.premium": "Premium required",
 "boutique.feedback.success": "✅ Frame purchased!",
 "boutique.feedback.error": "❌ Not enough coins or error!",
-"boutique.empty": "No frame in this category."
+"boutique.empty": "No frame in this category.",
+  "concours.participation_une_fois": "You have already entered this contest!",
+  "concours.popup_replace_photo": "You already have a photo for this contest. Adding a new one will delete the previous one (votes lost). Continue?",
+  "concours.erreur_ajout_photo": "Error while adding the photo to the contest.",
+  "concours.plus_de_votes": "No more votes today. Recharge to get more!",
+  "concours.deja_vote_auj": "You have already voted for this photo today! (Watch an ad to recharge and vote again)",
+  "concours.erreur_vote": "Error during voting",
+  "concours.popup_pub": "To access the contest, watch an ad to unlock",
+  "concours.popup_aujourdhui": "votes today",
+  "concours.btn_regarder_pub": "Watch an ad"
 
 }
 

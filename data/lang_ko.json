@@ -340,7 +340,15 @@
 "boutique.button.premium": "프리미엄 필요",
 "boutique.feedback.success": "✅ 프레임이 구매되었습니다!",
 "boutique.feedback.error": "❌ 코인이 부족하거나 오류가 발생했습니다!",
-"boutique.empty": "이 카테고리에 프레임이 없습니다."
-
+"boutique.empty": "이 카테고리에 프레임이 없습니다.",
+  "concours.participation_une_fois": "이미 이 콘테스트에 참가하셨습니다!",
+  "concours.popup_replace_photo": "이미 이 콘테스트에 사진이 있습니다. 새로 추가하면 이전 사진(투표 수 포함)이 삭제됩니다. 계속하시겠습니까?",
+  "concours.erreur_ajout_photo": "콘테스트에 사진을 추가하는 중 오류가 발생했습니다.",
+  "concours.plus_de_votes": "오늘은 더 이상 투표할 수 없습니다. 광고를 보고 투표를 충전하세요!",
+  "concours.deja_vote_auj": "오늘 이미 이 사진에 투표하셨습니다! (광고를 보고 다시 투표 가능)",
+  "concours.erreur_vote": "투표 중 오류가 발생했습니다",
+  "concours.popup_pub": "콘테스트에 참여하려면 광고를 시청하여 잠금 해제하세요",
+  "concours.popup_aujourdhui": "오늘의 투표",
+  "concours.btn_regarder_pub": "광고 보기"
 
 }

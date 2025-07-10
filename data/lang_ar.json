@@ -318,6 +318,15 @@
 "boutique.button.premium": "يتطلب بريميوم",
 "boutique.feedback.success": "✅ تم شراء الإطار!",
 "boutique.feedback.error": "❌ لا توجد عملات كافية أو خطأ!",
-"boutique.empty": "لا يوجد إطار في هذه الفئة."
+"boutique.empty": "لا يوجد إطار في هذه الفئة.",
+  "concours.participation_une_fois": "لقد شاركت في هذه المسابقة بالفعل!",
+  "concours.popup_replace_photo": "لديك بالفعل صورة لهذه المسابقة. إضافة صورة جديدة ستحذف القديمة (سيتم فقدان الأصوات). هل ترغب في المتابعة؟",
+  "concours.erreur_ajout_photo": "حدث خطأ أثناء إضافة الصورة إلى المسابقة.",
+  "concours.plus_de_votes": "لا مزيد من الأصوات اليوم. أعد الشحن للحصول على المزيد!",
+  "concours.deja_vote_auj": "لقد صوتت لهذه الصورة اليوم بالفعل! (شاهد إعلانًا لإعادة الشحن والتصويت مرة أخرى)",
+  "concours.erreur_vote": "حدث خطأ أثناء التصويت",
+  "concours.popup_pub": "للوصول إلى المسابقة، شاهد إعلانًا لفتح",
+  "concours.popup_aujourdhui": "أصوات اليوم",
+  "concours.btn_regarder_pub": "مشاهدة إعلان"
 
 }
