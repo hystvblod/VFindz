@@ -61,10 +61,12 @@ async function fetchAndCacheTop6() {
   const concoursId = getConcoursId();
   const { data, error } = await window.supabase
     .from('photosconcours')
-    .select('id, votes_total')
+    .select('id')
     .eq('concours_id', concoursId);
   if (error || !data) return [];
-  data.sort((a, b) => b.votes_total - a.votes_total);
+  // Utilise votes réels dans un vrai système
+  const votesCountMap = await getVotesCountMapFromCacheOrDB(concoursId);
+  data.sort((a, b) => (votesCountMap[b.id] || 0) - (votesCountMap[a.id] || 0));
   const top6 = data.slice(0, 6).map(d => d.id);
   localStorage.setItem(getTop6CacheKey(), JSON.stringify(top6));
   return top6;
@@ -73,36 +75,41 @@ function getCachedTop6() {
   return JSON.parse(localStorage.getItem(getTop6CacheKey()) || "[]");
 }
 
-// ----------- VOTES & PHOTOS VOTEES LOCAL -----------
-const VOTES_CONCOURS_CACHE_KEY = "votes_concours_cache";
-const VOTES_CONCOURS_CACHE_TIME_KEY = "votes_concours_cache_time";
-const VOTES_CONCOURS_CACHE_DURATION = 60 * 1000;
+// ----------- VOTES LIVE & CACHE LOCAL -----------
+const VOTES_COUNT_CACHE_KEY = "votes_count_cache";
+const VOTES_COUNT_CACHE_TIME_KEY = "votes_count_cache_time";
+const VOTES_COUNT_CACHE_DURATION = 60 * 1000; // 1 min
 
-async function getVotesConcoursFromCacheOrDB(concoursId, force = false) {
+async function getVotesCountMapFromCacheOrDB(concoursId, force = false) {
   const now = Date.now();
-  const cacheData = localStorage.getItem(VOTES_CONCOURS_CACHE_KEY);
-  const cacheTime = localStorage.getItem(VOTES_CONCOURS_CACHE_TIME_KEY);
+  const cacheData = localStorage.getItem(VOTES_COUNT_CACHE_KEY);
+  const cacheTime = localStorage.getItem(VOTES_COUNT_CACHE_TIME_KEY);
 
-  if (!force && cacheData && cacheTime && now - cacheTime < VOTES_CONCOURS_CACHE_DURATION) {
+  if (!force && cacheData && cacheTime && now - cacheTime < VOTES_COUNT_CACHE_DURATION) {
     return JSON.parse(cacheData);
   }
-  const { data, error } = await window.supabase
-    .from('photosconcours')
-    .select('id, votes_total')
+
+  // Récupère tous les votes pour ce concours (une ligne par vote)
+  const { data: allVotes, error } = await window.supabase
+    .from('concours_votes')
+    .select('photo_id')
     .eq('concours_id', concoursId);
-  if (!error && data) {
-    localStorage.setItem(VOTES_CONCOURS_CACHE_KEY, JSON.stringify(data));
-    localStorage.setItem(VOTES_CONCOURS_CACHE_TIME_KEY, now.toString());
-    return data;
+
+  if (error) {
+    console.error("Erreur récupération votes", error);
+    return {};
   }
-  return [];
-}
-function majVotesConcoursAffichage(votesData) {
-  votesData.forEach(vote => {
-    document.querySelectorAll(`[data-photoid="${vote.id}"] .nbvotes`).forEach(el => {
-      el.textContent = vote.votes_total;
-    });
+
+  // Compte le nombre de votes par photo
+  const voteCountMap = {};
+  (allVotes || []).forEach(v => {
+    voteCountMap[v.photo_id] = (voteCountMap[v.photo_id] || 0) + 1;
   });
+
+  localStorage.setItem(VOTES_COUNT_CACHE_KEY, JSON.stringify(voteCountMap));
+  localStorage.setItem(VOTES_COUNT_CACHE_TIME_KEY, now.toString());
+
+  return voteCountMap;
 }
 
 // ----------- INFOS CONCOURS DYNAMIQUES -----------
@@ -231,10 +238,7 @@ window.afficherGalerieConcours = async function(forceReload = false) {
   let { allPhotos, orderedPhotos } = await getPhotosAPaginer(forceReload);
 
   const concoursId = getConcoursId();
-  const votesData = await getVotesConcoursFromCacheOrDB(concoursId);
-  const votesMap = {};
-  votesData.forEach(v => votesMap[v.id] = v.votes_total);
-
+  const votesCountMap = await getVotesCountMapFromCacheOrDB(concoursId, forceReload);
   const pseudoMap = await getPseudoMapFromPhotos(orderedPhotos);
 
   // Recherche dynamique avec pseudoMap
@@ -252,7 +256,7 @@ window.afficherGalerieConcours = async function(forceReload = false) {
   galerie.innerHTML = `<div class="grid-photos-concours"></div>`;
 
   // Charge la première "page"
-  await renderConcoursPhotosPage(votesMap, pseudoMap);
+  await renderConcoursPhotosPage(votesCountMap, pseudoMap);
 
   // Scroll infini (une seule fois)
   const grid = galerie.querySelector('.grid-photos-concours');
@@ -260,13 +264,11 @@ window.afficherGalerieConcours = async function(forceReload = false) {
     galerie.addEventListener('scroll', async function() {
       if (endOfPhotos || loadingMore) return;
       if (galerie.scrollTop + galerie.clientHeight >= galerie.scrollHeight - 40) {
-        await renderConcoursPhotosPage(votesMap, pseudoMap);
+        await renderConcoursPhotosPage(votesCountMap, pseudoMap);
       }
     });
     galerie._scrollListenerAdded = true;
   }
-
-  // ======= ANCIEN BLOC VOTES RESTANTS SUPPRIMÉ ICI =======
 
   // Résultats recherche
   if (resultatsElt)
@@ -287,7 +289,7 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 }
 
 // ----------- Affiche 30 photos de plus à chaque appel -----------
-async function renderConcoursPhotosPage(votesMap, pseudoMap) {
+async function renderConcoursPhotosPage(votesCountMap, pseudoMap) {
   const grid = document.querySelector("#galerie-concours .grid-photos-concours");
   if (!grid) return;
   loadingMore = true;
@@ -298,25 +300,23 @@ async function renderConcoursPhotosPage(votesMap, pseudoMap) {
 
   for (let i = start; i < end; i++) {
     const photo = scrollPhotos[i];
+    const nbVotes = votesCountMap[photo.id] || 0;
     const html = creerCartePhotoHTML(
       photo,
       pseudoMap[photo.user_id] || "?",
       photo.user_id === userId,
-      votesMap[photo.id] ?? photo.votes_total
+      nbVotes
     );
     const div = document.createElement('div');
     div.innerHTML = html;
     div.firstElementChild.onclick = function() {
-      ouvrirPopupZoomConcours(photo, pseudoMap[photo.user_id] || "?", votesMap[photo.id] ?? photo.votes_total);
+      ouvrirPopupZoomConcours(photo, pseudoMap[photo.user_id] || "?", nbVotes);
     }
     grid.appendChild(div.firstElementChild);
   }
   loadedCount = end;
   if (loadedCount >= scrollPhotos.length) endOfPhotos = true;
   loadingMore = false;
-
-  // Rafraîchit le nombre de votes affiché (si nouveaux votes)
-  majVotesConcoursAffichage(Object.values(votesMap));
 }
 
 // ----------- GÉNÈRE UNE CARTE HTML (polaroïd, pseudo dynamique) -----------
@@ -333,7 +333,7 @@ function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
         <img class="photo-user" src="${photo.photo_url}">
         <div class="photo-concours-coeur" style="position:absolute;right:7px;top:7px;z-index:10;">
           <img src="assets/icons/coeur.svg" alt="Vote" style="width:19px;height:19px;vertical-align:middle;">
-          <span class="nbvotes" style="margin-left:4px;color:#ffe04a;font-weight:bold;font-size:1.01em;">${typeof nbVotes !== "undefined" ? nbVotes : photo.votes_total}</span>
+          <span class="nbvotes" style="margin-left:4px;color:#ffe04a;font-weight:bold;font-size:1.01em;">${nbVotes}</span>
         </div>
       </div>
       <div class="pseudo-miniature" style="color:#fff;text-align:center;font-size:1.08em;font-weight:500;margin-bottom:2px;margin-top:5px;letter-spacing:.04em;opacity:.94;">${pseudo || "?"}</div>
@@ -342,7 +342,6 @@ function creerCartePhotoHTML(photo, pseudo, isPlayer, nbVotes) {
 }
 
 // ----------- POPUP ZOOM STYLE DUEL, pseudo dynamique -----------
-// Signature adaptée pour recevoir le pseudo (nickel pour tout afficher propre)
 async function ouvrirPopupZoomConcours(photo, pseudo = "?", votesTotal = 0) {
   let old = document.getElementById("popup-photo");
   if (old) old.remove();
@@ -396,7 +395,6 @@ async function ouvrirPopupZoomConcours(photo, pseudo = "?", votesTotal = 0) {
   }
 }
 
-
 // ----------- VOTE POUR PHOTO (max votes par cycle, sécurisé RPC) -----------
 async function votePourPhoto(photoId) {
   let left = getVotesLeft();
@@ -430,6 +428,8 @@ async function votePourPhoto(photoId) {
   left -= 1;
   setVotesLeft(left);
   setConcoursPhotosCache(getConcoursId(), []);
+  localStorage.removeItem(VOTES_COUNT_CACHE_KEY);
+  localStorage.removeItem(VOTES_COUNT_CACHE_TIME_KEY);
 }
 
 // ----------- PARTICIPATION PHOTO -----------
@@ -469,15 +469,15 @@ async function showConcoursRewardPopup() {
   return new Promise(resolve => {
     const popup = document.createElement("div");
     popup.className = "popup show";
-popup.innerHTML = `
-  <div style="background:#fff;border-radius:18px;padding:36px 24px 32px 24px;max-width:340px;margin:auto;text-align:center;">
-    <div style="font-size:1.23em;font-weight:bold;margin-bottom:16px;">Concours Photo</div>
-    <div style="color:#555;margin-bottom:19px;">
-      Pour accéder au concours, regarde une pub pour débloquer <span style="color:#f90">${VOTES_PAR_REWARD()} votes</span> aujourd’hui${window.userIsPremium ? " (x2 si premium)" : ""}.
-    </div>
-    <button id="btnRewardConcours" class="main-button" style="margin-top:12px;">Regarder une pub</button>
-  </div>
-`;
+    popup.innerHTML = `
+      <div style="background:#fff;border-radius:18px;padding:36px 24px 32px 24px;max-width:340px;margin:auto;text-align:center;">
+        <div style="font-size:1.23em;font-weight:bold;margin-bottom:16px;">Concours Photo</div>
+        <div style="color:#555;margin-bottom:19px;">
+          Pour accéder au concours, regarde une pub pour débloquer <span style="color:#f90">${VOTES_PAR_REWARD()} votes</span> aujourd’hui${window.userIsPremium ? " (x2 si premium)" : ""}.
+        </div>
+        <button id="btnRewardConcours" class="main-button" style="margin-top:12px;">Regarder une pub</button>
+      </div>
+    `;
     document.body.appendChild(popup);
     popup.querySelector("#btnRewardConcours").onclick = async () => {
       await window.showAd();       // ← affiche la pub rewarded (branché sur AppLovin via pub.js)
