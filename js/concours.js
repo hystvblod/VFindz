@@ -524,12 +524,15 @@ async function showConcoursRewardPopup() {
 
 // ----------- INITIALISATION : set userId/premium -----------
 document.addEventListener("DOMContentLoaded", async () => {
-  await chargerInfosConcours();
+  // 1. Charger infos du concours = récupère le bon ID
+  await chargerInfosConcours(); // Définit concoursIdGlobal
 
+  // 2. Charger infos user après
   const user = await window.supabase.auth.getUser();
   window.userId = user.data?.user?.id || null;
   window.userIsPremium = !!user.data?.user?.user_metadata?.premium;
 
+  // 3. Toutes les autres initialisations
   async function checkTop6Minuit() {
     const lastTop6 = localStorage.getItem(getTop6CacheKey() + "_date");
     const today = getConcoursDateStr();
@@ -555,5 +558,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  // 4. C’EST SEULEMENT MAINTENANT qu’on affiche la galerie
   window.afficherGalerieConcours();
 });
+
