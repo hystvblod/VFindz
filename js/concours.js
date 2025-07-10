@@ -569,9 +569,9 @@ function fitPseudoToWidth(className = "pseudo-miniature", minSize = 0.65) {
     el.style.whiteSpace = "nowrap";
     el.style.overflow = "hidden";
     el.style.textOverflow = "ellipsis";
-    el.style.maxWidth = "100%";
+    el.style.maxWidth = el.style.width || "80px"; // adapte à la même taille
 
-    // Réduit la taille de la police jusqu'à ce que ça tienne
+    // Réduit la taille de la police jusqu'à ce que ça tienne sur 1 ligne
     while (
       el.scrollWidth > el.offsetWidth &&
       fontSize > minSize
@@ -582,7 +582,7 @@ function fitPseudoToWidth(className = "pseudo-miniature", minSize = 0.65) {
   });
 }
 
-// Appelle cette fonction après chaque rendu de la galerie
+// Appelle la fonction après chaque rendu :
 window.addEventListener("DOMContentLoaded", () => fitPseudoToWidth());
 window.addEventListener("resize", () => fitPseudoToWidth());
 setTimeout(() => fitPseudoToWidth(), 200);

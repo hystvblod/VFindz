@@ -2636,6 +2636,10 @@ overflow-y: auto;
   color: #ffe04a;
   white-space: nowrap;
   overflow: hidden;
-  width: 100%;
+  text-overflow: ellipsis;
+  width: 95px;        /* ~10px de marge de chaque côté */
+  max-width: 95px;
+  display: block;
+  margin: 0 auto;
   opacity: 0.92;
 }
