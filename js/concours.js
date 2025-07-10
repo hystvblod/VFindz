@@ -386,7 +386,7 @@ async function ouvrirPopupZoomConcours(photo, pseudo = "?", votesTotal = 0) {
 async function votePourPhoto(photoId) {
   let left = getVotesLeft();
   if (left <= 0) {
-    alert(window.tr('concours.plus_de_votes'));
+    alert(window.t('concours.plus_de_votes'));
     return;
   }
 
@@ -403,7 +403,7 @@ async function votePourPhoto(photoId) {
     .gte('vote_date', today);
 
   if (!isRechargeDone() && dejaVote && dejaVote.length > 0) {
-    alert(window.tr('concours.deja_vote_auj'));
+    alert(('concours.deja_vote_auj'));
     return;
   }
   // Si recharge active (pub vue), on autorise un deuxième vote
@@ -424,7 +424,7 @@ async function votePourPhoto(photoId) {
   console.log("ERREUR VOTE", res.error, res.data);
 
   if (res.error) {
-    alert(window.tr('concours.erreur_vote'));
+    alert(window.t('concours.erreur_vote'));
     return;
   }
 
@@ -454,11 +454,11 @@ window.ajouterPhotoConcours = async function() {
 
   if (dejaPhoto && dejaPhoto.length > 0) {
     if (!premium) {
-      alert(window.tr('concours.participation_une_fois')); // i18n: "Tu as déjà participé à ce concours !"
+      alert(window.t('concours.participation_une_fois')); // i18n: "Tu as déjà participé à ce concours !"
       return;
     } else {
       // Si premium, propose de remplacer
-      if (!confirm(window.tr('concours.popup_replace_photo'))) { // i18n: "...va supprimer l'ancienne..."
+      if (!confirm(window.t('concours.popup_replace_photo'))) { // i18n: "...va supprimer l'ancienne..."
         return;
       }
       // Supprime ancienne photo du bucket Supabase
@@ -493,7 +493,7 @@ window.ajouterPhotoConcours = async function() {
     if (error) throw error;
     setConcoursPhotosCache(concoursId, []);
   } catch (e) {
-    alert(window.tr('concours.erreur_ajout_photo')); // i18n
+    alert(window.t('concours.erreur_ajout_photo')); // i18n
     console.error(e);
   }
 }
@@ -507,9 +507,9 @@ async function showConcoursRewardPopup() {
       <div style="background:#fff;border-radius:18px;padding:36px 24px 32px 24px;max-width:340px;margin:auto;text-align:center;">
         <div style="font-size:1.23em;font-weight:bold;margin-bottom:16px;">Concours Photo</div>
         <div style="color:#555;margin-bottom:19px;">
-          ${window.tr('concours.popup_pub')} <span style="color:#f90">${VOTES_PAR_REWARD()} votes</span> ${window.tr('concours.popup_aujourdhui')}${window.userIsPremium ? " (x2 si premium)" : ""}.
+          ${window.t('concours.popup_pub')} <span style="color:#f90">${VOTES_PAR_REWARD()} votes</span> ${window.t('concours.popup_aujourdhui')}${window.userIsPremium ? " (x2 si premium)" : ""}.
         </div>
-        <button id="btnRewardConcours" class="main-button" style="margin-top:12px;">${window.tr('concours.btn_regarder_pub')}</button>
+        <button id="btnRewardConcours" class="main-button" style="margin-top:12px;">${window.t('concours.btn_regarder_pub')}</button>
       </div>
     `;
     document.body.appendChild(popup);
@@ -561,4 +561,3 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 4. C’EST SEULEMENT MAINTENANT qu’on affiche la galerie
   window.afficherGalerieConcours();
 });
-
