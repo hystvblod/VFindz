@@ -349,7 +349,13 @@
   "concours.erreur_vote": "Error during voting",
   "concours.popup_pub": "To access the contest, watch an ad to unlock",
   "concours.popup_aujourdhui": "votes today",
-  "concours.btn_regarder_pub": "Watch an ad"
+  "concours.btn_regarder_pub": "Watch an ad",
+  "concours.termine": "Contest finished!",
+"concours.fin_dans_jours": "Ends in {jours}d {heures}h {minutes}m {secondes}s",
+"concours.fin_dans_sans_jours": "Ends in {heures}h {minutes}m {secondes}s",
+"concours.votes_restants": "Votes left: {current} / {max}",
+"concours.resultats": "({n} result{n, plural, one {} other {s}})"
+
 
 }
 

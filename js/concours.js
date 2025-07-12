@@ -128,32 +128,47 @@ function majTimerConcours(finIso) {
   let votesElt = document.getElementById("votes-restants");
   if (!timerElt || !votesElt) return;
 
-  function update() {
-    const now = new Date();
-    const fin = new Date(finIso);
-    let diff = Math.floor((fin - now) / 1000);
-    if (diff < 0) {
-      timerElt.textContent = "Concours terminé !";
-      votesElt.textContent = "";
-      clearInterval(timerElt._timer);
-      return;
-    }
-    const jours = Math.floor(diff / 86400); diff -= jours * 86400;
-    const heures = Math.floor(diff / 3600); diff -= heures * 3600;
-    const minutes = Math.floor(diff / 60);
-    const secondes = diff % 60;
-    timerElt.textContent =
-      "Fin dans " + (jours > 0 ? jours + "j " : "") +
-      (heures < 10 ? "0" : "") + heures + "h " +
-      (minutes < 10 ? "0" : "") + minutes + "m " +
-      (secondes < 10 ? "0" : "") + secondes + "s";
-    // ➡️ Affiche les votes restants
-    const votesLeft = getVotesLeft();
-    votesElt.textContent = `Votes restants : ${votesLeft} / ${VOTES_PAR_REWARD()}`;
+ function update() {
+  const now = new Date();
+  const fin = new Date(finIso);
+  let diff = Math.floor((fin - now) / 1000);
+  if (diff < 0) {
+    timerElt.textContent = window.t('concours.termine');
+    votesElt.textContent = "";
+    clearInterval(timerElt._timer);
+    return;
   }
-  update();
-  timerElt._timer && clearInterval(timerElt._timer);
-  timerElt._timer = setInterval(update, 1000);
+  const jours = Math.floor(diff / 86400); diff -= jours * 86400;
+  const heures = Math.floor(diff / 3600); diff -= heures * 3600;
+  const minutes = Math.floor(diff / 60);
+  const secondes = diff % 60;
+
+  // Affiche la durée avec clés i18n (avec ou sans jours)
+  if (jours > 0) {
+    timerElt.textContent = window.t('concours.fin_dans_jours', {
+      jours,
+      heures: heures.toString().padStart(2, "0"),
+      minutes: minutes.toString().padStart(2, "0"),
+      secondes: secondes.toString().padStart(2, "0")
+    });
+  } else {
+    timerElt.textContent = window.t('concours.fin_dans_sans_jours', {
+      heures: heures.toString().padStart(2, "0"),
+      minutes: minutes.toString().padStart(2, "0"),
+      secondes: secondes.toString().padStart(2, "0")
+    });
+  }
+
+  // ➡️ Affiche les votes restants, clé i18n variable
+  const votesLeft = getVotesLeft();
+  votesElt.textContent = window.t('concours.votes_restants', {
+    current: votesLeft,
+    max: VOTES_PAR_REWARD()
+  });
+}
+update();
+timerElt._timer && clearInterval(timerElt._timer);
+timerElt._timer = setInterval(update, 1000);
 }
 
 // ----------- PHOTOS CONCOURS, TRI ET CACHE -----------
@@ -259,7 +274,7 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 
   // Résultats recherche
   if (resultatsElt)
-    resultatsElt.textContent = `(${filteredOrderedPhotos.length} résultat${filteredOrderedPhotos.length > 1 ? 's' : ''})`;
+   resultatsElt.textContent = window.t('concours.resultats', { n: filteredOrderedPhotos.length });
 
   // Recharge votes event
   const btnRecharge = document.getElementById('btn-recharge-votes');
@@ -403,7 +418,7 @@ async function votePourPhoto(photoId) {
     .gte('vote_date', today);
 
   if (!isRechargeDone() && dejaVote && dejaVote.length > 0) {
-    alert(('concours.deja_vote_auj'));
+    alert(window.t('concours.deja_vote_auj'));
     return;
   }
   // Si recharge active (pub vue), on autorise un deuxième vote

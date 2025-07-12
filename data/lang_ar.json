@@ -327,6 +327,12 @@
   "concours.erreur_vote": "حدث خطأ أثناء التصويت",
   "concours.popup_pub": "للوصول إلى المسابقة، شاهد إعلانًا لفتح",
   "concours.popup_aujourdhui": "أصوات اليوم",
-  "concours.btn_regarder_pub": "مشاهدة إعلان"
+  "concours.btn_regarder_pub": "مشاهدة إعلان",
+  "concours.termine": "انتهت المسابقة!",
+"concours.fin_dans_jours": "تنتهي خلال {jours}يوم {heures}س {minutes}د {secondes}ث",
+"concours.fin_dans_sans_jours": "تنتهي خلال {heures}س {minutes}د {secondes}ث",
+"concours.votes_restants": "الأصوات المتبقية: {current} / {max}",
+"concours.resultats": "({n} نتيجة{n, plural, zero {} one {} two {ان} few {ات} many {ات} other {ات}})"
+
 
 }

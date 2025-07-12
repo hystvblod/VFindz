@@ -331,6 +331,12 @@
 "boutique.button.premium": "Premium erforderlich",
 "boutique.feedback.success": "✅ Rahmen gekauft!",
 "boutique.feedback.error": "❌ Nicht genug Münzen oder Fehler!",
-"boutique.empty": "Kein Rahmen in dieser Kategorie."
+"boutique.empty": "Kein Rahmen in dieser Kategorie.",
+"concours.termine": "Wettbewerb beendet!",
+"concours.fin_dans_jours": "Endet in {jours}T {heures}Std {minutes}Min {secondes}Sek",
+"concours.fin_dans_sans_jours": "Endet in {heures}Std {minutes}Min {secondes}Sek",
+"concours.votes_restants": "Verbleibende Stimmen: {current} / {max}",
+"concours.resultats": "({n} Ergebnis{n, plural, one {} other {se}})"
+
 
 }

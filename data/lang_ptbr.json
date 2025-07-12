@@ -328,6 +328,12 @@
   "concours.erreur_vote": "Erro ao votar",
   "concours.popup_pub": "Para acessar o concurso, veja um anúncio para desbloquear",
   "concours.popup_aujourdhui": "votos hoje",
-  "concours.btn_regarder_pub": "Ver um anúncio"
+  "concours.btn_regarder_pub": "Ver um anúncio",
+  "concours.termine": "Concurso encerrado!",
+"concours.fin_dans_jours": "Termina em {jours}d {heures}h {minutes}m {secondes}s",
+"concours.fin_dans_sans_jours": "Termina em {heures}h {minutes}m {secondes}s",
+"concours.votes_restants": "Votos restantes: {current} / {max}",
+"concours.resultats": "({n} resultado{n, plural, one {} other {s}})"
+
 
 }

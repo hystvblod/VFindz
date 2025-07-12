@@ -349,6 +349,12 @@
   "concours.erreur_vote": "Terjadi kesalahan saat memberikan suara",
   "concours.popup_pub": "Untuk mengikuti kontes, tonton iklan untuk membuka akses",
   "concours.popup_aujourdhui": "suara hari ini",
-  "concours.btn_regarder_pub": "Tonton iklan"
+  "concours.btn_regarder_pub": "Tonton iklan",
+  "concours.termine": "Kontes selesai!",
+"concours.fin_dans_jours": "Berakhir dalam {jours}h {heures}j {minutes}m {secondes}d",
+"concours.fin_dans_sans_jours": "Berakhir dalam {heures}j {minutes}m {secondes}d",
+"concours.votes_restants": "Sisa suara: {current} / {max}",
+"concours.resultats": "({n} hasil)"
+
 
 }

@@ -349,6 +349,12 @@
   "concours.erreur_vote": "投票中にエラーが発生しました",
   "concours.popup_pub": "コンテストに参加するには、広告を見てアンロックしてください",
   "concours.popup_aujourdhui": "今日の投票数",
-  "concours.btn_regarder_pub": "広告を見る"
+  "concours.btn_regarder_pub": "広告を見る",
+  "concours.termine": "コンテストは終了しました！",
+"concours.fin_dans_jours": "{jours}日{heures}時間{minutes}分{secondes}秒で終了",
+"concours.fin_dans_sans_jours": "{heures}時間{minutes}分{secondes}秒で終了",
+"concours.votes_restants": "残りの投票数: {current} / {max}",
+"concours.resultats": "（{n}件の結果）"
+
 
 }

@@ -349,6 +349,12 @@
   "concours.erreur_vote": "Fout tijdens het stemmen",
   "concours.popup_pub": "Om deel te nemen aan de wedstrijd, bekijk een advertentie om te ontgrendelen",
   "concours.popup_aujourdhui": "stemmen vandaag",
-  "concours.btn_regarder_pub": "Bekijk een advertentie"
+  "concours.btn_regarder_pub": "Bekijk een advertentie",
+  "concours.termine": "Wedstrijd afgelopen!",
+"concours.fin_dans_jours": "Eindigt over {jours}d {heures}u {minutes}m {secondes}s",
+"concours.fin_dans_sans_jours": "Eindigt over {heures}u {minutes}m {secondes}s",
+"concours.votes_restants": "Resterende stemmen: {current} / {max}",
+"concours.resultats": "({n} resultaat{n, plural, one {} other {en}})"
+
 
 }
