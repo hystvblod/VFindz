@@ -129,6 +129,8 @@ function majTimerConcours(finIso) {
   if (!timerElt || !votesElt) return;
 
  function update() {
+  console.log("[DEBUG] window.t concours.votes_restants =", window.t('concours.votes_restants', {current: 2, max: 3}), "typeof =", typeof window.t('concours.votes_restants', {current: 2, max: 3}));
+    console.log("[DEBUG] window.t concours.fin_dans_jours =", window.t('concours.fin_dans_jours', {jours:1, heures:"01", minutes:"00", secondes:"00"}));
   const now = new Date();
   const fin = new Date(finIso);
   let diff = Math.floor((fin - now) / 1000);

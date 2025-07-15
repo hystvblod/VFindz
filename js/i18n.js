@@ -92,8 +92,14 @@ window.setLang = async function(newLang) {
   await window.loadI18nLang(true);
   window.i18nTranslateAll();
 };
-window.t = function(key, fallback) {
-  const txt = window.i18nGet ? window.i18nGet(key) : undefined;
-  if (txt && txt !== key) return txt;
-  return fallback || key;
+window.t = function(key, vars, fallback) {
+  let txt = window.i18nGet ? window.i18nGet(key) : undefined;
+  if (!txt || txt === key) txt = fallback || key;
+  // Remplace les variables dans la string (ex : {{current}})
+  if (vars && typeof vars === "object") {
+    for (const k in vars) {
+      txt = txt.replace(new RegExp(`{{\\s*${k}\\s*}}`, "g"), vars[k]);
+    }
+  }
+  return txt;
 };
