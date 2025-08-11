@@ -77,27 +77,27 @@ window.setCadreDuel = function(duelId, idx, cadreId) {
 };
 
 window.uploadPhotoDuelWebp = async function(dataUrl, duelId, idx, cadreId) {
-function dataURLtoBlob(dataurl) {
-  if (!dataurl || typeof dataurl !== "string" || !dataurl.includes(",")) {
-    const canvas = document.createElement("canvas");
-    canvas.width = 32; canvas.height = 32;
-    canvas.getContext("2d").fillStyle = "#fff";
-    canvas.getContext("2d").fillRect(0,0,32,32);
-    return new Promise(res => canvas.toBlob(b=>res(b),"image/webp"));
+  function dataURLtoBlob(dataurl) {
+    if (!dataurl || typeof dataurl !== "string" || !dataurl.includes(",")) {
+      const canvas = document.createElement("canvas");
+      canvas.width = 32; canvas.height = 32;
+      canvas.getContext("2d").fillStyle = "#fff";
+      canvas.getContext("2d").fillRect(0,0,32,32);
+      return new Promise(res => canvas.toBlob(b=>res(b),"image/webp"));
+    }
+    var arr = dataurl.split(','), match = arr[0].match(/:(.*?);/);
+    var mime = match && match[1] ? match[1] : "image/webp";
+    var bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--) u8arr[n] = bstr.charCodeAt(n);
+    return new Blob([u8arr], {type:mime});
   }
-  var arr = dataurl.split(','), match = arr[0].match(/:(.*?);/);
-  var mime = match && match[1] ? match[1] : "image/webp";
-  var bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-  while(n--) u8arr[n] = bstr.charCodeAt(n);
-  return new Blob([u8arr], {type:mime});
-}
 
   const userId = window.getUserId ? window.getUserId() : (await window.getPseudo());
   const blob = await dataURLtoBlob(dataUrl);
 
   const filePath = `duel_photos/${duelId}_${idx}_${userId}_${Date.now()}.webp`;
 
-  const { data: uploadData, error: uploadError } = await window.supabase.storage
+  const { error: uploadError } = await window.supabase.storage
     .from('photosduel')
     .upload(filePath, blob, { upsert: true, contentType: "image/webp" });
   if (uploadError) throw new Error("Erreur upload storage : " + uploadError.message);
@@ -114,8 +114,7 @@ function dataURLtoBlob(dataurl) {
     console.error("❌ Room null !");
     throw new Error("Room introuvable");
   }
-  const pseudo = await window.getPseudo();
-  const champ = (room.player1_id === userId) ? 'photosa' : 'photosb'
+  const champ = (room.player1_id === userId) ? 'photosa' : 'photosb';
   let photos = room[champ] || {};
   photos[idx] = { url, cadre: cadreId };
   await window.supabase.from('duels').update({ [champ]: photos }).eq('id', duelId);
@@ -397,7 +396,6 @@ window.gestionDefisPremium = async function(room, pseudo, userId) {
   let { data: p2 } = await window.supabase.from("users").select("premium").eq("id", room.player2_id).single();
   let isP1Premium = p1 && p1.premium;
   let isP2Premium = p2 && p2.premium;
-  let defis1 = "", defis2 = "", defis3a = "", defis3b = "";
   let isPlayer1 = (room.player1_id === userId);
   let role = "";
   if ((isP1Premium && !isP2Premium) || (!isP1Premium && isP2Premium)) {
@@ -495,15 +493,12 @@ window.gestionDefisPremium = async function(room, pseudo, userId) {
 };
 // =================== FIN BLOCS PREMIUM ===================
 
-// ... (Le reste de ton duel.js, inchangé, tout continue ici)
-// Si tu veux je te recolle les 1000 lignes entières mais ce bloc gère tout PREMIUM. 
-
 
 // Fonction pour ouvrir la popup de signalement
 window.ouvrirPopupSignal = function(photoUrl, idxStr) {
   const popup = document.getElementById("popup-signal-photo");
   if (!popup) {
-    alert("Erreur : popup de signalement introuvable !");
+    alert("Erreur : popup de signalement introuvable !");
     return;
   }
   popup.dataset.url = photoUrl;
@@ -511,6 +506,7 @@ window.ouvrirPopupSignal = function(photoUrl, idxStr) {
   popup.classList.remove("hidden");
   popup.classList.add("show");
 };
+
 window.renderDefis = async function({ myID, advID }) {
   const ul = $("duel-defi-list");
   if (!ul || !window.roomData || !window.roomData.defis || window.roomData.defis.length === 0) {
@@ -558,13 +554,15 @@ window.renderDefis = async function({ myID, advID }) {
       preview.className = "cadre-preview";
       const cadreImg = document.createElement("img");
       cadreImg.className = "photo-cadre";
-      cadreImg.src = window.getCadreUrl(myCadre);
+      const cadreImgUrl = await window.getCadreUrl(myCadre);
+      cadreImg.src = cadreImgUrl; // ✅ await
+
       const photoImg = document.createElement("img");
       photoImg.className = "photo-user";
       photoImg.src = myPhoto;
       photoImg.onclick = () => window.agrandirPhoto(myPhoto, myCadre);
       photoImg.oncontextmenu = (e) => { e.preventDefault(); window.ouvrirPopupChoixCadre(roomId, idxStr, myChamp); };
-      photoImg.ontouchstart = function(e) {
+      photoImg.ontouchstart = function() {
         this._touchTimer = setTimeout(() => { window.ouvrirPopupChoixCadre(roomId, idxStr, myChamp); }, 500);
       };
       photoImg.ontouchend = function() { clearTimeout(this._touchTimer); };
@@ -620,7 +618,7 @@ window.renderDefis = async function({ myID, advID }) {
 
     btnPhoto.onclick = () => window.gererPrisePhotoDuel(idxStr, myCadre);
     btnPhoto.oncontextmenu = (e) => { e.preventDefault(); window.ouvrirPopupValiderJeton(idxStr); };
-    btnPhoto.ontouchstart = function(e) {
+    btnPhoto.ontouchstart = function() {
       this._touchTimer = setTimeout(() => { window.ouvrirPopupValiderJeton(idxStr); }, 500);
     };
     btnPhoto.ontouchend = function() { clearTimeout(this._touchTimer); };
@@ -661,7 +659,8 @@ window.renderDefis = async function({ myID, advID }) {
       preview.className = "cadre-preview";
       const cadreImg = document.createElement("img");
       cadreImg.className = "photo-cadre";
-      cadreImg.src = window.getCadreUrl(advCadre);
+      const advCadreUrl = await window.getCadreUrl(advCadre);
+      cadreImg.src = advCadreUrl; // ✅ await
 
       const photoImg = document.createElement("img");
       photoImg.className = "photo-user";
@@ -716,14 +715,12 @@ window.renderDefis = async function({ myID, advID }) {
 // =================== POPUP FIN DE DUEL ===================
 window.afficherPopupFinDuel = async function(room) {
   const pseudo = await window.getPseudo();
-  // Utilise bien player1_pseudo/player2_pseudo partout pour l'affichage !
-const userId = window.getUserId(); // correction sécurisée
-const isP1 = room.player1_id === userId;
-const myChamp = isP1 ? 'photosa' : 'photosb';
-const advChamp = isP1 ? 'photosb' : 'photosa';
-const myPseudo = isP1 ? room.player1_pseudo : room.player2_pseudo;
-const advPseudo = isP1 ? room.player2_pseudo : room.player1_pseudo;
-
+  const userId = window.getUserId(); // correction sécurisée
+  const isP1 = room.player1_id === userId;
+  const myChamp = isP1 ? 'photosa' : 'photosb';
+  const advChamp = isP1 ? 'photosb' : 'photosa';
+  const myPseudo = isP1 ? room.player1_pseudo : room.player2_pseudo;
+  const advPseudo = isP1 ? room.player2_pseudo : room.player1_pseudo;
 
   const nbDefis = (room.defis || []).length;
   const photosMy = room[myChamp] || {};
@@ -788,7 +785,6 @@ window.checkFinDuel = async function() {
     await window.finirDuel();
     return;
   }
-
 };
 window.finirDuel = async function() {
   if (window.roomData.status !== 'finished') {
@@ -861,45 +857,7 @@ window.gererPrisePhotoDuel = async function(idx, cadreId = null) {
   }
 };
 
-
-
-// HANDLER : Quand tu retires un jeton (ex : valider défi)
-window.validerDefiAvecJeton = async function(idx) {
-  await window.removeJeton();
-  await window.afficherSolde();
-
-  // Récupère les infos de room courante
-  let duelId = window.currentRoomId || roomId;
-  if (!duelId) duelId = (new URLSearchParams(window.location.search)).get("room");
-  const pseudo = await window.getPseudo();
-  const room = await window.getRoom(duelId);
-  const myChamp = (room.player1_id === userId) ? 'photosa' : 'photosb'
-
-  // Chemin local de l'image "jeton validé"
-  const urlJeton = "assets/img/jeton_pp.jpg"; // (mets ton image stylée ici)
-  const cadreId = window.getCadreDuel ? window.getCadreDuel(duelId, idx) : "polaroid_01";
-
-  // Mise à jour Supabase
-  let photos = room[myChamp] || {};
-  photos[idx] = { url: urlJeton, cadre: cadreId };
-  await window.supabase.from('duels').update({ [myChamp]: photos }).eq('id', duelId);
-
-  // Mise à jour cache local
-  if (window.VFindDuelDB && window.VFindDuelDB.set) {
-    await window.VFindDuelDB.set(`${duelId}_${myChamp}_${idx}`, { url: urlJeton, cadre: cadreId });
-  }
-  if (window.setCadreDuel) window.setCadreDuel(duelId, idx, cadreId);
-
-  // Forcer le rendu à jour (pour voir directement le visuel "jeton" sur le défi)
-  if (typeof window.renderDefis === "function") {
-    const advID = (room.player1_pseudo === pseudo ? room.player2_pseudo : room.player1_pseudo);
-    await window.renderDefis({ myID: pseudo, advID });
-  } else {
-    location.reload();
-  }
-
-};
-// HANDLER : Ajoute un jeton (récompense/pub)
+// HANDLER : Ajoute un jeton (récompense/pub)
 window.gagnerJeton = async function() {
   await window.addJetons(1);
   await window.afficherSolde();
@@ -913,7 +871,6 @@ window.gagnerPoints = async function(montant) {
   await window.afficherSolde();
 };
 
-// Changement de cadre après la photo (popup choix)
 // Changement de cadre après la photo (popup choix)
 window.ouvrirPopupChoixCadre = async function(duelId, idx, champ) {
   let cadres = [];
@@ -930,7 +887,7 @@ window.ouvrirPopupChoixCadre = async function(duelId, idx, champ) {
   // BOUCLE CORRIGÉE : for...of pour await
   for (const cadre of cadres) {
     let el = document.createElement("img");
-    el.src = await window.getCadreUrl(cadre); // ⬅️ URL Supabase et non plus chemin local !
+    el.src = await window.getCadreUrl(cadre); // URL Supabase
     el.style.width = "72px";
     el.style.cursor = "pointer";
     el.style.borderRadius = "12px";
@@ -959,6 +916,7 @@ window.ouvrirPopupChoixCadre = async function(duelId, idx, champ) {
 window.fermerPopupCadreChoix = function() {
   document.getElementById("popup-cadre-choix").classList.add("hidden");
 };
+
 window.deleteDuelPhotosFromSupabase = async function(roomId) {
   const { data: room, error } = await window.supabase.from('duels').select('*').eq('id', roomId).single();
   if (error || !room) return;
@@ -970,7 +928,8 @@ window.deleteDuelPhotosFromSupabase = async function(roomId) {
       if (photoObj && photoObj.url) {
         const parts = photoObj.url.split('/photosduel/');
         if (parts.length === 2) {
-          filesToDelete.push("duel_photos/" + parts[1]);
+          // parts[1] est déjà "duel_photos/..."
+          filesToDelete.push(parts[1]); // ✅ ne pas préfixer une 2e fois
         }
       }
     });
@@ -984,7 +943,6 @@ window.getDefisDuelFromSupabase = async function(count = 3) {
   // FULL LOCAL
   return await window.getDefisLocal(count);
 };
-
 
 window.getRoom = async function(roomId) {
   const { data } = await window.supabase.from('duels').select('*').eq('id', roomId).single();
@@ -1027,18 +985,16 @@ window.savePhotoDuel = async function(idx, url, cadreId = null) {
 // Récupère l’URL du cadre (depuis Supabase ou cache local)
 window.agrandirPhoto = async function(url, cadreId) {
   $("photo-affichee").src = url;
-  let cadreUrl = await window.getCadreUrl(cadreId); // fonction à avoir dans userData.js !
-  $("cadre-affiche").src = cadreUrl || ""; // sécurise si jamais pas trouvé
+  let cadreUrl = await window.getCadreUrl(cadreId);
+  $("cadre-affiche").src = cadreUrl || "";
   const popup = $("popup-photo");
   popup.classList.remove('hidden');
   popup.classList.add('show');
 };
 
-
 window.cleanupDuelPhotos = async function() {
   await window.VFindDuelDB.deleteAllForRoom(roomId);
 };
-
 
 window.fermerPopupSignal = function() {
   const popup = document.getElementById("popup-signal-photo");
@@ -1056,9 +1012,10 @@ if (window.location.pathname.includes("duel_game.html")) {
   window.initDuelGame();
 }
 
+// Solde (versions Cloud)
 window.afficherSolde = async function() {
-  const points = await window.getPoints();
-  const jetons = await window.getJetons();
+  const points = await window.getPointsCloud();
+  const jetons = await window.getJetonsCloud();
   const pointsSpan = document.getElementById('points');
   const jetonsSpan = document.getElementById('jetons');
   if (pointsSpan) pointsSpan.textContent = points ?? 0;
@@ -1090,7 +1047,7 @@ document.body.addEventListener("click", async function(e) {
     const fileName = `defi${idx}_${motif}_${Date.now()}.webp`;
 
     // Envoie la photo dans le bucket "signalements"
-    const { data, error } = await window.supabase
+    const { error } = await window.supabase
       .storage
       .from('signalements')
       .upload(fileName, blob, { contentType: 'image/webp' });
@@ -1105,15 +1062,19 @@ document.body.addEventListener("click", async function(e) {
     alert("Erreur lors de l'envoi : " + err.message);
   }
 });
+
 // Patch compat duel.js (lecture cloud ONLY, anti-triche !)
 window.getPoints = window.getPointsCloud;
 window.getJetons = window.getJetonsCloud;
+
 // ========== POPUP VALIDATION DE DEFI AVEC JETON ==========
 
 // Ouvre la popup pour valider un défi avec un jeton
 window.ouvrirPopupValiderJeton = function(idx) {
+  const pop = document.getElementById("popup-jeton-valider");
+  if (!pop) { console.warn("[duel] popup-jeton-valider introuvable"); return; }
   window._idxJetonToValidate = idx;
-  document.getElementById("popup-jeton-valider").classList.remove("hidden");
+  pop.classList.remove("hidden");
 };
 
 // Handler pour le bouton Valider et Annuler
@@ -1125,7 +1086,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Appel logique de validation avec un jeton
       await window.validerDefiAvecJeton(window._idxJetonToValidate);
       window._idxJetonToValidate = null;
-      document.getElementById("popup-jeton-valider").classList.add("hidden");
+      const pop = document.getElementById("popup-jeton-valider");
+      if (pop) pop.classList.add("hidden");
     };
   }
 
@@ -1133,24 +1095,25 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnCancel = document.getElementById("btn-cancel-jeton");
   if (btnCancel) {
     btnCancel.onclick = function() {
-      document.getElementById("popup-jeton-valider").classList.add("hidden");
+      const pop = document.getElementById("popup-jeton-valider");
+      if (pop) pop.classList.add("hidden");
       window._idxJetonToValidate = null;
     };
   }
 });
 
-// La logique pour valider le défi avec un jeton
+// La logique pour valider le défi avec un jeton (VERSION UNIQUE ET CORRIGÉE)
 window.validerDefiAvecJeton = async function(idx) {
   // 1. Retire un jeton (doit être définie dans userData.js)
   await window.removeJeton();
-  await window.afficherSolde && window.afficherSolde();
+  await (window.afficherSolde && window.afficherSolde());
 
   // 2. Mets l'image "jeton validé" comme photo pour le défi
+  const userId = window.getUserId(); // ✅ corrige la référence manquante
   let duelId = window.currentRoomId || (new URLSearchParams(window.location.search)).get("room");
   const pseudo = await window.getPseudo();
   const room = await window.getRoom(duelId);
-  const myChamp = (room.player1_id === userId) ? 'photosa' : 'photosb'
-
+  const myChamp = (room.player1_id === userId) ? 'photosa' : 'photosb';
 
   const urlJeton = "assets/img/jeton_pp.jpg"; // Mets l'image de ton jeton ici
   const cadreId = window.getCadreDuel ? window.getCadreDuel(duelId, idx) : "polaroid_01";
@@ -1178,7 +1141,7 @@ window.validerDefiAvecJeton = async function(idx) {
 if (path.includes("duel_random.html")) {
   const existingRoomId = localStorage.getItem("duel_random_room");
   if (existingRoomId) {
-       console.log("[Duel] Reprise de room en cours :", existingRoomId);
+    console.log("[Duel] Reprise de room en cours :", existingRoomId);
     window.supabase
       .from('duels')
       .select('id, status')
@@ -1199,12 +1162,14 @@ if (path.includes("duel_random.html")) {
     window.findOrCreateRoom();
   }
 }
+
 async function updateSoldeAffichage() {
   const points = await window.getPointsCloud();
   const jetons = await window.getJetonsCloud();
   document.getElementById("points").textContent = points;
   document.getElementById("jetons").textContent = jetons;
 }
+
 window.refreshDefisLangueDuel = async function() {
   const lang = window.getCurrentLang ? window.getCurrentLang() : (localStorage.getItem("langue") || "fr");
   // Recharge le pool de défis dans la nouvelle langue pour la création des nouveaux duels
@@ -1220,4 +1185,3 @@ window.refreshDefisLangueDuel = async function() {
     window.renderDefisAccueil();
   }
 };
-
