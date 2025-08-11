@@ -128,49 +128,47 @@ function majTimerConcours(finIso) {
   let votesElt = document.getElementById("votes-restants");
   if (!timerElt || !votesElt) return;
 
- function update() {
-  console.log("[DEBUG] window.t concours.votes_restants =", window.t('concours.votes_restants', {current: 2, max: 3}), "typeof =", typeof window.t('concours.votes_restants', {current: 2, max: 3}));
-    console.log("[DEBUG] window.t concours.fin_dans_jours =", window.t('concours.fin_dans_jours', {jours:1, heures:"01", minutes:"00", secondes:"00"}));
-  const now = new Date();
-  const fin = new Date(finIso);
-  let diff = Math.floor((fin - now) / 1000);
-  if (diff < 0) {
-    timerElt.textContent = window.t('concours.termine');
-    votesElt.textContent = "";
-    clearInterval(timerElt._timer);
-    return;
-  }
-  const jours = Math.floor(diff / 86400); diff -= jours * 86400;
-  const heures = Math.floor(diff / 3600); diff -= heures * 3600;
-  const minutes = Math.floor(diff / 60);
-  const secondes = diff % 60;
+  function update() {
+    const now = new Date();
+    const fin = new Date(finIso);
+    let diff = Math.floor((fin - now) / 1000);
+    if (diff < 0) {
+      timerElt.textContent = window.t('concours.termine');
+      votesElt.textContent = "";
+      clearInterval(timerElt._timer);
+      return;
+    }
+    const jours = Math.floor(diff / 86400); diff -= jours * 86400;
+    const heures = Math.floor(diff / 3600); diff -= heures * 3600;
+    const minutes = Math.floor(diff / 60);
+    const secondes = diff % 60;
 
-  // Affiche la durée avec clés i18n (avec ou sans jours)
-  if (jours > 0) {
-    timerElt.textContent = window.t('concours.fin_dans_jours', {
-      jours,
-      heures: heures.toString().padStart(2, "0"),
-      minutes: minutes.toString().padStart(2, "0"),
-      secondes: secondes.toString().padStart(2, "0")
-    });
-  } else {
-    timerElt.textContent = window.t('concours.fin_dans_sans_jours', {
-      heures: heures.toString().padStart(2, "0"),
-      minutes: minutes.toString().padStart(2, "0"),
-      secondes: secondes.toString().padStart(2, "0")
+    // Affiche la durée avec clés i18n (avec ou sans jours)
+    if (jours > 0) {
+      timerElt.textContent = window.t('concours.fin_dans_jours', {
+        jours,
+        heures: heures.toString().padStart(2, "0"),
+        minutes: minutes.toString().padStart(2, "0"),
+        secondes: secondes.toString().padStart(2, "0")
+      });
+    } else {
+      timerElt.textContent = window.t('concours.fin_dans_sans_jours', {
+        heures: heures.toString().padStart(2, "0"),
+        minutes: minutes.toString().padStart(2, "0"),
+        secondes: secondes.toString().padStart(2, "0")
+      });
+    }
+
+    // ➡️ Affiche les votes restants, clé i18n variable
+    const votesLeft = getVotesLeft();
+    votesElt.textContent = window.t('concours.votes_restants', {
+      current: votesLeft,
+      max: VOTES_PAR_REWARD()
     });
   }
-
-  // ➡️ Affiche les votes restants, clé i18n variable
-  const votesLeft = getVotesLeft();
-  votesElt.textContent = window.t('concours.votes_restants', {
-    current: votesLeft,
-    max: VOTES_PAR_REWARD()
-  });
-}
-update();
-timerElt._timer && clearInterval(timerElt._timer);
-timerElt._timer = setInterval(update, 1000);
+  update();
+  timerElt._timer && clearInterval(timerElt._timer);
+  timerElt._timer = setInterval(update, 1000);
 }
 
 // ----------- PHOTOS CONCOURS, TRI ET CACHE -----------
@@ -231,6 +229,18 @@ function filtrerPhotosParPseudo(photos, search, pseudoMap = {}) {
 
 // ============ AFFICHAGE PRINCIPAL =============
 window.afficherGalerieConcours = async function(forceReload = false) {
+  // Correction : si concours terminé, on n'affiche plus rien
+  const concoursId = concoursIdGlobal;
+  const timerElt = document.getElementById("timer-concours");
+  if (timerElt && timerElt.textContent && timerElt.textContent.includes(window.t('concours.termine'))) {
+    localStorage.removeItem(getConcoursPhotosCacheKey(concoursId));
+    const galerie = document.getElementById("galerie-concours");
+    if (galerie) {
+      galerie.innerHTML = "<div style='text-align:center;color:#888;'>" + window.t('concours.termine') + "</div>";
+    }
+    return;
+  }
+
   if (!isRewardDone()) {
     await showConcoursRewardPopup();
     return;
@@ -241,7 +251,6 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 
   let { allPhotos, orderedPhotos } = await getPhotosAPaginer(forceReload);
 
-  const concoursId = concoursIdGlobal;
   const votesCountMap = await getVotesCountMapFromCacheOrDB(concoursId, forceReload);
   const pseudoMap = await getPseudoMapFromPhotos(orderedPhotos);
 
@@ -276,7 +285,7 @@ window.afficherGalerieConcours = async function(forceReload = false) {
 
   // Résultats recherche
   if (resultatsElt)
-   resultatsElt.textContent = window.t('concours.resultats', { n: filteredOrderedPhotos.length });
+    resultatsElt.textContent = window.t('concours.resultats', { n: filteredOrderedPhotos.length });
 
   // Recharge votes event
   const btnRecharge = document.getElementById('btn-recharge-votes');
@@ -423,22 +432,12 @@ async function votePourPhoto(photoId) {
     alert(window.t('concours.deja_vote_auj'));
     return;
   }
-  // Si recharge active (pub vue), on autorise un deuxième vote
-
-  // LOG AVANT L'APPEL
-  console.log("DEBUG VOTE", {
-    userId: window.userId,
-    photoId: photoId,
-    cycle: 1
-  });
 
   const res = await window.supabase.rpc("concours_vote", {
     p_user_id: window.userId,
     p_photo_id: photoId,
     p_cycle: 1
   });
-
-  console.log("ERREUR VOTE", res.error, res.data);
 
   if (res.error) {
     alert(window.t('concours.erreur_vote'));
@@ -471,11 +470,10 @@ window.ajouterPhotoConcours = async function() {
 
   if (dejaPhoto && dejaPhoto.length > 0) {
     if (!premium) {
-      alert(window.t('concours.participation_une_fois')); // i18n: "Tu as déjà participé à ce concours !"
+      alert(window.t('concours.participation_une_fois'));
       return;
     } else {
-      // Si premium, propose de remplacer
-      if (!confirm(window.t('concours.popup_replace_photo'))) { // i18n: "...va supprimer l'ancienne..."
+      if (!confirm(window.t('concours.popup_replace_photo'))) {
         return;
       }
       // Supprime ancienne photo du bucket Supabase
@@ -510,7 +508,7 @@ window.ajouterPhotoConcours = async function() {
     if (error) throw error;
     setConcoursPhotosCache(concoursId, []);
   } catch (e) {
-    alert(window.t('concours.erreur_ajout_photo')); // i18n
+    alert(window.t('concours.erreur_ajout_photo'));
     console.error(e);
   }
 }
@@ -542,7 +540,7 @@ async function showConcoursRewardPopup() {
 // ----------- INITIALISATION : set userId/premium -----------
 document.addEventListener("DOMContentLoaded", async () => {
   // 1. Charger infos du concours = récupère le bon ID
-   await window.loadI18nLang();
+  await window.loadI18nLang();
   await chargerInfosConcours(); // Définit concoursIdGlobal
 
   // 2. Charger infos user après
