@@ -245,9 +245,10 @@ window.afficherGalerieConcours = async function(forceReload = false) {
     await showConcoursRewardPopup();
     return;
   }
-  const galerie = document.getElementById("galerie-concours");
-  galerie.innerHTML = "<div style='text-align:center;color:#888;'>Chargement...</div>";
-  galerie.classList.add("grid-cadres");
+const galerie = document.getElementById('galerie-concours');
+galerie.className = "grid-cadres"; // applique la grille 3 colonnes
+galerie.innerHTML = ''; // vide le conteneur
+
 
   let { allPhotos, orderedPhotos } = await getPhotosAPaginer(forceReload);
 
