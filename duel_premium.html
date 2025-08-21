@@ -43,10 +43,10 @@
       </a>
       <h1 data-i18n="header.title.duel_premium">Duel Premium</h1>
       <div class="top-buttons">
-        <a href="index.html" class="btn-icon">
-          <img src="assets/icons/user.svg" alt="Profil" />
+        <a href="index.html" class="btn-icon" aria-label="Profil" data-i18n-aria-label="button.profile">
+          <img src="assets/icons/user.svg" alt="Profil" data-i18n-alt="button.profile" />
         </a>
-        <a href="parametres.html" class="btn-icon">
+        <a href="parametres.html" class="btn-icon" aria-label="Paramètres" data-i18n-aria-label="button.settings">
           <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings" />
         </a>
       </div>
@@ -70,14 +70,18 @@
   <main>
     <div class="duel-main">
       <div id="premium-alert" style="display:none;color:#f36d6d;text-align:center;margin-bottom:1.1em;font-weight:bold;" data-i18n="alert.premium_only"></div>
+
       <div class="section-titre" data-i18n="section.friends">Mes amis</div>
       <div id="liste-amis" class="amis-list"></div>
+
       <div class="section-titre" style="margin-top:2.4em;" data-i18n="section.received">Demandes de duel premium reçues</div>
       <div id="demandes-recue" class="duel-demandes-list"></div>
+
       <div class="section-titre" style="margin-top:2.4em;" data-i18n="section.sent">Demandes de duel premium envoyées</div>
       <div id="demandes-envoyees" class="duel-demandes-list"></div>
     </div>
   </main>
+
   <footer>
     <p data-i18n="footer">&copy; 2025 VFindz</p>
   </footer>
@@ -95,6 +99,14 @@ if (!window.supabase) {
 }
 let pseudoPublic = null;
 let profil = null;
+
+// --- i18n helper (fallback si i18n.t indisponible)
+function t(key, fallback='') {
+  try {
+    if (window.i18n && typeof window.i18n.t === 'function') return window.i18n.t(key) || fallback;
+  } catch(e){}
+  return fallback;
+}
 
 async function isPremiumUser() {
   if (typeof window.isPremium === "function") return await window.isPremium();
@@ -137,7 +149,7 @@ async function afficherAmis() {
   const ul = document.getElementById("liste-amis");
   ul.innerHTML = "";
   if (!amis.length) {
-    ul.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande'>Aucun ami enregistré.</div>";
+    ul.innerHTML = "<div class='aucune-demande' data-i18n='friends.none'>Aucun ami enregistré.</div>";
     return;
   }
   amis.forEach(ami => {
@@ -198,7 +210,7 @@ async function afficherDemandesDuel() {
 // INVITER un ami à un duel premium
 async function inviterDuelPremium(amiPseudo) {
   const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
-  if (!ami) { alert("Ami introuvable."); return; }
+  if (!ami) { alert(t('errors.friend_not_found','Ami introuvable.')); return; }
 
   // Ajoute ma demande côté ami (recues)
   const recuesAmi = toUniqueArray(ami.demandesduelrecuespremium);
@@ -225,11 +237,10 @@ async function inviterDuelPremium(amiPseudo) {
 
 // ACCEPTER une demande de duel premium : crée une room en type "amis_premium"
 async function accepterDuelPremium(amiPseudo) {
-  // Crée le duel (schéma conforme à ta table `duels`)
   const now = Date.now();
   const insertPayload = [{
-    player1_pseudo: amiPseudo,           // l'initiateur devient player1
-    player2_pseudo: pseudoPublic,        // moi qui accepte = player2
+    player1_pseudo: amiPseudo,
+    player2_pseudo: pseudoPublic,
     status: 'playing',
     createdat: now,
     starttime: now,
@@ -297,6 +308,7 @@ function fermerPopupDefiPremium() {
   document.getElementById("popup-defi-premium").classList.add("hidden");
 }
   </script>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       if (window.afficherSolde) window.afficherSolde();
@@ -306,12 +318,12 @@ function fermerPopupDefiPremium() {
   <!-- POPUP PREMIUM DÉFIS -->
   <div id="popup-defi-premium" class="hidden">
     <div class="popup-inner popup-premium-pro">
-      <div class="premium-badge" style="background:#ffe04a;color:#232323;margin-bottom:10px;">DUEL PREMIUM</div>
-      <div class="popup-premium-title" id="popup-defi-title" style="margin-bottom:12px;text-align:center"></div>
+      <div class="premium-badge" data-i18n="badge.premium" style="background:#ffe04a;color:#232323;margin-bottom:10px;">DUEL PREMIUM</div>
+      <div class="popup-premium-title" id="popup-defi-title" data-i18n="popup.premium.title" style="margin-bottom:12px;text-align:center">Défis Premium</div>
       <div id="popup-defi-fields"></div>
       <div style="margin-top:24px;display:flex;gap:10px;justify-content:center;">
-        <button class="btn-premium-pro" id="btn-valider-defi">Valider</button>
-        <button class="btn-annuler-premium-pro" onclick="fermerPopupDefiPremium()">Annuler</button>
+        <button class="btn-premium-pro" id="btn-valider-defi" data-i18n="btn.validate">Valider</button>
+        <button class="btn-annuler-premium-pro" onclick="fermerPopupDefiPremium()" data-i18n="btn.cancel">Annuler</button>
       </div>
     </div>
   </div>
