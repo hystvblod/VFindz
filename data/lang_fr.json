@@ -376,7 +376,63 @@
   "button.challenge": "Défier",
   "button.accept": "Accepter",
   "button.refuse": "Refuser",
-  "button.add": "Ajouter un ami"
+  "button.add": "Ajouter un ami",
+
+  
+  "header": {
+    "title": {
+      "duel_premium": "Duel Premium"
+    },
+    "back": "Retour"
+  },
+  "button": {
+    "profile": "Profil",
+    "settings": "Paramètres",
+    "premium": {
+      "duel": "Duel Premium "
+    }
+  },
+  "solde": {
+    "pieces": "Pièces",
+    "jetons": "Jetons"
+  },
+  "section": {
+    "friends": "Mes amis",
+    "received": "Demandes de duel premium reçues",
+    "sent": "Demandes de duel premium envoyées"
+  },
+  "aucune": {
+    "demande": "Aucun ami enregistré.",
+    "demande.received": "Aucune demande reçue.",
+    "demande.sent": "Aucune demande envoyée."
+  },
+  "badge": {
+    "new": "Nouveau",
+    "waiting": "En attente",
+    "premium": "DUEL PREMIUM"
+  },
+  "btn": {
+    "accept": "Accepter",
+    "refuse": "Refuser",
+    "validate": "Valider",
+    "cancel": "Annuler"
+  },
+  "popup": {
+    "premium": {
+      "title": "Défis Premium"
+    }
+  },
+  "alert": {
+    "premium_only": "Réservé aux membres Premium"
+  },
+  "errors": {
+    "friend_not_found": "Ami introuvable."
+  },
+  "friends": {
+    "none": "Aucun ami enregistré."
+  },
+  "footer": "© 2025 VFindz"
+
 }
 
 
