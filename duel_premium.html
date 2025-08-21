@@ -115,8 +115,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadProfil();
   const premium = await isPremiumUser();
   if (!premium) {
-    document.getElementById("premium-alert").style.display = "block";
-    document.getElementById("premium-alert").setAttribute('data-i18n', 'alert.premium_only');
+    const a = document.getElementById("premium-alert");
+    a.style.display = "block";
+    a.setAttribute('data-i18n', 'alert.premium_only');
     document.getElementById("liste-amis").innerHTML = "";
     document.getElementById("demandes-recue").innerHTML = "";
     document.getElementById("demandes-envoyees").innerHTML = "";
@@ -126,8 +127,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   afficherDemandesDuel();
 });
 
+function toUniqueArray(arrLike) {
+  const arr = Array.isArray(arrLike) ? arrLike : [];
+  return Array.from(new Set(arr));
+}
+
 async function afficherAmis() {
-  const amis = profil && profil.amis ? profil.amis : [];
+  const amis = Array.isArray(profil?.amis) ? profil.amis : [];
   const ul = document.getElementById("liste-amis");
   ul.innerHTML = "";
   if (!amis.length) {
@@ -150,89 +156,111 @@ async function afficherDemandesDuel() {
   // RECUES
   const ulRecue = document.getElementById("demandes-recue");
   ulRecue.innerHTML = "";
-  const recues = (profil && profil.demandesDuelRecuesPremium) ? profil.demandesDuelRecuesPremium : [];
-  if (!recues.length) ulRecue.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande.received'>Aucune demande reçue.</div>";
-  recues.forEach(ami => {
-    const card = document.createElement("div");
-    card.className = "demande-card";
-    card.innerHTML = `
-      <span class="demande-nom">${ami}<span class="badge-nouveau" data-i18n="badge.new">Nouveau</span></span>
-      <div>
-        <button class="btn-accepter" data-ami="${ami}" data-i18n="btn.accept">Accepter</button>
-        <button class="btn-refuser" data-ami="${ami}" data-i18n="btn.refuse">Refuser</button>
-      </div>
-    `;
-    card.querySelector(".btn-accepter").onclick = () => accepterDuelPremium(ami);
-    card.querySelector(".btn-refuser").onclick = () => refuserDuelPremium(ami);
-    ulRecue.appendChild(card);
-  });
+  const recues = toUniqueArray(profil?.demandesduelrecuespremium);
+  if (!recues.length) {
+    ulRecue.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande.received'>Aucune demande reçue.</div>";
+  } else {
+    recues.forEach(ami => {
+      const card = document.createElement("div");
+      card.className = "demande-card";
+      card.innerHTML = `
+        <span class="demande-nom">${ami}<span class="badge-nouveau" data-i18n="badge.new">Nouveau</span></span>
+        <div>
+          <button class="btn-accepter" data-ami="${ami}" data-i18n="btn.accept">Accepter</button>
+          <button class="btn-refuser" data-ami="${ami}" data-i18n="btn.refuse">Refuser</button>
+        </div>
+      `;
+      card.querySelector(".btn-accepter").onclick = () => accepterDuelPremium(ami);
+      card.querySelector(".btn-refuser").onclick = () => refuserDuelPremium(ami);
+      ulRecue.appendChild(card);
+    });
+  }
 
   // ENVOYÉES
   const ulEnv = document.getElementById("demandes-envoyees");
   ulEnv.innerHTML = "";
-  const envoyees = (profil && profil.demandesDuelEnvoyeesPremium) ? profil.demandesDuelEnvoyeesPremium : [];
-  if (!envoyees.length) ulEnv.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande.sent'>Aucune demande envoyée.</div>";
-  envoyees.forEach(ami => {
-    const card = document.createElement("div");
-    card.className = "demande-card";
-    card.innerHTML = `
-      <span class="demande-nom">${ami}</span>
-      <span class="badge-nouveau" style="background:#b3e2ff;color:#20435a;" data-i18n="badge.waiting">En attente</span>
-    `;
-    ulEnv.appendChild(card);
-  });
+  const envoyees = toUniqueArray(profil?.demandesduelenvoyeespremium);
+  if (!envoyees.length) {
+    ulEnv.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande.sent'>Aucune demande envoyée.</div>";
+  } else {
+    envoyees.forEach(ami => {
+      const card = document.createElement("div");
+      card.className = "demande-card";
+      card.innerHTML = `
+        <span class="demande-nom">${ami}</span>
+        <span class="badge-nouveau" style="background:#b3e2ff;color:#20435a;" data-i18n="badge.waiting">En attente</span>
+      `;
+      ulEnv.appendChild(card);
+    });
+  }
 }
 
-// INVITE un ami à un duel premium
+// INVITER un ami à un duel premium
 async function inviterDuelPremium(amiPseudo) {
   const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
   if (!ami) { alert("Ami introuvable."); return; }
-  const demandesRecues = new Set([...(ami.demandesDuelRecuesPremium || []), pseudoPublic]);
-  const { error: errRecues } = await window.supabase.from("users").update({
-    demandesDuelRecuesPremium: Array.from(demandesRecues)
-  }).eq("pseudo", amiPseudo);
+
+  // Ajoute ma demande côté ami (recues)
+  const recuesAmi = toUniqueArray(ami.demandesduelrecuespremium);
+  if (!recuesAmi.includes(pseudoPublic)) recuesAmi.push(pseudoPublic);
+  const { error: errRecues } = await window.supabase
+    .from("users")
+    .update({ demandesduelrecuespremium: recuesAmi })
+    .eq("pseudo", amiPseudo);
   if (errRecues) console.error("Erreur update Recues:", errRecues);
 
-  const demandesEnvoyees = new Set([...(profil.demandesDuelEnvoyeesPremium || []), amiPseudo]);
-  const { error: errEnvoyees } = await window.supabase.from("users").update({
-    demandesDuelEnvoyeesPremium: Array.from(demandesEnvoyees)
-  }).eq("pseudo", pseudoPublic);
-  if (errEnvoyees) console.error("Erreur update Envoyees:", errEnvoyees);
+  // Ajoute la demande envoyée côté moi
+  const envMoi = toUniqueArray(profil.demandesduelenvoyeespremium);
+  if (!envMoi.includes(amiPseudo)) envMoi.push(amiPseudo);
+  const { error: errEnv } = await window.supabase
+    .from("users")
+    .update({ demandesduelenvoyeespremium: envMoi })
+    .eq("pseudo", pseudoPublic);
+  if (errEnv) console.error("Erreur update Envoyees:", errEnv);
 
   await loadProfil();
   afficherAmis();
   afficherDemandesDuel();
 }
 
-// ACCEPTE une demande de duel premium : crée une room en type "amis_premium"
+// ACCEPTER une demande de duel premium : crée une room en type "amis_premium"
 async function accepterDuelPremium(amiPseudo) {
-  const { data } = await window.supabase.from('duels').insert([{
-    player1_pseudo: amiPseudo,
-    player2_pseudo: pseudoPublic,
+  // Crée le duel (schéma conforme à ta table `duels`)
+  const now = Date.now();
+  const insertPayload = [{
+    player1_pseudo: amiPseudo,           // l'initiateur devient player1
+    player2_pseudo: pseudoPublic,        // moi qui accepte = player2
     status: 'playing',
-    createdat: Date.now(),
+    createdat: now,
+    starttime: now,
     type: "amis_premium",
-    premium1: true,
-    premium2: true,
-    defis_player1: null,
-    defis_player2: null,
     defis_final: null,
-    starttime: Date.now(),
     photosa: {},
     photosb: {}
-  }]).select();
+  }];
 
-  // MAJ demandes
-  const { error: errRecues } = await window.supabase.from("users").update({
-    demandesDuelRecuesPremium: (profil.demandesDuelRecuesPremium || []).filter(p => p !== amiPseudo)
-  }).eq("pseudo", pseudoPublic);
+  const { data, error: duelErr } = await window.supabase.from('duels').insert(insertPayload).select();
+  if (duelErr) {
+    console.error("Erreur création duel:", duelErr);
+  }
+
+  // MAJ des listes (retire la demande)
+  const recuesMoi = toUniqueArray(profil.demandesduelrecuespremium).filter(p => p !== amiPseudo);
+  const { error: errRecues } = await window.supabase
+    .from("users")
+    .update({ demandesduelrecuespremium: recuesMoi })
+    .eq("pseudo", pseudoPublic);
   if (errRecues) console.error("Erreur update Recues:", errRecues);
 
   const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
-  const { error: errEnvoyees } = await window.supabase.from("users").update({
-    demandesDuelEnvoyeesPremium: (ami.demandesDuelEnvoyeesPremium || []).filter(p => p !== pseudoPublic)
-  }).eq("pseudo", amiPseudo);
-  if (errEnvoyees) console.error("Erreur update Envoyees:", errEnvoyees);
+  if (ami) {
+    const envAmi = toUniqueArray(ami.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
+    const { error: errEnv } = await window.supabase
+      .from("users")
+      .update({ demandesduelenvoyeespremium: envAmi })
+      .eq("pseudo", amiPseudo);
+    if (errEnv) console.error("Erreur update Envoyees:", errEnv);
+  }
 
   await loadProfil();
   afficherDemandesDuel();
@@ -243,16 +271,22 @@ async function accepterDuelPremium(amiPseudo) {
 }
 
 async function refuserDuelPremium(amiPseudo) {
-  const { error: errRecues } = await window.supabase.from("users").update({
-    demandesDuelRecuesPremium: (profil.demandesDuelRecuesPremium || []).filter(p => p !== amiPseudo)
-  }).eq("pseudo", pseudoPublic);
+  const recuesMoi = toUniqueArray(profil.demandesduelrecuespremium).filter(p => p !== amiPseudo);
+  const { error: errRecues } = await window.supabase
+    .from("users")
+    .update({ demandesduelrecuespremium: recuesMoi })
+    .eq("pseudo", pseudoPublic);
   if (errRecues) console.error("Erreur update Recues:", errRecues);
 
   const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
-  const { error: errEnvoyees } = await window.supabase.from("users").update({
-    demandesDuelEnvoyeesPremium: (ami.demandesDuelEnvoyeesPremium || []).filter(p => p !== pseudoPublic)
-  }).eq("pseudo", amiPseudo);
-  if (errEnvoyees) console.error("Erreur update Envoyees:", errEnvoyees);
+  if (ami) {
+    const envAmi = toUniqueArray(ami.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
+    const { error: errEnv } = await window.supabase
+      .from("users")
+      .update({ demandesduelenvoyeespremium: envAmi })
+      .eq("pseudo", amiPseudo);
+    if (errEnv) console.error("Erreur update Envoyees:", errEnv);
+  }
 
   await loadProfil();
   afficherDemandesDuel();
