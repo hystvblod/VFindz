@@ -6,13 +6,25 @@
 // 1) Liste des IDs de cadres dynamiques (draw/canvas)
 //    ➜ Ajoute ici les nouveaux effets (ils sont implémentés plus bas)
 const DRAW_IDS = [
-  // existants dans ton projet
+  // existants
   "etoiles", "bulles", "pixel", "neon", "vagues", "aquarelle",
   "feuilles", "cosmique", "pluie", "flammes",
-  // nouveaux "ultra pro" prêts à l'emploi
+  // "ultra pro"
   "stardust", "aurora", "glowgrid"
 ];
-window.DRAW_IDS = DRAW_IDS; // exposé global
+
+// Normalisation d'ID : "cadre_neon" / "Cadre-Neon" -> "neon"
+function norm(id) {
+  return String(id || "").toLowerCase().replace(/^cadre[_-]/, "");
+}
+
+// Expose une liste élargie qui accepte "neon" ET "cadre_neon"
+const DRAW_IDS_EXPANDED = Array.from(new Set([
+  ...DRAW_IDS,
+  ...DRAW_IDS.map(x => `cadre_${x}`)
+]));
+window.DRAW_IDS_ORIG = DRAW_IDS;
+window.DRAW_IDS = DRAW_IDS_EXPANDED; // exposé global
 
 // ---------------------------------------------------------------------------
 // 2) URL du cadre image : base64 local si dispo, sinon lien Supabase
@@ -24,24 +36,32 @@ window.getCadreUrl = getCadreUrl;
 
 // ---------------------------------------------------------------------------
 // 3) Création de l'élément d’aperçu cadre : <canvas> si draw, <img> sinon
-
 function createCadreElement(id, taille = { w: 80, h: 100 }) {
-  if (DRAW_IDS.includes(id)) {
+  const key = norm(id); // "cadre_neon" -> "neon"
+
+  // On détecte un cadre "draw" si :
+  // - son id (ou sa version normalisée) est dans DRAW_IDS élargis
+  // - OU une fonction de dessin existe pour cet id normalisé
+  const isDraw =
+    (Array.isArray(window.DRAW_IDS) && (window.DRAW_IDS.includes(id) || window.DRAW_IDS.includes(key))) ||
+    (window.DRAWERS && window.DRAWERS[key]);
+
+  if (isDraw) {
     const c = document.createElement("canvas");
     c.width = taille.w;
     c.height = taille.h;
     c.className = "photo-cadre";
 
-    // ⬇️ styles inline indispensables car ton CSS cible <img.photo-cadre>
+    // Styles inline pour se comporter comme <img.photo-cadre> (sans toucher le CSS global)
     c.style.position = "absolute";
     c.style.inset = "0";
     c.style.width = "100%";
     c.style.height = "100%";
-    c.style.zIndex = "2";          // le cadre (canvas) AU-DESSUS de la photo
+    c.style.zIndex = "2";          // le cadre au-dessus de la photo
     c.style.pointerEvents = "none";
 
     const ctx = c.getContext("2d");
-    if (window.previewCadre) window.previewCadre(ctx, id);
+    if (window.previewCadre) window.previewCadre(ctx, key); // on passe l'id normalisé
     return c;
   } else {
     const img = document.createElement("img");
@@ -50,23 +70,16 @@ function createCadreElement(id, taille = { w: 80, h: 100 }) {
     img.style.width = "100%";
     img.style.height = "100%";
     img.style.objectFit = "contain";
-    // (si ton CSS global met déjà position/z-index sur img.photo-cadre, ne rien changer)
     return img;
   }
 }
-
 window.createCadreElement = createCadreElement;
 
 // ---------------------------------------------------------------------------
-// 4) Popup zoom cadre
+/** 4) Popup zoom cadre */
 function zoomCadre(id) {
   const popup = document.createElement("div");
   popup.className = "popup show";
-  const cadreEl = createCadreElement(id, { w: 300, h: 375 });
-
-  const photo = document.createElement("img");
-  photo.className = "photo-user";
-  photo.src = "./assets/img/exemple.jpg";
 
   popup.innerHTML = `
     <div class="popup-inner">
@@ -75,8 +88,21 @@ function zoomCadre(id) {
     </div>
   `;
   const holder = popup.querySelector(".cadre-preview");
-  holder.appendChild(cadreEl); // cadre (canvas ou image)
-  holder.appendChild(photo);   // photo (par-dessus, cf. CSS .photo-user z-index)
+
+  // Photo d'abord (z-index 1) puis cadre (z-index 2)
+  const photo = document.createElement("img");
+  photo.className = "photo-user";
+  photo.src = "./assets/img/exemple.jpg";
+  photo.style.position = "absolute";
+  photo.style.inset = "0";
+  photo.style.width = "100%";
+  photo.style.height = "100%";
+  photo.style.objectFit = "cover";
+  photo.style.zIndex = "1";
+  holder.appendChild(photo);
+
+  const cadreEl = createCadreElement(id, { w: 300, h: 375 });
+  holder.appendChild(cadreEl);
 
   document.body.appendChild(popup);
 }
@@ -126,17 +152,25 @@ async function afficherCadres() {
     // Aperçu
     const preview = document.createElement("div");
     preview.className = "cadre-preview";
+    preview.style.position = "relative";
     preview.style.cursor = "zoom-in";
     preview.onclick = () => window.zoomCadre(cadreId);
 
-    const cadreEl = createCadreElement(cadreId, { w: 300, h: 375 });
-    preview.appendChild(cadreEl);
-
-    // Photo par-dessus (superposition gérée par ta CSS .photo-user)
+    // Photo d'abord
     const photo = document.createElement("img");
     photo.className = "photo-user";
     photo.src = "./assets/img/exemple.jpg";
+    photo.style.position = "absolute";
+    photo.style.inset = "0";
+    photo.style.width = "100%";
+    photo.style.height = "100%";
+    photo.style.objectFit = "cover";
+    photo.style.zIndex = "1";
     preview.appendChild(photo);
+
+    // Cadre par-dessus
+    const cadreEl = createCadreElement(cadreId, { w: 300, h: 375 });
+    preview.appendChild(cadreEl);
 
     // Bouton
     const btn = document.createElement("button");
@@ -171,7 +205,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 // 8) MOTEUR D’EFFETS ULTRA-PRO (dessin canvas) — previewCadre / overlayCadre
 //    ➜ Aucun autre fichier requis. Tout est ici.
 // ---------------------------------------------------------------------------
-
 (function () {
   // util: boucle anim + auto-stop si canvas retiré du DOM
   function animate(ctx, drawFrame) {
@@ -347,14 +380,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Mapping ID -> fonction de dessin
+  // Mapping ID -> fonction de dessin (IDs normalisés)
   const DRAWERS = {
     neon:     drawNeon,
-    etoiles:  drawStardust, // "etoiles" = alias de stardust
+    etoiles:  drawStardust, // alias
     stardust: drawStardust,
     aurora:   drawAurora,
     glowgrid: drawGlowGrid,
-    // placeholders pour IDs déjà présents (bulles, pixel, vagues, aquarelle, feuilles, cosmique, pluie, flammes)
+
+    // placeholders pour autres ids existants
     bulles:   drawStardust,
     pixel:    drawGlowGrid,
     vagues:   drawAurora,
@@ -364,9 +398,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     pluie:    drawGlowGrid,
     flammes:  drawNeon
   };
+  // Expose pour la boutique (détection catégorie draw)
+  window.DRAWERS = DRAWERS;
 
   // Aperçu autonome (utilisé par createCadreElement)
   function previewCadre(ctx, id) {
+    id = norm(id); // normalise
     const c = ctx.canvas, w = c.width, h = c.height;
     const fn = DRAWERS[id] || ((ctx,w,h) => {
       ctx.clearRect(0,0,w,h);
@@ -378,8 +415,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // Overlay par-dessus une photo déjà peinte dans ctx
-  // (à utiliser sur les écrans où tu composes photo + cadre dans un même canvas)
   function overlayCadre(ctx, id, w, h) {
+    id = norm(id); // normalise
     const fn = DRAWERS[id];
     if (!fn) {
       ctx.save();
