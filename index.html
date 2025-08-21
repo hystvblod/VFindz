@@ -261,39 +261,47 @@
     }
 
     // 1) Rendu du badge
-    function renderDuelBadge(count) {
-      const badge = document.getElementById('badge-duel');
-      const btn = document.getElementById('btn-duel');
-      if (!badge || !btn) return;
-      if (count > 0) {
-        badge.textContent = count;
-        badge.style.display = 'inline-flex';
-        btn.classList.add('btn-alert');
-      } else {
-        badge.textContent = '';
-        badge.style.display = 'none';
-        btn.classList.remove('btn-alert');
-      }
-    }
+function renderDuelBadge(count) {
+  const badge = document.getElementById('badge-duel');
+  const btn = document.getElementById('btn-duel');
+  if (!badge || !btn) return;
+  console.log('[BADGE] render count =', count);
+  if (count > 0) {
+    badge.textContent = count;
+    badge.style.display = 'inline-flex';
+    btn.classList.add('btn-alert');
+  } else {
+    badge.textContent = '';
+    badge.style.display = 'none';
+    btn.classList.remove('btn-alert');
+  }
+}
 
     // 2) Lecture du compteur
-    async function fetchAndRenderDuelBadge() {
-      try {
-        if (!window.supabase || !window.getPseudo) return;
-        const pseudo = await window.getPseudo();
-        const { data, error } = await window.supabase
-          .from('users')
-          .select('id, demandesduelrecuespremium')
-          .eq('pseudo', pseudo)
-          .single();
-        if (error) { console.error('[DUEL BADGE] SELECT error:', error); return; }
-        window.__me_id = data?.id;
-        const arr = Array.isArray(data?.demandesduelrecuespremium) ? data.demandesduelrecuespremium : [];
-        renderDuelBadge(arr.length);
-      } catch (e) {
-        console.error('[DUEL BADGE] Exception:', e);
-      }
-    }
+  async function fetchAndRenderDuelBadge() {
+  try {
+    if (!window.supabase || !window.getPseudo) return;
+    const pseudo = await window.getPseudo();
+    console.log('[BADGE] pseudo courant =', pseudo);
+
+    const { data, error } = await window.supabase
+      .from('users')
+      .select('id, pseudo, demandesduelrecuespremium, demandesduelenvoyeespremium')
+      .eq('pseudo', pseudo)
+      .single();
+
+    if (error) { console.error('[BADGE] SELECT error:', error); return; }
+    window.__me_id = data?.id;
+
+    const recues   = Array.isArray(data?.demandesduelrecuespremium) ? data.demandesduelrecuespremium : [];
+    const envoyees = Array.isArray(data?.demandesduelenvoyeespremium) ? data.demandesduelenvoyeespremium : [];
+    console.log('[BADGE] recues/envoyees =', recues, envoyees);
+
+    renderDuelBadge(recues.length + envoyees.length);
+  } catch (e) {
+    console.error('[BADGE] Exception:', e);
+  }
+}
 
     // 3) Realtime : se mettre à jour quand MA ligne users change
     function initDuelRealtime() {
