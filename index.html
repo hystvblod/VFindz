@@ -239,7 +239,7 @@
     }
     // --------------------------------------------------
 
-    // ---------- Chargement utilisateur anonyme sur toutes plateformes ----------
+    // ---------- Chargement utilisateur anonyme ----------
     window.addEventListener("DOMContentLoaded", async () => {
       if (window.loadUserData && typeof window.loadUserData === "function") {
         await window.loadUserData(true);
@@ -261,47 +261,47 @@
     }
 
     // 1) Rendu du badge
-function renderDuelBadge(count) {
-  const badge = document.getElementById('badge-duel');
-  const btn = document.getElementById('btn-duel');
-  if (!badge || !btn) return;
-  console.log('[BADGE] render count =', count);
-  if (count > 0) {
-    badge.textContent = count;
-    badge.style.display = 'inline-flex';
-    btn.classList.add('btn-alert');
-  } else {
-    badge.textContent = '';
-    badge.style.display = 'none';
-    btn.classList.remove('btn-alert');
-  }
-}
+    function renderDuelBadge(count) {
+      const badge = document.getElementById('badge-duel');
+      const btn = document.getElementById('btn-duel');
+      if (!badge || !btn) return;
+      console.log('[BADGE] render count =', count);
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-flex';
+        btn.classList.add('btn-alert');
+      } else {
+        badge.textContent = '';
+        badge.style.display = 'none';
+        btn.classList.remove('btn-alert');
+      }
+    }
 
-    // 2) Lecture du compteur
-  async function fetchAndRenderDuelBadge() {
-  try {
-    if (!window.supabase || !window.getPseudo) return;
-    const pseudo = await window.getPseudo();
-    console.log('[BADGE] pseudo courant =', pseudo);
+    // 2) Lecture du compteur (✅ UNIQUEMENT les reçues)
+    async function fetchAndRenderDuelBadge() {
+      try {
+        if (!window.supabase || !window.getPseudo) return;
+        const pseudo = await window.getPseudo();
+        console.log('[BADGE] pseudo courant =', pseudo);
 
-    const { data, error } = await window.supabase
-      .from('users')
-      .select('id, pseudo, demandesduelrecuespremium, demandesduelenvoyeespremium')
-      .eq('pseudo', pseudo)
-      .single();
+        const { data, error } = await window.supabase
+          .from('users')
+          .select('id, pseudo, demandesduelrecuespremium, demandesduelenvoyeespremium')
+          .eq('pseudo', pseudo)
+          .single();
 
-    if (error) { console.error('[BADGE] SELECT error:', error); return; }
-    window.__me_id = data?.id;
+        if (error) { console.error('[BADGE] SELECT error:', error); return; }
+        window.__me_id = data?.id;
 
-    const recues   = Array.isArray(data?.demandesduelrecuespremium) ? data.demandesduelrecuespremium : [];
-    const envoyees = Array.isArray(data?.demandesduelenvoyeespremium) ? data.demandesduelenvoyeespremium : [];
-    console.log('[BADGE] recues/envoyees =', recues, envoyees);
+        const recues   = Array.isArray(data?.demandesduelrecuespremium) ? data.demandesduelrecuespremium : [];
+        // const envoyees = Array.isArray(data?.demandesduelenvoyeespremium) ? data.demandesduelenvoyeespremium : [];
 
-    renderDuelBadge(recues.length + envoyees.length);
-  } catch (e) {
-    console.error('[BADGE] Exception:', e);
-  }
-}
+        // ✅ Seules les reçues colorent le bouton chez le destinataire
+        renderDuelBadge(recues.length);
+      } catch (e) {
+        console.error('[BADGE] Exception:', e);
+      }
+    }
 
     // 3) Realtime : se mettre à jour quand MA ligne users change
     function initDuelRealtime() {
@@ -322,7 +322,7 @@ function renderDuelBadge(count) {
       }
     }
 
-    // 4) Bootstrap du badge après que userData a connecté l’anonyme
+    // 4) Bootstrap
     window.addEventListener('DOMContentLoaded', async () => {
       try {
         await fetchAndRenderDuelBadge();
