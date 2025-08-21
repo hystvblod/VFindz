@@ -14,14 +14,11 @@
       <a href="profil.html" class="back-btn" title="Retour" data-i18n-title="header.back">
         <img src="assets/icons/arrow_back.svg" alt="Retour" data-i18n-alt="header.back"/>
       </a>
-         <h1 data-i18n="header.title.cadres">Mes cadres</h1>
-      <div class="top-buttons">
-        <a href="profil.html" class="btn-icon">
-          <img src="assets/icons/user.svg" alt="Profil" />
-        </a>
-        <a href="parametres.html" class="btn-icon">
-          <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings" />
-        </a>
+      <div class="header-center">
+        <h1 data-i18n="header.title.cadres">Mes cadres</h1>
+      </div>
+      <div class="header-actions">
+        <a class="btn btn-primary" href="importCadres.html" data-i18n="header.import">Importer</a>
       </div>
     </div>
   </header>
@@ -41,8 +38,8 @@
   <!-- 1. Charge Supabase (AVANT tout !) -->
   <script src="js/i18n.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="js/cadres.js"></script>
   <script src="js/userData.js"></script>
+  <script src="js/cadres.js"></script>
 
   <script>
     // Pop-up zoom sur le cadre
@@ -52,21 +49,33 @@
       popup.innerHTML = `
         <div class="popup-inner">
           <button id="close-popup" onclick="document.body.removeChild(this.parentNode.parentNode)">✖</button>
-          <div class="cadre-preview cadre-popup">
-            <img class="photo-cadre" src="${window.getCadreUrl(id)}" />
-            <img class="photo-user" src="./assets/img/exemple.jpg" />
-          </div>
+          <div id="zoom-holder" style="position:relative;width:300px;height:375px;margin:auto;"></div>
         </div>
       `;
       document.body.appendChild(popup);
+
+      const holder = popup.querySelector('#zoom-holder');
+
+      // image/photo de prévisualisation
+      const photo = document.createElement('img');
+      photo.src = 'assets/preview.jpg';
+      photo.style.position = "absolute";
+      photo.style.inset = "0";
+      photo.style.width = "100%";
+      photo.style.height = "100%";
+      photo.style.objectFit = "cover";
+      photo.style.zIndex = "1";
+      holder.appendChild(photo);
+
+      const cadreEl = createCadreElement(id, { w: 300, h: 375 });
+      holder.appendChild(cadreEl);
     };
 
-    // Sélectionner un cadre
+    // Utiliser un cadre
     window.utiliserCadre = async function(id) {
       if (typeof window.setCadreSelectionne === "function") {
         await window.setCadreSelectionne(id);
-        alert(window.i18n ? window.i18n("toast.selected") : "✅ Cadre sélectionné !");
-        await afficherCadres();
+        alert(window.i18n ? window.i18n("toast.success.setframe") : "✅ Cadre sélectionné !");
       } else {
         alert(window.i18n ? window.i18n("toast.error.setframe") : "Erreur : setCadreSelectionne non chargé !");
       }
@@ -82,7 +91,7 @@
       const getCadreSelectionne = window.getCadreSelectionne;
 
       if (!getCadresPossedes || !getCadreSelectionne) {
-        container.innerHTML = `<p data-i18n="main.error.notloaded">Erreur : fonctions non chargées.</p>`;
+        container.innerHTML = `<p data-i18n="main.error.notloaded">Erreur : fonctions non chargées.</p>`;
         return;
       }
 
@@ -99,16 +108,40 @@
       cadresPossedes.forEach(cadre => {
         const div = document.createElement("div");
         div.className = "cadre-item";
-        const used = cadre === cadreActif;
-        div.innerHTML = `
-          <div class="cadre-preview" style="cursor:zoom-in" onclick="window.zoomCadre('${cadre}')">
-            <img class="photo-cadre" src="${window.getCadreUrl(cadre)}" />
-            <img class="photo-user" src="./assets/img/exemple.jpg" />
-          </div>
-          <button onclick="window.utiliserCadre('${cadre}')" ${used ? "disabled" : ""} data-i18n="${used ? "button.used" : "button.use"}">
-            ${used ? "Utilisé" : "Utiliser"}
+
+        const holder = document.createElement("div");
+        holder.className = "cadre-preview";
+        holder.style.position = "relative";
+        holder.style.width = "140px";
+        holder.style.height = "175px";
+
+        const photo = document.createElement("img");
+        photo.src = 'assets/preview.jpg';
+        photo.style.position = "absolute";
+        photo.style.inset = "0";
+        photo.style.width = "100%";
+        photo.style.height = "100%";
+        photo.style.objectFit = "cover";
+        photo.style.zIndex = "1";
+        holder.appendChild(photo);
+
+        const el = createCadreElement(cadre, { w: 140, h: 175 });
+        el.style.position = "absolute";
+        el.style.inset = "0";
+        el.style.zIndex = "2";
+        holder.appendChild(el);
+
+        const row = document.createElement("div");
+        row.className = "cadre-actions";
+        row.innerHTML = `
+          <button class="btn btn-secondary" onclick="zoomCadre('${cadre}')">Zoom</button>
+          <button class="btn btn-primary" ${cadre === cadreActif ? 'disabled' : ''} onclick="utiliserCadre('${cadre}')">
+            ${cadre === cadreActif ? 'Actif' : 'Utiliser'}
           </button>
         `;
+
+        div.appendChild(holder);
+        div.appendChild(row);
         container.appendChild(div);
       });
     }
