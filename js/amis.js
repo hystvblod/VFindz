@@ -1,9 +1,12 @@
+// amis.js — VERSION CORRIGÉE + i18n
+
 let userPseudo = null;
 let userProfile = null;
 let lastAmiRequest = 0;
 let amiASupprimer = null;
 
-function toast(msg, color = "#222") {
+function toast(msgKey, color = "#222") {
+  const msg = (window.i18n && window.i18n.t) ? window.i18n.t(msgKey) : msgKey;
   let t = document.createElement("div");
   t.className = "toast-msg";
   t.textContent = msg;
@@ -23,22 +26,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     const pseudoAmi = document.getElementById("pseudo-ami").value.trim();
     if (!pseudoAmi) return;
     const now = Date.now();
-    if (now - lastAmiRequest < 3000) return toast("Patiente un peu avant de refaire une demande.", "#b93f3f");
+    if (now - lastAmiRequest < 3000) return toast("amis.waitRequest", "#b93f3f");
     lastAmiRequest = now;
     btnAjouter.disabled = true;
-    btnAjouter.textContent = "Ajout en cours...";
+    btnAjouter.textContent = (window.i18n ? window.i18n.t("amis.adding") : "Ajout en cours...");
     try {
       await window.envoyerDemandeAmi(pseudoAmi);
     } finally {
       btnAjouter.disabled = false;
-      btnAjouter.textContent = "Ajouter un ami";
+      btnAjouter.textContent = (window.i18n ? window.i18n.t("button.add") : "Ajouter un ami");
     }
   });
 
   document.getElementById("btn-lien-invit")?.addEventListener("click", () => {
     const base = window.location.origin + window.location.pathname;
     document.getElementById("lien-invit-output").value = `${base}?add=${userPseudo}`;
-    toast("Lien copié, partage à tes amis !");
+    toast("amis.linkCopied");
     document.getElementById("lien-invit-output").select();
     document.execCommand('copy');
   });
@@ -58,10 +61,10 @@ async function afficherListesAmis(data) {
       <li class="amis-li">
         <span class="ami-avatar">${pseudo.slice(0,2).toUpperCase()}</span>
         <span class="ami-nom">${pseudo}</span>
-        <button class="btn-small btn-defi" onclick="window.defierAmi('${pseudo}')">Défier</button>
+        <button class="btn-small btn-defi" onclick="window.defierAmi('${pseudo}')">${window.i18n.t("button.challenge")}</button>
         <button class="btn-small btn-suppr" onclick="window.demanderSuppressionAmi('${pseudo}')">❌</button>
       </li>`).join("")
-    : "<li class='txt-empty'>Tu n'as pas encore d'amis.</li>";
+    : `<li class='txt-empty'>${window.i18n.t("amis.none")}</li>`;
 
   const ulRecues = document.getElementById("demandes-recue");
   ulRecues.innerHTML = data.demandesRecues?.length
@@ -69,10 +72,10 @@ async function afficherListesAmis(data) {
       <li class="amis-li">
         <span class="ami-avatar">${pseudo.slice(0,2).toUpperCase()}</span>
         <span class="ami-nom">${pseudo}</span>
-        <button class="btn-small btn-accept" onclick="window.accepterDemande('${pseudo}')">Accepter</button>
-        <button class="btn-small btn-refuse" onclick="window.refuserDemande('${pseudo}')">Refuser</button>
+        <button class="btn-small btn-accept" onclick="window.accepterDemande('${pseudo}')">${window.i18n.t("button.accept")}</button>
+        <button class="btn-small btn-refuse" onclick="window.refuserDemande('${pseudo}')">${window.i18n.t("button.refuse")}</button>
       </li>`).join("")
-    : "<li class='txt-empty'>Aucune demande reçue.</li>";
+    : `<li class='txt-empty'>${window.i18n.t("amis.noRequests")}</li>`;
 
   const ulEnvoyees = document.getElementById("demandes-envoyees");
   ulEnvoyees.innerHTML = data.demandesEnvoyees?.length
@@ -81,33 +84,35 @@ async function afficherListesAmis(data) {
         <span class="ami-avatar">${pseudo.slice(0,2).toUpperCase()}</span>
         <span class="ami-nom">${pseudo}</span>
       </li>`).join("")
-    : "<li class='txt-empty'>Aucune demande envoyée.</li>";
+    : `<li class='txt-empty'>${window.i18n.t("amis.noSent")}</li>`;
 }
 
 // Demande d'ajout d'ami
 window.envoyerDemandeAmi = async function(pseudoAmi) {
   if (!userPseudo || !pseudoAmi || pseudoAmi === userPseudo)
-    return toast("Tu ne peux pas t'ajouter toi-même !", "#b93f3f");
+    return toast("amis.cannotAddSelf", "#b93f3f");
+
   const { data: ami, error } = await window.supabase
     .from("users")
     .select("id, demandesRecues, amis, demandesEnvoyees")
     .ilike("pseudo", pseudoAmi)
     .maybeSingle();
-  if (error || !ami) return toast("Aucun utilisateur trouvé.", "#b93f3f");
+
+  if (error || !ami) return toast("amis.notFound", "#b93f3f");
 
   userProfile = await window.getUserDataCloud();
 
-  if (userProfile.amis?.includes(pseudoAmi)) return toast("Vous êtes déjà amis !");
-  if (userProfile.demandesEnvoyees?.includes(pseudoAmi)) return toast("Demande déjà envoyée.");
-  if (userProfile.demandesRecues?.includes(pseudoAmi)) return toast("Cette personne t'a déjà envoyé une demande !");
+  if (userProfile.amis?.includes(pseudoAmi)) return toast("amis.alreadyFriends");
+  if (userProfile.demandesEnvoyees?.includes(pseudoAmi)) return toast("amis.alreadySent");
+  if (userProfile.demandesRecues?.includes(pseudoAmi)) return toast("amis.alreadyReceived");
 
   const newEnv = [...(userProfile.demandesEnvoyees || []), pseudoAmi];
   const newRec = [...(ami.demandesRecues || []), userPseudo];
 
-  await window.supabase.from("users").update({ demandesEnvoyees: newEnv }).ilike("pseudo", userPseudo);
+  await window.supabase.from("users").update({ demandesEnvoyees: newEnv }).eq("id", window.getUserId());
   await window.supabase.from("users").update({ demandesRecues: newRec }).eq("id", ami.id);
 
-  toast("Demande envoyée à " + pseudoAmi + " !");
+  toast("amis.sent");
   await rechargerAffichage();
 };
 
@@ -128,7 +133,7 @@ window.accepterDemande = async function(pseudoAmi) {
   await window.supabase.from("users").update({
     amis: newAmis,
     demandesRecues: newDemandes
-  }).ilike("pseudo", userPseudo);
+  }).eq("id", window.getUserId());
 
   await window.supabase.from("users").update({
     amis: [...(ami.amis || []), userPseudo],
@@ -136,7 +141,7 @@ window.accepterDemande = async function(pseudoAmi) {
   }).eq("id", ami.id);
 
   if (window.incrementFriendsInvited) await window.incrementFriendsInvited();
-  toast("Vous êtes maintenant amis !");
+  toast("amis.nowFriends");
   await rechargerAffichage();
 };
 
@@ -152,17 +157,17 @@ window.refuserDemande = async function(pseudoAmi) {
 
   await window.supabase.from("users").update({
     demandesRecues: (userProfile.demandesRecues || []).filter(p => p !== pseudoAmi)
-  }).ilike("pseudo", userPseudo);
+  }).eq("id", window.getUserId());
 
   await window.supabase.from("users").update({
     demandesEnvoyees: (ami.demandesEnvoyees || []).filter(p => p !== userPseudo)
   }).eq("id", ami.id);
 
-  toast("Demande refusée.");
+  toast("amis.refused");
   await rechargerAffichage();
 };
 
-// Suppression d'ami : popup
+// Suppression d'ami
 window.demanderSuppressionAmi = function(pseudoAmi) {
   amiASupprimer = pseudoAmi;
   document.getElementById('popup-suppr-ami-nom').textContent = pseudoAmi;
@@ -179,14 +184,16 @@ window.confirmerSuppressionAmi = async function() {
     .maybeSingle();
   if (!ami) return;
   userProfile = await window.getUserDataCloud();
+
   await window.supabase.from("users").update({
     amis: (userProfile.amis || []).filter(p => p !== pseudoAmi)
-  }).ilike("pseudo", userPseudo);
+  }).eq("id", window.getUserId());
+
   await window.supabase.from("users").update({
     amis: (ami.amis || []).filter(p => p !== userPseudo)
   }).eq("id", ami.id);
 
-  toast("Ami supprimé.");
+  toast("amis.removed");
   document.getElementById('popup-suppr-ami').classList.add('hidden');
   await rechargerAffichage();
 };
@@ -204,7 +211,7 @@ function detecterInvitationParLien() {
   const toAdd = params.get("add");
   if (toAdd) {
     document.getElementById("pseudo-ami").value = toAdd;
-    if (confirm(`Ajouter ${toAdd} comme ami ?`)) {
+    if (confirm(window.i18n.t("amis.confirmAdd", { pseudo: toAdd }))) {
       window.envoyerDemandeAmi(toAdd);
       window.history.replaceState({}, document.title, window.location.pathname);
     }

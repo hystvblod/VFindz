@@ -354,9 +354,32 @@
 "concours.fin_dans_jours": "Fin dans {jours}j {heures}h {minutes}m {secondes}s",
 "concours.fin_dans_sans_jours": "Fin dans {heures}h {minutes}m {secondes}s",
 "concours.votes_restants": "Votes restants : {current} / {max}",
-"concours.resultats": "({n} résultat{n, plural, one {} other {s}})"
+"concours.resultats": "({n} résultat{n, plural, one {} other {s}})",
 
+
+  "amis.waitRequest": "Patiente un peu avant de refaire une demande.",
+  "amis.adding": "Ajout en cours...",
+  "amis.linkCopied": "Lien copié, partage à tes amis !",
+  "amis.none": "Tu n'as pas encore d'amis.",
+  "amis.noRequests": "Aucune demande reçue.",
+  "amis.noSent": "Aucune demande envoyée.",
+  "amis.cannotAddSelf": "Tu ne peux pas t'ajouter toi-même !",
+  "amis.notFound": "Aucun utilisateur trouvé.",
+  "amis.alreadyFriends": "Vous êtes déjà amis !",
+  "amis.alreadySent": "Demande déjà envoyée.",
+  "amis.alreadyReceived": "Cette personne t'a déjà envoyé une demande !",
+  "amis.sent": "Demande envoyée !",
+  "amis.nowFriends": "Vous êtes maintenant amis !",
+  "amis.refused": "Demande refusée.",
+  "amis.removed": "Ami supprimé.",
+  "amis.confirmAdd": "Ajouter {{pseudo}} comme ami ?",
+  "button.challenge": "Défier",
+  "button.accept": "Accepter",
+  "button.refuse": "Refuser",
+  "button.add": "Ajouter un ami"
 }
+
+
 
 
 
