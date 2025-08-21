@@ -159,20 +159,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (typeof window.afficherSolde === "function") {
     try { await window.afficherSolde(); } catch(e){ console.warn("[SOLDE] afficherSolde a échoué:", e); }
   }
-  await loadProfil();
-  const premium = await isPremiumUser();
-  if (!premium) {
-    console.warn("[PREMIUM] Utilisateur non premium → on masque l’UI.");
-    const a = document.getElementById("premium-alert");
-    a.style.display = "block";
-    a.setAttribute('data-i18n', 'alert.premium_only');
-    document.getElementById("liste-amis").innerHTML = "";
-    document.getElementById("demandes-recue").innerHTML = "";
-    document.getElementById("demandes-envoyees").innerHTML = "";
-    return;
-  }
+await loadProfil();
+const premium = await isPremiumUser();
+
+if (!premium) {
+  console.warn("[PREMIUM] Utilisateur non premium → il peut voir/recevoir mais pas inviter.");
+  const a = document.getElementById("premium-alert");
+  a.style.display = "block";
+  a.setAttribute('data-i18n', 'alert.premium_only');
+  document.getElementById("liste-amis").innerHTML =
+    "<div class='aucune-demande' data-i18n='alert.premium_only'>Invitation réservée aux premium.</div>";
+  // MAIS on lui laisse ses demandes visibles
+  afficherDemandesDuel();
+} else {
   afficherAmis();
   afficherDemandesDuel();
+}
+
 });
 
 /* =========================
