@@ -305,6 +305,9 @@ async function afficherPhotosSauvegardees(photosMap) {
       photo.onclick = () => window.agrandirPhoto(dataUrl, id);
 
       preview.appendChild(fond);
+      if (fond instanceof HTMLCanvasElement && window.previewCadre) {
+  window.previewCadre(fond.getContext('2d'), cadreActuel);
+}
       preview.appendChild(photo);
       container.appendChild(preview);
       defiEl.classList.add("done");
