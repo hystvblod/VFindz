@@ -1,14 +1,3 @@
-/* ================================
-   userData.js — VFind (COMPLET)
-   ================================
-
-   NOTE: formatCadreId() a été modifié pour NE PAS écraser
-   les IDs nommés (ex: "neon", "aurora", "glowgrid"). On ne
-   génère "polaroid_XX" que si l'ID contient un numéro.
-
-   Tout le reste est ton code d'origine.
-*/
-
 const SUPABASE_URL = 'https://swmdepiukfginzhbeccz.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI';
 
@@ -197,19 +186,11 @@ async function getJetonsCloud() {
 }
 
 // --- CADRES ---
-// ⬇️ MODIFIÉ : conserve les IDs "nommés" (neon, aurora, etc.)
 function formatCadreId(id) {
-  if (!id) return "polaroid_01";
-  const raw = String(id).trim();
-  const key = raw.toLowerCase().replace(/^cadre[_-]/, "");
-  // Si l'ID ne contient PAS de chiffre -> on garde tel quel (compatible "draw")
-  if (!/\d/.test(raw)) return key;
-  // Sinon, on formatte en polaroid_XX comme avant
-  const num = raw.replace(/[^\d]/g, "");
-  const padded = num.padStart(2, "0") || "01";
+  const num = id.replace(/[^\d]/g, "");
+  const padded = num.padStart(2, "0");
   return "polaroid_" + padded;
 }
-
 async function getCadresPossedes(force = false) {
   if (!force) {
     const cached = getCachedOwnedFrames();
@@ -244,7 +225,7 @@ async function setCadreSelectionne(id) {
 // HISTORIQUE PHOTOS
 async function sauvegarderPhoto(base64, defi, type = "solo") {
   await loadUserData();
-  const historique = [...(userDataCache.historique || []), { base64, defi, date: new Date().toISOString(), type, defis: [defi] } ];
+  const historique = [...(userDataCache.historique || []), { base64, defi, date: new Date().toISOString(), type, defis: [defi] }];
   userDataCache.historique = historique;
   await supabase.from('users').update({ historique }).eq('id', userIdCache);
 }
@@ -588,7 +569,6 @@ async function getUserByPseudo(pseudo) {
   }
   return data || null;
 }
-
 // Ajout local d'une photo aimée complète (cadre inclus, limité à 30)
 window.ajouterPhotoAimeeComplete = function(defiId, imageDataUrl, cadreId) {
   let aimes = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]");
@@ -599,7 +579,6 @@ window.ajouterPhotoAimeeComplete = function(defiId, imageDataUrl, cadreId) {
   aimes.push({ defiId, imageDataUrl, cadreId, date: Date.now() });
   localStorage.setItem("photos_aimees_obj", JSON.stringify(aimes));
 };
-
 // Ajoute ça en bas du fichier, AVANT la globalisation window
 async function setLangIfNeeded() {
   await ensureAuth();
