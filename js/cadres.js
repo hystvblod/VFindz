@@ -24,6 +24,7 @@ window.getCadreUrl = getCadreUrl;
 
 // ---------------------------------------------------------------------------
 // 3) Création de l'élément d’aperçu cadre : <canvas> si draw, <img> sinon
+
 function createCadreElement(id, taille = { w: 80, h: 100 }) {
   if (DRAW_IDS.includes(id)) {
     const c = document.createElement("canvas");
@@ -31,11 +32,16 @@ function createCadreElement(id, taille = { w: 80, h: 100 }) {
     c.height = taille.h;
     c.className = "photo-cadre";
 
+    // ⬇️ styles inline indispensables car ton CSS cible <img.photo-cadre>
+    c.style.position = "absolute";
+    c.style.inset = "0";
+    c.style.width = "100%";
+    c.style.height = "100%";
+    c.style.zIndex = "2";          // le cadre (canvas) AU-DESSUS de la photo
+    c.style.pointerEvents = "none";
+
     const ctx = c.getContext("2d");
-    // Appelle la fonction de dessin (ajoutée plus bas dans ce fichier)
-    if (window.previewCadre) {
-      window.previewCadre(ctx, id);
-    }
+    if (window.previewCadre) window.previewCadre(ctx, id);
     return c;
   } else {
     const img = document.createElement("img");
@@ -44,9 +50,11 @@ function createCadreElement(id, taille = { w: 80, h: 100 }) {
     img.style.width = "100%";
     img.style.height = "100%";
     img.style.objectFit = "contain";
+    // (si ton CSS global met déjà position/z-index sur img.photo-cadre, ne rien changer)
     return img;
   }
 }
+
 window.createCadreElement = createCadreElement;
 
 // ---------------------------------------------------------------------------
