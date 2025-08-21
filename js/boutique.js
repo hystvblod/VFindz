@@ -1,5 +1,5 @@
 // === Dépendances : userData.js doit être chargé AVANT ce fichier ===
-
+//
 // Fonctions i18n requises AVANT ce script
 // Exemple minimal à avoir globalement :
 // const translations = { fr: {...}, en: {...}, ... };
@@ -109,24 +109,33 @@ async function acheterCadreBoutique(id, prix) {
     alert(t("boutique.feedback.error", "❌ Pas assez de pièces ou erreur !"));
     return;
   }
+
   await window.acheterCadre(id);
-  const url = `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${id}.webp`;
-  try {
-    const res = await fetch(url, { cache: "reload" });
-    const blob = await res.blob();
-    await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        localStorage.setItem(`cadre_${id}`, reader.result);
-        resolve();
-      };
-      reader.readAsDataURL(blob);
-    });
-  } catch (e) {
-    alert(t("boutique.feedback.base64error", "Erreur lors de l'enregistrement du cadre. Vérifie ta connexion."));
-    return;
+
+  // ✅ NOUVEAU : si cadre "draw" (canvas), NE PAS télécharger d'image .webp
+  if (Array.isArray(window.DRAW_IDS) && window.DRAW_IDS.includes(id)) {
+    localStorage.setItem('lastCadresUpdate', Date.now().toString());
+  } else {
+    // comportement image (inchangé)
+    const url = `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${id}.webp`;
+    try {
+      const res = await fetch(url, { cache: "reload" });
+      const blob = await res.blob();
+      await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          localStorage.setItem(`cadre_${id}`, reader.result);
+          resolve();
+        };
+        reader.readAsDataURL(blob);
+      });
+      localStorage.setItem('lastCadresUpdate', Date.now().toString());
+    } catch (e) {
+      alert(t("boutique.feedback.base64error", "Erreur lors de l'enregistrement du cadre. Vérifie ta connexion."));
+      return;
+    }
   }
-  localStorage.setItem('lastCadresUpdate', Date.now().toString());
+
   await window.getOwnedFrames(true);
   await updatePointsDisplay();
   await updateJetonsDisplay();
@@ -245,20 +254,26 @@ document.addEventListener("click", function (e) {
 const CATEGORIES = [
   { key: 'classique', nom: 'Classique' },
   { key: 'prestige', nom: 'Prestige' },
-  { key: 'premium', nom: 'Premium' },
-  { key: 'bloque', nom: 'Défi / Spéciaux 🔒' }
+  { key: 'premium',  nom: 'Premium'  },
+  { key: 'bloque',   nom: 'Défi / Spéciaux 🔒' }
 ];
 
+// ✅ Tous les cadres "draw" (canvas) sont rangés en "premium"
 function getCategorie(id) {
+  if (Array.isArray(window.DRAW_IDS) && window.DRAW_IDS.includes(id)) {
+    return 'premium';
+  }
   const num = parseInt(id.replace('polaroid_', ''));
-  if (num >= 1 && num <= 10) return 'classique';
-  if (num >= 11 && num <= 100) return 'prestige';
-  if (num >= 101 && num <= 200) return 'premium';
-  if (num >= 900 && num <= 1000) return 'bloque';
+  if (!Number.isNaN(num)) {
+    if (num >= 1 && num <= 10)   return 'classique';
+    if (num >= 11 && num <= 100) return 'prestige';
+    if (num >= 101 && num <= 200) return 'premium';
+    if (num >= 900 && num <= 1000) return 'bloque';
+  }
   return 'autre';
 }
 
-// ---- PATCH MINIATURES DEFI (fixes 100% le centrage et l'affichage)
+// ---- PATCH MINIATURES DEFI (100% compatible draw)
 async function afficherPhotosSauvegardees(photosMap) {
   const cadreActuel = await window.getCadreSelectionne();
   document.querySelectorAll(".defi-item").forEach(defiEl => {
@@ -274,9 +289,15 @@ async function afficherPhotosSauvegardees(photosMap) {
       const preview = document.createElement("div");
       preview.className = "cadre-preview";
 
-      const fond = document.createElement("img");
-      fond.className = "photo-cadre";
-      fond.src = window.getCadreUrl(cadreActuel);
+      // ✅ cadre universel (canvas si draw, image sinon)
+      const fond = (typeof window.createCadreElement === "function")
+        ? window.createCadreElement(cadreActuel, { w: 90, h: 110 })
+        : (function(){
+            const img = document.createElement("img");
+            img.className = "photo-cadre";
+            img.src = window.getCadreUrl ? window.getCadreUrl(cadreActuel) : "";
+            return img;
+          })();
 
       const photo = document.createElement("img");
       photo.className = "photo-user";
@@ -370,32 +391,54 @@ async function renderBoutique(categoryKey) {
       wrapper.style.position = "relative";
       wrapper.style.margin = "0 auto 10px";
 
-      const cadreEl = document.createElement("img");
-      cadreEl.src = window.getCadreUrl(cadre.id);
-
-      cadreEl.className = "photo-cadre";
-      cadreEl.style.width = "100%";
-      cadreEl.style.height = "100%";
+      // ✅ APERÇU UNIVERSAL : canvas si draw, image sinon
+      const cadreEl = (typeof window.createCadreElement === "function")
+        ? window.createCadreElement(cadre.id, { w: 80, h: 100 })
+        : (function(){
+            const img = document.createElement("img");
+            img.className = "photo-cadre";
+            img.src = window.getCadreUrl ? window.getCadreUrl(cadre.id) : "";
+            img.style.width = "100%";
+            img.style.height = "100%";
+            return img;
+          })();
 
       const photo = document.createElement("img");
       photo.src = "assets/img/exemple.jpg";
       photo.className = "photo-user";
 
+      wrapper.innerHTML = "";
       wrapper.appendChild(cadreEl);
       wrapper.appendChild(photo);
 
+      // ✅ POPUP de zoom avec aperçu universal
       wrapper.addEventListener("click", () => {
         const popup = document.createElement("div");
         popup.className = "popup show";
         popup.innerHTML = `
           <div class="popup-inner">
             <button id="close-popup" onclick="document.body.removeChild(this.parentNode.parentNode)">✖</button>
-            <div class="cadre-preview cadre-popup">
-              <img class="photo-cadre" src="https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadre.id}.webp" />
-              <img class="photo-user" src="assets/img/exemple.jpg" />
-            </div>
+            <div class="cadre-preview cadre-popup" style="position:relative;"></div>
           </div>
         `;
+        const holder = popup.querySelector(".cadre-preview");
+
+        const bigCadre = (typeof window.createCadreElement === "function")
+          ? window.createCadreElement(cadre.id, { w: 300, h: 375 })
+          : (function(){
+              const img = document.createElement("img");
+              img.className = "photo-cadre";
+              img.src = window.getCadreUrl ? window.getCadreUrl(cadre.id) : `https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/cadres/${cadre.id}.webp`;
+              return img;
+            })();
+
+        holder.appendChild(bigCadre);
+
+        const bigPhoto = document.createElement("img");
+        bigPhoto.className = "photo-user";
+        bigPhoto.src = "assets/img/exemple.jpg";
+        holder.appendChild(bigPhoto);
+
         document.body.appendChild(popup);
       });
 

@@ -2,6 +2,24 @@
 // !! userData.js, camera.js, pub.js DOIVENT être chargés AVANT CE FICHIER !!
 // Toutes les fonctions requises de userData.js DOIVENT être exposées sur window !
 
+/* ===== Helpers langues & defis (same as duel.js) ===== */
+function _normLang(code) {
+  const raw = (code || '').toLowerCase().replace('_','-');
+  if (raw.startsWith('pt-br')) return 'ptbr';
+  const m = { fr:'fr', en:'en', es:'es', de:'de', it:'it', nl:'nl', pt:'pt', ar:'ar', ja:'ja', ko:'ko', id:'idn' };
+  return m[(raw || 'fr').slice(0,2)] || 'fr';
+}
+function getLangParam() {
+  const raw = (window.getCurrentLang ? window.getCurrentLang() : null)
+           || localStorage.getItem('langue')
+           || (navigator.language || 'fr');
+  return _normLang(raw);
+}
+// cache par langue
+const DEFIS_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
+const DEFIS_CACHE_KEY = (lang) => `vfind_defis_cache_${lang}`;
+const DEFIS_CACHE_DATE_KEY = (lang) => `vfind_defis_cache_date_${lang}`;
+
 // ----------- UTILS -----------
 function getCadreUrl(id) {
   const local = localStorage.getItem(`cadre_${id}`);
@@ -38,27 +56,51 @@ let allDefis = [];
 let canRetakePhoto = false;
 let retakeDefiId = null;
 
-const DEFIS_CACHE_KEY = "vfind_defis_cache";
-const DEFIS_CACHE_DATE_KEY = "vfind_defis_cache_date";
-const DEFIS_CACHE_TTL = 24 * 60 * 60 * 1000; // 24h
 const SOLO_DEFIS_KEY = "solo_defiActifs";
 const SOLO_TIMER_KEY = "solo_defiTimer";
 
 // --------- CHARGEMENT DES DEFIS ---------
-async function chargerDefis(lang = "fr") {
-  const lastFetch = parseInt(localStorage.getItem(DEFIS_CACHE_DATE_KEY) || "0");
+async function chargerDefis(lang = null) {
+  const L = _normLang(lang || getLangParam());
+  const lastFetch = parseInt(localStorage.getItem(DEFIS_CACHE_DATE_KEY(L)) || "0");
   if (Date.now() - lastFetch < DEFIS_CACHE_TTL) {
-    const defisCache = localStorage.getItem(DEFIS_CACHE_KEY);
+    const defisCache = localStorage.getItem(DEFIS_CACHE_KEY(L));
     if (defisCache) {
       allDefis = JSON.parse(defisCache);
-      console.log("[SOLO] Defis chargés depuis cache local", allDefis.length);
+      console.log("[SOLO] Defis chargés depuis cache local", L, allDefis.length);
       return allDefis;
     }
   }
-  allDefis = await window.getDefisFromSupabase(lang);
-  localStorage.setItem(DEFIS_CACHE_KEY, JSON.stringify(allDefis));
-  localStorage.setItem(DEFIS_CACHE_DATE_KEY, Date.now().toString());
-  console.log("[SOLO] Defis téléchargés depuis Supabase", allDefis.length);
+
+  // priorité BDD
+  let arr = [];
+  try {
+    if (typeof window.getDefisFromSupabase === "function") {
+      const defs = await window.getDefisFromSupabase(L); // [{id, texte}]
+      arr = defs || [];
+    }
+  } catch (e) { console.warn("[SOLO] getDefisFromSupabase KO:", e?.message || e); }
+
+  // fallback local
+  if (!arr || !arr.length) {
+    try {
+      const rep = await fetch('data/defis.json');
+      const json = await rep.json();
+      const base = json.defis || json;
+      arr = (base || []).map((d, i) => ({
+        id: d.id ?? i,
+        texte: d[L] ?? d['fr'] ?? Object.values(d)[0]
+      })).filter(x => !!x.texte);
+      console.log("[SOLO] Defis téléchargés depuis defis.json", L, arr.length);
+    } catch (e) {
+      console.error("[SOLO] fallback local defis.json KO:", e);
+      arr = [];
+    }
+  }
+
+  allDefis = arr;
+  localStorage.setItem(DEFIS_CACHE_KEY(L), JSON.stringify(allDefis));
+  localStorage.setItem(DEFIS_CACHE_DATE_KEY(L), Date.now().toString());
   return allDefis;
 }
 
@@ -92,7 +134,6 @@ function nettoyerPhotosDefis() {
 
 // ----------- STOCKAGE PHOTO AIMEE -------------
 function aimerPhoto(defiId) {
-  // Récupère le snapshot encadré déjà enregistré pour ce défi
   let obj = {};
   try { obj = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`) || "{}"); } catch {}
   if (!obj.photo) return alert("Photo introuvable pour ce défi.");
@@ -100,7 +141,6 @@ function aimerPhoto(defiId) {
   let photosAimees = [];
   try { photosAimees = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]"); } catch {}
 
-  // Ne pas ajouter deux fois le même defiId
   if (photosAimees.some(x => x.defiId === defiId)) return;
 
   photosAimees.push({
@@ -112,7 +152,6 @@ function aimerPhoto(defiId) {
   localStorage.setItem("photos_aimees_obj", JSON.stringify(photosAimees));
   console.log("[SOLO] Photo aimée sauvegardée offline (img + cadre) :", defiId);
 }
-
 function retirerPhotoAimee(defiId) {
   let photosAimees = [];
   try { photosAimees = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]"); } catch {}
@@ -130,7 +169,7 @@ function majSolde() {
   const jts = document.getElementById("jetons");
   if (pts) pts.textContent = userData?.points || 0;
   if (jts) jts.textContent = userData?.jetons || 0;
-  console.log("[SOLO] MAJ solde :", userData?.points, userData?.jetons);
+  console.log("[SOLO] MAJ solde :", userData?.points, userData?.jetons);
 }
 
 // ----------- LOGIQUE JEU -------------
@@ -171,7 +210,7 @@ function nettoyerPhotosDefisPartie() {
 
 async function startGame() {
   await chargerUserData(true);
-  await chargerDefis();
+  await chargerDefis(getLangParam());
   nettoyerPhotosDefisPartie();
   const newDefis = getRandomDefis(3);
   const endTime = Date.now() + 24 * 60 * 60 * 1000;
@@ -257,9 +296,7 @@ async function loadDefis() {
     li.setAttribute("data-defi-id", defi.id);
 
     let photoData = null;
-    try {
-      photoData = JSON.parse(localStorage.getItem(`photo_defi_${defi.id}`));
-    } catch (e) {}
+    try { photoData = JSON.parse(localStorage.getItem(`photo_defi_${defi.id}`)); } catch (e) {}
     photosMap[defi.id] = photoData || null;
 
     const boutonPhoto = `
@@ -297,14 +334,10 @@ async function loadDefis() {
       }
     }
   }, 15);
-  console.log("[SOLO] loadDefis affiché:", defis.map(d => ({
-    id: d.id,
-    done: d.done,
-    hasPhoto: !!photosMap[d.id]
-  })));
+  console.log("[SOLO] loadDefis affiché:", defis.map(d => ({ id: d.id, done: d.done, hasPhoto: !!photosMap[d.id] })));
 }
 
-// ----------- FONCTION CLE SOLO : VALIDATION AVEC JETON -----------
+// ----------- FONCTION CLE SOLO : VALIDATION AVEC JETON -----------
 async function validerDefiAvecJeton(index) {
   let defis = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
   let defi = defis[index];
@@ -362,7 +395,7 @@ window.afficherPhotoDansCadreSolo = async function(defiId, dataUrl) {
   let defis = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
   let index = defis.findIndex(d => d.id == defiId);
   if (index === -1) {
-    alert("Impossible d’associer la photo à ce défi (id : " + defiId + "). Partie corrompue ou reset. Lance une nouvelle partie !");
+    alert("Impossible d’associer la photo à ce défi (id : " + defiId + "). Partie corrompue ou reset. Lance une nouvelle partie !");
     console.warn(`[SOLO] ERREUR: defis.indexOf(${defiId}) == -1`);
     return;
   }
@@ -374,14 +407,10 @@ window.afficherPhotoDansCadreSolo = async function(defiId, dataUrl) {
   const cadreId = oldData.cadre || cadreGlobal || "polaroid_01";
   console.log(`[SOLO] Cadre utilisé pour defi ${defiId}:`, cadreId);
 
-  // ✅ On normalise la photo AVANT stockage/affichage
   try {
     const photoNormalisee = await window.genererImageConcoursAvecCadre(dataUrl);
     console.log(`[SOLO] Photo normalisée OK (taille base64: ${photoNormalisee?.length || 0})`);
-    const data = {
-      photo: photoNormalisee,
-      cadre: cadreId
-    };
+    const data = { photo: photoNormalisee, cadre: cadreId };
     localStorage.setItem(`photo_defi_${defiId}`, JSON.stringify(data));
     localStorage.setItem(`photo_defi_${defiId}_date`, Date.now().toString());
     console.log(`[SOLO] Photo enregistrée dans localStorage pour defi ${defiId}`, data);
@@ -407,8 +436,6 @@ window.afficherPhotoDansCadreSolo = async function(defiId, dataUrl) {
   }
 
   await loadDefis();
-
-  // ✅ Recharge la page UNIQUEMENT après tout le stockage
   window.location.reload();
 };
 
@@ -417,9 +444,7 @@ window.renderPhotoCadreSolo = async function(defiId) {
   const container = document.getElementById(`photo-defi-container-${defiId}`);
   if (!container) return;
   let photoData = {};
-  try {
-    photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`));
-  } catch (e) {}
+  try { photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`)); } catch (e) {}
   const cadreId = photoData?.cadre || (await window.getCadreSelectionne()) || "polaroid_01";
   const photoUrl = photoData?.photo || "";
   console.log(`[SOLO] renderPhotoCadreSolo: defiId=${defiId}, cadreId=${cadreId}, photo? ${!!photoUrl}`);
@@ -456,9 +481,7 @@ window.ouvrirPopupChoixCadreSolo = async function(defiId) {
     console.log("[SOLO] ouvrirPopupChoixCadreSolo: cadres dispos:", cadres);
   } catch { cadres = ["polaroid_01"]; }
   let photoData = {};
-  try {
-    photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`));
-  } catch (e) {}
+  try { photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`)); } catch (e) {}
   const actuel = photoData?.cadre || (await window.getCadreSelectionne()) || "polaroid_01";
   const list = document.getElementById("list-cadres-popup-solo");
   if (!list) return;
@@ -486,7 +509,6 @@ window.ouvrirPopupChoixCadreSolo = async function(defiId) {
   const popup = document.getElementById("popup-cadre-solo");
   if (popup) popup.classList.remove("hidden");
 };
-
 window.fermerPopupCadreSolo = function() {
   const popup = document.getElementById("popup-cadre-solo");
   if (popup) popup.classList.add("hidden");
@@ -499,9 +521,7 @@ window.agrandirPhoto = async function(dataUrl, defiId) {
   if (!cadre || !photo) return;
 
   let photoData = null;
-  try {
-    photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`));
-  } catch (e) {}
+  try { photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`)); } catch (e) {}
 
   const cadreActuel = photoData?.cadre || (await window.getCadreSelectionne());
   cadre.src = getCadreUrl(cadreActuel);
@@ -532,11 +552,8 @@ window.agrandirPhoto = async function(dataUrl, defiId) {
     };
 
     let photosAimees = JSON.parse(localStorage.getItem("photos_aimees") || "[]");
-    if (photosAimees.includes(defiId)) {
-      btnAimer.classList.add("active");
-    } else {
-      btnAimer.classList.remove("active");
-    }
+    if (photosAimees.includes(defiId)) btnAimer.classList.add("active");
+    else btnAimer.classList.remove("active");
   }
 };
 
@@ -567,7 +584,7 @@ window.ouvrirPopupJeton = async function(index) {
       }
       await validerDefiAvecJeton(index);
       majSolde?.();
-      window.location.reload();  // ✅ Recharge après validé
+      window.location.reload();
     }
   } else {
     if (confirm("Plus de jeton disponible. Regarder une pub pour gagner 3 jetons ?")) {
@@ -645,7 +662,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   });
 
-  // ----------- BONUS : BOUTONS POPUP REPRISE SOLO -----------
+  // ----------- BONUS : BOUTONS POPUP REPRISE SOLO -----------
   const btnPubRepriseSolo = document.getElementById("btnReprisePubSolo");
   const btnAnnulerRepriseSolo = document.getElementById("btnAnnulerRepriseSolo");
   const btnPremiumSolo = document.getElementById("btnReprisePremiumSolo");
@@ -670,7 +687,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ----------- SIMULATION PUB (à remplacer par ta régie) -----------
 window.showRewardedAd = async function() {
   return new Promise((resolve) => {
-    alert("SIMULATION PUB : regarde ta vidéo ici…");
+    alert("SIMULATION PUB : regarde ta vidéo ici…");
     setTimeout(() => { resolve(); }, 3200);
   });
 };
@@ -689,9 +706,7 @@ window.afficherPhotosAimees = async function() {
 
   for (let defiId of photosAimees) {
     let photoData = null;
-    try {
-      photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`));
-    } catch (e) {}
+    try { photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`)); } catch (e) {}
 
     if (photoData && photoData.photo) {
       let cadre = photoData.cadre || "polaroid_01";
@@ -708,23 +723,11 @@ window.afficherPhotosAimees = async function() {
     }
   }
 };
-window.refreshDefisLangueSolo = async function() {
-  const lang = window.getCurrentLang ? window.getCurrentLang() : (localStorage.getItem("langue") || "fr");
-  allDefis = await window.getDefisFromSupabase(lang);
-  localStorage.setItem("vfind_defis_cache", JSON.stringify(allDefis));
-  localStorage.setItem("vfind_defis_cache_date", Date.now().toString());
 
-// Recharge la partie en cours (si partie en cours)
-let defis = JSON.parse(localStorage.getItem("solo_defiActifs") || "[]");
-if (defis && defis.length > 0) {
-  // Mets à jour le texte des défis affichés
-  for (let i = 0; i < defis.length; i++) {
-    const defiId = defis[i].id;
-    // Récupère la version dans la nouvelle langue (champ .texte préparé par getDefisFromSupabase)
-    let defiLang = allDefis.find(d => d.id === defiId);
-    defis[i].texte = defiLang?.texte || defis[i].texte;
-  }
-  localStorage.setItem("solo_defiActifs", JSON.stringify(defis));
-  await loadDefis();
-}
+// ----------- Changement de langue (solo) -----------
+// Variante "ne change PAS les défis en cours" (seulement le cache pour les prochaines parties)
+window.refreshDefisLangueSolo = async function() {
+  const L = getLangParam();
+  await chargerDefis(L);  // met à jour le cache
+  // si tu veux aussi rafraîchir l’UI globale de l’app : window.setLang?.(L);
 };

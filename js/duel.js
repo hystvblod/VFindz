@@ -164,11 +164,13 @@ const roomId = params.get("room");
 const path = window.location.pathname;
 
 // ==================== PATCH ANTI-MULTI =====================
+// 🔧 filtre sur type 'random' pour ne pas interférer avec amis/premium
 window.checkAlreadyInDuel = async function() {
   const userId = window.getUserId();
   const { data: duelsEnCours, error } = await window.supabase
     .from('duels')
-    .select('id, status, player1_id, player2_id')
+    .select('id, status, player1_id, player2_id, type')
+    .eq('type', 'random')
     .in('status', ['waiting', 'playing'])
     .or(`player1_id.eq.${userId},player2_id.eq.${userId}`);
 
@@ -188,9 +190,7 @@ window.checkAlreadyInDuel = async function() {
     }, 200);
     return true;
   }
-  room = duelsEnCours.find(d =>
-    d.player1_id === userId && d.status === "waiting"
-  );
+  room = duelsEnCours.find(d => d.player1_id === userId && d.status === "waiting");
   if (room) {
     localStorage.setItem("duel_random_room", room.id);
     localStorage.setItem("duel_is_player1", "1");
@@ -199,9 +199,7 @@ window.checkAlreadyInDuel = async function() {
     }, 200);
     return true;
   }
-  room = duelsEnCours.find(d =>
-    d.player2_id === userId && d.status === "waiting"
-  );
+  room = duelsEnCours.find(d => d.player2_id === userId && d.status === "waiting");
   if (room) {
     localStorage.setItem("duel_random_room", room.id);
     localStorage.setItem("duel_is_player1", "0");
@@ -214,22 +212,156 @@ window.checkAlreadyInDuel = async function() {
 };
 // ================= FIN PATCH ANTI-MULTI ===================
 
+/* ==================== DEFIS (multilingue) ==================== */
 window._allDefis = null;
-window._langDefi = (navigator.language || 'fr').slice(0,2);
 
+// Charge le pool local (data/defis.json)
 window.chargerDefisLocal = async function() {
   if (window._allDefis) return window._allDefis;
   const rep = await fetch('data/defis.json');
   const json = await rep.json();
-  window._allDefis = json.defis;
+  // tolérant : "json.defis" ou tableau direct
+  window._allDefis = json.defis || json;
   return window._allDefis;
 };
+
+// Renvoie N défis dans la langue des paramètres (fallback fr)
 window.getDefisLocal = async function(n = 3, forceLang = null) {
   const defis = await window.chargerDefisLocal();
-  const lang = forceLang || window._langDefi || 'fr';
-  const shuffled = defis.slice().sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, n).map(d => d[lang] || d["fr"] || Object.values(d)[1]);
+
+  // langue paramétrée -> sinon localStorage.langue -> sinon navigateur -> fr
+  let raw = forceLang
+    || (window.getCurrentLang ? window.getCurrentLang() : null)
+    || localStorage.getItem("langue")
+    || (navigator.language || 'fr');
+
+  raw = String(raw).toLowerCase().replace('_','-');
+  // normalisation
+  const norm = (code) => {
+    if (!code) return 'fr';
+    // pt-br -> ptbr
+    if (code.startsWith('pt-br')) return 'ptbr';
+    const short = code.slice(0,2);
+    const map = { fr:'fr', en:'en', es:'es', de:'de', it:'it', nl:'nl', pt:'pt', ar:'ar', ja:'ja', ko:'ko', id:'idn' };
+    return map[short] || 'fr';
+  };
+  const L = norm(raw);
+
+  // construit le pool dans la bonne langue (fallback fr si clé manquante)
+  const pool = defis.map(d => d[L] ?? d['fr']).filter(Boolean);
+  const shuffled = pool.slice().sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, n);
 };
+
+// Hybride : essaye d'abord la BDD (getDefisFromSupabase(lang)), sinon local
+window.getDefisDuelFromSupabase = async function(count = 3) {
+  const lang = (window.getCurrentLang ? window.getCurrentLang() : (localStorage.getItem("langue") || "fr"));
+  try {
+    if (typeof window.getDefisFromSupabase === 'function') {
+      const rows = await window.getDefisFromSupabase(lang); // attend {texte} par ligne
+      let arr = (rows || []).map(r => r.texte).filter(Boolean);
+      if (arr.length) {
+        arr = arr.sort(() => Math.random() - 0.5).slice(0, count);
+        return arr;
+      }
+    }
+  } catch(e) {
+    console.warn("[defis] cloud KO, fallback local:", e?.message || e);
+  }
+  return await window.getDefisLocal(count, lang);
+};
+/* ================== FIN DEFIS (multilingue) ================== */
+
+// 🔧 NOUVEAU: helpers anti double-room (création simultanée)
+window._cancelMyWaiting = async function(myRoomId) {
+  // Tente d'annuler seulement si elle est toujours 'waiting'
+  await window.supabase.from('duels')
+    .update({ status: 'cancelled' })
+    .eq('id', myRoomId)
+    .eq('status', 'waiting');
+};
+
+window._dedupePairRooms = async function(meId, otherId, preferRoomId = null) {
+  // Cherche toutes les rooms actives (waiting/playing) liées à la paire (même si player2_id est null)
+  const { data, error } = await window.supabase
+    .from('duels')
+    .select('id, createdat, status, player1_id, player2_id, type')
+    .eq('type', 'random')
+    .in('status', ['waiting','playing'])
+    .or(`player1_id.eq.${meId},player1_id.eq.${otherId},player2_id.eq.${meId},player2_id.eq.${otherId}`);
+
+  if (error || !data) return;
+  if (data.length <= 1) return;
+
+  // Choix de la room à garder : priorité à preferRoomId, sinon la plus ancienne
+  let keep = preferRoomId ? data.find(r => r.id === preferRoomId) : null;
+  if (!keep) keep = data.slice().sort((a,b) => (a.createdat||0) - (b.createdat||0))[0];
+
+  const toCancel = data.filter(r => r.id !== keep.id);
+  for (const r of toCancel) {
+    await window.supabase.from('duels')
+      .update({ status: 'cancelled' })
+      .eq('id', r.id)
+      .in('status', ['waiting','playing']);
+  }
+};
+
+window._raceToPairAfterCreate = function(myRoom, myUserId, myPseudo) {
+  // Essaie périodiquement de "claimer" une autre room waiting (anti deadlock à 2 rooms waiting)
+  let tries = 0;
+  const maxTries = 30; // ~45s
+  const interval = setInterval(async () => {
+    try {
+      tries++;
+      // Si ma room n'est plus waiting, on arrête
+      const { data: mine } = await window.supabase.from('duels').select('status').eq('id', myRoom.id).single();
+      if (!mine || mine.status !== 'waiting') { clearInterval(interval); return; }
+
+      // Cherche une room waiting d'un autre (type random)
+      const { data: rooms } = await window.supabase
+        .from('duels')
+        .select('*')
+        .eq('type','random')
+        .eq('status','waiting')
+        .is('player2_id', null)
+        .neq('player1_id', myUserId)
+        .order('createdat', { ascending: true })
+        .limit(1);
+
+      if (rooms && rooms.length) {
+        const target = rooms[0];
+        // Tente de la claim de façon atomique
+        const upd = await window.supabase.from('duels').update({
+          player2_id: myUserId,
+          player2_pseudo: myPseudo,
+          status: 'playing',
+          starttime: Date.now()
+        }).eq('id', target.id)
+          .eq('status','waiting')
+          .is('player2_id', null)
+          .select();
+
+        if (!upd.error && upd.data && upd.data.length) {
+          // On a réussi à pairer ailleurs : on annule la mienne (si toujours waiting)
+          await window._cancelMyWaiting(myRoom.id);
+          // Déduplication paire
+          await window._dedupePairRooms(myUserId, target.player1_id, target.id);
+          clearInterval(interval);
+          // Go jouer
+          localStorage.setItem("duel_random_room", target.id);
+          localStorage.setItem("duel_is_player1", "0");
+          setTimeout(()=>{ window.location.href = `duel_game.html?room=${target.id}`; }, 150);
+          return;
+        }
+      }
+
+      if (tries >= maxTries) clearInterval(interval);
+    } catch(e) {
+      if (tries >= maxTries) clearInterval(interval);
+    }
+  }, 1500);
+};
+
 window.findOrCreateRoom = async function() {
   if (await window.checkAlreadyInDuel()) return;
   localStorage.removeItem("duel_random_room");
@@ -237,11 +369,14 @@ window.findOrCreateRoom = async function() {
   const userId = window.getUserId();
   const userPseudo = await window.getPseudo();
 
+  // 1) Essais de claim une room existante (anti-courses) — type 'random' + player2_id NULL
   for (let i = 0; i < 5; i++) {
     let { data: rooms } = await window.supabase
       .from('duels')
       .select('*')
+      .eq('type','random')
       .eq('status', 'waiting')
+      .is('player2_id', null)
       .neq('player1_id', userId)
       .order('createdat', { ascending: true })
       .limit(1);
@@ -256,8 +391,17 @@ window.findOrCreateRoom = async function() {
       })
         .eq('id', room.id)
         .eq('status', 'waiting')
+        .is('player2_id', null)
         .select();
-      if (updError || !updated || updated.length === 0) continue;
+
+      if (updError || !updated || updated.length === 0) {
+        await new Promise(r => setTimeout(r, 250 + Math.floor(Math.random()*250)));
+        continue;
+      }
+
+      // 🔧 déduplication éventuelle si 2 rooms pour la même paire existent
+      try { await window._dedupePairRooms(userId, room.player1_id, updated[0].id); } catch {}
+
       localStorage.setItem("duel_random_room", room.id);
       localStorage.setItem("duel_is_player1", "0");
       setTimeout(() => {
@@ -267,6 +411,8 @@ window.findOrCreateRoom = async function() {
     }
     await new Promise(r => setTimeout(r, 1200));
   }
+
+  // 2) Si rien trouvé/claimé → créer ma room
   if (await window.checkAlreadyInDuel()) return;
   const defis = await window.getDefisDuelFromSupabase(3);
   const roomObj = {
@@ -291,10 +437,15 @@ window.findOrCreateRoom = async function() {
   }
   localStorage.setItem("duel_random_room", data[0].id);
   localStorage.setItem("duel_is_player1", "1");
+
+  // 🔧 course parallèle pour tenter de pairer une autre room et annuler la mienne si besoin
+  try { window._raceToPairAfterCreate(data[0], userId, userPseudo); } catch {}
+
   setTimeout(() => {
     waitRoom(data[0].id);
   }, 200);
 };
+
 function waitRoom(roomId) {
   const poll = async () => {
     try {
@@ -304,12 +455,15 @@ function waitRoom(roomId) {
         return;
       }
       if (r && r.status === "playing") {
+        // 🔧 anti-doublon ultime
+        try { if (r.player1_id && r.player2_id) await window._dedupePairRooms(r.player1_id, r.player2_id, r.id); } catch {}
         setTimeout(() => {
           window.location.href = `duel_game.html?room=${roomId}`;
         }, 200);
       } else if (r && r.status === "waiting") {
         setTimeout(poll, 1500);
       } else {
+        // cancelled/finished
         alert("Room annulée ou supprimée.");
       }
     } catch (e) {
@@ -327,6 +481,12 @@ window.initDuelGame = async function() {
   const userId = window.getUserId();
   let room = await window.getRoom(roomId);
   window.isPlayer1 = (room.player1_id === userId);
+
+  // 🔧 24h STRICT PARTOUT : si status=playing mais starttime manquant, on le fixe maintenant
+  if (room.status === 'playing' && !room.starttime) {
+    await window.supabase.from('duels').update({ starttime: Date.now() }).eq('id', room.id);
+    room = await window.getRoom(roomId);
+  }
 
   // PREMIUM - SI AMIS PREMIUM, DEFI FINAL À SAISIR AVANT DE JOUER
   if (room.type === "amis_premium" && !room.defis_final) {
@@ -555,7 +715,7 @@ window.renderDefis = async function({ myID, advID }) {
       const cadreImg = document.createElement("img");
       cadreImg.className = "photo-cadre";
       const cadreImgUrl = await window.getCadreUrl(myCadre);
-      cadreImg.src = cadreImgUrl; // ✅ await
+      cadreImg.src = cadreImgUrl;
 
       const photoImg = document.createElement("img");
       photoImg.className = "photo-user";
@@ -660,7 +820,7 @@ window.renderDefis = async function({ myID, advID }) {
       const cadreImg = document.createElement("img");
       cadreImg.className = "photo-cadre";
       const advCadreUrl = await window.getCadreUrl(advCadre);
-      cadreImg.src = advCadreUrl; // ✅ await
+      cadreImg.src = advCadreUrl;
 
       const photoImg = document.createElement("img");
       photoImg.className = "photo-user";
@@ -939,16 +1099,11 @@ window.deleteDuelPhotosFromSupabase = async function(roomId) {
   }
 };
 
-window.getDefisDuelFromSupabase = async function(count = 3) {
-  // FULL LOCAL
-  return await window.getDefisLocal(count);
-};
-
+// getRoom / getPhoto / savePhoto
 window.getRoom = async function(roomId) {
   const { data } = await window.supabase.from('duels').select('*').eq('id', roomId).single();
   return data;
 };
-
 window.getPhotoDuel = async function(roomId, champ, idx) {
   const cacheKey = `${roomId}_${champ}_${idx}`;
   let obj = await window.VFindDuelDB.get(cacheKey);
@@ -970,7 +1125,6 @@ window.getPhotoDuel = async function(roomId, champ, idx) {
   }
   return null;
 };
-
 window.savePhotoDuel = async function(idx, url, cadreId = null) {
   const champ = window.isPlayer1 ? 'photosa' : 'photosb';
   if (!cadreId) cadreId = window.getCadreDuel(roomId, idx);
@@ -1024,7 +1178,6 @@ window.afficherSolde = async function() {
 
 // Gestion du signalement photo vers Supabase Storage
 document.body.addEventListener("click", async function(e) {
-  // Gestion du clic sur un motif de signalement
   const signalTypeBtn = e.target.closest(".btn-signal-type");
   if (!signalTypeBtn) return;
 
@@ -1039,14 +1192,10 @@ document.body.addEventListener("click", async function(e) {
   }
 
   try {
-    // Télécharge la photo en blob
     const response = await fetch(photoUrl);
     const blob = await response.blob();
-
-    // Crée un nom unique pour le fichier signalé
     const fileName = `defi${idx}_${motif}_${Date.now()}.webp`;
 
-    // Envoie la photo dans le bucket "signalements"
     const { error } = await window.supabase
       .storage
       .from('signalements')
@@ -1068,8 +1217,6 @@ window.getPoints = window.getPointsCloud;
 window.getJetons = window.getJetonsCloud;
 
 // ========== POPUP VALIDATION DE DEFI AVEC JETON ==========
-
-// Ouvre la popup pour valider un défi avec un jeton
 window.ouvrirPopupValiderJeton = function(idx) {
   const pop = document.getElementById("popup-jeton-valider");
   if (!pop) { console.warn("[duel] popup-jeton-valider introuvable"); return; }
@@ -1077,21 +1224,16 @@ window.ouvrirPopupValiderJeton = function(idx) {
   pop.classList.remove("hidden");
 };
 
-// Handler pour le bouton Valider et Annuler
 document.addEventListener("DOMContentLoaded", () => {
-  // Bouton Valider
   const btnValider = document.getElementById("btn-confirm-jeton");
   if (btnValider) {
     btnValider.onclick = async function() {
-      // Appel logique de validation avec un jeton
       await window.validerDefiAvecJeton(window._idxJetonToValidate);
       window._idxJetonToValidate = null;
       const pop = document.getElementById("popup-jeton-valider");
       if (pop) pop.classList.add("hidden");
     };
   }
-
-  // Bouton Annuler
   const btnCancel = document.getElementById("btn-cancel-jeton");
   if (btnCancel) {
     btnCancel.onclick = function() {
@@ -1102,33 +1244,29 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// La logique pour valider le défi avec un jeton (VERSION UNIQUE ET CORRIGÉE)
+// La logique pour valider le défi avec un jeton
 window.validerDefiAvecJeton = async function(idx) {
-  // 1. Retire un jeton (doit être définie dans userData.js)
   await window.removeJeton();
   await (window.afficherSolde && window.afficherSolde());
 
-  // 2. Mets l'image "jeton validé" comme photo pour le défi
-  const userId = window.getUserId(); // ✅ corrige la référence manquante
+  const userId = window.getUserId();
   let duelId = window.currentRoomId || (new URLSearchParams(window.location.search)).get("room");
   const pseudo = await window.getPseudo();
   const room = await window.getRoom(duelId);
   const myChamp = (room.player1_id === userId) ? 'photosa' : 'photosb';
 
-  const urlJeton = "assets/img/jeton_pp.jpg"; // Mets l'image de ton jeton ici
+  const urlJeton = "assets/img/jeton_pp.jpg";
   const cadreId = window.getCadreDuel ? window.getCadreDuel(duelId, idx) : "polaroid_01";
 
   let photos = room[myChamp] || {};
   photos[idx] = { url: urlJeton, cadre: cadreId };
   await window.supabase.from('duels').update({ [myChamp]: photos }).eq('id', duelId);
 
-  // Mets à jour le cache local
   if (window.VFindDuelDB && window.VFindDuelDB.set) {
     await window.VFindDuelDB.set(`${duelId}_${myChamp}_${idx}`, { url: urlJeton, cadre: cadreId });
   }
   if (window.setCadreDuel) window.setCadreDuel(duelId, idx, cadreId);
 
-  // Rafraîchit l'affichage (ou reload)
   if (typeof window.renderDefis === "function") {
     const advID = (room.player1_pseudo === pseudo ? room.player2_pseudo : room.player1_pseudo);
     await window.renderDefis({ myID: pseudo, advID });
@@ -1148,7 +1286,7 @@ if (path.includes("duel_random.html")) {
       .eq('id', existingRoomId)
       .single()
       .then(({ data }) => {
-        if (data && data.status && data.status !== 'finished') {
+        if (data && data.status && data.status !== 'finished' && data.status !== 'cancelled') {
           setTimeout(() => {
             window.location.href = `duel_game.html?room=${existingRoomId}`;
           }, 200);
@@ -1170,17 +1308,13 @@ async function updateSoldeAffichage() {
   document.getElementById("jetons").textContent = jetons;
 }
 
+// Permet de purger le cache local des défis quand la langue change
 window.refreshDefisLangueDuel = async function() {
   const lang = window.getCurrentLang ? window.getCurrentLang() : (localStorage.getItem("langue") || "fr");
-  // Recharge le pool de défis dans la nouvelle langue pour la création des nouveaux duels
-  if (window._allDefis) {
-    window._allDefis = null;
-  }
-  // Recharge à la prochaine partie (ou force le rechargement ici si tu veux une preview en live)
+  if (window._allDefis) window._allDefis = null; // purge cache
   if (typeof window.chargerDefisLocal === "function") {
     await window.chargerDefisLocal(lang);
   }
-  // Tu peux aussi forcer un rafraîchissement de l'UI si besoin, par exemple :
   if (typeof window.renderDefisAccueil === "function") {
     window.renderDefisAccueil();
   }
