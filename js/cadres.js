@@ -57,7 +57,7 @@ function createCadreElement(id, taille = { w: 80, h: 100 }) {
     c.style.inset = "0";
     c.style.width = "100%";
     c.style.height = "100%";
-    c.style.zIndex = "4";          // le cadre au-dessus de la photo
+    c.style.zIndex = "2";          // le cadre au-dessus de la photo
     c.style.pointerEvents = "none";
 
     const ctx = c.getContext("2d");
