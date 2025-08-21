@@ -1,4 +1,4 @@
-// amis.js — VERSION CORRIGÉE + i18n SAFE
+// amis.js — RPC + i18n SAFE + ID-only + JSONB
 
 let userPseudo = null;
 let userProfile = null;
@@ -12,17 +12,16 @@ function T(key, fallback = key, params = {}) {
       return window.i18n.t(key, params);
     }
   } catch {}
-  // Remplacement très simple des {{var}} si pas d'i18n
   let txt = fallback;
-  Object.keys(params || {}).forEach(k => {
-    txt = txt.replace(new RegExp(`{{\\s*${k}\\s*}}`, "g"), params[k]);
-  });
+  for (const k in (params || {})) {
+    txt = txt.replace(new RegExp(`{{\\s*${k}\\s*}}`, "g"), String(params[k]));
+  }
   return txt;
 }
 
 function toast(msgKey, color = "#222", fallback = msgKey, params = {}) {
   const msg = T(msgKey, fallback, params);
-  let t = document.createElement("div");
+  const t = document.createElement("div");
   t.className = "toast-msg";
   t.textContent = msg;
   t.style.background = color;
@@ -41,12 +40,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     const pseudoAmi = document.getElementById("pseudo-ami").value.trim();
     if (!pseudoAmi) return;
     const now = Date.now();
-    if (now - lastAmiRequest < 3000) return toast("amis.waitRequest", "#b93f3f", "Patiente un peu avant de refaire une demande.");
+    if (now - lastAmiRequest < 3000)
+      return toast("amis.waitRequest", "#b93f3f", "Patiente un peu avant de refaire une demande.");
     lastAmiRequest = now;
     btnAjouter.disabled = true;
     btnAjouter.textContent = T("amis.adding", "Ajout en cours...");
     try {
-      await window.envoyerDemandeAmi(pseudoAmi);
+      await envoyerDemandeAmi(pseudoAmi);
     } finally {
       btnAjouter.disabled = false;
       btnAjouter.textContent = T("button.add", "Ajouter un ami");
@@ -102,89 +102,76 @@ async function afficherListesAmis(data) {
     : `<li class='txt-empty'>${T("amis.noSent", "Aucune demande envoyée.")}</li>`;
 }
 
-// Demande d'ajout d'ami
-window.envoyerDemandeAmi = async function(pseudoAmi) {
-  if (!userPseudo || !pseudoAmi || pseudoAmi === userPseudo)
+// ===== RPC wrappers =====
+async function envoyerDemandeAmi(pseudoAmi) {
+  // garde quelques gardes-fous côté client
+  const my = await window.getUserDataCloud();
+  if (!pseudoAmi || pseudoAmi === my.pseudo)
     return toast("amis.cannotAddSelf", "#b93f3f", "Tu ne peux pas t'ajouter toi-même !");
-
-  const { data: ami, error } = await window.supabase
-    .from("users")
-    .select("id, demandesRecues, amis, demandesEnvoyees")
-    .ilike("pseudo", pseudoAmi)
-    .maybeSingle();
-
-  if (error || !ami) return toast("amis.notFound", "#b93f3f", "Aucun utilisateur trouvé.");
-
-  userProfile = await window.getUserDataCloud();
-
-  if (userProfile.amis?.includes(pseudoAmi)) return toast("amis.alreadyFriends", "#222", "Vous êtes déjà amis !");
-  if (userProfile.demandesEnvoyees?.includes(pseudoAmi)) return toast("amis.alreadySent", "#222", "Demande déjà envoyée.");
-  if (userProfile.demandesRecues?.includes(pseudoAmi)) return toast("amis.alreadyReceived", "#222", "Cette personne t'a déjà envoyé une demande !");
-
-  const newEnv = [...(userProfile.demandesEnvoyees || []), pseudoAmi];
-  const newRec = [...(ami.demandesRecues || []), userPseudo];
-
-  // Update de TON profil par ID unique
-  await window.supabase.from("users").update({ demandesEnvoyees: newEnv }).eq("id", window.getUserId());
-  // Update du profil de l'ami par son id
-  await window.supabase.from("users").update({ demandesRecues: newRec }).eq("id", ami.id);
-
+  // appel RPC (fait les 2 updates côté serveur)
+  const { data, error } = await window.supabase.rpc('friends_request', {
+    op: 'send',
+    other_pseudo: pseudoAmi
+  });
+  if (error || !data?.ok) {
+    console.error('friends_request send:', error || data);
+    const reason = data?.reason || 'unknown';
+    const mapMsg = {
+      not_authenticated: "Tu n'es pas connecté.",
+      sender_not_found: "Profil introuvable.",
+      receiver_not_found: "Aucun utilisateur trouvé.",
+      already_friends: "Vous êtes déjà amis !",
+      already_sent: "Demande déjà envoyée.",
+      already_received: "Cette personne t'a déjà envoyé une demande !"
+    };
+    return toast("amis.errorSend", "#b93f3f", mapMsg[reason] || "Impossible d'envoyer la demande.");
+  }
   toast("amis.sent", "#222", "Demande envoyée !");
   await rechargerAffichage();
-};
+}
 
-// Accepter une demande d'ami
 window.accepterDemande = async function(pseudoAmi) {
-  const { data: ami } = await window.supabase
-    .from("users")
-    .select("id, amis, demandesEnvoyees")
-    .ilike("pseudo", pseudoAmi)
-    .maybeSingle();
-
-  if (!ami) return;
-
-  userProfile = await window.getUserDataCloud();
-  const newAmis = [...(userProfile.amis || []), pseudoAmi];
-  const newDemandes = (userProfile.demandesRecues || []).filter(p => p !== pseudoAmi);
-
-  await window.supabase.from("users").update({
-    amis: newAmis,
-    demandesRecues: newDemandes
-  }).eq("id", window.getUserId());
-
-  await window.supabase.from("users").update({
-    amis: [...(ami.amis || []), userPseudo],
-    demandesEnvoyees: (ami.demandesEnvoyees || []).filter(p => p !== userPseudo)
-  }).eq("id", ami.id);
-
+  const { data, error } = await window.supabase.rpc('friends_request', {
+    op: 'accept',
+    other_pseudo: pseudoAmi
+  });
+  if (error || !data?.ok) {
+    console.error('friends_request accept:', error || data);
+    return toast("amis.errorAccept", "#b93f3f", "Impossible d'accepter la demande.");
+  }
   if (window.incrementFriendsInvited) await window.incrementFriendsInvited();
   toast("amis.nowFriends", "#222", "Vous êtes maintenant amis !");
   await rechargerAffichage();
 };
 
-// Refuser une demande
 window.refuserDemande = async function(pseudoAmi) {
-  const { data: ami } = await window.supabase
-    .from("users")
-    .select("id, demandesEnvoyees")
-    .ilike("pseudo", pseudoAmi)
-    .maybeSingle();
-  if (!ami) return;
-  userProfile = await window.getUserDataCloud();
-
-  await window.supabase.from("users").update({
-    demandesRecues: (userProfile.demandesRecues || []).filter(p => p !== pseudoAmi)
-  }).eq("id", window.getUserId());
-
-  await window.supabase.from("users").update({
-    demandesEnvoyees: (ami.demandesEnvoyees || []).filter(p => p !== userPseudo)
-  }).eq("id", ami.id);
-
+  const { data, error } = await window.supabase.rpc('friends_request', {
+    op: 'refuse',
+    other_pseudo: pseudoAmi
+  });
+  if (error || !data?.ok) {
+    console.error('friends_request refuse:', error || data);
+    return toast("amis.errorRefuse", "#b93f3f", "Impossible de refuser la demande.");
+  }
   toast("amis.refused", "#222", "Demande refusée.");
   await rechargerAffichage();
 };
 
-// Suppression d'ami
+// (optionnel) annuler une demande envoyée
+window.annulerDemandeEnvoyee = async function(pseudoAmi) {
+  const { data, error } = await window.supabase.rpc('friends_request', {
+    op: 'cancel',
+    other_pseudo: pseudoAmi
+  });
+  if (error || !data?.ok) {
+    console.error('friends_request cancel:', error || data);
+    return toast("amis.errorCancel", "#b93f3f", "Impossible d'annuler la demande.");
+  }
+  toast("amis.canceled", "#222", "Demande annulée.");
+  await rechargerAffichage();
+};
+
+// Suppression d'ami : popup
 window.demanderSuppressionAmi = function(pseudoAmi) {
   amiASupprimer = pseudoAmi;
   document.getElementById('popup-suppr-ami-nom').textContent = pseudoAmi;
@@ -194,23 +181,19 @@ window.confirmerSuppressionAmi = async function() {
   if (!amiASupprimer) return;
   const pseudoAmi = amiASupprimer;
   amiASupprimer = null;
-  const { data: ami } = await window.supabase
-    .from("users")
-    .select("id, amis")
-    .ilike("pseudo", pseudoAmi)
-    .maybeSingle();
-  if (!ami) return;
-  userProfile = await window.getUserDataCloud();
-
-  await window.supabase.from("users").update({
-    amis: (userProfile.amis || []).filter(p => p !== pseudoAmi)
-  }).eq("id", window.getUserId());
-
-  await window.supabase.from("users").update({
-    amis: (ami.amis || []).filter(p => p !== userPseudo)
-  }).eq("id", ami.id);
-
-  toast("amis.removed", "#222", "Ami supprimé.");
+  // on peut réutiliser 'cancel' si tu veux juste retirer le lien de demandes, mais ici c'est une vraie suppression d'ami
+  // Pour rester simple: on pourra faire un RPC dédié plus tard (remove_friend).
+  const me = await window.getUserDataCloud();
+  const { data, error } = await window.supabase.rpc('friends_request', {
+    op: 'removeFriend', // géré aussi par la fonction SQL ci-dessous
+    other_pseudo: pseudoAmi
+  });
+  if (error || !data?.ok) {
+    console.error('friends_request removeFriend:', error || data);
+    toast("amis.errorRemove", "#b93f3f", "Impossible de supprimer l'ami.");
+  } else {
+    toast("amis.removed", "#222", "Ami supprimé.");
+  }
   document.getElementById('popup-suppr-ami').classList.add('hidden');
   await rechargerAffichage();
 };
@@ -230,7 +213,7 @@ function detecterInvitationParLien() {
     document.getElementById("pseudo-ami").value = toAdd;
     const question = T("amis.confirmAdd", "Ajouter {{pseudo}} comme ami ?", { pseudo: toAdd });
     if (confirm(question)) {
-      window.envoyerDemandeAmi(toAdd);
+      envoyerDemandeAmi(toAdd);
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }
