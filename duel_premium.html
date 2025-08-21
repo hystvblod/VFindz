@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -106,9 +106,7 @@ let profil = null;
 
 // i18n helper (fallback si i18n.t indisponible)
 function t(key, fallback='') {
-  try {
-    if (window.i18n && typeof window.i18n.t === 'function') return window.i18n.t(key) || fallback;
-  } catch(e){}
+  try { if (window.i18n && typeof window.i18n.t === 'function') return window.i18n.t(key) || fallback; } catch(e){}
   return fallback;
 }
 function toUniqueArray(arrLike) {
@@ -130,11 +128,7 @@ async function isPremiumUser() {
     const { data, error } = await window.supabase
       .from('users').select('premium')
       .eq('pseudo', pseudoPublic).single();
-    if (error) {
-      console.error("[PREMIUM] Erreur SELECT premium:", error);
-      return false;
-    }
-    console.log("[PREMIUM] Champ premium:", data?.premium);
+    if (error) { console.error("[PREMIUM] Erreur SELECT premium:", error); return false; }
     return !!data?.premium;
   } catch (e) {
     console.error("[PREMIUM] Exception:", e);
@@ -149,12 +143,10 @@ async function loadProfil() {
   console.log("[PROFIL] Pseudo courant:", pseudoPublic);
   const { data, error } = await window.supabase
     .from('users')
-    .select('*')   // si besoin de l'id pour RPC, passe à 'id, *'
+    .select('id, pseudo, amis, demandesduelrecuespremium, demandesduelenvoyeespremium, premium')  // [CHANGE] on récupère aussi id
     .eq('pseudo', pseudoPublic)
     .single();
-  if (error) {
-    console.error("[PROFIL] Erreur SELECT profil:", error);
-  }
+  if (error) { console.error("[PROFIL] Erreur SELECT profil:", error); }
   profil = data || null;
   console.log("[PROFIL] Profil chargé:", profil);
 }
@@ -189,7 +181,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function afficherAmis() {
   console.log("[UI] afficherAmis()");
   const amis = Array.isArray(profil?.amis) ? profil.amis : [];
-  console.log("[UI] Amis:", amis);
   const ul = document.getElementById("liste-amis");
   ul.innerHTML = "";
   if (!amis.length) {
@@ -214,7 +205,6 @@ async function afficherDemandesDuel() {
   const ulRecue = document.getElementById("demandes-recue");
   ulRecue.innerHTML = "";
   const recues = toUniqueArray(profil?.demandesduelrecuespremium);
-  console.log("[UI] demandesduelrecuespremium:", recues);
   if (!recues.length) {
     ulRecue.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande.received'>Aucune demande reçue.</div>";
   } else {
@@ -238,7 +228,6 @@ async function afficherDemandesDuel() {
   const ulEnv = document.getElementById("demandes-envoyees");
   ulEnv.innerHTML = "";
   const envoyees = toUniqueArray(profil?.demandesduelenvoyeespremium);
-  console.log("[UI] demandesduelenvoyeespremium:", envoyees);
   if (!envoyees.length) {
     ulEnv.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande.sent'>Aucune demande envoyée.</div>";
   } else {
@@ -257,49 +246,39 @@ async function afficherDemandesDuel() {
 /* =========================
    ACTIONS
    ========================= */
-// INVITER un ami à un duel premium
+// INVITER un ami à un duel premium → **RPC** // [CHANGE]
 async function inviterDuelPremium(amiPseudo) {
   console.log("[DUEL] inviterDuelPremium →", amiPseudo);
+
+  // Récupérer l'ID de l'ami
   const { data: ami, error: selErr } = await window.supabase
-    .from("users").select("*").eq("pseudo", amiPseudo).single();
-  if (selErr) {
-    console.error("[DUEL] SELECT ami ERROR:", selErr);
+    .from("users").select("id,pseudo")
+    .eq("pseudo", amiPseudo).single();
+  if (selErr || !ami) {
+    console.error("[DUEL] Ami introuvable:", selErr);
     alert(t('errors.friend_not_found','Ami introuvable.'));
     return;
   }
-  if (!ami) {
-    console.warn("[DUEL] Ami introuvable (null).");
-    alert(t('errors.friend_not_found','Ami introuvable.'));
+  if (!profil?.id) {
+    console.error("[DUEL] Mon profil n'a pas d'id. Vérifie loadProfil().");
+    alert("Erreur profil (id manquant).");
     return;
   }
-  console.log("[DUEL] Ami trouvé:", ami);
 
-  // Ajoute ma demande côté ami (recues)
-  const recuesAmi = toUniqueArray(ami.demandesduelrecuespremium);
-  if (!recuesAmi.includes(pseudoPublic)) recuesAmi.push(pseudoPublic);
-  const { error: errRecues } = await window.supabase
-    .from("users")
-    .update({ demandesduelrecuespremium: recuesAmi })
-    .eq("pseudo", amiPseudo);
-  if (errRecues) {
-    console.error("[DUEL] UPDATE recues (ami) ERROR:", errRecues, "→ Vérifie tes RLS (tu n’as peut-être pas le droit d’update la ligne de l’ami).");
-  } else {
-    console.log("[DUEL] OK: recues ami =", recuesAmi);
+  // Appeler la RPC server-side (bypass RLS proprement)
+  const { error: rpcErr } = await window.supabase.rpc('request_premium_duel', {
+    p_from: profil.id,
+    p_to: ami.id,
+    p_from_pseudo: pseudoPublic,
+    p_to_pseudo: ami.pseudo
+  });
+  if (rpcErr) {
+    console.error("[DUEL] RPC request_premium_duel ERROR:", rpcErr);
+    alert("Erreur envoi de la demande.");
+    return;
   }
 
-  // Ajoute la demande envoyée côté moi
-  const envMoi = toUniqueArray(profil.demandesduelenvoyeespremium);
-  if (!envMoi.includes(amiPseudo)) envMoi.push(amiPseudo);
-  const { error: errEnv } = await window.supabase
-    .from("users")
-    .update({ demandesduelenvoyeespremium: envMoi })
-    .eq("pseudo", pseudoPublic);
-  if (errEnv) {
-    console.error("[DUEL] UPDATE envoyées (moi) ERROR:", errEnv);
-  } else {
-    console.log("[DUEL] OK: envoyées moi =", envMoi);
-  }
-
+  console.log("[DUEL] Demande enregistrée (RPC OK).");
   await loadProfil();
   afficherAmis();
   afficherDemandesDuel();
@@ -321,40 +300,25 @@ async function accepterDuelPremium(amiPseudo) {
     photosb: {}
   }];
 
-  const { data, error: duelErr } = await window.supabase
-    .from('duels').insert(insertPayload).select();
-  if (duelErr) {
-    console.error("[DUEL] INSERT duel ERROR:", duelErr);
-  } else {
-    console.log("[DUEL] Duel créé:", data);
-  }
+  const { data, error: duelErr } = await window.supabase.from('duels').insert(insertPayload).select();
+  if (duelErr) { console.error("[DUEL] INSERT duel ERROR:", duelErr); }
 
   // MAJ des listes (retire la demande chez moi)
   const recuesMoi = toUniqueArray(profil.demandesduelrecuespremium).filter(p => p !== amiPseudo);
-  const { error: errRecues } = await window.supabase
-    .from("users")
-    .update({ demandesduelrecuespremium: recuesMoi })
-    .eq("pseudo", pseudoPublic);
-  if (errRecues) console.error("[DUEL] UPDATE recues (moi) ERROR:", errRecues);
+  await window.supabase.from("users").update({ demandesduelrecuespremium: recuesMoi }).eq("pseudo", pseudoPublic);
 
-  // Et retire “envoyées” chez l’ami
-  const { data: ami, error: amiErr } = await window.supabase
-    .from("users").select("*").eq("pseudo", amiPseudo).single();
-  if (amiErr) console.error("[DUEL] SELECT ami ERROR:", amiErr);
+  // Retire “envoyées” chez l’ami (si autorisé ; sinon créer une RPC d’acceptation)
+  const { data: ami } = await window.supabase.from("users").select("demandesduelenvoyeespremium").eq("pseudo", amiPseudo).single();
   if (ami) {
     const envAmi = toUniqueArray(ami.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
-    const { error: errEnv } = await window.supabase
-      .from("users")
-      .update({ demandesduelenvoyeespremium: envAmi })
-      .eq("pseudo", amiPseudo);
-    if (errEnv) console.error("[DUEL] UPDATE envoyées (ami) ERROR:", errEnv);
+    await window.supabase.from("users").update({ demandesduelenvoyeespremium: envAmi }).eq("pseudo", amiPseudo);
   }
 
   await loadProfil();
   afficherDemandesDuel();
 
   if (data && data.length && data[0].id) {
-    console.log("[DUEL] Redirection vers duel_game.html?room=", data[0].id);
+    console.log("[DUEL] Redirection → duel_game.html?room=", data[0].id);
     window.location.href = `duel_game.html?room=${data[0].id}`;
   }
 }
@@ -362,22 +326,12 @@ async function accepterDuelPremium(amiPseudo) {
 async function refuserDuelPremium(amiPseudo) {
   console.log("[DUEL] refuserDuelPremium →", amiPseudo);
   const recuesMoi = toUniqueArray(profil.demandesduelrecuespremium).filter(p => p !== amiPseudo);
-  const { error: errRecues } = await window.supabase
-    .from("users")
-    .update({ demandesduelrecuespremium: recuesMoi })
-    .eq("pseudo", pseudoPublic);
-  if (errRecues) console.error("[DUEL] UPDATE recues (moi) ERROR:", errRecues);
+  await window.supabase.from("users").update({ demandesduelrecuespremium: recuesMoi }).eq("pseudo", pseudoPublic);
 
-  const { data: ami, error: amiErr } = await window.supabase
-    .from("users").select("*").eq("pseudo", amiPseudo).single();
-  if (amiErr) console.error("[DUEL] SELECT ami ERROR:", amiErr);
+  const { data: ami } = await window.supabase.from("users").select("demandesduelenvoyeespremium").eq("pseudo", amiPseudo).single();
   if (ami) {
     const envAmi = toUniqueArray(ami.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
-    const { error: errEnv } = await window.supabase
-      .from("users")
-      .update({ demandesduelenvoyeespremium: envAmi })
-      .eq("pseudo", amiPseudo);
-    if (errEnv) console.error("[DUEL] UPDATE envoyées (ami) ERROR:", errEnv);
+    await window.supabase.from("users").update({ demandesduelenvoyeespremium: envAmi }).eq("pseudo", amiPseudo);
   }
 
   await loadProfil();
@@ -395,9 +349,7 @@ function fermerPopupDefiPremium() {
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      if (window.afficherSolde) {
-        try { window.afficherSolde(); } catch(e){ console.warn("[SOLDE] afficherSolde sync a échoué:", e); }
-      }
+      if (window.afficherSolde) try { window.afficherSolde(); } catch(e){}
     });
   </script>
 
