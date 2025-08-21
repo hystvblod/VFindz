@@ -568,7 +568,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   console.log(">>> BOUTIQUE: loaded user data");
   await fetchCadres(true);           // 2️⃣ FORCE le fetch cloud pour les cadres (pas le cache local)
   console.log(">>> BOUTIQUE: fetched cadres");
-  await renderBoutique('classique'); // 3️⃣ Affiche la boutique avec la vraie data
+  await renderBoutique('premium');
+// 3️⃣ Affiche la boutique avec la vraie data
   console.log(">>> BOUTIQUE: rendered boutique classique");
   await updatePointsDisplay();       // 4️⃣ Recharge pièces à jour depuis cloud
   await updateJetonsDisplay();       // 5️⃣ Recharge jetons à jour depuis cloud
