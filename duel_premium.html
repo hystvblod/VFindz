@@ -205,8 +205,8 @@ async function afficherDemandesDuel() {
           const { data: rooms } = await window.supabase
             .from('duels')
             .select('id,status')
-            .or(`and(joueur_a.eq.${profil.id},joueur_b.eq.${ami.id}),and(joueur_a.eq.${ami.id},joueur_b.eq.${profil.id})`)
-            .in('status', ['playing','ready','pending']);
+            .or(`and(player1_id.eq.${profil.id},player2_id.eq.${ami.id}),and(player1_id.eq.${ami.id},player2_id.eq.${profil.id})`)
+            .in('status', ['playing','waiting']);
           if (rooms && rooms.length) {
             statusHTML = `<a href="duel_game.html?room=${rooms[0].id}" class="badge-nouveau" style="background:#65e965;color:#1b2a1b;">Jouer</a>`;
           }
@@ -227,7 +227,6 @@ async function afficherDemandesDuel() {
    INVITER / ACCEPTER / REFUSER
    ========================= */
 async function inviterDuelPremium(amiPseudo) {
-  // Interdit d’inviter si pas premium (mais la page reste accessible)
   try {
     const prem = await isPremiumUser();
     if (!prem) { alert(t('duel_premium.need_premium_to_invite','Le mode Premium est requis pour INVITER. Tu peux recevoir et accepter un duel premium.')); return; }
@@ -237,7 +236,7 @@ async function inviterDuelPremium(amiPseudo) {
   if (!ami) { alert(t('errors.friend_not_found','Ami introuvable.')); return; }
   if (!profil?.id) { alert("Erreur profil (id manquant)."); return; }
 
-  // 1) RPC si dispo
+  // RPC optionnel
   try {
     const { error: rpcErr } = await window.supabase.rpc('request_premium_duel', {
       p_from: profil.id, p_to: ami.id,
@@ -246,7 +245,7 @@ async function inviterDuelPremium(amiPseudo) {
     if (!rpcErr) { await loadProfil(); afficherAmis(); afficherDemandesDuel(); return; }
   } catch(e){}
 
-  // 2) Fallback manuel
+  // Fallback manuel sur users
   try {
     const { data: meNow } = await window.supabase.from("users").select("id,demandesduelenvoyeespremium").eq("id", profil.id).single();
     const { data: amiNow } = await window.supabase.from("users").select("id,demandesduelrecuespremium").eq("id", ami.id).single();
@@ -259,7 +258,7 @@ async function inviterDuelPremium(amiPseudo) {
 }
 
 async function accepterDuelPremium(amiPseudo) {
-  // 0) RPC d’acceptation si elle existe (recommandé)
+  // RPC optionnel
   try {
     const { data: ok, error: rpcErr } = await window.supabase.rpc('accept_premium_duel', {
       p_me_pseudo: pseudoPublic,
@@ -271,29 +270,33 @@ async function accepterDuelPremium(amiPseudo) {
     }
   } catch(e){}
 
-  // 1) Insertion directe de la room dans *duels* (schéma UUID)
+  // Insertion directe dans duels (alignée sur TON SQL)
   const ami = await getUserByPseudo(amiPseudo);
   if (!ami || !profil?.id) { alert("Impossible de créer la room (profil/ami)."); return; }
 
-  const nowIso = new Date().toISOString();
+  const now = Date.now(); // BIGINT (ms)
   const insertPayload = [{
-    joueur_a: ami.id,                 // UUID de l’ami
-    joueur_b: profil.id,             // UUID de moi
-    status: 'playing',
-    created_at: nowIso,
+    player1_id: ami.id,           // l’ami est player1
+    player2_id: profil.id,        // toi = player2
+    player1_pseudo: ami.pseudo,
+    player2_pseudo: pseudoPublic,
+    status: 'playing',            // ou 'waiting' si tu préfères
+    createdat: now,
+    starttime: now,
     type: "amis_premium",
     defis: null,
-    resultats: { photosa: {}, photosb: {} }
+    defis_final: null,
+    photosa: {},
+    photosb: {}
   }];
 
   const { data, error: duelErr } = await window.supabase.from('duels').insert(insertPayload).select();
   if (duelErr) { console.error("[DUEL] INSERT duel ERROR:", duelErr); alert("Erreur création de la room."); return; }
 
-  // 2) Nettoyage local (mes reçues)
+  // Nettoyage des demandes
   const recuesMoi = toUniqueArray(profil.demandesduelrecuespremium).filter(p => p !== amiPseudo);
   await window.supabase.from("users").update({ demandesduelrecuespremium: recuesMoi }).eq("id", profil.id);
 
-  // 3) Tentative de nettoyer “envoyées” chez l’ami
   try {
     const { data: amiRow } = await window.supabase.from("users").select("id,pseudo,demandesduelenvoyeespremium").eq("id", ami.id).single();
     if (amiRow) {
@@ -354,7 +357,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       const a = document.getElementById("premium-alert");
       a.style.display = "block";
       a.setAttribute('data-i18n', 'alert.premium_only');
-      // on affiche uniquement les demandes (pas d’invitation)
       document.getElementById("liste-amis").innerHTML =
         "<div class='aucune-demande' data-i18n='alert.premium_only'>Invitation réservée aux premium.</div>";
       afficherDemandesDuel();
