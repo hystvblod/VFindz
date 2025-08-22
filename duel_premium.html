@@ -3,42 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title data-i18n="header.title.duel_premium">Duel Amis Premium</title>
+  <title data-i18n="duel_premium.title">Duel Premium</title>
   <link rel="stylesheet" href="style/main.css" />
   <style>
-    .duel-main { max-width: 420px; margin: 2.4rem auto 0 auto; background: rgba(38,41,56,0.93); border-radius: 1.3rem; box-shadow: 0 8px 32px #0003, 0 2px 0 #232435; padding: 2.2rem 1.4rem 1.6rem 1.4rem;}
-    .amis-list { display: flex; flex-direction: column; gap: 1.1rem; margin-bottom: 2.2rem;}
-    .ami-card { display: flex; align-items: center; justify-content: space-between; background: #2e3047; border-radius: 0.9rem; padding: 0.9em 1.2em; box-shadow: 0 3px 12px #0002; min-height: 52px;}
-    .ami-nom { font-weight: 600; font-size: 1.14em; color: #ffe04a; letter-spacing: .2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px;}
-    .btn-duel-ami { background: #ffe04a; color: #2b2b2b; font-weight: bold; border: none; border-radius: 8px; padding: 7px 16px; font-size: 1.03em; box-shadow: 0 2px 8px #0002; cursor: pointer; transition: background .14s; margin-left: 14px;}
-    .btn-duel-ami:active { background: #ffd900; }
-    .section-titre { color: #e8eaf6; font-size: 1.15em; font-weight: 600; margin: 1.7em 0 0.7em 0; letter-spacing: .2px; text-align: center;}
-    .duel-demandes-list { background: #24263b; border-radius: 0.9rem; padding: 1em 1em 0.6em 1em; min-height: 45px; margin-bottom: 1.1rem; box-shadow: 0 2px 8px #0001;}
-    .demande-card { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.6em; gap: 0.6em;}
-    .demande-nom { font-weight: 500; color: #ffe04a; font-size: 1.03em; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
-    .badge-nouveau { background: #ffe04a; color: #2a2a23; font-size: 0.97em; border-radius: 6px; padding: 1px 7px; margin-left: 5px; font-weight: bold; letter-spacing: .4px; box-shadow: 0 1px 4px #0001;}
-    .btn-accepter, .btn-refuser { border: none; border-radius: 8px; padding: 6px 14px; font-weight: bold; font-size: 0.97em; margin-left: 5px; cursor: pointer; transition: background .13s;}
-    .btn-accepter { background: #65e965; color: #253a25;}
-    .btn-refuser { background: #f36d6d; color: #232323;}
-    .btn-accepter:active { background: #32d132; }
-    .btn-refuser:active { background: #de3a3a; }
-    .aucune-demande { color: #bdbdc8; text-align: center; font-size: 1.01em; margin: 0.3em 0 0.8em 0;}
+    .duel-main{max-width:420px;margin:2.4rem auto 0;background:rgba(38,41,56,.93);border-radius:1.3rem;box-shadow:0 8px 32px #0003,0 2px 0 #232435;padding:2.2rem 1.4rem 1.6rem}
+    .section-titre{color:#e8eaf6;font-size:1.15em;font-weight:600;margin:1.7em 0 .7em;text-align:center}
+    .amis-list{display:flex;flex-direction:column;gap:1.1rem;margin-bottom:2.2rem}
+    .ami-card{display:flex;align-items:center;justify-content:space-between;background:#2e3047;border-radius:.9rem;padding:.9em 1.2em;box-shadow:0 3px 12px #0002;min-height:52px}
+    .ami-nom{font-weight:600;font-size:1.14em;color:#ffe04a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}
+    .btn-duel-ami{background:#ffe04a;color:#2b2b2b;font-weight:700;border:none;border-radius:8px;padding:7px 16px;font-size:1.03em;box-shadow:0 2px 8px #0002;cursor:pointer}
+    .duel-demandes-list{background:#24263b;border-radius:.9rem;padding:1em 1em .6em;min-height:45px;box-shadow:0 2px 8px #0001}
+    .demande-card{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6em;gap:.6em}
+    .demande-nom{font-weight:500;color:#ffe04a;font-size:1.03em;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .badge-nouveau{background:#ffe04a;color:#2a2a23;font-size:.97em;border-radius:6px;padding:1px 7px;margin-left:5px;font-weight:700;box-shadow:0 1px 4px #0001}
+    .btn-accepter,.btn-refuser{border:none;border-radius:8px;padding:6px 14px;font-weight:700;font-size:.97em;cursor:pointer}
+    .btn-accepter{background:#65e965;color:#253a25}
+    .btn-refuser{background:#f36d6d;color:#232323}
+    .aucune-demande{color:#bdbdc8;text-align:center;font-size:1.01em;margin:.3em 0 .8em}
 
-    /* Popup défif premium (optionnel, conservé) */
-    #popup-defi-premium { position:fixed; z-index:1500; left:0; top:0; width:100vw; height:100vh; background:rgba(30,32,48,0.84); display:flex; align-items:center; justify-content:center; }
-    #popup-defi-premium.hidden { display:none; }
-    .popup-inner.popup-premium-pro { background:#232435; border-radius:1.23em; padding:2.1em 1.2em 1.6em 1.2em; max-width:94vw; width:100%; box-shadow:0 8px 28px #0007; }
-    .premium-badge { border-radius:7px; padding:4px 13px 4px 13px; font-size:1.04em; display:inline-block; font-weight:bold; margin-bottom:8px; }
-    .popup-premium-title { font-size:1.21em; font-weight:bold; color:#ffe04a; margin-bottom:0.4em; }
-    .popup-premium-input { width:100%; border-radius:7px; padding:8px; margin-bottom:10px; border:1.5px solid #ffe04a; font-size:1.08em; }
-    .btn-premium-pro { background:#ffe04a; color:#232323; font-weight:bold; border:none; border-radius:9px; padding:8px 23px; font-size:1.04em; box-shadow:0 2px 8px #0002; cursor:pointer; }
-    .btn-annuler-premium-pro { background:#dddbe2; color:#222; border:none; border-radius:9px; padding:8px 23px; font-size:1.04em; font-weight:normal; }
-
-    @media (max-width:600px){
-      .duel-main{max-width:98vw;padding:1.1em 0.5em;}
-      .ami-nom{max-width:110px;}
-      .demande-nom{max-width:90px;}
-    }
+    /* POPUP plein écran & centrée */
+    #popup-defi-premium{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(30,32,48,.84);width:100vw;height:100vh}
+    #popup-defi-premium.show{display:flex}
+    .popup-inner{background:#232435;border-radius:1.23em;padding:1.6em 1.2em 1.2em;width:440px;max-width:94vw;box-shadow:0 8px 28px #0007;color:#e9ecff}
+    .premium-badge{border-radius:7px;padding:4px 13px;font-size:1.04em;font-weight:700;margin-bottom:10px;background:#ffe04a;color:#242424;display:inline-block}
+    .popup-title{font-size:1.21em;font-weight:800;color:#ffe04a;margin:4px 0 10px}
+    .popup-input{width:100%;border-radius:9px;padding:10px;margin-bottom:10px;border:1.5px solid #ffe04a;font-size:1.02em;background:#1f2133;color:#fff}
+    .popup-actions{display:flex;gap:.6em;justify-content:flex-end;margin-top:8px}
+    .btn-primary{background:#ffe04a;color:#232323;font-weight:800;border:none;border-radius:9px;padding:10px 22px;font-size:1.02em;box-shadow:0 2px 8px #0002;cursor:pointer}
+    .btn-ghost{background:#dddbe2;color:#222;border:none;border-radius:9px;padding:10px 22px;font-size:1.02em}
+    @media (max-width:600px){.duel-main{max-width:98vw;padding:1.1em .5em}.ami-nom{max-width:110px}.demande-nom{max-width:90px}.popup-inner{width:92vw}}
   </style>
 </head>
 <body class="duel-container">
@@ -48,7 +41,7 @@
       <a href="profil.html" class="back-btn" title="Retour" data-i18n-title="header.back">
         <img src="assets/icons/arrow_back.svg" alt="Retour" data-i18n-alt="header.back"/>
       </a>
-      <h1 data-i18n="header.title.duel_premium">Duel Premium</h1>
+      <h1 data-i18n="duel_premium.title">Duel Premium</h1>
       <div class="top-buttons">
         <a href="index.html" class="btn-icon" aria-label="Profil" data-i18n-aria-label="button.profile">
           <img src="assets/icons/user.svg" alt="Profil" data-i18n-alt="button.profile" />
@@ -76,340 +69,315 @@
 
   <main>
     <div class="duel-main">
-      <div id="premium-alert" style="display:none;color:#f36d6d;text-align:center;margin-bottom:1.1em;font-weight:bold;" data-i18n="alert.premium_only"></div>
+      <div id="premium-alert" style="display:none;color:#f36d6d;text-align:center;margin-bottom:1.1em;font-weight:bold" data-i18n="duel_premium.premium_only">Invitation réservée aux premium.</div>
 
-      <div class="section-titre" data-i18n="section.friends">Mes amis</div>
+      <div class="section-titre" data-i18n="duel_premium.section.friends">Mes amis</div>
       <div id="liste-amis" class="amis-list"></div>
 
-      <div class="section-titre" style="margin-top:2.4em;" data-i18n="section.received">Demandes de duel premium reçues</div>
+      <div class="section-titre" style="margin-top:2.4em" data-i18n="duel_premium.section.received">Demandes de duel premium reçues</div>
       <div id="demandes-recue" class="duel-demandes-list"></div>
 
-      <div class="section-titre" style="margin-top:2.4em;" data-i18n="section.sent">Demandes de duel premium envoyées</div>
+      <div class="section-titre" style="margin-top:2.4em" data-i18n="duel_premium.section.sent">Demandes de duel premium envoyées</div>
       <div id="demandes-envoyees" class="duel-demandes-list"></div>
     </div>
   </main>
 
   <footer>
-    <p data-i18n="footer">&copy; 2025 VFindz</p>
+    <p data-i18n="footer.copyright">© 2025 VFindz</p>
   </footer>
 
-  <!-- Librairies -->
+  <!-- POPUP : écrire les défis -->
+  <div id="popup-defi-premium" role="dialog" aria-modal="true" aria-labelledby="pp-title">
+    <div class="popup-inner">
+      <span class="premium-badge">Premium</span>
+      <div id="pp-title" class="popup-title" data-i18n="duel_premium.popup.title">Écris les 3 défis du duel</div>
+      <input id="pp-d1" class="popup-input" type="text" maxlength="120" data-i18n-placeholder="duel_premium.popup.defi1_ph" placeholder="Défi 1 (obligatoire)">
+      <input id="pp-d2" class="popup-input" type="text" maxlength="120" data-i18n-placeholder="duel_premium.popup.defi2_ph" placeholder="Défi 2 (optionnel)">
+      <input id="pp-d3" class="popup-input" type="text" maxlength="120" data-i18n-placeholder="duel_premium.popup.defi3_ph" placeholder="Défi 3 (optionnel)">
+      <div class="popup-actions">
+        <button id="pp-cancel" class="btn-ghost" data-i18n="common.cancel">Annuler</button>
+        <button id="pp-ok" class="btn-primary" data-i18n="duel_premium.popup.start">Lancer le duel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Libs -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="js/userData.js"></script>
   <script src="js/i18n.js"></script>
 
   <script>
-/* =========================
-   SUPABASE INIT + HELPERS
-   ========================= */
-if (!window.supabase) {
-  console.log("[INIT] Création client Supabase…");
-  window.supabase = supabase.createClient(
-    'https://swmdepiukfginzhbeccz.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI'
-  );
-}
-let pseudoPublic = null;
-let profil = null;
+    // --- Supabase client ---
+    if (!window.supabase) {
+      window.supabase = window.supabaseJsClient = supabase.createClient(
+        'https://swmdepiukfginzhbeccz.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI'
+      );
+    }
+    const sb = window.supabase; // alias sûr
 
-function t(key, fallback='') {
-  try { if (window.i18n && typeof i18n.t === 'function') return i18n.t(key); } catch(e){}
-  return fallback || key;
-}
-function toUniqueArray(arrLike) {
-  const arr = Array.isArray(arrLike) ? arrLike.slice() : [];
-  return [...new Set(arr.filter(Boolean))];
-}
-async function getUserByPseudo(pseudo) {
-  const { data, error } = await window.supabase
-    .from('users')
-    .select('id,pseudo')
-    .eq('pseudo', pseudo)
-    .single();
-  if (error || !data) return null;
-  return data;
-}
+    let pseudoPublic = null;
+    let profil = null;
+    let __acceptFriendPseudo = null;
 
-/* =========================
-   PREMIUM / PROFIL
-   ========================= */
-async function isPremiumUser() {
-  try { if (typeof window.isPremium === 'function') return !!(await window.isPremium()); } catch(e){}
-  return !!profil?.premium;
-}
-async function loadProfil() {
-  await window.loadUserData?.();
-  pseudoPublic = await window.getPseudo?.();
-  const { data, error } = await window.supabase
-    .from('users')
-    .select('id, pseudo, amis, demandesduelrecuespremium, demandesduelenvoyeespremium, premium')
-    .eq('pseudo', pseudoPublic)
-    .single();
-  if (!error && data) profil = data;
-}
+    // --- Helpers ---
+    const A = (x) => Array.isArray(x) ? x : [];
+    const uniq = (arr) => [...new Set(A(arr).filter(Boolean))];
 
-/* =========================
-   AIDE : attendre l’auth avant les fetchs
-   ========================= */
-async function ensureUserReady(maxMs=3000) {
-  const start = Date.now();
-  while (Date.now() - start < maxMs) {
-    try {
-      const p = await (typeof window.getPseudo === 'function' ? window.getPseudo() : null);
-      if (p) return p;
-    } catch(e){}
-    await new Promise(r=>setTimeout(r,150));
-  }
-  return null;
-}
+    async function ensureUserReady(maxMs=3000){
+      const t0 = Date.now();
+      while (Date.now() - t0 < maxMs) {
+        try { if (typeof window.getPseudo === 'function') {
+          const p = await window.getPseudo(); if (p) return p;
+        }} catch(e){}
+        await new Promise(r=>setTimeout(r,140));
+      }
+      return null;
+    }
 
-/* =========================
-   AFFICHAGE UI
-   ========================= */
-function afficherAmis() {
-  const ul = document.getElementById("liste-amis");
-  ul.innerHTML = "";
-  const arr = Array.isArray(profil?.amis) ? profil.amis : [];
-  arr.forEach(p => {
-    const li = document.createElement("div");
-    li.className = "ami-card";
-    li.innerHTML = `
-      <span class="ami-nom">${p}</span>
-      <button class="btn-duel-ami" onclick="inviterDuelPremium('${p}')" data-i18n="duel_premium.inviter_btn">Inviter</button>
-    `;
-    ul.appendChild(li);
-  });
-}
+    async function getUserByPseudo(pseudo){
+      const { data, error } = await sb.from('users').select('id,pseudo').eq('pseudo', pseudo).single();
+      if (error || !data) return null;
+      return data;
+    }
 
-async function afficherDemandesDuel() {
-  const ulRecue = document.getElementById("demandes-recue");
-  ulRecue.innerHTML = "";
-  const recues = toUniqueArray(profil?.demandesduelrecuespremium);
-  if (!recues.length) {
-    ulRecue.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande.received'>Aucune demande reçue.</div>";
-  } else {
-    recues.forEach(pseudo => {
-      const div = document.createElement("div");
-      div.className = "demande-card";
-      div.innerHTML = `
-        <span class="demande-nom">${pseudo}<span class="badge-nouveau" data-i18n="badge.new">Nouveau</span></span>
-        <div>
-          <button class="btn-accepter" onclick="accepterDuelPremium('${pseudo}')" data-i18n="common.accept">Accepter</button>
-          <button class="btn-refuser" onclick="refuserDuelPremium('${pseudo}')" data-i18n="common.refuse">Refuser</button>
-        </div>
-      `;
-      ulRecue.appendChild(div);
-    });
-  }
+    async function isPremiumUser(){
+      try { if (typeof window.isPremium === 'function') return !!(await window.isPremium()); } catch(e){}
+      return !!profil?.premium;
+    }
 
-  const ulEnv = document.getElementById("demandes-envoyees");
-  ulEnv.innerHTML = "";
-  const envoyees = toUniqueArray(profil?.demandesduelenvoyeespremium);
-  if (!envoyees.length) {
-    ulEnv.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande.sent'>Aucune demande envoyée.</div>";
-  } else {
-    for (const amiPseudo of envoyees) {
-      let statusHTML = `<span class="badge-nouveau" style="background:#b3e2ff;color:#20435a;" data-i18n="badge.waiting">En attente</span>`;
+    async function loadProfil(){
+      await window.loadUserData?.();
+      pseudoPublic = await window.getPseudo?.();
+      const { data } = await sb
+        .from('users')
+        .select('id,pseudo,amis,demandesduelrecuespremium,demandesduelenvoyeespremium,premium')
+        .eq('pseudo', pseudoPublic)
+        .single();
+      if (data) profil = data;
+    }
+
+    // --- UI ---
+    function afficherAmis(){
+      const wrap = document.getElementById('liste-amis');
+      wrap.innerHTML = '';
+      A(profil?.amis).forEach(p => {
+        const row = document.createElement('div');
+        row.className = 'ami-card';
+        row.innerHTML = `
+          <span class="ami-nom">${p}</span>
+          <button class="btn-duel-ami" data-i18n="duel_premium.invite">Inviter</button>`;
+        row.querySelector('.btn-duel-ami').onclick = () => inviterDuelPremium(p);
+        wrap.appendChild(row);
+      });
+      window.i18n && window.i18n.apply && window.i18n.apply(wrap);
+    }
+
+    async function afficherDemandesDuel(){
+      // reçues
+      const recWrap = document.getElementById('demandes-recue'); recWrap.innerHTML='';
+      const rec = uniq(profil?.demandesduelrecuespremium);
+      if (!rec.length){
+        const d = document.createElement('div');
+        d.className='aucune-demande';
+        d.setAttribute('data-i18n','duel_premium.none_received');
+        d.textContent='Aucune demande reçue.';
+        recWrap.appendChild(d);
+      } else {
+        rec.forEach(p => {
+          const d = document.createElement('div'); d.className='demande-card';
+          d.innerHTML = `
+            <span class="demande-nom">${p}<span class="badge-nouveau" data-i18n="duel_premium.badge_new">Nouveau</span></span>
+            <div>
+              <button class="btn-accepter" data-i18n="common.accept">Accepter</button>
+              <button class="btn-refuser"  data-i18n="common.refuse">Refuser</button>
+            </div>`;
+          d.querySelector('.btn-accepter').onclick = () => accepterDuelPremium(p);
+          d.querySelector('.btn-refuser').onclick  = () => refuserDuelPremium(p);
+          recWrap.appendChild(d);
+        });
+      }
+
+      // envoyées
+      const envWrap = document.getElementById('demandes-envoyees'); envWrap.innerHTML='';
+      const env = uniq(profil?.demandesduelenvoyeespremium);
+      if (!env.length){
+        const d = document.createElement('div');
+        d.className='aucune-demande';
+        d.setAttribute('data-i18n','duel_premium.none_sent');
+        d.textContent='Aucune demande envoyée.';
+        envWrap.appendChild(d);
+      } else {
+        for (const amiPseudo of env) {
+          let statusHTML = `<span class="badge-nouveau" style="background:#b3e2ff;color:#20435a" data-i18n="duel_premium.badge_wait">En attente</span>`;
+          try {
+            const ami = await getUserByPseudo(amiPseudo);
+            if (ami && profil?.id) {
+              const { data: rooms } = await sb
+                .from('duels').select('id,status')
+                .or(`and(player1_id.eq.${profil.id},player2_id.eq.${ami.id}),and(player1_id.eq.${ami.id},player2_id.eq.${profil.id})`)
+                .in('status', ['playing','waiting']);
+              if (rooms && rooms.length) {
+                statusHTML = `<a href="duel_game.html?room=${rooms[0].id}" class="badge-nouveau" style="background:#65e965;color:#1b2a1b" data-i18n="common.play">Jouer</a>`;
+              }
+            }
+          } catch(e){}
+          const d = document.createElement('div'); d.className='demande-card';
+          d.innerHTML = `<span class="demande-nom">${amiPseudo}</span>${statusHTML}`;
+          envWrap.appendChild(d);
+        }
+      }
+      window.i18n && window.i18n.apply && window.i18n.apply(envWrap);
+    }
+
+    // --- Actions ---
+    async function inviterDuelPremium(amiPseudo){
+      try { if (!(await isPremiumUser())) { alert((i18n&&i18n.t)? i18n.t('duel_premium.need_premium_to_invite') : 'Le mode Premium est requis pour inviter.'); return; } } catch(e){}
+      const ami = await getUserByPseudo(amiPseudo);
+      if (!ami) { alert((i18n&&i18n.t)? i18n.t('errors.friend_not_found') : 'Ami introuvable.'); return; }
+      if (!profil?.id) { alert('Profil non prêt.'); return; }
+
+      // RPC si dispo
+      try {
+        const { error: rpcErr } = await sb.rpc('request_premium_duel', {
+          p_from: profil.id, p_to: ami.id,
+          p_from_pseudo: pseudoPublic, p_to_pseudo: ami.pseudo
+        });
+        if (!rpcErr) { await loadProfil(); afficherAmis(); afficherDemandesDuel(); return; }
+      } catch(e){}
+
+      // Fallback manuel
+      try {
+        const { data: meNow }  = await sb.from('users').select('demandesduelenvoyeespremium').eq('id', profil.id).single();
+        const { data: amiNow } = await sb.from('users').select('demandesduelrecuespremium').eq('id', ami.id).single();
+        const env = uniq(meNow?.demandesduelenvoyeespremium); if (!env.includes(ami.pseudo)) env.push(ami.pseudo);
+        const rec = uniq(amiNow?.demandesduelrecuespremium); if (!rec.includes(pseudoPublic)) rec.push(pseudoPublic);
+        await sb.from('users').update({ demandesduelenvoyeespremium: env }).eq('id', profil.id);
+        await sb.from('users').update({ demandesduelrecuespremium: rec }).eq('id', ami.id);
+        await loadProfil(); afficherAmis(); afficherDemandesDuel();
+      } catch(e){ alert('Erreur d’envoi de la demande.'); }
+    }
+
+    // Popup
+    function openDefiPopup(friendPseudo){
+      __acceptFriendPseudo = friendPseudo;
+      document.getElementById('pp-d1').value='';
+      document.getElementById('pp-d2').value='';
+      document.getElementById('pp-d3').value='';
+      document.getElementById('popup-defi-premium').classList.add('show');
+    }
+    function closeDefiPopup(){
+      document.getElementById('popup-defi-premium').classList.remove('show');
+      __acceptFriendPseudo = null;
+    }
+
+    async function accepterDuelPremium(amiPseudo){ openDefiPopup(amiPseudo); }
+
+    async function createDuelWithDefis(amiPseudo, defisObj){
+      const ami = await getUserByPseudo(amiPseudo);
+      if (!ami || !profil?.id) { alert((i18n&&i18n.t)? i18n.t('errors.create_room') : 'Erreur création du duel.'); return; }
+
+      const now = Date.now();
+      const insertPayload = [{
+        player1_id: ami.id,
+        player2_id: profil.id,
+        player1_pseudo: ami.pseudo,
+        player2_pseudo: pseudoPublic,
+        score1: 0, score2: 0,
+        status: 'playing',           // ou 'waiting'
+        createdat: now,
+        starttime: now,
+        type: 'amis_premium',
+        defis: null,
+        defis_final: defisObj,
+        photosa: {}, photosb: {}
+      }];
+
+      const { data, error } = await sb.from('duels').insert(insertPayload).select();
+      if (error) { console.error(error); alert((i18n&&i18n.t)? i18n.t('errors.create_room') : 'Erreur création du duel.'); return; }
+
+      // nettoyer demandes
+      const recMoi = uniq(profil.demandesduelrecuespremium).filter(p=>p!==amiPseudo);
+      await sb.from('users').update({ demandesduelrecuespremium: recMoi }).eq('id', profil.id);
+      try {
+        const { data: amiRow } = await sb.from('users').select('id,pseudo,demandesduelenvoyeespremium').eq('id', ami.id).single();
+        if (amiRow) {
+          const envAmi = uniq(amiRow.demandesduelenvoyeespremium).filter(p=>p!==pseudoPublic);
+          await sb.from('users').update({ demandesduelenvoyeespremium: envAmi }).eq('id', ami.id);
+        }
+      } catch(e){}
+
+      await loadProfil(); afficherDemandesDuel();
+      if (data && data.length) location.href = `duel_game.html?room=${data[0].id}`;
+    }
+
+    async function refuserDuelPremium(amiPseudo){
+      const recMoi = uniq(profil.demandesduelrecuespremium).filter(p=>p!==amiPseudo);
+      await sb.from('users').update({ demandesduelrecuespremium: recMoi }).eq('id', profil.id);
       try {
         const ami = await getUserByPseudo(amiPseudo);
-        if (ami && profil?.id) {
-          const { data: rooms } = await window.supabase
-            .from('duels')
-            .select('id,status')
-            .or(`and(player1_id.eq.${profil.id},player2_id.eq.${ami.id}),and(player1_id.eq.${ami.id},player2_id.eq.${profil.id})`)
-            .in('status', ['playing','waiting']);
-          if (rooms && rooms.length) {
-            statusHTML = `<a href="duel_game.html?room=${rooms[0].id}" class="badge-nouveau" style="background:#65e965;color:#1b2a1b;">Jouer</a>`;
+        if (ami) {
+          const { data: amiRow } = await sb.from('users').select('id,pseudo,demandesduelenvoyeespremium').eq('id', ami.id).single();
+          if (amiRow) {
+            const envAmi = uniq(amiRow.demandesduelenvoyeespremium).filter(p=>p!==pseudoPublic);
+            await sb.from('users').update({ demandesduelenvoyeespremium: envAmi }).eq('id', ami.id);
           }
         }
       } catch(e){}
-      const card = document.createElement("div");
-      card.className = "demande-card";
-      card.innerHTML = `
-        <span class="demande-nom">${amiPseudo}</span>
-        ${statusHTML}
-      `;
-      ulEnv.appendChild(card);
+      await loadProfil(); afficherDemandesDuel();
     }
-  }
-}
 
-/* =========================
-   INVITER / ACCEPTER / REFUSER
-   ========================= */
-async function inviterDuelPremium(amiPseudo) {
-  // Interdit d’inviter si non-premium
-  try {
-    const prem = await isPremiumUser();
-    if (!prem) { alert(t('duel_premium.need_premium_to_invite','Le mode Premium est requis pour INVITER. Tu peux recevoir et accepter un duel premium.')); return; }
-  } catch(e) {}
+    // --- Bootstrap ---
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      try { if (typeof window.afficherSolde === 'function') { try { await window.afficherSolde(); } catch(e){} } } catch(e){}
 
-  const ami = await getUserByPseudo(amiPseudo);
-  if (!ami) { alert(t('errors.friend_not_found','Ami introuvable.')); return; }
-  if (!profil?.id) { alert("Erreur profil (id manquant)."); return; }
+      await ensureUserReady();
+      await loadProfil();
 
-  // 1) RPC si présent
-  try {
-    const { error: rpcErr } = await window.supabase.rpc('request_premium_duel', {
-      p_from: profil.id, p_to: ami.id,
-      p_from_pseudo: pseudoPublic, p_to_pseudo: ami.pseudo
-    });
-    if (!rpcErr) { await loadProfil(); afficherAmis(); afficherDemandesDuel(); return; }
-  } catch(e){}
-
-  // 2) Fallback manuel
-  try {
-    const { data: meNow }  = await window.supabase.from("users").select("id,demandesduelenvoyeespremium").eq("id", profil.id).single();
-    const { data: amiNow } = await window.supabase.from("users").select("id,demandesduelrecuespremium").eq("id", ami.id).single();
-    const env = toUniqueArray(meNow?.demandesduelenvoyeespremium); if (!env.includes(ami.pseudo)) env.push(ami.pseudo);
-    const rec = toUniqueArray(amiNow?.demandesduelrecuespremium); if (!rec.includes(pseudoPublic)) rec.push(pseudoPublic);
-    await window.supabase.from("users").update({ demandesduelenvoyeespremium: env }).eq("id", profil.id);
-    await window.supabase.from("users").update({ demandesduelrecuespremium: rec }).eq("id", ami.id);
-    await loadProfil(); afficherAmis(); afficherDemandesDuel();
-  } catch(e){ alert("Erreur envoi de la demande."); }
-}
-
-async function accepterDuelPremium(amiPseudo) {
-  // 0) RPC (si présent côté DB)
-  try {
-    const { data: ok, error: rpcErr } = await window.supabase.rpc('accept_premium_duel', {
-      p_me_pseudo: pseudoPublic,
-      p_friend_pseudo: amiPseudo
-    });
-    if (!rpcErr && ok && ok.room_id) {
-      window.location.href = `duel_game.html?room=${ok.room_id}`;
-      return;
-    }
-  } catch(e){}
-
-  // 1) Fallback : insertion directe dans "duels" (schéma actuel)
-  const ami = await getUserByPseudo(amiPseudo);
-  if (!ami || !profil?.id) { alert("Impossible de créer la room (profil/ami)."); return; }
-
-  const now = Date.now(); // BIGINT en ms
-  const insertPayload = [{
-    player1_id: ami.id,           // l’ami en P1
-    player2_id: profil.id,        // moi en P2
-    player1_pseudo: ami.pseudo,
-    player2_pseudo: pseudoPublic,
-    score1: 0,
-    score2: 0,
-    status: 'playing',            // ou 'waiting'
-    createdat: now,
-    starttime: now,
-    type: "amis_premium",
-    defis: null,
-    defis_final: null,
-    photosa: {},
-    photosb: {}
-  }];
-
-  const { data, error: duelErr } = await window.supabase
-    .from('duels').insert(insertPayload).select();
-
-  if (duelErr) { console.error("[DUEL] INSERT duel ERROR:", duelErr); alert("Erreur création de la room."); return; }
-
-  // 2) Nettoie les listes de demandes
-  const recuesMoi = toUniqueArray(profil.demandesduelrecuespremium).filter(p => p !== amiPseudo);
-  await window.supabase.from("users").update({ demandesduelrecuespremium: recuesMoi }).eq("id", profil.id);
-
-  try {
-    const { data: amiRow } = await window.supabase
-      .from("users").select("id,pseudo,demandesduelenvoyeespremium").eq("id", ami.id).single();
-    if (amiRow) {
-      const envAmi = toUniqueArray(amiRow.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
-      await window.supabase.from("users").update({ demandesduelenvoyeespremium: envAmi }).eq("id", ami.id);
-    }
-  } catch(e){}
-
-  await loadProfil();
-  afficherDemandesDuel();
-
-  if (data && data.length) {
-    location.href = `duel_game.html?room=${data[0].id}`;
-  }
-}
-
-async function refuserDuelPremium(amiPseudo) {
-  const recuesMoi = toUniqueArray(profil.demandesduelrecuespremium).filter(p => p !== amiPseudo);
-  await window.supabase.from("users").update({ demandesduelrecuespremium: recuesMoi }).eq("id", profil.id);
-  try {
-    const ami = await getUserByPseudo(amiPseudo);
-    if (ami) {
-      const { data: amiRow } = await window.supabase
-        .from("users").select("id,pseudo,demandesduelenvoyeespremium").eq("id", ami.id).single();
-      if (amiRow) {
-        const envAmi = toUniqueArray(amiRow.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
-        await window.supabase.from("users").update({ demandesduelenvoyeespremium: envAmi }).eq("id", ami.id);
+      if (!(await isPremiumUser())) {
+        const a = document.getElementById('premium-alert');
+        a.style.display = 'block';
+        a.setAttribute('data-i18n','duel_premium.premium_only');
+        document.getElementById('liste-amis').innerHTML =
+          "<div class='aucune-demande' data-i18n='duel_premium.premium_only'>Invitation réservée aux premium.</div>";
+        afficherDemandesDuel();
+      } else {
+        afficherAmis();
+        afficherDemandesDuel();
       }
-    }
-  } catch(e){}
-  await loadProfil();
-  afficherDemandesDuel();
-}
 
-/* =========================
-   MARQUER COMME "VU" À L’OUVERTURE
-   ========================= */
-async function markPremiumSeen() {
-  try {
-    const { data: me } = await window.supabase
-      .from('users').select('id, demandesduelrecuespremium').eq('id', profil?.id).single();
-    if (me && Array.isArray(me.demandesduelrecuespremium) && me.demandesduelrecuespremium.length > 0) {
-      await window.supabase.from('users').update({ demandesduelrecuespremium: [] }).eq('id', me.id);
-    }
-  } catch (e) {}
-  try { localStorage.setItem('duelPremiumNotifCount','0'); } catch(e){}
-}
+      // Marquer comme vues
+      try {
+        const { data: me } = await sb.from('users').select('id,demandesduelrecuespremium').eq('id', profil?.id).single();
+        if (me && A(me.demandesduelrecuespremium).length > 0) {
+          await sb.from('users').update({ demandesduelrecuespremium: [] }).eq('id', me.id);
+        }
+        localStorage.setItem('duelPremiumNotifCount','0');
+      } catch(e){}
 
-/* =========================
-   BOOTSTRAP PAGE
-   ========================= */
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    if (typeof window.afficherSolde === "function") {
-      try { await window.afficherSolde(); } catch(e){}
-    }
-    await ensureUserReady();
-    await loadProfil();
+      // Realtime
+      try {
+        window.__duelPremChan = sb.channel('duel-premium-'+(profil?.id||'me'))
+          .on('postgres_changes',{event:'UPDATE',schema:'public',table:'users',filter:`id=eq.${profil?.id}`},
+            async ()=>{ await loadProfil(); afficherAmis(); afficherDemandesDuel(); })
+          .subscribe();
+      } catch(e){}
 
-    const premium = await isPremiumUser();
-    if (!premium) {
-      const a = document.getElementById("premium-alert");
-      a.style.display = "block";
-      a.setAttribute('data-i18n', 'alert.premium_only');
-      // on affiche uniquement les demandes (pas d’invitation)
-      document.getElementById("liste-amis").innerHTML =
-        "<div class='aucune-demande' data-i18n='alert.premium_only'>Invitation réservée aux premium.</div>";
-      afficherDemandesDuel();
-    } else {
-      afficherAmis();
-      afficherDemandesDuel();
-    }
+      // Popup actions
+      document.getElementById('pp-cancel').onclick = () => closeDefiPopup();
+      document.getElementById('pp-ok').onclick = async () => {
+        const d1 = (document.getElementById('pp-d1').value||'').trim();
+        const d2 = (document.getElementById('pp-d2').value||'').trim();
+        const d3 = (document.getElementById('pp-d3').value||'').trim();
+        if (!d1) { alert((i18n&&i18n.t)? i18n.t('duel_premium.need_d1') : 'Le défi 1 est obligatoire.'); return; }
+        const defis = { d1 }; if (d2) defis.d2 = d2; if (d3) defis.d3 = d3;
+        const friend = __acceptFriendPseudo; closeDefiPopup();
+        await createDuelWithDefis(friend, defis);
+      };
 
-    await markPremiumSeen();
-
-    // Realtime refresh (ma ligne users)
-    try {
-      const chan = window.supabase.channel('duel-premium-' + (profil?.id||'me'))
-        .on('postgres_changes', {
-          event:'UPDATE', schema:'public', table:'users', filter:`id=eq.${profil?.id}`
-        }, async () => {
-          await loadProfil();
-          afficherAmis();
-          afficherDemandesDuel();
-        })
-        .subscribe();
-      window.__duelPremChan = chan;
-    } catch(e){}
-  } catch (e) {}
-});
-  </script>
-
-  <script>
-    function fermerPopupDefiPremium() {
-      document.getElementById('popup-defi-premium').classList.add('hidden');
-    }
+      // i18n initial
+      window.i18n && window.i18n.apply && window.i18n.apply(document.body);
+    });
   </script>
 </body>
 </html>

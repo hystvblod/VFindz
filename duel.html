@@ -7,57 +7,40 @@
   <link rel="stylesheet" href="style/main.css" />
 
   <style>
-    html, body { margin:0; padding:0; }
-    :root { --app-w: 520px; --pad-x: 14px; }
+    /* ===== STYLE SPÉCIFIQUE À LA PAGE DUEL (on laisse le header au CSS global) ===== */
 
-    /* ====== HEADER en GRID : 3 colonnes fixes pour centrer le titre ====== */
-    .header-solo .header-row{
-      display: grid;
-      grid-template-columns: 40px 1fr 80px; /* largeur fixe pour garder le H1 immobile */
-      align-items: center;
-      gap: 8px;
-      max-width: var(--app-w);
+    /* Conteneur principal */
+    .duel-main-wrap{
+      max-width: 520px;
       margin: 0 auto;
-      padding: 12px var(--pad-x) 4px var(--pad-x);
+      padding: 0 14px;
       box-sizing: border-box;
     }
-    .header-solo .back-btn img{ display:block; width:22px; height:22px; }
-    .header-solo h1{
-      margin:0; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-    .header-solo .top-buttons{
-      display:flex; justify-content:flex-end; align-items:center; gap:10px;
-    }
-    .header-solo .top-buttons .btn-icon img{ width:22px; height:22px; display:block; }
 
-    /* Solde aligné à la même largeur centrée */
-    .solde-container.solde-solo{
-      max-width: var(--app-w);
-      margin: 0 auto;
-      padding: 0 var(--pad-x);
-      box-sizing: border-box;
-      display:flex; gap:18px;
-    }
-    .solde-item .solde-ligne{ display:flex; align-items:center; gap:8px; }
-    .icon-solo-piece,.icon-solo-jeton{ width:20px; height:20px; }
-
-    /* ====== Corps centré ====== */
-    .duel-main-wrap{ max-width:var(--app-w); margin:0 auto; padding:0 var(--pad-x); box-sizing:border-box; }
+    /* Boutons de choix */
     .duel-choice-box{
-      display:flex; flex-direction:column; gap:14px;
-      width:100%; max-width:var(--app-w);
-      margin: 22px auto 28px auto;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      width:100%;
+      margin:22px auto 28px auto;
     }
     .duel-choice-btn{
-      display:block; width:100%;
-      text-decoration:none; text-align:center;
-      font-weight:700; padding:1rem 1.2rem; border-radius:14px;
-      background:#ffffff22; color:#fff; backdrop-filter:blur(5px);
+      display:block;
+      width:100%;
+      text-decoration:none;
+      text-align:center;
+      font-weight:700;
+      padding:1rem 1.2rem;
+      border-radius:14px;
+      background:#ffffff22;
+      color:#fff;
+      backdrop-filter:blur(5px);
       transition:background .2s ease, box-shadow .2s ease, outline-color .2s ease;
     }
     .duel-choice-btn:hover{ background:#ffffff44; }
 
-    /* ====== Badge + état "alerte" (couleur index) ====== */
+    /* Badge + état alerte */
     .notif-wrap{ position:relative; display:inline-block; }
     .notif-badge{
       position:absolute; top:-8px; right:-10px;
@@ -69,27 +52,46 @@
     }
     .btn-alert{
       background:#ff3b30 !important; color:#fff !important;
-      outline:2px solid #ff3b30; box-shadow:0 0 0 4px #ff3b3033, 0 10px 22px rgba(0,0,0,.35);
+      outline:2px solid #ff3b30;
+      box-shadow:0 0 0 4px #ff3b3033, 0 10px 22px rgba(0,0,0,.35);
     }
 
-    /* ====== Footer bas gauche ====== */
+    /* Footer */
     footer{
-      max-width: var(--app-w);
+      max-width: 520px;
       margin: 0 auto;
-      padding: 0 var(--pad-x) 18px var(--pad-x);
+      padding: 0 14px 18px 14px;
       box-sizing: border-box;
     }
     footer p{ margin:0; text-align:left; opacity:.75; }
 
+    /* Ligne de solde : on réutilise le style “profil” pour cohérence */
+    .duel-solde-bar{
+      max-width:520px;
+      margin: 2px auto 0 auto;
+      padding: 0 14px;
+      display:flex;
+      align-items:center;
+      gap:18px;
+      box-sizing:border-box;
+    }
+    .duel-solde-bar .solde-piece,
+    .duel-solde-bar .solde-jeton{
+      display:flex; align-items:center; gap:8px;
+    }
+    .duel-solde-bar .vcoin-solo,
+    .duel-solde-bar .jeton-solo{ width:20px; height:20px; }
+
     @media (max-width:600px){
-      :root{ --app-w: 92vw; --pad-x: 10px; }
-      .header-solo .header-row{ grid-template-columns: 36px 1fr 72px; }
+      .duel-main-wrap{ max-width:92vw; padding:0 10px; }
+      .duel-solde-bar{ max-width:92vw; padding:0 10px; }
+      footer{ max-width:92vw; padding:0 10px 18px 10px; }
     }
   </style>
 </head>
 <body class="duel-container">
 
-  <!-- HEADER -->
+  <!-- HEADER (identique aux autres pages : classes et grille gérées par main.css) -->
   <header class="header-solo">
     <div class="header-row">
       <a href="index.html" class="back-btn" title="Retour" data-i18n-title="header.back">
@@ -97,7 +99,7 @@
       </a>
       <h1 class="duel-titre-pro" data-i18n="header.title.duel">Duel</h1>
       <div class="top-buttons">
-        <a href="index.html" class="btn-icon" aria-label="Profil">
+        <a href="profil.html" class="btn-icon" aria-label="Profil">
           <img src="assets/icons/user.svg" alt="Profil" />
         </a>
         <a href="parametres.html" class="btn-icon" aria-label="Paramètres">
@@ -106,18 +108,15 @@
       </div>
     </div>
 
-    <div class="solde-container solde-solo" id="solde-container">
-      <div class="solde-item">
-        <div class="solde-ligne">
-          <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" />
-          <span id="points"></span>
-        </div>
+    <!-- SOLDE (même rendu que sur Profil) -->
+    <div class="duel-solde-bar" id="solde-container">
+      <div class="solde-piece">
+        <img src="assets/img/vcoin.webp" class="vcoin-solo" alt="VCoins" />
+        <span id="points">0</span>
       </div>
-      <div class="solde-item">
-        <div class="solde-ligne">
-          <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" />
-          <span id="jetons"></span>
-        </div>
+      <div class="solde-jeton">
+        <img src="assets/img/jeton_p.webp" class="jeton-solo" alt="Jetons" />
+        <span id="jetons">0</span>
       </div>
     </div>
   </header>
@@ -125,7 +124,9 @@
   <!-- CONTENU -->
   <main class="duel-main-wrap">
     <div class="duel-choice-box">
-      <a href="duel_random.html" class="duel-choice-btn" data-i18n="duel.choice.random">Jouer contre un adversaire aléatoire</a>
+      <a href="duel_random.html" class="duel-choice-btn" data-i18n="duel.choice.random">
+        Jouer contre un adversaire aléatoire
+      </a>
 
       <!-- Ami + badge -->
       <a href="duel_amis.html" id="btn-duel-ami" class="duel-choice-btn notif-wrap" data-i18n="duel.choice.friend">
@@ -141,32 +142,10 @@
     </div>
   </main>
 
-  <!-- FOOTER : bas gauche -->
+  <!-- FOOTER -->
   <footer>
     <p data-i18n="footer">© 2025 VFindz</p>
   </footer>
-
-  <!-- POPUPS (conservées) -->
-  <div id="popup-signal-photo" class="popup hidden" tabindex="-1">
-    <div class="popup-inner">
-      <h2 data-i18n="popup.signal.title">Signaler cette photo</h2>
-      <p data-i18n="popup.signal.question">Quel est le problème ?</p>
-      <div class="signal-motifs">
-        <button class="btn-signal-type" data-type="triche" data-i18n="popup.signal.cheat">Triche / Hors-sujet</button>
-        <button class="btn-signal-type" data-type="nudite" data-i18n="popup.signal.nudity">Nudité / Contenu choquant</button>
-        <button class="btn-signal-type" data-type="autre" data-i18n="popup.signal.other">Autre motif</button>
-      </div>
-      <button id="close-popup" class="close-btn" data-i18n="popup.signal.close">Fermer</button>
-    </div>
-  </div>
-
-  <div id="popup-jeton-valider" class="popup hidden" tabindex="-1">
-    <div class="popup-inner">
-      <h2 data-i18n="popup.jeton.title">Valider avec 1 jeton ?</h2>
-      <button id="btn-confirm-jeton" data-i18n="popup.jeton.confirm">Valider</button>
-      <button id="btn-cancel-jeton" data-i18n="popup.jeton.cancel">Annuler</button>
-    </div>
-  </div>
 
   <!-- SCRIPTS -->
   <script src="js/i18n.js"></script>
@@ -184,8 +163,8 @@
       );
     }
 
-    // Helpers
-    const A = (x) => Array.isArray(x) ? x : [];
+    const A = x => Array.isArray(x) ? x : [];
+
     function setBadge(btnId, badgeId, count){
       const btn = document.getElementById(btnId);
       const badge = document.getElementById(badgeId);
@@ -200,6 +179,7 @@
         btn.classList.remove('btn-alert');
       }
     }
+
     async function ensureUserReady(maxMs=3000){
       const t0=Date.now();
       while(Date.now()-t0<maxMs){
@@ -214,8 +194,8 @@
       return null;
     }
 
-    // Lecture et rendu des compteurs
     let MY_ID = null;
+
     async function refreshBadges(){
       const pseudo = await ensureUserReady();
       if(!pseudo) return;
@@ -226,13 +206,17 @@
         .eq('pseudo', pseudo)
         .single();
 
-      if(error || !data){ setBadge('btn-duel-ami','badge-duel-ami',0); setBadge('btn-duel-premium','badge-duel-premium',0); return; }
+      if(error || !data){
+        setBadge('btn-duel-ami','badge-duel-ami',0);
+        setBadge('btn-duel-premium','badge-duel-premium',0);
+        return;
+      }
 
       MY_ID = data.id;
 
       const classicDuels = A(data.demandesduelrecues).length;        // text[]
       const friendReqs   = A(data.demandesamisrecues).length;        // text[]
-      const premiumDuels = A(data.demandesduelrecuespremium).length; // jsonb array
+      const premiumDuels = A(data.demandesduelrecuespremium).length; // jsonb[]
 
       // Ami rouge si demandes d'ami OU duel classique
       setBadge('btn-duel-ami', 'badge-duel-ami', friendReqs + classicDuels);
