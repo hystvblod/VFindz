@@ -20,7 +20,7 @@
     .btn-accepter{background:#65e965;color:#253a25}
     .btn-refuser{background:#f36d6d;color:#232323}
     .aucune-demande{color:#bdbdc8;text-align:center;font-size:1.01em;margin:.3em 0 .8em}
-    /* POPUP plein écran & centrée */
+    /* POPUP */
     #popup-defi-premium{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(30,32,48,.84);width:100vw;height:100vh}
     #popup-defi-premium.show{display:flex}
     .popup-inner{background:#232435;border-radius:1.23em;padding:1.6em 1.2em 1.2em;width:440px;max-width:94vw;box-shadow:0 8px 28px #0007;color:#e9ecff}
@@ -122,14 +122,14 @@
   <script src="js/userData.js"></script>
   <script src="js/i18n.js"></script>
   <script>
-    // Back-compat pour i18n.t/apply
+    // Back-compat i18n
     window.i18n = window.i18n || {};
     window.i18n.t = (k, vars, fb) => (window.t ? window.t(k, vars, fb) : (fb || k));
     window.i18n.apply = (root) => { if (window.i18nTranslateAll) window.i18nTranslateAll(); };
   </script>
 
   <script>
-    // --- Supabase client ---
+    /* ============ Supabase client ============ */
     if (!window.supabase) {
       window.supabase = window.supabaseJsClient = supabase.createClient(
         'https://swmdepiukfginzhbeccz.supabase.co',
@@ -143,70 +143,77 @@
     let __acceptFriendPseudo = null;
     let __popupMode = 'one_premium_me'; // 'one_premium_me' | 'both_premium'
 
-    // --- Helpers ---
-    function A(x){ return Array.isArray(x) ? x : []; }
-    function uniq(arr){ return [...new Set(A(arr).filter(Boolean))]; }
-    function t(key, fallback){
-      try { return (window.i18n && window.i18n.t) ? window.i18n.t(key) : (fallback || key); }
-      catch(e){ return fallback || key; }
-    }
+    /* ============ Helpers ============ */
+    const A = (x)=>Array.isArray(x)?x:[];
+    const uniq = (arr)=>[...new Set(A(arr).filter(Boolean))];
+    function t(key, fb){ try{ return (window.i18n&&window.i18n.t)?window.i18n.t(key): (fb||key);}catch(e){return fb||key;} }
 
     async function ensureUserReady(maxMs=3000){
       const t0 = Date.now();
-      while (Date.now() - t0 < maxMs) {
-        try { if (typeof window.getPseudo === 'function') { const p = await window.getPseudo(); if (p) return p; } }
-        catch(e){}
+      while (Date.now()-t0 < maxMs){
+        try{ if (typeof window.getPseudo==='function'){ const p = await window.getPseudo(); if (p) return p; } }catch(e){}
         await new Promise(r=>setTimeout(r,140));
       }
       return null;
     }
 
     async function getUserByPseudo(pseudo){
-      const resp = await sb.from('users').select('id,pseudo,premium').eq('pseudo', pseudo).single();
-      return (!resp.error && resp.data) ? resp.data : null;
+      const r = await sb.from('users').select('id,pseudo,premium').eq('pseudo', pseudo).single();
+      return (!r.error && r.data) ? r.data : null;
     }
 
     async function isPremiumUser(){
-      try { if (typeof window.isPremium === 'function') return !!(await window.isPremium()); } catch(e){}
+      try{ if (typeof window.isPremium==='function') return !!(await window.isPremium()); }catch(e){}
       return !!(profil && profil.premium);
     }
 
     async function loadProfil(){
       if (window.loadUserData) await window.loadUserData();
       if (window.getPseudo) pseudoPublic = await window.getPseudo();
-      const resp = await sb
-        .from('users')
+      const r = await sb.from('users')
         .select('id,pseudo,amis,demandesduelrecuespremium,demandesduelenvoyeespremium,premium')
-        .eq('pseudo', pseudoPublic)
-        .single();
-      if (resp.data) profil = resp.data;
+        .eq('pseudo', pseudoPublic).single();
+      if (r.data) profil = r.data;
     }
 
-    // --- UI ---
+    /* ============ UI Amis & Demandes ============ */
     function afficherAmis(){
       const wrap = document.getElementById('liste-amis');
       wrap.innerHTML = '';
-      A(profil && profil.amis).forEach(function(p){
+      A(profil && profil.amis).forEach(p=>{
         const row = document.createElement('div');
         row.className = 'ami-card';
         row.innerHTML =
-          '<span class="ami-nom">'+p+'</span>' +
-          '<button class="btn-duel-ami" data-i18n="duel_premium.invite">'+t('duel_premium.invite','Inviter')+'</button>';
-        row.querySelector('.btn-duel-ami').onclick = function(){ inviterDuelPremium(p); };
+          `<span class="ami-nom">${p}</span>
+           <button class="btn-duel-ami" data-i18n="duel_premium.invite">${t('duel_premium.invite','Inviter')}</button>`;
+        row.querySelector('.btn-duel-ami').onclick = ()=> inviterDuelPremium(p);
         wrap.appendChild(row);
       });
       if (window.i18n && window.i18n.apply) window.i18n.apply(wrap);
     }
 
     function buildDuelFilter(meId, amiId){
-      const pair = (a,b) => `and(player1_id.eq.${a},player2_id.eq.${b})`;
-      return pair(meId,amiId)+','+pair(amiId,meId);
+      const pair=(a,b)=>`and(player1_id.eq.${a},player2_id.eq.${b})`;
+      return `${pair(meId,amiId)},${pair(amiId,meId)}`;
+    }
+
+    async function findActiveRoom(meId, amiId){
+      const filter = buildDuelFilter(meId, amiId);
+      const r = await sb.from('duels')
+        .select('id,status,type')
+        .eq('type','amis_premium')
+        .or(filter)
+        .in('status',['waiting','playing'])
+        .order('createdat',{ascending:false})
+        .limit(1);
+      return (!r.error && r.data && r.data[0]) ? r.data[0] : null;
     }
 
     async function afficherDemandesDuel(){
-      // reçues
+      /* --- Reçues --- */
       const recWrap = document.getElementById('demandes-recue'); recWrap.innerHTML='';
       const rec = uniq(profil && profil.demandesduelrecuespremium);
+
       if (!rec.length){
         const d = document.createElement('div');
         d.className='aucune-demande';
@@ -214,23 +221,37 @@
         d.textContent = t('duel_premium.none_received','Aucune demande reçue.');
         recWrap.appendChild(d);
       } else {
-        rec.forEach(function(p){
+        for (const p of rec){
+          let rightHTML =
+            `<button class="btn-accepter" data-i18n="common.accept">${t('common.accept','Accepter')}</button>
+             <button class="btn-refuser"  data-i18n="common.refuse">${t('common.refuse','Refuser')}</button>`;
+
+          try{
+            const ami = await getUserByPseudo(p);
+            if (ami && profil && profil.id){
+              const room = await findActiveRoom(profil.id, ami.id);
+              if (room){
+                rightHTML = `<a href="duel_game.html?room=${room.id}" class="badge-nouveau" style="background:#65e965;color:#1b2a1b" data-i18n="common.play">${t('common.play','Jouer')}</a>`;
+              }
+            }
+          }catch(e){}
+
           const d = document.createElement('div'); d.className='demande-card';
           d.innerHTML =
-            '<span class="demande-nom">'+p+'<span class="badge-nouveau" data-i18n="duel_premium.badge_new">'+t('duel_premium.badge_new','Nouveau')+'</span></span>' +
-            '<div>' +
-              '<button class="btn-accepter" data-i18n="common.accept">'+t('common.accept','Accepter')+'</button>' +
-              '<button class="btn-refuser"  data-i18n="common.refuse">'+t('common.refuse','Refuser')+'</button>' +
-            '</div>';
-          d.querySelector('.btn-accepter').onclick = function(){ accepterDuelPremium(p); };
-          d.querySelector('.btn-refuser').onclick  = function(){ refuserDuelPremium(p); };
+            `<span class="demande-nom">${p}</span>
+             <div>${rightHTML}</div>`;
+          const btnAcc = d.querySelector('.btn-accepter');
+          const btnRef = d.querySelector('.btn-refuser');
+          if (btnAcc) btnAcc.onclick = ()=> accepterDuelPremium(p);
+          if (btnRef) btnRef.onclick = ()=> refuserDuelPremium(p);
           recWrap.appendChild(d);
-        });
+        }
       }
 
-      // envoyées
+      /* --- Envoyées --- */
       const envWrap = document.getElementById('demandes-envoyees'); envWrap.innerHTML='';
       const env = uniq(profil && profil.demandesduelenvoyeespremium);
+
       if (!env.length){
         const d2 = document.createElement('div');
         d2.className='aucune-demande';
@@ -238,61 +259,53 @@
         d2.textContent = t('duel_premium.none_sent','Aucune demande envoyée.');
         envWrap.appendChild(d2);
       } else {
-        for (const amiPseudo of env) {
-          let statusHTML = '<span class="badge-nouveau" style="background:#b3e2ff;color:#20435a" data-i18n="duel_premium.badge_wait">'+t('duel_premium.badge_wait','En attente')+'</span>';
-          try {
+        for (const amiPseudo of env){
+          let statusHTML = `<span class="badge-nouveau" style="background:#b3e2ff;color:#20435a" data-i18n="duel_premium.badge_wait">${t('duel_premium.badge_wait','En attente')}</span>`;
+          try{
             const ami = await getUserByPseudo(amiPseudo);
-            if (ami && profil && profil.id) {
-              const filter = buildDuelFilter(profil.id, ami.id);
-              const roomsResp = await sb
-                .from('duels').select('id,status')
-                .or(filter)
-                .in('status', ['playing','waiting']);
-              const rooms = roomsResp.data || [];
-              if (rooms.length) {
-                statusHTML = '<a href="duel_game.html?room='+rooms[0].id+'" class="badge-nouveau" style="background:#65e965;color:#1b2a1b" data-i18n="common.play">'+t('common.play','Jouer')+'</a>';
+            if (ami && profil && profil.id){
+              const room = await findActiveRoom(profil.id, ami.id);
+              if (room){
+                statusHTML = `<a href="duel_game.html?room=${room.id}" class="badge-nouveau" style="background:#65e965;color:#1b2a1b" data-i18n="common.play">${t('common.play','Jouer')}</a>`;
               }
             }
-          } catch(e){}
+          }catch(e){}
           const d3 = document.createElement('div'); d3.className='demande-card';
-          d3.innerHTML = '<span class="demande-nom">'+amiPseudo+'</span>'+statusHTML;
+          d3.innerHTML = `<span class="demande-nom">${amiPseudo}</span>${statusHTML}`;
           envWrap.appendChild(d3);
         }
       }
-      if (window.i18n && window.i18n.apply) window.i18n.apply(envWrap);
+
+      if (window.i18n && window.i18n.apply){
+        window.i18n.apply(recWrap);
+        window.i18n.apply(envWrap);
+      }
     }
 
-    // --- Actions ---
+    /* ============ Actions ============ */
     async function inviterDuelPremium(amiPseudo){
-      try {
+      try{
         const prem = await isPremiumUser();
-        if (!prem) {
-          alert(t('duel_premium.need_premium_to_invite','Le mode Premium est requis pour inviter.'));
-          return;
-        }
-      } catch(e){}
+        if (!prem){ alert(t('duel_premium.need_premium_to_invite','Le mode Premium est requis pour inviter.')); return; }
+      }catch(e){}
       const ami = await getUserByPseudo(amiPseudo);
-      if (!ami) { alert(t('errors.friend_not_found','Ami introuvable.')); return; }
-      if (!profil || !profil.id) { alert('Profil non prêt.'); return; }
+      if (!ami){ alert(t('errors.friend_not_found','Ami introuvable.')); return; }
+      if (!profil || !profil.id){ alert('Profil non prêt.'); return; }
 
-      // RPC côté DB (écrit demandesduel* proprement)
+      // RPC conseillé pour écrire les tableaux demandesduel* côté DB
       const { error } = await sb.rpc('request_premium_duel', {
         p_from: profil.id, p_to: ami.id,
         p_from_pseudo: pseudoPublic, p_to_pseudo: ami.pseudo
       });
-      if (error) {
-        console.error('[RPC request_premium_duel]', error);
-        alert('Erreur envoi invitation (RPC). Vérifie la fonction SQL / droits.');
-        return;
-      }
+      if (error){ console.error('[RPC request_premium_duel]', error); alert('Erreur envoi invitation (RPC).'); return; }
+
       await loadProfil();
       afficherAmis();
       afficherDemandesDuel();
     }
 
-    // --- Popup modes ---
     function setPopupMode(mode){
-      __popupMode = mode; // 'one_premium_me' | 'both_premium'
+      __popupMode = mode;
       const title = document.getElementById('pp-title');
       const d1 = document.getElementById('pp-d1');
       const d2 = document.getElementById('pp-d2');
@@ -301,26 +314,23 @@
       const cand = document.getElementById('pp-cand');
       const ok   = document.getElementById('pp-ok');
 
-      if (mode === 'both_premium'){
+      if (mode==='both_premium'){
         title.textContent = t('duel_premium.popup.title_both_premium','Vous êtes tous deux Premium');
-        d1.style.display = 'none'; d2.style.display = 'none'; d3.style.display = 'none';
-        fixe.style.display = 'block'; cand.style.display = 'block';
+        d1.style.display='none'; d2.style.display='none'; d3.style.display='none';
+        fixe.style.display='block'; cand.style.display='block';
         ok.textContent = t('duel_premium.popup.continue','Valider');
-      } else {
+      }else{
         title.textContent = t('duel_premium.popup.title_one_premium','Tu es Premium : écris les 3 défis');
-        d1.style.display = 'block'; d2.style.display = 'block'; d3.style.display = 'block';
-        fixe.style.display = 'none'; cand.style.display = 'none';
+        d1.style.display='block'; d2.style.display='block'; d3.style.display='block';
+        fixe.style.display='none'; cand.style.display='none';
         ok.textContent = t('duel_premium.popup.start','Lancer le duel');
       }
     }
-
     function openDefiPopup(friendPseudo, options){
-      options = options || { mode: 'one_premium_me' };
+      options = options||{mode:'one_premium_me'};
       __acceptFriendPseudo = friendPseudo;
-      ['pp-d1','pp-d2','pp-d3','pp-fixe','pp-cand'].forEach(id=>{
-        const el = document.getElementById(id); if (el) el.value='';
-      });
-      setPopupMode(options.mode || 'one_premium_me');
+      ['pp-d1','pp-d2','pp-d3','pp-fixe','pp-cand'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value='';});
+      setPopupMode(options.mode||'one_premium_me');
       document.getElementById('popup-defi-premium').classList.add('show');
     }
     function closeDefiPopup(){
@@ -328,49 +338,27 @@
       __acceptFriendPseudo = null;
     }
 
-    // --- Trouver une room existante entre 2 users ---
-    async function findExistingRoomBetween(meId, amiId){
-      const filter = buildDuelFilter(meId, amiId);
-      const r = await sb
-        .from('duels')
-        .select('id,status,type,defis_mode,defis_author_id,defis_partial,player1_id,player2_id')
-        .or(filter)
-        .order('createdat', { ascending:false })
-        .limit(1);
-      if (r.error || !r.data || !r.data.length) return null;
-      return r.data[0];
-    }
-
-    function pickRandom(a,b){
-      const cand = [];
-      if (a) cand.push(a);
-      if (b) cand.push(b);
-      if (!cand.length) return null;
-      return cand[Math.floor(Math.random()*cand.length)];
-    }
-
-    // --- Accept flows (A/B) ---
     async function accepterDuelPremium(amiPseudo){
       const me = { id: profil ? profil.id : null, pseudo: pseudoPublic, premium: await isPremiumUser() };
       const ami = await getUserByPseudo(amiPseudo);
       if (!ami || !me.id){ alert(t('errors.create_room','Erreur création du duel.')); return; }
 
-      // B: deux premium -> chacun écrit 1 fixe + 1 candidat
       if (me.premium && ami.premium){
-        openDefiPopup(amiPseudo, { mode:'both_premium' });
+        // Deux premium → popup 1 fixe + 1 candidat
+        openDefiPopup(amiPseudo, {mode:'both_premium'});
         return;
       }
 
-      // A: un seul premium -> le premium écrit 3 défis
       if (me.premium && !ami.premium){
-        openDefiPopup(amiPseudo, { mode:'one_premium_me' });
+        // Moi premium → j’écrirai 3 défis
+        openDefiPopup(amiPseudo, {mode:'one_premium_me'});
         return;
       }
 
       if (!me.premium && ami.premium){
-        // Non-premium accepte l’invit d’un premium : room en "waiting"
+        // Non-premium qui accepte → créer une room waiting en attendant que le premium écrive les 3 défis
         const now = Date.now();
-        const insertPayload = [{
+        const payload = [{
           player1_id: ami.id,
           player2_id: me.id,
           player1_pseudo: ami.pseudo,
@@ -379,24 +367,22 @@
           createdat: now,
           starttime: now,
           type: 'amis_premium',
-          defis_mode: 'one_premium_friend_writes',
-          defis_author_id: ami.id,
           defis_final: null,
           photosa: {}, photosb: {}
         }];
-        const ins = await sb.from('duels').insert(insertPayload).select();
+        const ins = await sb.from('duels').insert(payload).select();
         if (ins.error){ console.error(ins.error); alert(t('errors.create_room','Erreur création du duel.')); return; }
 
         // Nettoyage demandes
-        const recMoi = uniq(profil && profil.demandesduelrecuespremium).filter(p => p!==amiPseudo);
+        const recMoi = uniq(profil && profil.demandesduelrecuespremium).filter(x=>x!==amiPseudo);
         await sb.from('users').update({ demandesduelrecuespremium: recMoi }).eq('id', me.id);
-        try {
+        try{
           const amiRow = await sb.from('users').select('id,pseudo,demandesduelenvoyeespremium').eq('id', ami.id).single();
-          if (amiRow && amiRow.data) {
-            const envAmi = uniq(amiRow.data.demandesduelenvoyeespremium).filter(p => p!==me.pseudo);
+          if (amiRow && amiRow.data){
+            const envAmi = uniq(amiRow.data.demandesduelenvoyeespremium).filter(x=>x!==me.pseudo);
             await sb.from('users').update({ demandesduelenvoyeespremium: envAmi }).eq('id', ami.id);
           }
-        } catch(e){}
+        }catch(e){}
         await loadProfil(); afficherDemandesDuel();
 
         alert(t('duel_premium.info.waiting_premium_defis','Le joueur premium rédigera les défis.'));
@@ -407,9 +393,12 @@
       alert(t('errors.create_room','Erreur création du duel.'));
     }
 
+    /* ============ Création / Finalisation selon ton schéma ============ */
+
+    // Mode A : un premium écrit 3 défis → direct playing
     async function createDuelWithDefis_OnePremium(ami, defisArray){
       const now = Date.now();
-      const insertPayload = [{
+      const payload = [{
         player1_id: ami.id,
         player2_id: profil.id,
         player1_pseudo: ami.pseudo,
@@ -418,56 +407,66 @@
         createdat: now,
         starttime: now,
         type: 'amis_premium',
-        defis_mode: 'one_premium_all3',
-        defis_author_id: profil.id,
-        defis_final: defisArray,  // tableau
-        defis: defisArray,        // miroir pour l'écran de jeu
+        defis_final: defisArray, // tableau
+        defis: defisArray,       // miroir pour l'UI du jeu (duel_game lit room.defis)
         photosa: {}, photosb: {}
       }];
-
-      const ins = await sb.from('duels').insert(insertPayload).select();
-      if (ins.error) { console.error(ins.error); alert(t('errors.create_room','Erreur création du duel.')); return null; }
-      return (ins.data && ins.data[0]) ? ins.data[0] : null;
+      const ins = await sb.from('duels').insert(payload).select();
+      if (ins.error){ console.error(ins.error); alert(t('errors.create_room','Erreur création du duel.')); return null; }
+      return ins.data[0];
     }
 
+    // Mode B : deux premium → chacun 1 fixe + 1 candidat
     async function createOrFinalizeDuel_BothPremium(ami, myFixed, myCand){
       const meId = profil.id, amiId = ami.id;
-      const existing = await findExistingRoomBetween(meId, amiId);
 
-      // Cas 1 : room en attente avec la contribution de l'autre → on finalise
-      if (existing && existing.status === 'waiting' && existing.defis_mode === 'both_premium' && existing.defis_partial) {
-        try {
-          let otherPartial = existing.defis_partial;
-          if (typeof otherPartial === 'string') { try { otherPartial = JSON.parse(otherPartial); } catch(e){} }
+      // chercher une room waiting entre nous sans defis_final
+      const filter = buildDuelFilter(meId, amiId);
+      const r = await sb.from('duels')
+        .select('id,status,type,player1_id,player2_id,defis1,defis2,defis3a,defis3b,defis_final')
+        .eq('type','amis_premium')
+        .or(filter)
+        .eq('status','waiting')
+        .is('defis_final', null)
+        .order('createdat',{ascending:false})
+        .limit(1);
 
-          const otherFixed = otherPartial?.fixed || '';
-          const otherCand  = otherPartial?.cand  || '';
-          const d1 = otherFixed;
-          const d2 = myFixed;
-          const d3 = pickRandom(myCand, otherCand);
+      const existing = (!r.error && r.data && r.data[0]) ? r.data[0] : null;
 
-          const finalArr = [d1, d2]; if (d3) finalArr.push(d3);
+      // Si une room existe → on complète mes colonnes (selon mon côté) puis on finalise si tout est rempli
+      if (existing){
+        const IamP1 = existing.player1_id === meId;
+        const update = {};
+        if (IamP1){ update.defis1 = myFixed; update.defis3a = myCand || null; }
+        else      { update.defis2 = myFixed; update.defis3b = myCand || null; }
 
-          const upd = await sb
-            .from('duels')
-            .update({ defis_final: finalArr, defis: finalArr, status: 'playing', defis_partial: null })
-            .eq('id', existing.id)
-            .select();
+        // Pré-calcul pour savoir si tout est prêt après update
+        const d1 = IamP1 ? myFixed        : (existing.defis1 || null);
+        const d2 = IamP1 ? (existing.defis2||null) : myFixed;
+        const cA = IamP1 ? (myCand||null) : (existing.defis3a||null);
+        const cB = IamP1 ? (existing.defis3b||null) : (myCand||null);
 
-          if (upd.error){ console.error(upd.error); alert(t('errors.create_room','Erreur finalisation du duel.')); return existing; }
-          return (upd.data && upd.data[0]) ? upd.data[0] : existing;
-        } catch(e){
-          console.error(e);
-          alert(t('errors.create_room','Erreur finalisation du duel.'));
-          return existing;
+        // si tout est rempli → tirage d3
+        if (d1 && d2 && (cA || cB)){
+          const pick = (a,b)=> {
+            const arr=[]; if(a)arr.push(a); if(b)arr.push(b);
+            return arr[Math.floor(Math.random()*arr.length)];
+          };
+          const d3 = pick(cA,cB);
+          update.defis_final = [d1,d2,d3];
+          update.defis = update.defis_final;
+          update.status = 'playing';
         }
+
+        const upd = await sb.from('duels').update(update).eq('id', existing.id).select();
+        if (upd.error){ console.error(upd.error); alert(t('errors.create_room','Erreur finalisation du duel.')); return existing; }
+        return upd.data[0];
       }
 
-      // Cas 2 : pas de contribution de l'autre → on crée une room en "waiting" avec MA contribution
+      // Sinon → je crée une room waiting avec MA contribution uniquement
       const now = Date.now();
-      const myPartial = { author_id: meId, fixed: myFixed, cand: myCand };
-
-      const insertPayload = [{
+      const I_write_as_P2 = true; // comme dans ton flux précédent : je me positionne player2
+      const payload = [{
         player1_id: amiId,
         player2_id: meId,
         player1_pseudo: ami.pseudo,
@@ -476,97 +475,98 @@
         createdat: now,
         starttime: now,
         type: 'amis_premium',
-        defis_mode: 'both_premium',
-        defis_author_id: null,
-        defis_partial: myPartial,
+        defis1: I_write_as_P2 ? null     : myFixed,
+        defis2: I_write_as_P2 ? myFixed  : null,
+        defis3a: I_write_as_P2 ? null    : (myCand || null),
+        defis3b: I_write_as_P2 ? (myCand || null) : null,
         defis_final: null,
         photosa: {}, photosb: {}
       }];
 
-      const ins = await sb.from('duels').insert(insertPayload).select();
-      if (ins.error) { console.error(ins.error); alert(t('errors.create_room','Erreur création du duel.')); return null; }
-      return (ins.data && ins.data[0]) ? ins.data[0] : null;
+      const ins = await sb.from('duels').insert(payload).select();
+      if (ins.error){ console.error(ins.error); alert(t('errors.create_room','Erreur création du duel.')); return null; }
+      return ins.data[0];
     }
 
     async function refuserDuelPremium(amiPseudo){
-      const recMoi = uniq(profil && profil.demandesduelrecuespremium).filter(p => p!==amiPseudo);
+      const recMoi = uniq(profil && profil.demandesduelrecuespremium).filter(x=>x!==amiPseudo);
       await sb.from('users').update({ demandesduelrecuespremium: recMoi }).eq('id', profil.id);
-      try {
+      try{
         const ami = await getUserByPseudo(amiPseudo);
-        if (ami) {
+        if (ami){
           const amiRow = await sb.from('users').select('id,pseudo,demandesduelenvoyeespremium').eq('id', ami.id).single();
-          if (amiRow && amiRow.data) {
-            const envAmi = uniq(amiRow.data.demandesduelenvoyeespremium).filter(p => p!==pseudoPublic);
+          if (amiRow && amiRow.data){
+            const envAmi = uniq(amiRow.data.demandesduelenvoyeespremium).filter(x=>x!==pseudoPublic);
             await sb.from('users').update({ demandesduelenvoyeespremium: envAmi }).eq('id', ami.id);
           }
         }
-      } catch(e){}
+      }catch(e){}
       await loadProfil(); afficherDemandesDuel();
     }
 
-    // --- Bootstrap ---
-    document.addEventListener('DOMContentLoaded', async function(){
-      try { if (typeof window.afficherSolde === 'function') { try { await window.afficherSolde(); } catch(e){} } } catch(e){}
+    /* ============ Bootstrap ============ */
+    document.addEventListener('DOMContentLoaded', async ()=>{
+      try{ if (typeof window.afficherSolde==='function'){ try{ await window.afficherSolde(); }catch(e){} } }catch(e){}
 
       await ensureUserReady(3000);
       await loadProfil();
 
-      if (!(await isPremiumUser())) {
+      if (!(await isPremiumUser())){
         const a = document.getElementById('premium-alert');
-        a.style.display = 'block';
+        a.style.display='block';
         a.setAttribute('data-i18n','duel_premium.premium_only');
         document.getElementById('liste-amis').innerHTML =
           "<div class='aucune-demande' data-i18n='duel_premium.premium_only'>Invitation réservée aux premium.</div>";
         afficherDemandesDuel();
-      } else {
+      }else{
         afficherAmis();
         afficherDemandesDuel();
       }
 
-      // Marquer comme vues
-      try {
+      // Marquer les notifs comme lues
+      try{
         const me = await sb.from('users').select('id,demandesduelrecuespremium').eq('id', profil && profil.id).single();
-        if (me && me.data && A(me.data.demandesduelrecuespremium).length > 0) {
+        if (me && me.data && A(me.data.demandesduelrecuespremium).length>0){
           await sb.from('users').update({ demandesduelrecuespremium: [] }).eq('id', me.data.id);
         }
         localStorage.setItem('duelPremiumNotifCount','0');
-      } catch(e){}
+      }catch(e){}
 
-      // Realtime (sur MA ligne users)
-      try {
-        window.__duelPremChan = sb.channel('duel-premium-'+((profil && profil.id) ? profil.id : 'me'))
+      // Realtime (ma ligne users)
+      try{
+        window.__duelPremChan = sb.channel('duel-premium-'+(profil?.id||'me'))
           .on('postgres_changes',
-              {event:'UPDATE',schema:'public',table:'users',filter:'id=eq.'+((profil && profil.id) ? profil.id : '0')},
-              async function(){ await loadProfil(); afficherAmis(); afficherDemandesDuel(); })
+              {event:'UPDATE',schema:'public',table:'users',filter:'id=eq.'+(profil?.id||'0')},
+              async ()=>{ await loadProfil(); afficherAmis(); afficherDemandesDuel(); })
           .subscribe();
-      } catch(e){}
+      }catch(e){}
 
       // Popup actions
-      document.getElementById('pp-cancel').onclick = function(){ closeDefiPopup(); };
-      document.getElementById('pp-ok').onclick = async function(){
+      document.getElementById('pp-cancel').onclick = ()=> closeDefiPopup();
+      document.getElementById('pp-ok').onclick = async ()=>{
         const friend = __acceptFriendPseudo;
         if (!friend){ closeDefiPopup(); return; }
         const ami = await getUserByPseudo(friend);
         if (!ami){ alert(t('errors.friend_not_found','Ami introuvable.')); return; }
 
-        if (__popupMode === 'one_premium_me'){
-          // A : moi premium -> 3 défis
+        if (__popupMode==='one_premium_me'){
+          // Moi premium → 3 défis
           const d1 = (document.getElementById('pp-d1').value||'').trim();
           const d2 = (document.getElementById('pp-d2').value||'').trim();
           const d3 = (document.getElementById('pp-d3').value||'').trim();
           if (!d1){ alert(t('duel_premium.need_d1','Le défi 1 est obligatoire.')); return; }
-          const arr = [d1]; if (d2) arr.push(d2); if (d3) arr.push(d3);
+          const arr=[d1]; if(d2)arr.push(d2); if(d3)arr.push(d3);
 
           closeDefiPopup();
           const room = await createDuelWithDefis_OnePremium(ami, arr);
 
           // Nettoyage demandes
           try{
-            const recMoi = uniq(profil && profil.demandesduelrecuespremium).filter(p => p!==friend);
+            const recMoi = uniq(profil && profil.demandesduelrecuespremium).filter(x=>x!==friend);
             await sb.from('users').update({ demandesduelrecuespremium: recMoi }).eq('id', profil.id);
             const amiRow = await sb.from('users').select('id,pseudo,demandesduelenvoyeespremium').eq('id', ami.id).single();
             if (amiRow && amiRow.data){
-              const envAmi = uniq(amiRow.data.demandesduelenvoyeespremium).filter(p => p!==pseudoPublic);
+              const envAmi = uniq(amiRow.data.demandesduelenvoyeespremium).filter(x=>x!==pseudoPublic);
               await sb.from('users').update({ demandesduelenvoyeespremium: envAmi }).eq('id', ami.id);
             }
           }catch(e){}
@@ -576,8 +576,8 @@
           return;
         }
 
-        if (__popupMode === 'both_premium'){
-          // B : deux premium -> fixe + candidat
+        if (__popupMode==='both_premium'){
+          // Deux premium → fixe + candidat
           const fixe = (document.getElementById('pp-fixe').value||'').trim();
           const cand = (document.getElementById('pp-cand').value||'').trim();
           if (!fixe){ alert(t('duel_premium.need_d1','Le défi 1 est obligatoire.')); return; }
@@ -587,11 +587,11 @@
 
           // Nettoyage demandes (côté acceptant)
           try{
-            const recMoi = uniq(profil && profil.demandesduelrecuespremium).filter(p => p!==friend);
+            const recMoi = uniq(profil && profil.demandesduelrecuespremium).filter(x=>x!==friend);
             await sb.from('users').update({ demandesduelrecuespremium: recMoi }).eq('id', profil.id);
             const amiRow = await sb.from('users').select('id,pseudo,demandesduelenvoyeespremium').eq('id', ami.id).single();
             if (amiRow && amiRow.data){
-              const envAmi = uniq(amiRow.data.demandesduelenvoyeespremium).filter(p => p!==pseudoPublic);
+              const envAmi = uniq(amiRow.data.demandesduelenvoyeespremium).filter(x=>x!==pseudoPublic);
               await sb.from('users').update({ demandesduelenvoyeespremium: envAmi }).eq('id', ami.id);
             }
           }catch(e){}
