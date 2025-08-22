@@ -431,9 +431,55 @@
   "friends": {
     "none": "Aucun ami enregistré."
   },
-  "footer": "© 2025 VFindz"
+  "footer": "© 2025 VFindz",
 
+  
+
+  "duel_premium.title": "Duel Premium",
+
+  "header.back": "Retour",
+  "button.profile": "Profil",
+  "button.settings": "Paramètres",
+
+  "solde.pieces": "Pièces",
+  "solde.jetons": "Jetons",
+
+  "duel_premium.premium_only": "Invitation réservée aux premium.",
+  "duel_premium.section.friends": "Mes amis",
+  "duel_premium.section.received": "Demandes de duel premium reçues",
+  "duel_premium.section.sent": "Demandes de duel premium envoyées",
+
+  "footer.copyright": "© 2025 VFindz",
+
+  "duel_premium.popup.title": "Écris les 3 défis du duel",
+  "duel_premium.popup.defi1_ph": "Défi 1 (obligatoire)",
+  "duel_premium.popup.defi2_ph": "Défi 2 (optionnel)",
+  "duel_premium.popup.defi3_ph": "Défi 3 (optionnel)",
+  "duel_premium.popup.fixed_ph": "Ton défi fixe (obligatoire)",
+  "duel_premium.popup.candidate_ph": "Ton défi candidat (pour le tirage au sort)",
+  "duel_premium.popup.start": "Lancer le duel",
+  "duel_premium.popup.title_one_premium": "Tu es Premium : écris les 3 défis",
+  "duel_premium.popup.title_both_premium": "Vous êtes tous deux Premium",
+  "duel_premium.popup.continue": "Valider",
+
+  "common.cancel": "Annuler",
+  "common.accept": "Accepter",
+  "common.refuse": "Refuser",
+  "common.play": "Jouer",
+
+  "duel_premium.invite": "Inviter",
+  "duel_premium.none_received": "Aucune demande reçue.",
+  "duel_premium.none_sent": "Aucune demande envoyée.",
+  "duel_premium.badge_new": "Nouveau",
+  "duel_premium.badge_wait": "En attente",
+  "duel_premium.need_premium_to_invite": "Le mode Premium est requis pour inviter.",
+  "duel_premium.need_d1": "Le défi 1 est obligatoire.",
+  "duel_premium.info.waiting_premium_defis": "Le joueur premium rédigera les défis.",
+
+  "errors.friend_not_found": "Ami introuvable.",
+  "errors.create_room": "Erreur création du duel."
 }
+
 
 
 
