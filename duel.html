@@ -116,12 +116,26 @@
 
   <!-- ====== PATCH NOTIF PREMIUM : compteur + realtime ====== -->
   <script>
-    // Si userData n'a pas déjà créé le client
     if (!window.supabase) {
       window.supabase = supabase.createClient(
         'https://swmdepiukfginzhbeccz.supabase.co',
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI'
       );
+    }
+
+    // helper pour attendre que getPseudo() soit prêt
+    async function ensureUserReady(maxMs=3000){
+      const t0=Date.now();
+      while(Date.now()-t0<maxMs){
+        try{
+          if(typeof window.getPseudo==="function"){
+            const p=await window.getPseudo();
+            if(p) return p;
+          }
+        }catch(e){}
+        await new Promise(r=>setTimeout(r,150));
+      }
+      return null;
     }
 
     function renderPremiumBadge(count) {
@@ -175,11 +189,10 @@
       }
     }
 
-    // Lance après que userData a auth l’utilisateur
     window.addEventListener('DOMContentLoaded', async () => {
       try {
-        // Si tu utilises afficherSolde ici, laisse-le avant
         if (window.afficherSolde) { try { await window.afficherSolde(); } catch(e){} }
+        await ensureUserReady();        // <-- attend que getPseudo soit prêt
         await fetchAndRenderPremiumBadge();
         initPremiumRealtime();
       } catch (e) {
