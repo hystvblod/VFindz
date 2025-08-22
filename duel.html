@@ -7,30 +7,65 @@
   <link rel="stylesheet" href="style/main.css" />
 
   <style>
-    /* ===== Badge de notif Duel Premium ===== */
-    .notif-wrap { position: relative; display: inline-block; }
-    .notif-badge {
-      position: absolute; top: -8px; right: -10px;
-      min-width: 20px; height: 20px; padding: 0 6px;
-      border-radius: 12px; background: #ff3b30; color: #fff;
-      font-size: 12px; line-height: 20px; font-weight: 800;
-      display: none; align-items: center; justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,.25), 0 0 0 2px #1e1e2f;
-    }
-    /* quand il y a des demandes, on colore le bouton premium */
-    #btn-duel-premium.btn-alert {
-      background-color: #ff3b30 !important;
-      color: #fff !important;
+    /* ===== Reset minimal pour éviter les décalages natifs ===== */
+    html, body { margin: 0; padding: 0; }
+
+    /* ===== Gabarit centré commun (même largeur partout) ===== */
+    :root { --app-w: 520px; --pad-x: 14px; }
+
+    /* Centre les blocs du header (ligne du haut + solde) */
+    .header-solo .header-row,
+    .solde-container.solde-solo {
+      max-width: var(--app-w);
+      margin: 0 auto;
+      padding-left: var(--pad-x);
+      padding-right: var(--pad-x);
+      box-sizing: border-box;
     }
 
-    /* Optionnel : harmoniser visuel des boutons duel-choice-btn si besoin */
-    .duel-choice-box { display:flex; flex-direction:column; gap:14px; max-width:520px; margin:2rem auto; padding:0 1rem; }
-    .duel-choice-btn {
-      display:block; text-decoration:none; font-weight:700; padding:1rem 1.2rem; border-radius:14px;
-      background:#ffffff22; color:#fff; backdrop-filter:blur(5px); transition: all .2s ease;
-      text-align:center;
+    /* Conteneur principal du contenu de la page */
+    .duel-main-wrap {
+      max-width: var(--app-w);
+      margin: 0 auto;
+      padding-left: var(--pad-x);
+      padding-right: var(--pad-x);
+      box-sizing: border-box;
     }
-    .duel-choice-btn:hover { background:#ffffff44; }
+
+    /* ===== Badge de notif Duel Premium ===== */
+    .notif-wrap { position: relative; display: inline-block; }
+    .notif-badge{
+      position:absolute; top:-8px; right:-10px;
+      min-width:20px; height:20px; padding:0 6px;
+      border-radius:12px; background:#ff3b30; color:#fff;
+      font-size:12px; line-height:20px; font-weight:800;
+      display:none; align-items:center; justify-content:center;
+      box-shadow:0 2px 8px rgba(0,0,0,.25), 0 0 0 2px #1e1e2f;
+    }
+    /* quand il y a des demandes, on colore le bouton premium */
+    #btn-duel-premium.btn-alert{ background-color:#ff3b30!important; color:#fff!important; }
+
+    /* ===== Bloc des choix, parfaitement centré ===== */
+    .duel-choice-box{
+      display:flex; flex-direction:column; gap:14px;
+      width:100%; max-width:var(--app-w);
+      margin:2rem auto;
+      padding:0; /* le padding latéral est pris par .duel-main-wrap */
+      box-sizing:border-box;
+    }
+    .duel-choice-btn{
+      display:block; width:100%;
+      text-decoration:none; text-align:center;
+      font-weight:700; padding:1rem 1.2rem; border-radius:14px;
+      background:#ffffff22; color:#fff; backdrop-filter:blur(5px);
+      transition:background .2s ease;
+    }
+    .duel-choice-btn:hover{ background:#ffffff44; }
+
+    /* Petit affinement mobile */
+    @media (max-width: 600px){
+      :root { --app-w: 92vw; --pad-x: 10px; }
+    }
   </style>
 </head>
 <body class="duel-container">
@@ -67,19 +102,20 @@
     </div>
   </header>
 
-  <main>
+  <main class="duel-main-wrap">
     <div class="duel-choice-box">
       <a href="duel_random.html" class="duel-choice-btn" data-i18n="duel.choice.random">Jouer contre un adversaire aléatoire</a>
       <a href="duel_amis.html" class="duel-choice-btn" data-i18n="duel.choice.friend">Jouer contre un ami</a>
 
-      <!-- PATCH: bouton Duel Premium avec badge -->
+      <!-- Bouton Duel Premium avec badge -->
       <a href="duel_premium.html" id="btn-duel-premium" class="duel-choice-btn notif-wrap" data-i18n="duel.choice.premium">
         Duel Premium
         <span id="badge-duel-premium" class="notif-badge" aria-label="Nouvelles demandes"></span>
       </a>
     </div>
   </main>
-  <footer>
+
+  <footer class="duel-main-wrap">
     <p data-i18n="footer">© 2025 VFindz</p>
   </footer>
 
@@ -114,7 +150,7 @@
   <script src="js/userData.js"></script>
   <script src="js/duel.js"></script>
 
-  <!-- ====== PATCH NOTIF PREMIUM : compteur + realtime ====== -->
+  <!-- ====== NOTIF PREMIUM : compteur + realtime ====== -->
   <script>
     if (!window.supabase) {
       window.supabase = supabase.createClient(
@@ -123,7 +159,6 @@
       );
     }
 
-    // helper pour attendre que getPseudo() soit prêt
     async function ensureUserReady(maxMs=3000){
       const t0=Date.now();
       while(Date.now()-t0<maxMs){
@@ -155,7 +190,6 @@
 
     async function fetchAndRenderPremiumBadge() {
       try {
-        if (!window.supabase || !window.getPseudo) return;
         const pseudo = await window.getPseudo();
         const { data, error } = await window.supabase
           .from('users')
@@ -183,7 +217,7 @@
             table: 'users',
             filter: `id=eq.${window.__me_id}`
           }, () => fetchAndRenderPremiumBadge())
-          .subscribe((status) => console.log('[PREMIUM BADGE] Realtime status:', status));
+          .subscribe();
       } catch (e) {
         console.error('[PREMIUM BADGE] Realtime init error:', e);
       }
@@ -192,7 +226,7 @@
     window.addEventListener('DOMContentLoaded', async () => {
       try {
         if (window.afficherSolde) { try { await window.afficherSolde(); } catch(e){} }
-        await ensureUserReady();        // <-- attend que getPseudo soit prêt
+        await ensureUserReady();
         await fetchAndRenderPremiumBadge();
         initPremiumRealtime();
       } catch (e) {
