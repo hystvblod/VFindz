@@ -112,6 +112,12 @@ function toUniqueArray(arrLike) {
   const arr = Array.isArray(arrLike) ? arrLike.slice() : [];
   return [...new Set(arr.filter(Boolean))];
 }
+async function getUserByPseudo(pseudo) {
+  const { data, error } = await window.supabase.from('users')
+    .select('id,pseudo').eq('pseudo', pseudo).single();
+  if (error || !data) return null;
+  return data;
+}
 
 /* =========================
    PREMIUM / PROFIL
@@ -121,8 +127,8 @@ async function isPremiumUser() {
   return !!profil?.premium;
 }
 async function loadProfil() {
-  await window.loadUserData();
-  pseudoPublic = await window.getPseudo();
+  await window.loadUserData?.();
+  pseudoPublic = await window.getPseudo?.();
   const { data, error } = await window.supabase
     .from('users')
     .select('id, pseudo, amis, demandesduelrecuespremium, demandesduelenvoyeespremium, premium')
@@ -163,7 +169,8 @@ function afficherAmis() {
     ul.appendChild(li);
   });
 }
-function afficherDemandesDuel() {
+
+async function afficherDemandesDuel() {
   const ulRecue = document.getElementById("demandes-recue");
   ulRecue.innerHTML = "";
   const recues = toUniqueArray(profil?.demandesduelrecuespremium);
@@ -190,27 +197,29 @@ function afficherDemandesDuel() {
   if (!envoyees.length) {
     ulEnv.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande.sent'>Aucune demande envoyée.</div>";
   } else {
-    envoyees.forEach(async (ami) => {
-      // Si une room existe déjà pour la paire, on n’affiche pas “en attente”
+    for (const amiPseudo of envoyees) {
       let statusHTML = `<span class="badge-nouveau" style="background:#b3e2ff;color:#20435a;" data-i18n="badge.waiting">En attente</span>`;
       try {
-        const { data: rooms } = await window.supabase
-          .from('duels')
-          .select('id, playera, playerb, status')
-          .or(`and(playera.eq.${pseudoPublic},playerb.eq.${ami}),and(playera.eq.${ami},playerb.eq.${pseudoPublic})`)
-          .in('status', ['playing','ready','pending']);
-        if (rooms && rooms.length) {
-          statusHTML = `<a href="duel_game.html?room=${rooms[0].id}" class="badge-nouveau" style="background:#65e965;color:#1b2a1b;">Jouer</a>`;
+        const ami = await getUserByPseudo(amiPseudo);
+        if (ami && profil?.id) {
+          const { data: rooms } = await window.supabase
+            .from('duels')
+            .select('id,status')
+            .or(`and(joueur_a.eq.${profil.id},joueur_b.eq.${ami.id}),and(joueur_a.eq.${ami.id},joueur_b.eq.${profil.id})`)
+            .in('status', ['playing','ready','pending']);
+          if (rooms && rooms.length) {
+            statusHTML = `<a href="duel_game.html?room=${rooms[0].id}" class="badge-nouveau" style="background:#65e965;color:#1b2a1b;">Jouer</a>`;
+          }
         }
       } catch(e){}
       const card = document.createElement("div");
       card.className = "demande-card";
       card.innerHTML = `
-        <span class="demande-nom">${ami}</span>
+        <span class="demande-nom">${amiPseudo}</span>
         ${statusHTML}
       `;
       ulEnv.appendChild(card);
-    });
+    }
   }
 }
 
@@ -218,16 +227,14 @@ function afficherDemandesDuel() {
    INVITER / ACCEPTER / REFUSER
    ========================= */
 async function inviterDuelPremium(amiPseudo) {
-  // Interdit d’inviter si pas premium, mais l’utilisateur peut rester sur la page
+  // Interdit d’inviter si pas premium (mais la page reste accessible)
   try {
     const prem = await isPremiumUser();
     if (!prem) { alert(t('duel_premium.need_premium_to_invite','Le mode Premium est requis pour INVITER. Tu peux recevoir et accepter un duel premium.')); return; }
   } catch(e) {}
 
-  const { data: ami, error: selErr } = await window.supabase
-    .from("users").select("id,pseudo")
-    .eq("pseudo", amiPseudo).single();
-  if (selErr || !ami) { alert(t('errors.friend_not_found','Ami introuvable.')); return; }
+  const ami = await getUserByPseudo(amiPseudo);
+  if (!ami) { alert(t('errors.friend_not_found','Ami introuvable.')); return; }
   if (!profil?.id) { alert("Erreur profil (id manquant)."); return; }
 
   // 1) RPC si dispo
@@ -252,7 +259,7 @@ async function inviterDuelPremium(amiPseudo) {
 }
 
 async function accepterDuelPremium(amiPseudo) {
-  // 0) RPC d’acceptation si elle existe (recommandé, gère RLS proprement)
+  // 0) RPC d’acceptation si elle existe (recommandé)
   try {
     const { data: ok, error: rpcErr } = await window.supabase.rpc('accept_premium_duel', {
       p_me_pseudo: pseudoPublic,
@@ -264,31 +271,33 @@ async function accepterDuelPremium(amiPseudo) {
     }
   } catch(e){}
 
-  // 1) Insertion directe de la room (ISO timestamps)
+  // 1) Insertion directe de la room dans *duels* (schéma UUID)
+  const ami = await getUserByPseudo(amiPseudo);
+  if (!ami || !profil?.id) { alert("Impossible de créer la room (profil/ami)."); return; }
+
   const nowIso = new Date().toISOString();
   const insertPayload = [{
-    playera: amiPseudo,
-    playerb: pseudoPublic,
+    joueur_a: ami.id,                 // UUID de l’ami
+    joueur_b: profil.id,             // UUID de moi
     status: 'playing',
-    createdat: nowIso,
-    starttime: nowIso,
+    created_at: nowIso,
     type: "amis_premium",
-    defis_final: null,
-    photosa: {},
-    photosb: {}
+    defis: null,
+    resultats: { photosa: {}, photosb: {} }
   }];
+
   const { data, error: duelErr } = await window.supabase.from('duels').insert(insertPayload).select();
   if (duelErr) { console.error("[DUEL] INSERT duel ERROR:", duelErr); alert("Erreur création de la room."); return; }
 
   // 2) Nettoyage local (mes reçues)
   const recuesMoi = toUniqueArray(profil.demandesduelrecuespremium).filter(p => p !== amiPseudo);
-  await window.supabase.from("users").update({ demandesduelrecuespremium: recuesMoi }).eq("pseudo", pseudoPublic);
+  await window.supabase.from("users").update({ demandesduelrecuespremium: recuesMoi }).eq("id", profil.id);
 
-  // 3) Tentative de nettoyer “envoyées” chez l’ami (peut échouer si RLS)
+  // 3) Tentative de nettoyer “envoyées” chez l’ami
   try {
-    const { data: ami } = await window.supabase.from("users").select("id,pseudo,demandesduelenvoyeespremium").eq("pseudo", amiPseudo).single();
-    if (ami) {
-      const envAmi = toUniqueArray(ami.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
+    const { data: amiRow } = await window.supabase.from("users").select("id,pseudo,demandesduelenvoyeespremium").eq("id", ami.id).single();
+    if (amiRow) {
+      const envAmi = toUniqueArray(amiRow.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
       await window.supabase.from("users").update({ demandesduelenvoyeespremium: envAmi }).eq("id", ami.id);
     }
   } catch(e){}
@@ -303,12 +312,15 @@ async function accepterDuelPremium(amiPseudo) {
 
 async function refuserDuelPremium(amiPseudo) {
   const recuesMoi = toUniqueArray(profil.demandesduelrecuespremium).filter(p => p !== amiPseudo);
-  await window.supabase.from("users").update({ demandesduelrecuespremium: recuesMoi }).eq("pseudo", pseudoPublic);
+  await window.supabase.from("users").update({ demandesduelrecuespremium: recuesMoi }).eq("id", profil.id);
   try {
-    const { data: ami } = await window.supabase.from("users").select("id,pseudo,demandesduelenvoyeespremium").eq("pseudo", amiPseudo).single();
+    const ami = await getUserByPseudo(amiPseudo);
     if (ami) {
-      const envAmi = toUniqueArray(ami.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
-      await window.supabase.from("users").update({ demandesduelenvoyeespremium: envAmi }).eq("id", ami.id);
+      const { data: amiRow } = await window.supabase.from("users").select("id,pseudo,demandesduelenvoyeespremium").eq("id", ami.id).single();
+      if (amiRow) {
+        const envAmi = toUniqueArray(amiRow.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
+        await window.supabase.from("users").update({ demandesduelenvoyeespremium: envAmi }).eq("id", ami.id);
+      }
     }
   } catch(e){}
   await loadProfil();
@@ -320,7 +332,7 @@ async function refuserDuelPremium(amiPseudo) {
    ========================= */
 async function markPremiumSeen() {
   try {
-    const { data: me } = await window.supabase.from('users').select('id, demandesduelrecuespremium').eq('pseudo', pseudoPublic).single();
+    const { data: me } = await window.supabase.from('users').select('id, demandesduelrecuespremium').eq('id', profil?.id).single();
     if (me && Array.isArray(me.demandesduelrecuespremium) && me.demandesduelrecuespremium.length > 0) {
       await window.supabase.from('users').update({ demandesduelrecuespremium: [] }).eq('id', me.id);
     }
