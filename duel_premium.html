@@ -431,62 +431,64 @@
       return (ins.data && ins.data[0]) ? ins.data[0] : null;
     }
 
-    async function createOrFinalizeDuel_BothPremium(ami, myFixed, myCand){
-      const meId = profil.id, amiId = ami.id;
-      const existing = await findExistingRoomBetween(meId, amiId);
+async function createOrFinalizeDuel_BothPremium(ami, myFixed, myCand){
+  const meId = profil.id, amiId = ami.id;
+  const existing = await findExistingRoomBetween(meId, amiId);
 
-      // Si une room 'waiting' existe avec defis_partial de l'autre → finaliser
-      if (existing && existing.status === 'waiting' && existing.defis_mode === 'both_premium' && existing.defis_partial) {
-        try {
-          var partial = existing.defis_partial;
-          if (typeof partial === 'string') { try { partial = JSON.parse(partial); } catch(e){} }
-          const otherFixed = partial && partial.fixed ? partial.fixed : '';
-          const otherCand  = partial && partial.cand  ? partial.cand  : '';
-          const d1 = otherFixed;
-          const d2 = myFixed;
-          const d3 = pickRandom(myCand, otherCand);
+  // Si une room 'waiting' existe avec la contribution de l'autre → finaliser
+  if (existing && existing.status === 'waiting' && existing.defis_mode === 'both_premium' && existing.defis_partial) {
+    try {
+      let otherPartial = existing.defis_partial;
+      if (typeof otherPartial === 'string') { try { otherPartial = JSON.parse(otherPartial); } catch(e){} }
 
-          const defis_final = { d1: d1, d2: d2 };
-          if (d3) defis_final.d3 = d3;
+      const otherFixed = (otherPartial && otherPartial.fixed) ? otherPartial.fixed : '';
+      const otherCand  = (otherPartial && otherPartial.cand ) ? otherPartial.cand  : '';
+      const d1 = otherFixed;
+      const d2 = myFixed;
+      const d3 = pickRandom(myCand, otherCand);
 
-          const upd = await sb
-            .from('duels')
-            .update({ defis_final: defis_final, status: 'playing', defis_partial: null })
-            .eq('id', existing.id)
-            .select();
+      const defis_final = { d1, d2 };
+      if (d3) defis_final.d3 = d3;
 
-          if (upd.error){ console.error(upd.error); alert(t('errors.create_room','Erreur finalisation du duel.')); return existing; }
-          return (upd.data && upd.data[0]) ? upd.data[0] : existing;
-        } catch(e){
-          console.error(e);
-          alert(t('errors.create_room','Erreur finalisation du duel.'));
-          return existing;
-        }
-      }
+      const upd = await sb
+        .from('duels')
+        .update({ defis_final, status: 'playing', defis_partial: null })
+        .eq('id', existing.id)
+        .select();
 
-      // Sinon : créer une room 'waiting' avec mes données partielles
-      const now = Date.now();
-      const partial = { author_id: meId, fixed: myFixed, cand: myCand };
-      const insertPayload = [{
-        player1_id: amiId,
-        player2_id: meId,
-        player1_pseudo: ami.pseudo,
-        player2_pseudo: pseudoPublic,
-        status: 'waiting',
-        createdat: now,
-        starttime: now,
-        type: 'amis_premium',
-        defis_mode: 'both_premium',
-        defis_author_id: null,
-        defis_partial: partial,
-        defis_final: null,
-        photosa: {}, photosb: {}
-      }];
-
-      const ins = await sb.from('duels').insert(insertPayload).select();
-      if (ins.error) { console.error(ins.error); alert(t('errors.create_room','Erreur création du duel.')); return null; }
-      return (ins.data && ins.data[0]) ? ins.data[0] : null;
+      if (upd.error){ console.error(upd.error); alert(t('errors.create_room','Erreur finalisation du duel.')); return existing; }
+      return (upd.data && upd.data[0]) ? upd.data[0] : existing;
+    } catch(e){
+      console.error(e);
+      alert(t('errors.create_room','Erreur finalisation du duel.'));
+      return existing;
     }
+  }
+
+  // Sinon : créer une room 'waiting' avec MA contribution
+  const now = Date.now();
+  const myPartial = { author_id: meId, fixed: myFixed, cand: myCand };
+  const insertPayload = [{
+    player1_id: amiId,
+    player2_id: meId,
+    player1_pseudo: ami.pseudo,
+    player2_pseudo: pseudoPublic,
+    status: 'waiting',
+    createdat: now,
+    starttime: now,
+    type: 'amis_premium',
+    defis_mode: 'both_premium',
+    defis_author_id: null,
+    defis_partial: myPartial,
+    defis_final: null,
+    photosa: {}, photosb: {}
+  }];
+
+  const ins = await sb.from('duels').insert(insertPayload).select();
+  if (ins.error) { console.error(ins.error); alert(t('errors.create_room','Erreur création du duel.')); return null; }
+  return (ins.data && ins.data[0]) ? ins.data[0] : null;
+}
+
 
     async function refuserDuelPremium(amiPseudo){
       const recMoi = uniq(profil && profil.demandesduelrecuespremium).filter(function(p){ return p!==amiPseudo; });
