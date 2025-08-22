@@ -154,95 +154,66 @@
   <script src="js/duel.js"></script>
 
   <!-- Badges Ami/Premium : compteur + realtime -->
-  <script>
     // Client Supabase si pas déjà présent
-    if (!window.supabase) {
-      window.supabase = supabase.createClient(
-        'https://swmdepiukfginzhbeccz.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI'
-      );
+<script>
+  if (!window.supabase) {
+    window.supabase = supabase.createClient(
+      'https://swmdepiukfginzhbeccz.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI'
+    );
+  }
+
+  const A = (x) => Array.isArray(x) ? x : [];
+
+  async function getMeId() {
+    try { if (window.ensureAuth) await window.ensureAuth(); } catch(e){}
+    try { return window.getUserId ? window.getUserId() : null; } catch(e){ return null; }
+  }
+
+  function renderPremiumBadge(count) {
+    const badge = document.getElementById('badge-duel-premium');
+    const btn = document.getElementById('btn-duel-premium');
+    if (!badge || !btn) return;
+    if (count > 0) {
+      badge.textContent = String(count);
+      badge.style.display = 'inline-flex';
+      btn.classList.add('btn-alert');
+    } else {
+      badge.textContent = '';
+      badge.style.display = 'none';
+      btn.classList.remove('btn-alert');
     }
+  }
 
-    const A = x => Array.isArray(x) ? x : [];
+  async function refreshPremiumBadge(){
+    const id = await getMeId(); if(!id) return;
+    const { data, error } = await window.supabase
+      .from('users')
+      .select('demandesduelrecuespremium')
+      .eq('id', id)
+      .single();
+    if (error || !data) { console.warn('[PREMIUM BADGE] select error', error); return; }
+    renderPremiumBadge(A(data.demandesduelrecuespremium).length);
+    window.__prem_id = id;
+  }
 
-    function setBadge(btnId, badgeId, count){
-      const btn = document.getElementById(btnId);
-      const badge = document.getElementById(badgeId);
-      if(!btn || !badge) return;
-      if(count > 0){
-        badge.textContent = String(count);
-        badge.style.display = 'inline-flex';
-        btn.classList.add('btn-alert');
-      } else {
-        badge.textContent = '';
-        badge.style.display = 'none';
-        btn.classList.remove('btn-alert');
-      }
-    }
+  function initPremiumRealtime(){
+    if(!window.__prem_id) return;
+    if(window.__premChan) window.__premChan.unsubscribe();
+    window.__premChan = window.supabase
+      .channel('users-premium-badge-'+window.__prem_id)
+      .on('postgres_changes', {
+        event:'UPDATE', schema:'public', table:'users', filter:`id=eq.${window.__prem_id}`
+      }, refreshPremiumBadge)
+      .subscribe();
+  }
 
-    async function ensureUserReady(maxMs=3000){
-      const t0=Date.now();
-      while(Date.now()-t0<maxMs){
-        try{
-          if(typeof window.getPseudo==="function"){
-            const p=await window.getPseudo();
-            if(p) return p;
-          }
-        }catch(e){}
-        await new Promise(r=>setTimeout(r,150));
-      }
-      return null;
-    }
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    try { if (window.afficherSolde) await window.afficherSolde(); } catch(e){}
+    await refreshPremiumBadge();
+    initPremiumRealtime();
+  });
+</script>
 
-    let MY_ID = null;
-
-    async function refreshBadges(){
-      const pseudo = await ensureUserReady();
-      if(!pseudo) return;
-
-      const { data, error } = await window.supabase
-        .from('users')
-        .select('id,demandesduelrecues,demandesamisrecues,demandesduelrecuespremium')
-        .eq('pseudo', pseudo)
-        .single();
-
-      if(error || !data){
-        setBadge('btn-duel-ami','badge-duel-ami',0);
-        setBadge('btn-duel-premium','badge-duel-premium',0);
-        return;
-      }
-
-      MY_ID = data.id;
-
-      const classicDuels = A(data.demandesduelrecues).length;        // text[]
-      const friendReqs   = A(data.demandesamisrecues).length;        // text[]
-      const premiumDuels = A(data.demandesduelrecuespremium).length; // jsonb[]
-
-      // Ami rouge si demandes d'ami OU duel classique
-      setBadge('btn-duel-ami', 'badge-duel-ami', friendReqs + classicDuels);
-
-      // Premium rouge si demandes premium
-      setBadge('btn-duel-premium', 'badge-duel-premium', premiumDuels);
-    }
-
-    function initRealtime(){
-      try{
-        if(!MY_ID) return;
-        if(window.__duelPageChan) window.__duelPageChan.unsubscribe();
-        window.__duelPageChan = window.supabase
-          .channel('duel-page-'+MY_ID)
-          .on('postgres_changes', {
-            event: 'UPDATE', schema:'public', table:'users', filter:`id=eq.${MY_ID}`
-          }, refreshBadges)
-          .subscribe();
-      }catch(e){}
-    }
-
-    window.addEventListener('DOMContentLoaded', async () => {
-      try{ if(typeof window.afficherSolde==='function'){ await window.afficherSolde(); } }catch(e){}
-      await refreshBadges();
-      initRealtime();
-    });
-  </script>
 </body>
 </html>

@@ -243,76 +243,65 @@
 
   <!-- ====== PATCH NOTIF DUEL : compteur + realtime ====== -->
   <script>
-    // client supabase si non créé ailleurs
-    if (!window.supabase && window.supabaseUrl === undefined) {
-      window.supabase = supabase.createClient(
-        'https://swmdepiukfginzhbeccz.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI'
-      );
-    }
-    const A = x => Array.isArray(x) ? x : [];
-    let MY_ID = null;
+  if (!window.supabase) {
+    window.supabase = supabase.createClient(
+      'https://swmdepiukfginzhbeccz.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI'
+    );
+  }
 
-    function setBadge(on){
-      const btn = document.getElementById('btn-duel');
-      const badge = document.getElementById('badge-duel');
-      if(!btn || !badge) return;
-      if(on){
-        badge.textContent = '!';
-        badge.style.display = 'inline-flex';
-        btn.classList.add('btn-alert');
-      }else{
-        badge.textContent = '';
-        badge.style.display = 'none';
-        btn.classList.remove('btn-alert');
-      }
-    }
+  const A = (x) => Array.isArray(x) ? x : [];
 
-    async function ensurePseudo(maxMs=3000){
-      const t0 = Date.now();
-      while(Date.now()-t0 < maxMs){
-        try{
-          if(typeof window.getPseudo === 'function'){
-            const p = await window.getPseudo();
-            if(p) return p;
-          }
-        }catch(e){}
-        await new Promise(r=>setTimeout(r,150));
-      }
-      return null;
-    }
+  async function getMeId() {
+    try { if (window.ensureAuth) await window.ensureAuth(); } catch(e){}
+    try { return window.getUserId ? window.getUserId() : null; } catch(e){ return null; }
+  }
 
-    async function refreshBadge(){
-      const pseudo = await ensurePseudo(); if(!pseudo) return;
-      const { data, error } = await window.supabase
-        .from('users')
-        .select('id, demandesduelrecues, demandesamisrecues, demandesduelrecuespremium')
-        .eq('pseudo', pseudo)
-        .single();
-      if(error || !data){ setBadge(false); return; }
-      MY_ID = data.id;
-      const on = A(data.demandesduelrecues).length > 0
-              || A(data.demandesamisrecues).length > 0
-              || A(data.demandesduelrecuespremium).length > 0;
-      setBadge(on);
-    }
+  function setBadge(on){
+    const btn=document.getElementById('btn-duel');
+    const b=document.getElementById('badge-duel');
+    if(!btn||!b) return;
+    if(on){ b.textContent='!'; b.style.display='inline-flex'; btn.classList.add('btn-alert'); }
+    else { b.textContent='';  b.style.display='none';        btn.classList.remove('btn-alert'); }
+  }
 
-    function initRealtime(){
-      if(!MY_ID) return;
-      if(window.__idxChan) window.__idxChan.unsubscribe();
-      window.__idxChan = window.supabase
-        .channel('index-badge-'+MY_ID)
-        .on('postgres_changes', {
-          event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${MY_ID}`
-        }, refreshBadge)
-        .subscribe();
-    }
+  async function refreshBadge(){
+    const id = await getMeId(); if(!id) return;
+    const { data, error } = await window.supabase
+      .from('users')
+      .select('demandesduelrecues, demandesduelrecuespremium, demandesamisrecues')
+      .eq('id', id)
+      .single();
 
-    document.addEventListener('DOMContentLoaded', async ()=>{
-      await refreshBadge();
-      initRealtime();
-    });
-  </script>
+    if (error || !data) { console.warn('[DUEL BADGE] select error', error); setBadge(false); return; }
+
+    const on =
+      A(data.demandesduelrecues).length > 0 ||
+      A(data.demandesduelrecuespremium).length > 0 ||
+      A(data.demandesamisrecues).length > 0;
+
+    setBadge(on);
+    window.__me_id = id;
+  }
+
+  function initRealtime(){
+    if(!window.__me_id) return;
+    if(window.__idxChan) window.__idxChan.unsubscribe();
+    window.__idxChan = window.supabase
+      .channel('users-duel-badge-'+window.__me_id)
+      .on('postgres_changes', {
+        event:'UPDATE', schema:'public', table:'users', filter:`id=eq.${window.__me_id}`
+      }, refreshBadge)
+      .subscribe();
+  }
+
+  document.addEventListener('DOMContentLoaded', async ()=>{
+    await refreshBadge();
+    initRealtime();
+  });
+</script>
+
+
 
 </body>
 </html>
