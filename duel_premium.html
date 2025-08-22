@@ -122,6 +122,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="js/userData.js"></script>
   <script src="js/i18n.js"></script>
+  <script>
+  // Back-compat for old pages that expect i18n.apply / i18n.t
+  window.i18n = window.i18n || {};
+  window.i18n.t = (k, vars, fb) => (window.t ? window.t(k, vars, fb) : (fb || k));
+  window.i18n.apply = (root) => { if (window.i18nTranslateAll) window.i18nTranslateAll(); };
+</script>
 
   <script>
     // --- Supabase client ---
