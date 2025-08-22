@@ -260,6 +260,21 @@
       );
     }
 
+    // (nouveau) helper : attendre que getPseudo() soit prêt
+    async function ensureUserReady(maxMs=3000){
+      const t0=Date.now();
+      while(Date.now()-t0<maxMs){
+        try{
+          if(typeof window.getPseudo==="function"){
+            const p=await window.getPseudo();
+            if(p) return p;
+          }
+        }catch(e){}
+        await new Promise(r=>setTimeout(r,150));
+      }
+      return null;
+    }
+
     // 1) Rendu du badge
     function renderDuelBadge(count) {
       const badge = document.getElementById('badge-duel');
@@ -286,17 +301,14 @@
 
         const { data, error } = await window.supabase
           .from('users')
-          .select('id, pseudo, demandesduelrecuespremium, demandesduelenvoyeespremium')
+          .select('id, pseudo, demandesduelrecuespremium')
           .eq('pseudo', pseudo)
           .single();
 
         if (error) { console.error('[BADGE] SELECT error:', error); return; }
         window.__me_id = data?.id;
 
-        const recues   = Array.isArray(data?.demandesduelrecuespremium) ? data.demandesduelrecuespremium : [];
-        // const envoyees = Array.isArray(data?.demandesduelenvoyeespremium) ? data.demandesduelenvoyeespremium : [];
-
-        // ✅ Seules les reçues colorent le bouton chez le destinataire
+        const recues = Array.isArray(data?.demandesduelrecuespremium) ? data.demandesduelrecuespremium : [];
         renderDuelBadge(recues.length);
       } catch (e) {
         console.error('[BADGE] Exception:', e);
@@ -325,7 +337,8 @@
     // 4) Bootstrap
     window.addEventListener('DOMContentLoaded', async () => {
       try {
-        await fetchAndRenderDuelBadge();
+        await ensureUserReady();          // << attend l’auth/identité
+        await fetchAndRenderDuelBadge();  // puis lit Supabase
         initDuelRealtime();
       } catch (e) {
         console.error('[DUEL BADGE] bootstrap error:', e);
