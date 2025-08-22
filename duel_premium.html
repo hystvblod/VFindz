@@ -200,7 +200,6 @@
     }
 
     function buildDuelFilter(meId, amiId){
-      // évite les template strings
       function pair(a,b){ return 'and(player1_id.eq.'+a+',player2_id.eq.'+b+')'; }
       return pair(meId,amiId)+','+pair(amiId,meId);
     }
@@ -277,25 +276,20 @@
       if (!ami) { alert(t('errors.friend_not_found','Ami introuvable.')); return; }
       if (!profil || !profil.id) { alert('Profil non prêt.'); return; }
 
-      // RPC si dispo
-      try {
-        const res = await sb.rpc('request_premium_duel', {
-          p_from: profil.id, p_to: ami.id,
-          p_from_pseudo: pseudoPublic, p_to_pseudo: ami.pseudo
-        });
-        if (!res.error) { await loadProfil(); afficherAmis(); afficherDemandesDuel(); return; }
-      } catch(e){}
+      // RPC OBLIGATOIRE (plus de fallback client-side)
+      const { error } = await sb.rpc('request_premium_duel', {
+        p_from: profil.id, p_to: ami.id,
+        p_from_pseudo: pseudoPublic, p_to_pseudo: ami.pseudo
+      });
+      if (error) {
+        console.error('[RPC request_premium_duel]', error);
+        alert('Erreur envoi invitation (RPC). Vérifie la fonction SQL / droits.');
+        return;
+      }
 
-      // Fallback manuel
-      try {
-        const meNow  = await sb.from('users').select('demandesduelenvoyeespremium').eq('id', profil.id).single();
-        const amiNow = await sb.from('users').select('demandesduelrecuespremium').eq('id', ami.id).single();
-        const env = uniq(meNow.data && meNow.data.demandesduelenvoyeespremium); if (env.indexOf(ami.pseudo) === -1) env.push(ami.pseudo);
-        const rec = uniq(amiNow.data && amiNow.data.demandesduelrecuespremium); if (rec.indexOf(pseudoPublic) === -1) rec.push(pseudoPublic);
-        await sb.from('users').update({ demandesduelenvoyeespremium: env }).eq('id', profil.id);
-        await sb.from('users').update({ demandesduelrecuespremium: rec }).eq('id', ami.id);
-        await loadProfil(); afficherAmis(); afficherDemandesDuel();
-      } catch(e){ alert('Erreur d’envoi de la demande.'); }
+      await loadProfil();
+      afficherAmis();
+      afficherDemandesDuel();
     }
 
     // --- Popup modes ---
@@ -325,7 +319,6 @@
     function openDefiPopup(friendPseudo, options){
       options = options || { mode: 'one_premium_me' };
       __acceptFriendPseudo = friendPseudo;
-      // reset
       ['pp-d1','pp-d2','pp-d3','pp-fixe','pp-cand'].forEach(function(id){
         var el = document.getElementById(id); if (el) el.value='';
       });
@@ -377,14 +370,13 @@
       }
 
       if (!me.premium && ami.premium){
-        // Je ne suis pas premium : on crée une room en attente des 3 défis de l'ami premium.
+        // Non-premium accepte l'invit d'un premium : room en "waiting" (pas de score)
         const now = Date.now();
         const insertPayload = [{
           player1_id: ami.id,
           player2_id: me.id,
           player1_pseudo: ami.pseudo,
           player2_pseudo: me.pseudo,
-          score1: 0, score2: 0,
           status: 'waiting',
           createdat: now,
           starttime: now,
@@ -424,7 +416,6 @@
         player2_id: profil.id,
         player1_pseudo: ami.pseudo,
         player2_pseudo: pseudoPublic,
-        score1: 0, score2: 0,
         status: 'playing',
         createdat: now,
         starttime: now,
@@ -481,7 +472,6 @@
         player2_id: meId,
         player1_pseudo: ami.pseudo,
         player2_pseudo: pseudoPublic,
-        score1: 0, score2: 0,
         status: 'waiting',
         createdat: now,
         starttime: now,
@@ -542,7 +532,7 @@
         localStorage.setItem('duelPremiumNotifCount','0');
       } catch(e){}
 
-      // Realtime
+      // Realtime (sur MA ligne users)
       try {
         window.__duelPremChan = sb.channel('duel-premium-'+((profil && profil.id) ? profil.id : 'me'))
           .on('postgres_changes',
