@@ -104,142 +104,110 @@ if (!window.supabase) {
 let pseudoPublic = null;
 let profil = null;
 
-// i18n helper (fallback si i18n.t indisponible)
 function t(key, fallback='') {
-  try { if (window.i18n && typeof window.i18n.t === 'function') return window.i18n.t(key) || fallback; } catch(e){}
-  return fallback;
+  try { if (window.i18n && typeof i18n.t === 'function') return i18n.t(key); } catch(e){}
+  return fallback || key;
 }
 function toUniqueArray(arrLike) {
-  const arr = Array.isArray(arrLike) ? arrLike : [];
-  return Array.from(new Set(arr));
+  const arr = Array.isArray(arrLike) ? arrLike.slice() : [];
+  return [...new Set(arr.filter(Boolean))];
 }
 
 /* =========================
    PREMIUM / PROFIL
    ========================= */
 async function isPremiumUser() {
-  try {
-    if (typeof window.isPremium === "function") {
-      const v = await window.isPremium();
-      console.log("[PREMIUM] via helper isPremium():", v);
-      return v;
-    }
-    if (!pseudoPublic) return false;
-    const { data, error } = await window.supabase
-      .from('users').select('premium')
-      .eq('pseudo', pseudoPublic).single();
-    if (error) { console.error("[PREMIUM] Erreur SELECT premium:", error); return false; }
-    return !!data?.premium;
-  } catch (e) {
-    console.error("[PREMIUM] Exception:", e);
-    return false;
-  }
+  try { if (typeof window.isPremium === 'function') return !!(await window.isPremium()); } catch(e){}
+  return !!profil?.premium;
 }
-
 async function loadProfil() {
-  console.log("[PROFIL] Chargement du profil…");
   await window.loadUserData();
   pseudoPublic = await window.getPseudo();
-  console.log("[PROFIL] Pseudo courant:", pseudoPublic);
   const { data, error } = await window.supabase
     .from('users')
-    .select('id, pseudo, amis, demandesduelrecuespremium, demandesduelenvoyeespremium, premium')  // [CHANGE] on récupère aussi id
+    .select('id, pseudo, amis, demandesduelrecuespremium, demandesduelenvoyeespremium, premium')
     .eq('pseudo', pseudoPublic)
     .single();
-  if (error) { console.error("[PROFIL] Erreur SELECT profil:", error); }
-  profil = data || null;
-  console.log("[PROFIL] Profil chargé:", profil);
+  if (!error && data) profil = data;
 }
 
 /* =========================
-   BOOTSTRAP PAGE
+   AIDE : attendre l’auth avant les fetchs
    ========================= */
-document.addEventListener("DOMContentLoaded", async () => {
-  console.log("[DOM] DOMContentLoaded");
-  if (typeof window.afficherSolde === "function") {
-    try { await window.afficherSolde(); } catch(e){ console.warn("[SOLDE] afficherSolde a échoué:", e); }
+async function ensureUserReady(maxMs=3000) {
+  const start = Date.now();
+  while (Date.now() - start < maxMs) {
+    try {
+      const p = await (typeof window.getPseudo === 'function' ? window.getPseudo() : null);
+      if (p) return p;
+    } catch(e){}
+    await new Promise(r=>setTimeout(r,150));
   }
-await loadProfil();
-const premium = await isPremiumUser();
-
-if (!premium) {
-  console.warn("[PREMIUM] Utilisateur non premium → il peut voir/recevoir mais pas inviter.");
-  const a = document.getElementById("premium-alert");
-  a.style.display = "block";
-  a.setAttribute('data-i18n', 'alert.premium_only');
-  document.getElementById("liste-amis").innerHTML =
-    "<div class='aucune-demande' data-i18n='alert.premium_only'>Invitation réservée aux premium.</div>";
-  // MAIS on lui laisse ses demandes visibles
-  afficherDemandesDuel();
-} else {
-  afficherAmis();
-  afficherDemandesDuel();
+  return null;
 }
 
-});
-
 /* =========================
-   UI RENDER
+   AFFICHAGE UI
    ========================= */
-async function afficherAmis() {
-  console.log("[UI] afficherAmis()");
-  const amis = Array.isArray(profil?.amis) ? profil.amis : [];
+function afficherAmis() {
   const ul = document.getElementById("liste-amis");
   ul.innerHTML = "";
-  if (!amis.length) {
-    ul.innerHTML = "<div class='aucune-demande' data-i18n='friends.none'>Aucun ami enregistré.</div>";
-    return;
-  }
-  amis.forEach(ami => {
-    const card = document.createElement("div");
-    card.className = "ami-card";
-    card.innerHTML = `
-      <span class="ami-nom">${ami}</span>
-      <button class="btn-duel-ami" data-ami="${ami}" data-i18n="btn.premium.duel">Duel Premium ⚡</button>
+  const arr = Array.isArray(profil?.amis) ? profil.amis : [];
+  arr.forEach(p => {
+    const li = document.createElement("div");
+    li.className = "ami-card";
+    li.innerHTML = `
+      <span class="ami-nom">${p}</span>
+      <button class="btn-duel-ami" onclick="inviterDuelPremium('${p}')" data-i18n="duel_premium.inviter_btn">Inviter</button>
     `;
-    card.querySelector(".btn-duel-ami").onclick = () => inviterDuelPremium(ami);
-    ul.appendChild(card);
+    ul.appendChild(li);
   });
 }
-
-async function afficherDemandesDuel() {
-  console.log("[UI] afficherDemandesDuel()");
-  // RECUES
+function afficherDemandesDuel() {
   const ulRecue = document.getElementById("demandes-recue");
   ulRecue.innerHTML = "";
   const recues = toUniqueArray(profil?.demandesduelrecuespremium);
   if (!recues.length) {
     ulRecue.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande.received'>Aucune demande reçue.</div>";
   } else {
-    recues.forEach(ami => {
-      const card = document.createElement("div");
-      card.className = "demande-card";
-      card.innerHTML = `
-        <span class="demande-nom">${ami}<span class="badge-nouveau" data-i18n="badge.new">Nouveau</span></span>
+    recues.forEach(pseudo => {
+      const div = document.createElement("div");
+      div.className = "demande-card";
+      div.innerHTML = `
+        <span class="demande-nom">${pseudo}<span class="badge-nouveau" data-i18n="badge.new">Nouveau</span></span>
         <div>
-          <button class="btn-accepter" data-ami="${ami}" data-i18n="btn.accept">Accepter</button>
-          <button class="btn-refuser" data-ami="${ami}" data-i18n="btn.refuse">Refuser</button>
+          <button class="btn-accepter" onclick="accepterDuelPremium('${pseudo}')" data-i18n="common.accept">Accepter</button>
+          <button class="btn-refuser" onclick="refuserDuelPremium('${pseudo}')" data-i18n="common.refuse">Refuser</button>
         </div>
       `;
-      card.querySelector(".btn-accepter").onclick = () => accepterDuelPremium(ami);
-      card.querySelector(".btn-refuser").onclick = () => refuserDuelPremium(ami);
-      ulRecue.appendChild(card);
+      ulRecue.appendChild(div);
     });
   }
 
-  // ENVOYÉES
   const ulEnv = document.getElementById("demandes-envoyees");
   ulEnv.innerHTML = "";
   const envoyees = toUniqueArray(profil?.demandesduelenvoyeespremium);
   if (!envoyees.length) {
     ulEnv.innerHTML = "<div class='aucune-demande' data-i18n='aucune.demande.sent'>Aucune demande envoyée.</div>";
   } else {
-    envoyees.forEach(ami => {
+    envoyees.forEach(async (ami) => {
+      // Si une room existe déjà pour la paire, on n’affiche pas “en attente”
+      let statusHTML = `<span class="badge-nouveau" style="background:#b3e2ff;color:#20435a;" data-i18n="badge.waiting">En attente</span>`;
+      try {
+        const { data: rooms } = await window.supabase
+          .from('duels')
+          .select('id, playera, playerb, status')
+          .or(`and(playera.eq.${pseudoPublic},playerb.eq.${ami}),and(playera.eq.${ami},playerb.eq.${pseudoPublic})`)
+          .in('status', ['playing','ready','pending']);
+        if (rooms && rooms.length) {
+          statusHTML = `<a href="duel_game.html?room=${rooms[0].id}" class="badge-nouveau" style="background:#65e965;color:#1b2a1b;">Jouer</a>`;
+        }
+      } catch(e){}
       const card = document.createElement("div");
       card.className = "demande-card";
       card.innerHTML = `
         <span class="demande-nom">${ami}</span>
-        <span class="badge-nouveau" style="background:#b3e2ff;color:#20435a;" data-i18n="badge.waiting">En attente</span>
+        ${statusHTML}
       `;
       ulEnv.appendChild(card);
     });
@@ -247,126 +215,161 @@ async function afficherDemandesDuel() {
 }
 
 /* =========================
-   ACTIONS
+   INVITER / ACCEPTER / REFUSER
    ========================= */
-// INVITER un ami à un duel premium → **RPC** // [CHANGE]
 async function inviterDuelPremium(amiPseudo) {
-  console.log("[DUEL] inviterDuelPremium →", amiPseudo);
+  // Interdit d’inviter si pas premium, mais l’utilisateur peut rester sur la page
+  try {
+    const prem = await isPremiumUser();
+    if (!prem) { alert(t('duel_premium.need_premium_to_invite','Le mode Premium est requis pour INVITER. Tu peux recevoir et accepter un duel premium.')); return; }
+  } catch(e) {}
 
-  // Récupérer l'ID de l'ami
   const { data: ami, error: selErr } = await window.supabase
     .from("users").select("id,pseudo")
     .eq("pseudo", amiPseudo).single();
-  if (selErr || !ami) {
-    console.error("[DUEL] Ami introuvable:", selErr);
-    alert(t('errors.friend_not_found','Ami introuvable.'));
-    return;
-  }
-  if (!profil?.id) {
-    console.error("[DUEL] Mon profil n'a pas d'id. Vérifie loadProfil().");
-    alert("Erreur profil (id manquant).");
-    return;
-  }
+  if (selErr || !ami) { alert(t('errors.friend_not_found','Ami introuvable.')); return; }
+  if (!profil?.id) { alert("Erreur profil (id manquant)."); return; }
 
-  // Appeler la RPC server-side (bypass RLS proprement)
-  const { error: rpcErr } = await window.supabase.rpc('request_premium_duel', {
-    p_from: profil.id,
-    p_to: ami.id,
-    p_from_pseudo: pseudoPublic,
-    p_to_pseudo: ami.pseudo
-  });
-  if (rpcErr) {
-    console.error("[DUEL] RPC request_premium_duel ERROR:", rpcErr);
-    alert("Erreur envoi de la demande.");
-    return;
-  }
+  // 1) RPC si dispo
+  try {
+    const { error: rpcErr } = await window.supabase.rpc('request_premium_duel', {
+      p_from: profil.id, p_to: ami.id,
+      p_from_pseudo: pseudoPublic, p_to_pseudo: ami.pseudo
+    });
+    if (!rpcErr) { await loadProfil(); afficherAmis(); afficherDemandesDuel(); return; }
+  } catch(e){}
 
-  console.log("[DUEL] Demande enregistrée (RPC OK).");
-  await loadProfil();
-  afficherAmis();
-  afficherDemandesDuel();
+  // 2) Fallback manuel
+  try {
+    const { data: meNow } = await window.supabase.from("users").select("id,demandesduelenvoyeespremium").eq("id", profil.id).single();
+    const { data: amiNow } = await window.supabase.from("users").select("id,demandesduelrecuespremium").eq("id", ami.id).single();
+    const env = toUniqueArray(meNow?.demandesduelenvoyeespremium); if (!env.includes(ami.pseudo)) env.push(ami.pseudo);
+    const rec = toUniqueArray(amiNow?.demandesduelrecuespremium); if (!rec.includes(pseudoPublic)) rec.push(pseudoPublic);
+    await window.supabase.from("users").update({ demandesduelenvoyeespremium: env }).eq("id", profil.id);
+    await window.supabase.from("users").update({ demandesduelrecuespremium: rec }).eq("id", ami.id);
+    await loadProfil(); afficherAmis(); afficherDemandesDuel();
+  } catch(e){ alert("Erreur envoi de la demande."); }
 }
 
-// ACCEPTER une demande de duel premium : crée une room en type "amis_premium"
 async function accepterDuelPremium(amiPseudo) {
-  console.log("[DUEL] accepterDuelPremium →", amiPseudo);
-  const now = Date.now();
+  // 0) RPC d’acceptation si elle existe (recommandé, gère RLS proprement)
+  try {
+    const { data: ok, error: rpcErr } = await window.supabase.rpc('accept_premium_duel', {
+      p_me_pseudo: pseudoPublic,
+      p_friend_pseudo: amiPseudo
+    });
+    if (!rpcErr && ok && ok.room_id) {
+      window.location.href = `duel_game.html?room=${ok.room_id}`;
+      return;
+    }
+  } catch(e){}
+
+  // 1) Insertion directe de la room (ISO timestamps)
+  const nowIso = new Date().toISOString();
   const insertPayload = [{
-    player1_pseudo: amiPseudo,
-    player2_pseudo: pseudoPublic,
+    playera: amiPseudo,
+    playerb: pseudoPublic,
     status: 'playing',
-    createdat: now,
-    starttime: now,
+    createdat: nowIso,
+    starttime: nowIso,
     type: "amis_premium",
     defis_final: null,
     photosa: {},
     photosb: {}
   }];
-
   const { data, error: duelErr } = await window.supabase.from('duels').insert(insertPayload).select();
-  if (duelErr) { console.error("[DUEL] INSERT duel ERROR:", duelErr); }
+  if (duelErr) { console.error("[DUEL] INSERT duel ERROR:", duelErr); alert("Erreur création de la room."); return; }
 
-  // MAJ des listes (retire la demande chez moi)
+  // 2) Nettoyage local (mes reçues)
   const recuesMoi = toUniqueArray(profil.demandesduelrecuespremium).filter(p => p !== amiPseudo);
   await window.supabase.from("users").update({ demandesduelrecuespremium: recuesMoi }).eq("pseudo", pseudoPublic);
 
-  // Retire “envoyées” chez l’ami (si autorisé ; sinon créer une RPC d’acceptation)
-  const { data: ami } = await window.supabase.from("users").select("demandesduelenvoyeespremium").eq("pseudo", amiPseudo).single();
-  if (ami) {
-    const envAmi = toUniqueArray(ami.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
-    await window.supabase.from("users").update({ demandesduelenvoyeespremium: envAmi }).eq("pseudo", amiPseudo);
-  }
+  // 3) Tentative de nettoyer “envoyées” chez l’ami (peut échouer si RLS)
+  try {
+    const { data: ami } = await window.supabase.from("users").select("id,pseudo,demandesduelenvoyeespremium").eq("pseudo", amiPseudo).single();
+    if (ami) {
+      const envAmi = toUniqueArray(ami.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
+      await window.supabase.from("users").update({ demandesduelenvoyeespremium: envAmi }).eq("id", ami.id);
+    }
+  } catch(e){}
 
   await loadProfil();
   afficherDemandesDuel();
 
-  if (data && data.length && data[0].id) {
-    console.log("[DUEL] Redirection → duel_game.html?room=", data[0].id);
-    window.location.href = `duel_game.html?room=${data[0].id}`;
+  if (data && data.length) {
+    location.href = `duel_game.html?room=${data[0].id}`;
   }
 }
 
 async function refuserDuelPremium(amiPseudo) {
-  console.log("[DUEL] refuserDuelPremium →", amiPseudo);
   const recuesMoi = toUniqueArray(profil.demandesduelrecuespremium).filter(p => p !== amiPseudo);
   await window.supabase.from("users").update({ demandesduelrecuespremium: recuesMoi }).eq("pseudo", pseudoPublic);
-
-  const { data: ami } = await window.supabase.from("users").select("demandesduelenvoyeespremium").eq("pseudo", amiPseudo).single();
-  if (ami) {
-    const envAmi = toUniqueArray(ami.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
-    await window.supabase.from("users").update({ demandesduelenvoyeespremium: envAmi }).eq("pseudo", amiPseudo);
-  }
-
+  try {
+    const { data: ami } = await window.supabase.from("users").select("id,pseudo,demandesduelenvoyeespremium").eq("pseudo", amiPseudo).single();
+    if (ami) {
+      const envAmi = toUniqueArray(ami.demandesduelenvoyeespremium).filter(p => p !== pseudoPublic);
+      await window.supabase.from("users").update({ demandesduelenvoyeespremium: envAmi }).eq("id", ami.id);
+    }
+  } catch(e){}
   await loadProfil();
   afficherDemandesDuel();
 }
 
 /* =========================
-   POPUP PREMIUM DÉFIS
+   MARQUER COMME "VU" À L’OUVERTURE
    ========================= */
-function fermerPopupDefiPremium() {
-  console.log("[POPUP] fermerPopupDefiPremium()");
-  document.getElementById("popup-defi-premium").classList.add("hidden");
+async function markPremiumSeen() {
+  try {
+    const { data: me } = await window.supabase.from('users').select('id, demandesduelrecuespremium').eq('pseudo', pseudoPublic).single();
+    if (me && Array.isArray(me.demandesduelrecuespremium) && me.demandesduelrecuespremium.length > 0) {
+      await window.supabase.from('users').update({ demandesduelrecuespremium: [] }).eq('id', me.id);
+    }
+  } catch (e) {}
+  try { localStorage.setItem('duelPremiumNotifCount','0'); } catch(e){}
 }
+
+/* =========================
+   BOOTSTRAP PAGE
+   ========================= */
+document.addEventListener("DOMContentLoaded", async () => {
+  try {
+    if (typeof window.afficherSolde === "function") { try { await window.afficherSolde(); } catch(e){} }
+    await ensureUserReady();
+    await loadProfil();
+
+    const premium = await isPremiumUser();
+    if (!premium) {
+      const a = document.getElementById("premium-alert");
+      a.style.display = "block";
+      a.setAttribute('data-i18n', 'alert.premium_only');
+      // on affiche uniquement les demandes (pas d’invitation)
+      document.getElementById("liste-amis").innerHTML =
+        "<div class='aucune-demande' data-i18n='alert.premium_only'>Invitation réservée aux premium.</div>";
+      afficherDemandesDuel();
+    } else {
+      afficherAmis();
+      afficherDemandesDuel();
+    }
+
+    await markPremiumSeen();
+
+    // Realtime refresh (ma ligne users)
+    try {
+      const chan = window.supabase.channel('duel-premium-' + (profil?.id||'me'))
+        .on('postgres_changes', {
+          event:'UPDATE', schema:'public', table:'users', filter:`id=eq.${profil?.id}`
+        }, async () => { await loadProfil(); afficherAmis(); afficherDemandesDuel(); })
+        .subscribe();
+      window.__duelPremChan = chan;
+    } catch(e){}
+  } catch (e) {}
+});
   </script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (window.afficherSolde) try { window.afficherSolde(); } catch(e){}
-    });
+    function fermerPopupDefiPremium() {
+      document.getElementById('popup-defi-premium').classList.add('hidden');
+    }
   </script>
-
-  <!-- POPUP PREMIUM DÉFIS -->
-  <div id="popup-defi-premium" class="hidden">
-    <div class="popup-inner popup-premium-pro">
-      <div class="premium-badge" data-i18n="badge.premium" style="background:#ffe04a;color:#232323;margin-bottom:10px;">DUEL PREMIUM</div>
-      <div class="popup-premium-title" id="popup-defi-title" data-i18n="popup.premium.title" style="margin-bottom:12px;text-align:center">Défis Premium</div>
-      <div id="popup-defi-fields"></div>
-      <div style="margin-top:24px;display:flex;gap:10px;justify-content:center;">
-        <button class="btn-premium-pro" id="btn-valider-defi" data-i18n="btn.validate">Valider</button>
-        <button class="btn-annuler-premium-pro" onclick="fermerPopupDefiPremium()" data-i18n="btn.cancel">Annuler</button>
-      </div>
-    </div>
-  </div>
 </body>
 </html>
