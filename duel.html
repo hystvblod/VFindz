@@ -7,51 +7,46 @@
   <link rel="stylesheet" href="style/main.css" />
 
   <style>
-    /* ===== Reset minimal pour éviter les décalages natifs ===== */
-    html, body { margin: 0; padding: 0; }
-
-    /* ===== Gabarit centré commun (même largeur partout) ===== */
+    html, body { margin:0; padding:0; }
     :root { --app-w: 520px; --pad-x: 14px; }
 
-    /* Centre les blocs du header (ligne du haut + solde) */
-    .header-solo .header-row,
-    .solde-container.solde-solo {
+    /* ====== HEADER en GRID : 3 colonnes fixes pour centrer le titre ====== */
+    .header-solo .header-row{
+      display: grid;
+      grid-template-columns: 40px 1fr 80px; /* ← largeur fixe pour garder le H1 i-mm-obile */
+      align-items: center;
+      gap: 8px;
       max-width: var(--app-w);
       margin: 0 auto;
-      padding-left: var(--pad-x);
-      padding-right: var(--pad-x);
+      padding: 12px var(--pad-x) 4px var(--pad-x);
       box-sizing: border-box;
     }
+    .header-solo .back-btn img{ display:block; width:22px; height:22px; }
+    .header-solo h1{
+      margin:0; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    }
+    .header-solo .top-buttons{
+      display:flex; justify-content:flex-end; align-items:center; gap:10px;
+    }
+    .header-solo .top-buttons .btn-icon img{ width:22px; height:22px; display:block; }
 
-    /* Conteneur principal du contenu de la page */
-    .duel-main-wrap {
+    /* Solde aligné à la même largeur centrée */
+    .solde-container.solde-solo{
       max-width: var(--app-w);
       margin: 0 auto;
-      padding-left: var(--pad-x);
-      padding-right: var(--pad-x);
+      padding: 0 var(--pad-x);
       box-sizing: border-box;
+      display:flex; gap:18px;
     }
+    .solde-item .solde-ligne{ display:flex; align-items:center; gap:8px; }
+    .icon-solo-piece,.icon-solo-jeton{ width:20px; height:20px; }
 
-    /* ===== Badge de notif Duel Premium ===== */
-    .notif-wrap { position: relative; display: inline-block; }
-    .notif-badge{
-      position:absolute; top:-8px; right:-10px;
-      min-width:20px; height:20px; padding:0 6px;
-      border-radius:12px; background:#ff3b30; color:#fff;
-      font-size:12px; line-height:20px; font-weight:800;
-      display:none; align-items:center; justify-content:center;
-      box-shadow:0 2px 8px rgba(0,0,0,.25), 0 0 0 2px #1e1e2f;
-    }
-    /* quand il y a des demandes, on colore le bouton premium */
-    #btn-duel-premium.btn-alert{ background-color:#ff3b30!important; color:#fff!important; }
-
-    /* ===== Bloc des choix, parfaitement centré ===== */
+    /* ====== Corps centré ====== */
+    .duel-main-wrap{ max-width:var(--app-w); margin:0 auto; padding:0 var(--pad-x); box-sizing:border-box; }
     .duel-choice-box{
       display:flex; flex-direction:column; gap:14px;
       width:100%; max-width:var(--app-w);
-      margin:2rem auto;
-      padding:0; /* le padding latéral est pris par .duel-main-wrap */
-      box-sizing:border-box;
+      margin: 22px auto 28px auto;
     }
     .duel-choice-btn{
       display:block; width:100%;
@@ -62,15 +57,36 @@
     }
     .duel-choice-btn:hover{ background:#ffffff44; }
 
-    /* Petit affinement mobile */
-    @media (max-width: 600px){
-      :root { --app-w: 92vw; --pad-x: 10px; }
+    /* ====== Badge Premium ====== */
+    .notif-wrap{ position:relative; display:inline-block; }
+    .notif-badge{
+      position:absolute; top:-8px; right:-10px;
+      min-width:20px; height:20px; padding:0 6px;
+      border-radius:12px; background:#ff3b30; color:#fff;
+      font-size:12px; line-height:20px; font-weight:800;
+      display:none; align-items:center; justify-content:center;
+      box-shadow:0 2px 8px rgba(0,0,0,.25), 0 0 0 2px #1e1e2f;
+    }
+    #btn-duel-premium.btn-alert{ background:#ff3b30!important; color:#fff!important; }
+
+    /* ====== Footer collé en bas à gauche du cadre ====== */
+    footer{
+      max-width: var(--app-w);
+      margin: 0 auto;
+      padding: 0 var(--pad-x) 18px var(--pad-x);
+      box-sizing: border-box;
+    }
+    footer p{ margin:0; text-align:left; opacity:.75; }
+
+    @media (max-width:600px){
+      :root{ --app-w: 92vw; --pad-x: 10px; }
+      .header-solo .header-row{ grid-template-columns: 36px 1fr 72px; }
     }
   </style>
 </head>
 <body class="duel-container">
 
-  <!-- HEADER STYLE SOLO/DUEL -->
+  <!-- HEADER -->
   <header class="header-solo">
     <div class="header-row">
       <a href="index.html" class="back-btn" title="Retour" data-i18n-title="header.back">
@@ -86,6 +102,7 @@
         </a>
       </div>
     </div>
+
     <div class="solde-container solde-solo" id="solde-container">
       <div class="solde-item">
         <div class="solde-ligne">
@@ -102,12 +119,12 @@
     </div>
   </header>
 
+  <!-- CONTENU -->
   <main class="duel-main-wrap">
     <div class="duel-choice-box">
       <a href="duel_random.html" class="duel-choice-btn" data-i18n="duel.choice.random">Jouer contre un adversaire aléatoire</a>
       <a href="duel_amis.html" class="duel-choice-btn" data-i18n="duel.choice.friend">Jouer contre un ami</a>
 
-      <!-- Bouton Duel Premium avec badge -->
       <a href="duel_premium.html" id="btn-duel-premium" class="duel-choice-btn notif-wrap" data-i18n="duel.choice.premium">
         Duel Premium
         <span id="badge-duel-premium" class="notif-badge" aria-label="Nouvelles demandes"></span>
@@ -115,13 +132,12 @@
     </div>
   </main>
 
-  <footer class="duel-main-wrap">
+  <!-- FOOTER : bas gauche -->
+  <footer>
     <p data-i18n="footer">© 2025 VFindz</p>
   </footer>
 
-  <!-- ===================== POPUPS À GARDER DANS CHAQUE PAGE DUEL ===================== -->
-
-  <!-- ✅ POPUP SIGNALER PHOTO -->
+  <!-- POPUPS (conservées) -->
   <div id="popup-signal-photo" class="popup hidden" tabindex="-1">
     <div class="popup-inner">
       <h2 data-i18n="popup.signal.title">Signaler cette photo</h2>
@@ -135,7 +151,6 @@
     </div>
   </div>
 
-  <!-- ✅ POPUP JETON VALIDER -->
   <div id="popup-jeton-valider" class="popup hidden" tabindex="-1">
     <div class="popup-inner">
       <h2 data-i18n="popup.jeton.title">Valider avec 1 jeton ?</h2>
@@ -144,13 +159,13 @@
     </div>
   </div>
 
-  <!-- ===================== SCRIPTS ===================== -->
+  <!-- SCRIPTS -->
   <script src="js/i18n.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="js/userData.js"></script>
   <script src="js/duel.js"></script>
 
-  <!-- ====== NOTIF PREMIUM : compteur + realtime ====== -->
+  <!-- Badge Premium : compteur + realtime -->
   <script>
     if (!window.supabase) {
       window.supabase = supabase.createClient(
@@ -162,12 +177,7 @@
     async function ensureUserReady(maxMs=3000){
       const t0=Date.now();
       while(Date.now()-t0<maxMs){
-        try{
-          if(typeof window.getPseudo==="function"){
-            const p=await window.getPseudo();
-            if(p) return p;
-          }
-        }catch(e){}
+        try{ if(typeof window.getPseudo==="function"){ const p=await window.getPseudo(); if(p) return p; } }catch(e){}
         await new Promise(r=>setTimeout(r,150));
       }
       return null;
@@ -177,15 +187,8 @@
       const badge = document.getElementById('badge-duel-premium');
       const btn = document.getElementById('btn-duel-premium');
       if (!badge || !btn) return;
-      if (count > 0) {
-        badge.textContent = count;
-        badge.style.display = 'inline-flex';
-        btn.classList.add('btn-alert');
-      } else {
-        badge.textContent = '';
-        badge.style.display = 'none';
-        btn.classList.remove('btn-alert');
-      }
+      if (count > 0) { badge.textContent = count; badge.style.display = 'inline-flex'; btn.classList.add('btn-alert'); }
+      else { badge.textContent = ''; badge.style.display = 'none'; btn.classList.remove('btn-alert'); }
     }
 
     async function fetchAndRenderPremiumBadge() {
@@ -200,9 +203,7 @@
         window.__me_id = data?.id;
         const arr = Array.isArray(data?.demandesduelrecuespremium) ? data.demandesduelrecuespremium : [];
         renderPremiumBadge(arr.length);
-      } catch (e) {
-        console.error('[PREMIUM BADGE] Exception:', e);
-      }
+      } catch (e) { console.error('[PREMIUM BADGE] Exception:', e); }
     }
 
     function initPremiumRealtime() {
@@ -212,26 +213,17 @@
         window.__premiumChannel = window.supabase
           .channel('premium-req-' + Math.random().toString(36).slice(2))
           .on('postgres_changes', {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'users',
-            filter: `id=eq.${window.__me_id}`
+            event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${window.__me_id}`
           }, () => fetchAndRenderPremiumBadge())
           .subscribe();
-      } catch (e) {
-        console.error('[PREMIUM BADGE] Realtime init error:', e);
-      }
+      } catch (e) { console.error('[PREMIUM BADGE] Realtime init error:', e); }
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-      try {
-        if (window.afficherSolde) { try { await window.afficherSolde(); } catch(e){} }
-        await ensureUserReady();
-        await fetchAndRenderPremiumBadge();
-        initPremiumRealtime();
-      } catch (e) {
-        console.error('[PREMIUM BADGE] bootstrap error:', e);
-      }
+      try { if (window.afficherSolde) { try { await window.afficherSolde(); } catch(e){} } } catch(e){}
+      await ensureUserReady();
+      await fetchAndRenderPremiumBadge();
+      initPremiumRealtime();
     });
   </script>
 </body>
