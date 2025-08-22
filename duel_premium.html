@@ -435,14 +435,14 @@ async function createOrFinalizeDuel_BothPremium(ami, myFixed, myCand){
   const meId = profil.id, amiId = ami.id;
   const existing = await findExistingRoomBetween(meId, amiId);
 
-  // Si une room 'waiting' existe avec la contribution de l'autre → finaliser
+  // Cas 1 : il existe déjà une room en attente avec la contribution de l'autre → on finalise
   if (existing && existing.status === 'waiting' && existing.defis_mode === 'both_premium' && existing.defis_partial) {
     try {
       let otherPartial = existing.defis_partial;
       if (typeof otherPartial === 'string') { try { otherPartial = JSON.parse(otherPartial); } catch(e){} }
 
-      const otherFixed = (otherPartial && otherPartial.fixed) ? otherPartial.fixed : '';
-      const otherCand  = (otherPartial && otherPartial.cand ) ? otherPartial.cand  : '';
+      const otherFixed = otherPartial?.fixed || '';
+      const otherCand  = otherPartial?.cand  || '';
       const d1 = otherFixed;
       const d2 = myFixed;
       const d3 = pickRandom(myCand, otherCand);
@@ -465,9 +465,10 @@ async function createOrFinalizeDuel_BothPremium(ami, myFixed, myCand){
     }
   }
 
-  // Sinon : créer une room 'waiting' avec MA contribution
+  // Cas 2 : pas de room avec la contribution de l'autre → on crée une room en "waiting" avec MA contribution
   const now = Date.now();
   const myPartial = { author_id: meId, fixed: myFixed, cand: myCand };
+
   const insertPayload = [{
     player1_id: amiId,
     player2_id: meId,
@@ -488,6 +489,7 @@ async function createOrFinalizeDuel_BothPremium(ami, myFixed, myCand){
   if (ins.error) { console.error(ins.error); alert(t('errors.create_room','Erreur création du duel.')); return null; }
   return (ins.data && ins.data[0]) ? ins.data[0] : null;
 }
+
 
 
     async function refuserDuelPremium(amiPseudo){
