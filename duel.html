@@ -57,7 +57,7 @@
     }
     .duel-choice-btn:hover{ background:#ffffff44; }
 
-    /* ====== Badge Premium + cartouche rouge ====== */
+    /* ====== Badge + état "alerte" (couleur index) ====== */
     .notif-wrap{ position:relative; display:inline-block; }
     .notif-badge{
       position:absolute; top:-8px; right:-10px;
@@ -67,8 +67,7 @@
       display:none; align-items:center; justify-content:center;
       box-shadow:0 2px 8px rgba(0,0,0,.25), 0 0 0 2px #1e1e2f;
     }
-    /* Quand il y a des demandes : bouton en rouge + halo */
-    #btn-duel-premium.btn-alert{
+    .btn-alert{
       background:#ff3b30 !important; color:#fff !important;
       outline:2px solid #ff3b30; box-shadow:0 0 0 4px #ff3b3033, 0 10px 22px rgba(0,0,0,.35);
     }
@@ -127,9 +126,14 @@
   <main class="duel-main-wrap">
     <div class="duel-choice-box">
       <a href="duel_random.html" class="duel-choice-btn" data-i18n="duel.choice.random">Jouer contre un adversaire aléatoire</a>
-      <a href="duel_amis.html" class="duel-choice-btn" data-i18n="duel.choice.friend">Jouer contre un ami</a>
 
-      <!-- Premium avec badge -->
+      <!-- Ami + badge -->
+      <a href="duel_amis.html" id="btn-duel-ami" class="duel-choice-btn notif-wrap" data-i18n="duel.choice.friend">
+        Jouer contre un ami
+        <span id="badge-duel-ami" class="notif-badge" aria-label="Nouvelles demandes"></span>
+      </a>
+
+      <!-- Premium + badge -->
       <a href="duel_premium.html" id="btn-duel-premium" class="duel-choice-btn notif-wrap" data-i18n="duel.choice.premium">
         Duel Premium
         <span id="badge-duel-premium" class="notif-badge" aria-label="Nouvelles demandes"></span>
@@ -170,8 +174,9 @@
   <script src="js/userData.js"></script>
   <script src="js/duel.js"></script>
 
-  <!-- Badge Premium : compteur + realtime -->
+  <!-- Badges Ami/Premium : compteur + realtime -->
   <script>
+    // Client Supabase si pas déjà présent
     if (!window.supabase) {
       window.supabase = supabase.createClient(
         'https://swmdepiukfginzhbeccz.supabase.co',
@@ -179,21 +184,14 @@
       );
     }
 
-    async function ensureUserReady(maxMs=3000){
-      const t0=Date.now();
-      while(Date.now()-t0<maxMs){
-        try{ if(typeof window.getPseudo==="function"){ const p=await window.getPseudo(); if(p) return p; } }catch(e){}
-        await new Promise(r=>setTimeout(r,150));
-      }
-      return null;
-    }
-
-    function renderPremiumBadge(count) {
-      const badge = document.getElementById('badge-duel-premium');
-      const btn = document.getElementById('btn-duel-premium');
-      if (!badge || !btn) return;
-      if (count > 0) {
-        badge.textContent = count;
+    // Helpers
+    const A = (x) => Array.isArray(x) ? x : [];
+    function setBadge(btnId, badgeId, count){
+      const btn = document.getElementById(btnId);
+      const badge = document.getElementById(badgeId);
+      if(!btn || !badge) return;
+      if(count > 0){
+        badge.textContent = String(count);
         badge.style.display = 'inline-flex';
         btn.classList.add('btn-alert');
       } else {
@@ -202,40 +200,64 @@
         btn.classList.remove('btn-alert');
       }
     }
-
-    async function fetchAndRenderPremiumBadge() {
-      try {
-        const pseudo = await window.getPseudo();
-        const { data, error } = await window.supabase
-          .from('users')
-          .select('id, demandesduelrecuespremium')
-          .eq('pseudo', pseudo)
-          .single();
-        if (error) { console.error('[PREMIUM BADGE] SELECT error:', error); return; }
-        window.__me_id = data?.id;
-        const arr = Array.isArray(data?.demandesduelrecuespremium) ? data.demandesduelrecuespremium : [];
-        renderPremiumBadge(arr.length);
-      } catch (e) { console.error('[PREMIUM BADGE] Exception:', e); }
+    async function ensureUserReady(maxMs=3000){
+      const t0=Date.now();
+      while(Date.now()-t0<maxMs){
+        try{
+          if(typeof window.getPseudo==="function"){
+            const p=await window.getPseudo();
+            if(p) return p;
+          }
+        }catch(e){}
+        await new Promise(r=>setTimeout(r,150));
+      }
+      return null;
     }
 
-    function initPremiumRealtime() {
-      try {
-        if (!window.supabase || !window.__me_id) return;
-        if (window.__premiumChannel) { window.__premiumChannel.unsubscribe(); }
-        window.__premiumChannel = window.supabase
-          .channel('premium-req-' + Math.random().toString(36).slice(2))
+    // Lecture et rendu des compteurs
+    let MY_ID = null;
+    async function refreshBadges(){
+      const pseudo = await ensureUserReady();
+      if(!pseudo) return;
+
+      const { data, error } = await window.supabase
+        .from('users')
+        .select('id,demandesduelrecues,demandesamisrecues,demandesduelrecuespremium')
+        .eq('pseudo', pseudo)
+        .single();
+
+      if(error || !data){ setBadge('btn-duel-ami','badge-duel-ami',0); setBadge('btn-duel-premium','badge-duel-premium',0); return; }
+
+      MY_ID = data.id;
+
+      const classicDuels = A(data.demandesduelrecues).length;        // text[]
+      const friendReqs   = A(data.demandesamisrecues).length;        // text[]
+      const premiumDuels = A(data.demandesduelrecuespremium).length; // jsonb array
+
+      // Ami rouge si demandes d'ami OU duel classique
+      setBadge('btn-duel-ami', 'badge-duel-ami', friendReqs + classicDuels);
+
+      // Premium rouge si demandes premium
+      setBadge('btn-duel-premium', 'badge-duel-premium', premiumDuels);
+    }
+
+    function initRealtime(){
+      try{
+        if(!MY_ID) return;
+        if(window.__duelPageChan) window.__duelPageChan.unsubscribe();
+        window.__duelPageChan = window.supabase
+          .channel('duel-page-'+MY_ID)
           .on('postgres_changes', {
-            event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${window.__me_id}`
-          }, () => fetchAndRenderPremiumBadge())
+            event: 'UPDATE', schema:'public', table:'users', filter:`id=eq.${MY_ID}`
+          }, refreshBadges)
           .subscribe();
-      } catch (e) { console.error('[PREMIUM BADGE] Realtime init error:', e); }
+      }catch(e){}
     }
 
     window.addEventListener('DOMContentLoaded', async () => {
-      try { if (window.afficherSolde) { try { await window.afficherSolde(); } catch(e){} } } catch(e){}
-      await ensureUserReady();
-      await fetchAndRenderPremiumBadge();
-      initPremiumRealtime();
+      try{ if(typeof window.afficherSolde==='function'){ await window.afficherSolde(); } }catch(e){}
+      await refreshBadges();
+      initRealtime();
     });
   </script>
 </body>
