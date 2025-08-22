@@ -152,6 +152,23 @@ function retirerPhotoAimee(defiId) {
 window.aimerPhoto = aimerPhoto;
 window.retirerPhotoAimee = retirerPhotoAimee;
 
+// === Photos aimées DUEL (clé = `${roomId}_${champ}_${idx}`) ===
+window.getPhotosAimeesDuel = function () {
+  try { return JSON.parse(localStorage.getItem("photos_aimees_duel") || "[]"); }
+  catch { return []; }
+};
+window.aimerPhotoDuel = function (key) {
+  const arr = window.getPhotosAimeesDuel();
+  if (!arr.includes(key)) {
+    arr.push(key);
+    localStorage.setItem("photos_aimees_duel", JSON.stringify(arr));
+  }
+};
+window.retirerPhotoAimeeDuel = function (key) {
+  const arr = window.getPhotosAimeesDuel().filter(k => k !== key);
+  localStorage.setItem("photos_aimees_duel", JSON.stringify(arr));
+};
+
 // --------- Variables globales ---------
 window.currentRoomId = null;
 window.isPlayer1 = false;
@@ -473,6 +490,13 @@ function waitRoom(roomId) {
   poll();
 }
 
+// ===== Normalise defis/defis_final en tableau (OBJ -> ARRAY) =====
+window.normalizeDefis = function (src) {
+  if (Array.isArray(src)) return src.filter(Boolean);
+  if (src && typeof src === "object") return [src.d1, src.d2, src.d3].filter(Boolean);
+  return [];
+};
+
 // =================== INIT GAME AVEC PREMIUM ===================
 window.initDuelGame = async function() {
   if (!(path.includes("duel_game.html") && roomId)) return;
@@ -529,10 +553,13 @@ window.initDuelGame = async function() {
     if ($("pseudo-adv")) $("pseudo-adv").textContent = advID ? advID : "Adversaire";
     if (window.roomData.starttime && $("timer")) startGlobalTimer(window.roomData.starttime);
     else if ($("timer")) $("timer").textContent = "--:--:--";
-    // PREMIUM - forçage defis sur defis_final
-    if (window.roomData.type === "amis_premium" && window.roomData.defis_final) {
-      window.roomData.defis = window.roomData.defis_final;
-    }
+
+    // PREMIUM - source des défis + normalisation (OBJ -> ARRAY)
+    let defisSrc = (window.roomData.type === "amis_premium")
+      ? (window.roomData.defis_final || window.roomData.defis)
+      : window.roomData.defis;
+    window.roomData.defis = window.normalizeDefis(defisSrc);
+
     window.renderDefis({ myID, advID });
   }
   function startGlobalTimer(startTime) {
@@ -610,7 +637,8 @@ window.gestionDefisPremium = async function(room, pseudo, userId) {
       let d3 = this.defi3 ? this.defi3.value.trim() : "";
       let dataToSave = {};
       if (role === "full") {
-        dataToSave = { defis_final: [d1, d2, d3] };
+        // 👇 miroir defis_final -> defis
+        dataToSave = { defis_final: [d1, d2, d3], defis: [d1, d2, d3] };
       }
       else if (role === "1_3") {
         await window.supabase.from("duels").update({
@@ -634,7 +662,8 @@ window.gestionDefisPremium = async function(room, pseudo, userId) {
             let choix = Math.random() < 0.5 ? checkRoom.defis3a : checkRoom.defis3b;
             let defisFinal = [checkRoom.defis1, checkRoom.defis2, choix];
             await window.supabase.from("duels").update({
-              defis_final: defisFinal
+              defis_final: defisFinal,
+              defis: defisFinal // 👈 miroir pour l’UI
             }).eq("id", room.id);
             resolve();
           } else {
