@@ -13,7 +13,7 @@
     /* ====== HEADER en GRID : 3 colonnes fixes pour centrer le titre ====== */
     .header-solo .header-row{
       display: grid;
-      grid-template-columns: 40px 1fr 80px; /* ← largeur fixe pour garder le H1 i-mm-obile */
+      grid-template-columns: 40px 1fr 80px; /* largeur fixe pour garder le H1 immobile */
       align-items: center;
       gap: 8px;
       max-width: var(--app-w);
@@ -53,11 +53,11 @@
       text-decoration:none; text-align:center;
       font-weight:700; padding:1rem 1.2rem; border-radius:14px;
       background:#ffffff22; color:#fff; backdrop-filter:blur(5px);
-      transition:background .2s ease;
+      transition:background .2s ease, box-shadow .2s ease, outline-color .2s ease;
     }
     .duel-choice-btn:hover{ background:#ffffff44; }
 
-    /* ====== Badge Premium ====== */
+    /* ====== Badge Premium + cartouche rouge ====== */
     .notif-wrap{ position:relative; display:inline-block; }
     .notif-badge{
       position:absolute; top:-8px; right:-10px;
@@ -67,9 +67,13 @@
       display:none; align-items:center; justify-content:center;
       box-shadow:0 2px 8px rgba(0,0,0,.25), 0 0 0 2px #1e1e2f;
     }
-    #btn-duel-premium.btn-alert{ background:#ff3b30!important; color:#fff!important; }
+    /* Quand il y a des demandes : bouton en rouge + halo */
+    #btn-duel-premium.btn-alert{
+      background:#ff3b30 !important; color:#fff !important;
+      outline:2px solid #ff3b30; box-shadow:0 0 0 4px #ff3b3033, 0 10px 22px rgba(0,0,0,.35);
+    }
 
-    /* ====== Footer collé en bas à gauche du cadre ====== */
+    /* ====== Footer bas gauche ====== */
     footer{
       max-width: var(--app-w);
       margin: 0 auto;
@@ -94,10 +98,10 @@
       </a>
       <h1 class="duel-titre-pro" data-i18n="header.title.duel">Duel</h1>
       <div class="top-buttons">
-        <a href="index.html" class="btn-icon">
+        <a href="index.html" class="btn-icon" aria-label="Profil">
           <img src="assets/icons/user.svg" alt="Profil" />
         </a>
-        <a href="parametres.html" class="btn-icon">
+        <a href="parametres.html" class="btn-icon" aria-label="Paramètres">
           <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings" />
         </a>
       </div>
@@ -125,6 +129,7 @@
       <a href="duel_random.html" class="duel-choice-btn" data-i18n="duel.choice.random">Jouer contre un adversaire aléatoire</a>
       <a href="duel_amis.html" class="duel-choice-btn" data-i18n="duel.choice.friend">Jouer contre un ami</a>
 
+      <!-- Premium avec badge -->
       <a href="duel_premium.html" id="btn-duel-premium" class="duel-choice-btn notif-wrap" data-i18n="duel.choice.premium">
         Duel Premium
         <span id="badge-duel-premium" class="notif-badge" aria-label="Nouvelles demandes"></span>
@@ -187,8 +192,15 @@
       const badge = document.getElementById('badge-duel-premium');
       const btn = document.getElementById('btn-duel-premium');
       if (!badge || !btn) return;
-      if (count > 0) { badge.textContent = count; badge.style.display = 'inline-flex'; btn.classList.add('btn-alert'); }
-      else { badge.textContent = ''; badge.style.display = 'none'; btn.classList.remove('btn-alert'); }
+      if (count > 0) {
+        badge.textContent = count;
+        badge.style.display = 'inline-flex';
+        btn.classList.add('btn-alert');
+      } else {
+        badge.textContent = '';
+        badge.style.display = 'none';
+        btn.classList.remove('btn-alert');
+      }
     }
 
     async function fetchAndRenderPremiumBadge() {
