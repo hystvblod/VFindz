@@ -1,129 +1,173 @@
-// --- pub.js ---
-// AUCUN await global ici !
+// --- js/pub.js ---
+// AUCUN await global ici.
 
-// Détection plateforme
+// Plateforme
 function getPlatformLower() {
   try {
     const cap = window.Capacitor;
-    if (cap?.getPlatform) return cap.getPlatform().toLowerCase(); // 'ios' | 'android' | 'web'
+    if (cap?.getPlatform) return cap.getPlatform().toLowerCase();
   } catch (_) {}
-  const p = (navigator.userAgent || "").toLowerCase();
-  if (p.includes('android')) return 'android';
-  if (p.includes('iphone') || p.includes('ipad') || p.includes('ios')) return 'ios';
+  const ua = (navigator.userAgent || '').toLowerCase();
+  if (ua.includes('android')) return 'android';
+  if (ua.includes('iphone') || ua.includes('ipad') || ua.includes('ios')) return 'ios';
   return 'web';
 }
 const PLATFORM = getPlatformLower();
 const IS_IOS = PLATFORM === 'ios';
-const IS_ANDROID = PLATFORM === 'android';
 
-// ---- Clés/IDs séparés par plateforme (REMPLACE ICI) ----
-const SDK_KEY = IS_IOS ? "TA_CLE_SDK_IOS" : "TA_CLE_SDK_ANDROID";
-const AD_UNIT_REWARDED     = IS_IOS ? "IOS_REWARDED_ID"     : "ANDROID_REWARDED_ID";
-const AD_UNIT_INTERSTITIAL = IS_IOS ? "IOS_INTERSTITIAL_ID" : "ANDROID_INTERSTITIAL_ID";
+// IDs AppLovin MAX — REMPLACE ICI par tes vraies clés (iOS ≠ Android)
+const SDK_KEY               = IS_IOS ? 'TA_CLE_SDK_IOS'         : 'TA_CLE_SDK_ANDROID';
+const AD_UNIT_ID_REWARDED   = IS_IOS ? 'IOS_REWARDED_ADUNIT'    : 'ANDROID_REWARDED_ADUNIT';
+const AD_UNIT_ID_INTERSTIT  = IS_IOS ? 'IOS_INTERSTITIAL_ADUNIT': 'ANDROID_INTERSTITIAL_ADUNIT';
 
-// Demander l’autorisation ATT sur iOS avant d’initialiser MAX (si plugin dispo)
+// Récompenses
+const REWARD_JETONS = 1;
+const REWARD_VCOINS = 300;
+const REWARD_REVIVE = true;
+
+// Garde ta fonction NoAds côté Supabase si elle existe déjà
+async function hasNoAds() {
+  try {
+    if (!window.sb || !window.getUserId) return false;
+    const { data, error } = await window.sb
+      .from('users')
+      .select('nopub')
+      .eq('id', window.getUserId())
+      .single();
+    if (error) return false;
+    return !!data?.nopub;
+  } catch (_) {
+    return false;
+  }
+}
+window.hasNoAds = hasNoAds;
+
+// ATT (iOS) avant init MAX
 async function requestATTIfNeeded() {
   if (!IS_IOS) return;
   try {
     const att = window.Capacitor?.Plugins?.AppTrackingTransparency;
-    // Plusieurs plugins exposent .requestPermission()
     if (att?.requestPermission) {
-      await att.requestPermission(); // on ignore le statut ici
+      await att.requestPermission();
     }
   } catch (e) {
-    console.warn("ATT permission error:", e);
+    console.warn('ATT error:', e);
   }
 }
 
-async function initAds() {
+// Init + preload ads
+async function _initAdsOnce() {
+  const MAX = window.Capacitor?.Plugins?.AppLovinPlugin;
+  if (!MAX) { console.warn('[Ads] AppLovinPlugin indisponible.'); return; }
+
+  await requestATTIfNeeded();
+
   try {
-    const MAX = window.Capacitor?.Plugins?.AppLovinPlugin;
-    if (!MAX) return;
-
-    // ATT AVANT l'init en iOS
-    await requestATTIfNeeded();
-
     await MAX.initialize({ sdkKey: SDK_KEY });
 
-    // Optionnel : RGPD si ton plugin expose un setter
-    // if (typeof MAX.setHasUserConsent === 'function') {
-    //   const consent = (window.userConsent || localStorage.getItem("rgpdConsent")) === "accept";
-    //   await MAX.setHasUserConsent(consent);
-    // }
+    // (optionnel) Consentement si exposé par le plugin
+    // const consent = (localStorage.getItem('rgpdConsent') === 'accept') && (localStorage.getItem('adsConsent') === 'yes');
+    // if (typeof MAX.setHasUserConsent === 'function') await MAX.setHasUserConsent(!!consent);
 
-    await MAX.loadRewardedAd(AD_UNIT_REWARDED);
-    await MAX.loadInterstitialAd(AD_UNIT_INTERSTITIAL);
-  } catch (error) {
-    console.warn("Erreur initialisation AppLovin :", error);
+    await MAX.loadRewardedAd(AD_UNIT_ID_REWARDED);
+    await MAX.loadInterstitialAd(AD_UNIT_ID_INTERSTIT);
+    console.log('[Ads] MAX init + preloads OK');
+  } catch (e) {
+    console.warn('[Ads] Init error:', e);
   }
 }
 
-// Lance l'init quand le DOM est prêt (pas d'await global)
-document.addEventListener("DOMContentLoaded", () => {
-  // On laisse l'async interne vivre sa vie
-  initAds();
-});
+// Expose pour ta pop-up RGPD (index.html appelle window.initAds() après consentement)
+window.initAds = function() {
+  _initAdsOnce();
+};
 
-// -------- Fonctions utilitaires pour l'app --------
-// (userData.js doit être chargé avant ce fichier !)
-
-window.showAd = async function(type = "rewarded") {
-  // Premium : pas de pub (mais on crédite quand même si rewarded)
+// Show interstitial
+async function showInterstitial() {
+  if (await hasNoAds()) {
+    console.log('[Ads] Interstitiel bloqué (NoPub)');
+    return;
+  }
+  const MAX = window.Capacitor?.Plugins?.AppLovinPlugin;
+  if (!MAX) {
+    console.log('[Ads] Interstitiel simulée (dev)');
+    return;
+  }
   try {
-    const premium = await window.isPremium?.();
-    if (premium) {
-      if (type === "rewarded") await window.addPoints?.(10);
-      await window.updatePointsDisplay?.();
-      return;
-    }
-  } catch (_) {}
-
-  // RGPD/Consentement (UE)
-  const consent = window.userConsent || localStorage.getItem("rgpdConsent");
-  if (consent !== "accept") return;
-
-  try {
-    const MAX = window.Capacitor?.Plugins?.AppLovinPlugin;
-    if (MAX) {
-      if (type === "rewarded") {
-        await MAX.showRewardedAd(AD_UNIT_REWARDED);
-      } else if (type === "interstitial") {
-        await MAX.showInterstitialAd(AD_UNIT_INTERSTITIAL);
-      }
-    } else {
-      // En mode navigateur : simule une pub pour dev/test
-      alert("[SIMULATION PUB] Regarde une pub " + type);
-      if (type === "rewarded") await window.addPoints?.(10);
-    }
+    await MAX.showInterstitialAd(AD_UNIT_ID_INTERSTIT);
   } catch (e) {
-    console.warn("Erreur pub :", e);
+    console.warn('[Ads] Interstitial error:', e);
   }
+}
 
-  await window.updatePointsDisplay?.();
-};
-
-// -- MAJ points affichés
-window.updatePointsDisplay = async function() {
-  const pointsSpan = document.getElementById("points");
-  if (pointsSpan && window.getPoints) {
-    try { pointsSpan.textContent = await window.getPoints(); } catch (_) {}
+// Show rewarded (+ callback success)
+function showRewarded(callback) {
+  const MAX = window.Capacitor?.Plugins?.AppLovinPlugin;
+  if (!MAX) {
+    console.log('[Ads] Rewarded simulée (dev)');
+    setTimeout(() => typeof callback === 'function' && callback(true), 2000);
+    return;
   }
-};
+  MAX.showRewardedAd(AD_UNIT_ID_REWARDED)
+    .then((res) => {
+      const ok = !!res?.rewarded;
+      if (typeof callback === 'function') callback(ok);
+    })
+    .catch((e) => {
+      console.warn('[Ads] Rewarded error:', e);
+      if (typeof callback === 'function') callback(false);
+    });
+}
 
-// ========== Fonction pour la popup BOUTIQUE : PUB → Jetons ==========
-// (pense à protéger côté serveur si besoin)
-window.acheterJetonsAvecPub = async function() {
-  // Affiche une pub rewarded, attend la fin
-  await window.showAd('rewarded');
-  // Ajoute 3 jetons à l'utilisateur (RPC côté Supabase)
-  try {
-    await window.supabase.rpc('secure_add_jetons', { nb: 3 });
-  } catch (e) {
-    console.warn("secure_add_jetons error:", e);
+// Helpers boutique (récompenses locales)
+function showRewardBoutique() {
+  showRewarded(async (ok) => {
+    if (!ok) return;
+    try {
+      await window.addJetonsSupabase?.(REWARD_JETONS);
+      alert(`+${REWARD_JETONS} jeton ajouté !`);
+      if (window.renderThemes) window.renderThemes();
+    } catch (e) {
+      alert("Erreur lors de l'ajout de jeton: " + (e?.message || e));
+    }
+  });
+}
+
+function showRewardVcoins() {
+  showRewarded(async (ok) => {
+    if (!ok) return;
+    try {
+      await window.addVCoinsSupabase?.(REWARD_VCOINS);
+      alert(`+${REWARD_VCOINS} VCoins ajoutés !`);
+      if (window.renderThemes) window.renderThemes();
+    } catch (e) {
+      alert("Erreur lors de l'ajout de VCoins: " + (e?.message || e));
+    }
+  });
+}
+
+function showRewardRevive(callback) {
+  if (!REWARD_REVIVE) return;
+  showRewarded((ok) => { if (ok && typeof callback === 'function') callback(); });
+}
+
+// Compteur interstitiel toutes X parties
+let _games = parseInt(localStorage.getItem('compteurParties') || '0', 10);
+function partieTerminee() {
+  _games += 1;
+  localStorage.setItem('compteurParties', String(_games));
+  const INTERSTITIEL_APRES_X_PARTIES = 2;
+  if (_games >= INTERSTITIEL_APRES_X_PARTIES) {
+    _games = 0;
+    localStorage.setItem('compteurParties', '0');
+    showInterstitial();
   }
-  // Mets à jour l'affichage
-  try { if (window.afficherSolde) await window.afficherSolde(); } catch (_) {}
-  // Ferme la popup si dispo
-  if (window.fermerPopupJetonBoutique) window.fermerPopupJetonBoutique();
-  alert("+3 jetons ajoutés !");
-};
+}
+
+// Expose global
+window.showInterstitial = showInterstitial;
+window.showRewarded = showRewarded;
+window.showRewardBoutique = showRewardBoutique;
+window.showRewardVcoins = showRewardVcoins;
+window.showRewardRevive = showRewardRevive;
+window.partieTerminee = partieTerminee;
