@@ -2643,3 +2643,65 @@ overflow-y: auto;
   margin: 0 auto;
   opacity: 0.92;
 }
+/* ---- Cartes boutique : s'assure que la carte pousse le bouton en bas ---- */
+.grid-cadres .cadre-item{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;   /* contenu en haut */
+  height:100%;
+  min-height:190px;             /* ajuste si besoin */
+}
+
+/* bouton full width en bas */
+.grid-cadres .cadre-item > button{
+  margin-top:auto;              /* colle en bas */
+  width:100%;
+  display:block;
+}
+
+/* bloc "meta" (titre + prix) centré */
+.cadre-meta{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  width:100%;
+}
+
+/* titre adaptable (une seule ligne, pas d'ellipsis) */
+.cadre-title{
+  margin:2px 0 0;
+  line-height:1.05;
+  font-weight:700;
+  white-space:nowrap;
+  overflow:visible;             /* pas de coupure */
+}
+
+/* prix */
+.cadre-price{
+  opacity:.85;
+  font-size:.95rem;
+}
+
+/* Grille responsive : une seule définition propre */
+.grid-cadres{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:20px 14px;
+  padding:20px;
+  justify-items:center;
+  width:100%;
+  box-sizing:border-box;
+}
+@media (max-width: 700px){
+  .grid-cadres{ grid-template-columns:repeat(2, 1fr); }
+}
+@media (max-width: 420px){
+  .grid-cadres{ grid-template-columns:1fr; }
+}
+
+/* Cadre PNG : éviter la déformation */
+.photo-cadre{
+  object-fit:contain;           /* au lieu de cover !important */
+}

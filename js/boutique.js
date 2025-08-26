@@ -68,14 +68,10 @@ async function acheterJetonAvecPieces() {
   }
 }
 
-// 1 pub = 1 jeton
+// 🎬 1 pub = 1 jeton (crédit après event rewarded via pub.js)
 async function acheterJetonAvecPub() {
   try {
-    // Si tu as une vraie pub rewardée, branche-la ici :
-    // await window.showAd?.(() => {});
-    await window.supabase.rpc('secure_add_jetons', { nb: 1 });
-    alert(_t("boutique.feedback.jeton1", "✅ 1 jeton ajouté !"));
-    await updateJetonsDisplay();
+    await window.showRewardBoutique?.(); // crédite à l’événement rewarded
   } catch (e) {
     alert("Erreur: " + (e?.message || e));
   } finally {
@@ -123,13 +119,10 @@ function fermerPopupPiecesBoutique() {
   if (el) el.classList.add("hidden");
 }
 
-// 🎬 Pub → +100 pièces (fixe)
+// 🎬 Pub → +100 pièces (crédit après event rewarded via pub.js)
 async function acheterPiecesAvecPub() {
   try {
-    // await window.showAd?.(() => {});
-    await window.supabase.rpc('secure_add_points', { nb: 100 });
-    await updatePointsDisplay();
-    alert(_t("boutique.feedback.coins100", "✅ +100 pièces !"));
+    await window.showRewardVcoins?.(); // crédite à l’événement rewarded
   } catch (e) {
     alert("Erreur: " + (e?.message || e));
   } finally {
