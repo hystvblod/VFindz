@@ -10,6 +10,11 @@
     #popup-achat-jeton.hidden,
     #popup-achat-pieces.hidden,
     #popup-premium.hidden { display:none !important; }
+
+    /* S'assure que les popups passent devant tout */
+    #popup-achat-jeton,
+    #popup-achat-pieces,
+    #popup-premium { position: fixed; inset: 0; z-index: 9999; }
   </style>
 </head>
 <body class="boutique-container">
@@ -74,7 +79,6 @@
   <div id="popup-achat-jeton" class="hidden">
     <div class="popup-inner popup-premium-pro" style="max-width:420px;">
       <div class="premium-badge" data-i18n="popup.tokens.badge">JETONS</div>
-      <!-- Titre générique (plus “3 jetons”) -->
       <div class="popup-premium-title" data-i18n="popup.tokens.title_generic">Obtenir des jetons</div>
       <div class="popup-premium-price" style="margin-bottom: 14px;" data-i18n="popup.tokens.method">
         Choisis une méthode
@@ -82,11 +86,9 @@
 
       <!-- Méthodes 1 jeton -->
       <div class="premium-list-pro" style="margin-bottom:10px;">
-        <!-- 1 jeton = 100 pièces -->
         <button class="btn-premium-pro" onclick="acheterJetonAvecPieces()" data-i18n="popup.tokens.paywithcoins_1">
           💸 Payer 100 pièces (1 jeton)
         </button>
-        <!-- 1 pub = 1 jeton -->
         <button class="btn-premium-pro" onclick="acheterJetonAvecPub()" data-i18n="popup.tokens.paywithad_1">
           📺 Regarder une pub (1 jeton)
         </button>
@@ -112,7 +114,7 @@
     </div>
   </div>
 
-  <!-- ✅ POPUP : OBTENIR DES PIÈCES (remplace achat.html) -->
+  <!-- ✅ POPUP : OBTENIR DES PIÈCES -->
   <div id="popup-achat-pieces" class="hidden">
     <div class="popup-inner popup-premium-pro" style="max-width:420px;">
       <div class="premium-badge" data-i18n="popup.coins.badge">PIÈCES</div>
