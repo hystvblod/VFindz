@@ -307,6 +307,7 @@ async function renderBoutique(categoryKey) {
 
   boutiqueContainer.innerHTML = "";
   const grid = document.createElement("div");
+  grid.id = "cadres-grid";
   grid.className = "grid-cadres";
 
   const cadresCat = CADRES_DATA.filter(cadre => getCategorie(cadre.id) === categoryKey);
