@@ -362,13 +362,17 @@ async function renderBoutique(categoryKey) {
         document.body.appendChild(popup);
       });
 
+      // ---- Titre, Prix, Bouton avec classes pour le CSS ----
       const title = document.createElement("h3");
+      title.className = "cadre-title";
       title.textContent = cadre.nom;
 
       const price = document.createElement("p");
+      price.className = "cadre-price";
       price.textContent = `${cadre.prix ? cadre.prix + " " + _t("label.pieces", "pièces") : ""}`;
 
       const button = document.createElement("button");
+      button.className = "cadre-cta";
 
       if (cadre.condition) {
         const unlockInfo = await checkCadreUnlock(cadre);
@@ -382,7 +386,7 @@ async function renderBoutique(categoryKey) {
             button.textContent = cadre.prix ? _t("boutique.button.acheter", "Acheter") : _t("boutique.button.debloque", "Débloqué !");
             button.disabled = !!cadre.prix ? false : true;
             if (cadre.prix) button.addEventListener("click", () => acheterCadreBoutique(cadre.id, cadre.prix));
-            else button.classList.add("btn-success");
+            else button.classList.add("btn-success"); // garde l’état visuel
           } else {
             button.textContent = _t("boutique.button.debloque", "Débloqué !");
             button.disabled = true;
