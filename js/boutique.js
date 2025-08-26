@@ -36,7 +36,7 @@ function ouvrirPopupJetonBoutique() {
     setTimeout(() => {
       const ids = ["tokens_12", "tokens_50"];
       ids.forEach(id => {
-        const span = document.getElementById("price-" + id.replace("tokens_", "tokens_"));
+        const span = document.getElementById("price-" + id);
         const price = typeof window.getStorePrice === "function" ? window.getStorePrice(id) : null;
         if (span && price) span.textContent = price;
       });
@@ -90,16 +90,8 @@ async function acheterPackJetons(productId) {
       alert("Achat non disponible sur ce device.");
       return;
     }
-    const ok = await window.validerAchat(productId);
-    if (!ok) return;
-
-    const CREDIT = { tokens_12: 12, tokens_50: 50 };
-    const nb = CREDIT[productId] || 0;
-    if (nb > 0) {
-      await window.supabase.rpc('secure_add_jetons', { nb });
-      await updateJetonsDisplay();
-      alert(_t("boutique.feedback.jetons_generic", `✅ ${nb} jetons ajoutés !`));
-    }
+    // On lance l'achat via le plugin (pas d'attente/retour)
+    window.validerAchat(productId);
   } catch (e) {
     alert("Achat annulé ou erreur : " + (e?.message || e));
   } finally {
@@ -168,15 +160,8 @@ async function acheterPackPieces(packId) {
       alert("Achat non disponible sur ce device.");
       return;
     }
-    const ok = await window.validerAchat(packId);
-    if (!ok) return;
-    const CREDIT = { coins_099: 1500, coins_199: 4000, coins_399: 9000, coins_999: 30000 };
-    const nb = CREDIT[packId] || 0;
-    if (nb > 0) {
-      await window.supabase.rpc('secure_add_points', { nb });
-      await updatePointsDisplay();
-      alert(_t("boutique.feedback.coins_generic", `✅ +${nb} pièces !`));
-    }
+    // On lance l'achat via le plugin (pas d'attente/retour, pas de crédit local ici)
+    window.validerAchat(packId);
   } catch (e) {
     alert("Achat annulé ou erreur : " + (e?.message || e));
   } finally {
@@ -461,8 +446,8 @@ function fermerPopupPremium() {
 }
 async function acheterPremium() {
   if (typeof window.validerAchat === 'function') {
-    const ok = await window.validerAchat('premium');
-    if (ok) alert(_t("popup.premium.ok", "✅ Premium activé !"));
+    // Déclenche l'achat premium via le plugin
+    window.validerAchat('premium');
     return;
   }
   alert("Achat non disponible sur ce device.");

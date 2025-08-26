@@ -12,6 +12,16 @@ window.setColTitlePremium = async function(element, pseudo) {
   }
 };
 
+// === Helper récompenses Premium (10 normal, 20 si Premium) ===
+async function _getPerDefiReward() {
+  try {
+    const prem = await (window.isPremium ? window.isPremium() : false);
+    return prem ? 20 : 10;
+  } catch (_) {
+    return 10;
+  }
+}
+
 window.VFindDuelDB = {
   db: null,
   async init() {
@@ -985,8 +995,10 @@ window.afficherPopupFinDuel = async function(room) {
   $("fin-details").innerHTML = html;
 
   let nbFaits = Object.values(photosMy).filter(p => p && p.url).length;
-  let gain = nbFaits * 10;
-  if (nbFaits === nbDefis) gain += 10;
+  const perDefi = await _getPerDefiReward();   // 10 normal, 20 si Premium
+  let gain = nbFaits * perDefi;
+  const bonus = (nbFaits === nbDefis) ? 10 : 0;
+  gain += bonus;
 
   let gainFlag = "gain_duel_" + room.id + "_" + myPseudo;
   if (!localStorage.getItem(gainFlag)) {
@@ -996,7 +1008,7 @@ window.afficherPopupFinDuel = async function(room) {
   }
 
   $("fin-gain").innerHTML =
-    `+${gain} pièces (${nbFaits} défi${nbFaits > 1 ? "s" : ""} x10${nbFaits === 3 ? " +10 bonus" : ""})`;
+    `+${gain} pièces (${nbFaits} défi${nbFaits > 1 ? "s" : ""} x${perDefi}${bonus ? " +10 bonus" : ""})`;
 
   $("fin-titre").textContent = "Fin du duel";
   $("popup-fin-duel").classList.remove("hidden");
@@ -1044,7 +1056,16 @@ window.finirDuel = async function() {
 
 
 // POPUP PUB/PREMIUM
-window.ouvrirPopupRepriseDuel = function(onPub) {
+window.ouvrirPopupRepriseDuel = async function(onPub) {
+  // Si Premium: pas de popup, on exécute directement l'action "onPub"
+  try {
+    const prem = await (window.isPremium ? window.isPremium() : false);
+    if (prem) {
+      if (typeof onPub === "function") onPub();
+      return;
+    }
+  } catch(_) {}
+
   const popup = document.getElementById("popup-reprise-photo-duel");
   popup.classList.remove("hidden");
   popup.classList.add("show");
@@ -1086,7 +1107,7 @@ window.gererPrisePhotoDuel = async function(idx, cadreId = null) {
     return;
   }
 
-  // PREMIUM : illimité
+  // PREMIUM : illimité (et sans pub)
   if (premium) {
     window.cameraOuvrirCameraPourDuel && window.cameraOuvrirCameraPourDuel(idx, duelId, cadreId);
     return;
