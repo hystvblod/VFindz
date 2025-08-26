@@ -901,6 +901,57 @@ window.renderDefis = async function({ myID, advID }) {
 // ===========================
 
 
+/* =================== DEMANDE DE REVANCHE (amis/premium) =================== */
+window.demanderRevanche = async function(room) {
+  try {
+    const meId = window.getUserId();
+    const mePseudo = await window.getPseudo();
+    const opponentId = (room.player1_id === meId) ? room.player2_id : room.player1_id;
+    const opponentPseudo = (room.player1_id === meId) ? room.player2_pseudo : room.player1_pseudo;
+
+    if (!opponentId) {
+      alert("Adversaire introuvable.");
+      return;
+    }
+
+    // DéfIs par défaut (pour démarrer si accepté). Le flux premium/amis peut re-surcharger ensuite.
+    const defis = await window.getDefisDuelFromSupabase(3);
+
+    const newRoom = {
+      player1_id: meId,
+      player1_pseudo: mePseudo,
+      player2_id: opponentId,
+      player2_pseudo: opponentPseudo || null,
+      score1: 0,
+      score2: 0,
+      status: 'waiting',            // en attente de l’autre
+      createdat: Date.now(),
+      defis: defis,
+      starttime: null,
+      photosa: {},
+      photosb: {},
+      type: room.type,              // conserve le type (amis / amis_premium)
+      revanche_of: room.id,         // lien vers la room d’origine
+      demande_revanche: { from: meId, to: opponentId, at: Date.now(), status: 'pending' }
+    };
+
+    const { data, error } = await window.supabase.from('duels').insert([newRoom]).select();
+    if (error || !data || !data[0]) {
+      alert("Erreur envoi demande de revanche : " + (error?.message || "inconnue"));
+      return;
+    }
+
+    // Optionnel : stocker pour reprise si besoin
+    localStorage.setItem("duel_revanche_room", data[0].id);
+
+    alert(`Demande de revanche envoyée à ${opponentPseudo || "ton ami"}.`);
+  } catch(e) {
+    alert("Erreur revanche : " + (e?.message || e));
+  }
+};
+/* ================= FIN DEMANDE DE REVANCHE ================== */
+
+
 // =================== POPUP FIN DE DUEL ===================
 window.afficherPopupFinDuel = async function(room) {
   const pseudo = await window.getPseudo();
@@ -951,8 +1002,17 @@ window.afficherPopupFinDuel = async function(room) {
   $("popup-fin-duel").classList.remove("hidden");
   $("popup-fin-duel").classList.add("show");
 
-  $("fin-btn-replay").onclick = function () {
-    window.location.href = "duel_random.html";
+  // 🔁 Rejouer : si random -> aléatoire ; sinon -> demande de revanche à la même personne
+  $("fin-btn-replay").onclick = async function () {
+    try {
+      if (room.type === "random") {
+        window.location.href = "duel_random.html";
+      } else {
+        await window.demanderRevanche(room);
+      }
+    } catch(e) {
+      alert("Erreur revanche : " + (e?.message || e));
+    }
   };
   $("fin-btn-retour").onclick = function () {
     window.location.href = "index.html";

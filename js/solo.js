@@ -351,7 +351,7 @@ async function validerDefiAvecJeton(index) {
 window.validerDefiAvecJeton = validerDefiAvecJeton;
 
 // ----------- PRISE/REPRISE PHOTO CENTRALISÉE -----------
-window.gererPrisePhoto = function(defiId, index) {
+window.gererPrisePhoto = async function(defiId, index) {
   let defis = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
   let defi = defis[index];
   defi.photoCount = defi.photoCount || 0;
@@ -364,7 +364,10 @@ window.gererPrisePhoto = function(defiId, index) {
     return;
   }
 
-  if (window.isPremium && window.isPremium()) {
+  // Premium = reprises illimitées (pas de pub)
+  let premium = false;
+  try { premium = await (window.hasNoAds?.() || window.isPremium?.()); } catch (_) {}
+  if (premium) {
     canRetakePhoto = true;
     retakeDefiId = defiId;
     console.log(`[SOLO] Prise photo (premium retake) pour defi ${defiId}`);
@@ -372,13 +375,14 @@ window.gererPrisePhoto = function(defiId, index) {
     return;
   }
 
+  // NON-premium : 1 reprise via popup pub (si tu gères une limite)
   if (defi.photoCount >= 1) {
     console.log(`[SOLO] Popup retake demandé (déjà 1 photo) pour defi ${defiId}`);
     const popup = document.getElementById("popup-premium-photo");
     if (popup) {
       popup.classList.remove("hidden");
       popup.classList.add("show");
-      // ... gestion boutons
+      // tes handlers boutons existent déjà côté HTML
     }
     return;
   } else {
@@ -432,7 +436,8 @@ window.afficherPhotoDansCadreSolo = async function(defiId, dataUrl) {
 
   if (window.pubAfterPhoto) {
     window.pubAfterPhoto = false;
-    await showRewardedAd();
+    // affiche une rewarded si NON premium (bloqué automatiquement pour premium via pub.js)
+    await window.showRewardedAd();
   }
 
   await loadDefis();
@@ -574,9 +579,11 @@ window.validerDefi = async function(index) {
 };
 
 window.ouvrirPopupJeton = async function(index) {
+  // Premium : pas de pub reward (bloquée) — on propose juste l’achat ou rien
+  const noAds = await (window.hasNoAds?.() || window.isPremium?.());
   const jetons = await window.getJetons();
   if (jetons > 0) {
-    if (confirm("Valider ce défi avec un jeton ?")) {
+    if (confirm("Valider ce défi avec 1 jeton ?")) {
       const { data, error } = await window.supabase.rpc('secure_remove_jeton', { nb: 1 });
       if (error || !data || data.success !== true) {
         alert("Erreur lors de la soustraction du jeton ou plus de jetons dispo !");
@@ -587,10 +594,21 @@ window.ouvrirPopupJeton = async function(index) {
       window.location.reload();
     }
   } else {
-    if (confirm("Plus de jeton disponible. Regarder une pub pour gagner 3 jetons ?")) {
-      await showRewardedAd();
-      alert("3 jetons crédités !");
-      majSolde();
+    if (noAds) {
+      alert("Tu es en Premium (pas de pub). Obtiens des jetons via la boutique.");
+      return;
+    }
+    if (confirm("Plus de jeton. Regarder une pub pour gagner 1 jeton ?")) {
+      const ok = await window.showRewardedAd(); // bloquée automatiquement si Premium
+      if (ok !== false) {
+        try {
+          await window.addJetonsSupabase?.(1);
+          alert("1 jeton crédité !");
+          majSolde?.();
+        } catch (e) {
+          alert("Erreur lors du crédit de jeton: " + (e?.message || e));
+        }
+      }
     }
   }
 };
@@ -600,9 +618,16 @@ window.ouvrirPopupJeton = async function(index) {
 window.endGameAuto = async function() {
   let defis = JSON.parse(localStorage.getItem(SOLO_DEFIS_KEY) || "[]");
   if (!defis.length) return;
+
+  // x2 pièces par défi si Premium
+  let premium = false;
+  try { premium = await (window.isPremium?.() || window.hasNoAds?.()); } catch (_) {}
+  const perDefi = premium ? 20 : 10;
+
   let nbFaits = defis.filter(d => d.done).length;
-  let gain = nbFaits * 10;
-  if (nbFaits === 3) gain += 10;
+  let gain = nbFaits * perDefi;
+  if (nbFaits === 3) gain += 10; // bonus final inchangé
+
   await chargerUserData(true);
   const oldPoints = userData.points || 0;
   const newPoints = oldPoints + gain;
@@ -618,7 +643,7 @@ window.endGameAuto = async function() {
   if (endMsg) endMsg.textContent = `Partie terminée ! Tu as validé ${nbFaits}/3 défis.`;
 
   const gainMsg = document.getElementById("gain-message");
-  if (gainMsg) gainMsg.textContent = `+${gain} pièces (${nbFaits} défi${nbFaits>1?"s":""} x10${nbFaits===3?" +10 bonus":""})`;
+  if (gainMsg) gainMsg.textContent = `+${gain} pièces (${nbFaits} défi${nbFaits>1?"s":""} x${perDefi}${nbFaits===3?" +10 bonus":""})`;
 
   const popupEnd = document.getElementById("popup-end");
   if (popupEnd) {
@@ -636,7 +661,7 @@ window.endGameAuto = async function() {
       popupEnd.classList.remove("show");
       await startGame();
     };
-  }
+    }
 
   const returnBtnEnd = document.getElementById("returnBtnEnd");
   if (returnBtnEnd) {
@@ -670,7 +695,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (btnPubRepriseSolo && btnAnnulerRepriseSolo && btnPremiumSolo && popupRepriseSolo) {
     btnPubRepriseSolo.addEventListener("click", async () => {
-      await window.showRewardedAd("rewarded");
+      await window.showRewardedAd(); // bloqué pour Premium
       popupRepriseSolo.classList.add("hidden");
     });
 
@@ -684,11 +709,16 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-// ----------- SIMULATION PUB (à remplacer par ta régie) -----------
+// ----------- SIMULATION/WRAP PUB REWARDED (utilise pub.js) -----------
 window.showRewardedAd = async function() {
   return new Promise((resolve) => {
+    if (typeof window.showRewarded === 'function') {
+      window.showRewarded((ok) => resolve(!!ok));
+      return;
+    }
+    // Fallback dev
     alert("SIMULATION PUB : regarde ta vidéo ici…");
-    setTimeout(() => { resolve(); }, 3200);
+    setTimeout(() => { resolve(true); }, 1800);
   });
 };
 
