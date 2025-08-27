@@ -2697,11 +2697,57 @@ overflow-y: auto;
 @media (max-width: 700px){
   .grid-cadres{ grid-template-columns:repeat(2, 1fr); }
 }
-@media (max-width: 420px){
-  .grid-cadres{ grid-template-columns:1fr; }
-}
+
 
 /* Cadre PNG : éviter la déformation */
 .photo-cadre{
   object-fit:contain;           /* au lieu de cover !important */
 }
+/* === BOUTIQUE : Grille 3 colonnes fixe (même à 390px) === */
+#boutique-container .grid-cadres,
+.grid-cadres {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 20px 14px !important;
+  padding: 20px !important;
+  justify-items: center !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Cartes : bouton collé en bas */
+.grid-cadres .cadre-item{
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+  min-height: 190px; /* ajuste si tu veux */
+}
+
+.grid-cadres .cadre-item > button,
+.grid-cadres .cadre-item .cadre-cta {
+  margin-top: auto !important;
+  width: 100% !important;
+  display: block;
+}
+
+/* Titre qui s’adapte (pas de coupure) */
+.grid-cadres .cadre-item .cadre-title{
+  margin: 4px 0 0;
+  line-height: 1.15;
+  font-weight: 700;
+  text-align: center;
+  white-space: normal;          /* autorise le retour à la ligne */
+  word-break: break-word;       /* évite les débordements */
+  font-size: clamp(.9rem, 2.8vw, 1rem);  /* s’adapte au conteneur */
+}
+
+/* Prix discret */
+.grid-cadres .cadre-item .cadre-price{
+  opacity: .85;
+  font-size: .95rem;
+}
+
+/* Évite toute déformation du PNG de cadre */
+.grid-cadres .photo-cadre{ object-fit: contain !important; }
