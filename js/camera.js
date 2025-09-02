@@ -62,6 +62,7 @@ window.genererImageConcoursAvecCadre = function(base64Image) {
 
       // Ajoute le cadre polaroid au-dessus
       const cadre = new Image();
+      cadre.crossOrigin = "anonymous";
       cadre.onload = () => {
         ctx.drawImage(cadre, 0, 0, sizeW, sizeH);
         resolve(canvas.toDataURL("image/webp", 0.93));
