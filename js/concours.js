@@ -2,6 +2,7 @@
 window.showAd = window.showAd || (() => Promise.resolve());
 window.userIsPremium = window.userIsPremium || false;
 window.userId = window.userId || null;
+window.showRewarded = window.showRewarded || (async () => true);
 
 const URL_CONCOURS = "https://swmdepiukfginzhbeccz.supabase.co/storage/v1/object/public/concours//concours.json";
 const PAGE_SIZE = 30;

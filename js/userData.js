@@ -644,6 +644,8 @@ window.getJetons = getJetonsCloud;
 
 // ----- AJOUTE CECI À LA FIN DE userData.js -----
 // Fonction cloud SÉCURISÉE de retrait de jeton pour les duels
+// ----- AJOUTE CECI À LA FIN DE userData.js -----
+// Fonction cloud SÉCURISÉE de retrait de jeton pour les duels
 window.removeJeton = async function() {
   await loadUserData();
   // Appel d'une RPC côté serveur (SECURITY DEFINER) qui décrémente de 1
