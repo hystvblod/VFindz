@@ -3,6 +3,52 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+/* ========= MONKEY-PATCH: redirige toutes les RPC secure_* vers l’Edge /functions/v1/reward =========
+   -> Aucun autre fichier à changer : tous les supabase.rpc('secure_*', {nb}) passent désormais par l’Edge.
+*/
+(function() {
+  if (!window.supabase || !supabase.rpc) return;
+  const rpcOriginal = supabase.rpc.bind(supabase);
+
+async function callEdgeReward(action, nb) {
+  const sessResp = await supabase.auth.getSession();
+  const session = sessResp?.data?.session;
+  if (!session) throw new Error("Not authenticated");
+
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/hyper-endpoint`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${session.access_token}`
+    },
+    body: JSON.stringify({ action, nb })
+  });
+
+  if (!res.ok) {
+    const t = await res.text().catch(() => "");
+    throw new Error(`Edge error ${res.status}: ${t}`);
+  }
+  const data = await res.json().catch(() => ({}));
+  return { data, error: null };
+
+  }
+
+  supabase.rpc = async (fn, args) => {
+    if (typeof fn === 'string' && fn.startsWith('secure_')) {
+      const nb = args?.nb ?? 0;
+      if (fn === 'secure_add_points')    return callEdgeReward('add_points', nb);
+      if (fn === 'secure_remove_points') return callEdgeReward('remove_points', nb);
+      if (fn === 'secure_add_jetons')    return callEdgeReward('add_jetons', nb);
+      if (fn === 'secure_remove_jeton')  return callEdgeReward('remove_jeton', nb);
+      // Fallback si d’autres secure_* apparaissent plus tard
+      return callEdgeReward(fn, nb);
+    }
+    // Tout le reste continue d’utiliser la RPC Postgres normale
+    return rpcOriginal(fn, args);
+  };
+})();
+/* =================================== FIN MONKEY-PATCH =================================== */
+
 let userDataCache = null;
 let userIdCache = null;
 
@@ -153,7 +199,7 @@ async function setPseudo(pseudo) {
   const premium = isPremiumCached();
   const nbChangements = userDataCache.nbChangementsPseudo;
   if (nbChangements >= 1 && !premium) {
-    // Appel RPC pour enlever 300 points
+    // Appel RPC pour enlever 300 points -> intercepté et géré par l’Edge
     const points = await getPointsCloud();
     if (points < 300) {
       alert("Changer d'identifiant coûte 300 pièces. Tu n’en as pas assez.");
@@ -642,13 +688,10 @@ window.getCadreUrl = getCadreUrl;
 window.getUserByPseudo = getUserByPseudo;
 window.getJetons = getJetonsCloud;
 
-// ----- AJOUTE CECI À LA FIN DE userData.js -----
-// Fonction cloud SÉCURISÉE de retrait de jeton pour les duels
-// ----- AJOUTE CECI À LA FIN DE userData.js -----
 // Fonction cloud SÉCURISÉE de retrait de jeton pour les duels
 window.removeJeton = async function() {
   await loadUserData();
-  // Appel d'une RPC côté serveur (SECURITY DEFINER) qui décrémente de 1
+  // Appel RPC -> intercepté par le monkey-patch et exécuté par l’Edge
   const { data, error } = await supabase.rpc('secure_remove_jeton', { nb: 1 });
   if (error || !data || data.success !== true) {
     throw new Error("Erreur lors de la consommation d'un jeton.");
