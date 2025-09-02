@@ -1,356 +1,407 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title data-i18n="header.title.duelprive">Duel privé - VFindz</title>
-  <link rel="stylesheet" href="style/main.css" />
+  <meta charset="utf-8" />
+  <title>Duel privé • VFind</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    .duel-main {
-      max-width: 420px;
-      margin: 2.4rem auto 0 auto;
-      background: rgba(38,41,56,0.93);
-      border-radius: 1.3rem;
-      box-shadow: 0 8px 32px #0003, 0 2px 0 #232435;
-      padding: 2.2rem 1.4rem 1.6rem 1.4rem;
+    body {
+      background: #0f1220;
+      color: #fff;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial;
+      margin: 0; padding: 0;
     }
-    .amis-list {
-      display: flex;
-      flex-direction: column;
-      gap: 1.1rem;
-      margin-bottom: 2.2rem;
+    header {
+      padding: 16px 20px;
+      display:flex; align-items:center; justify-content:space-between;
+      background: #181b2e; border-bottom: 1px solid #232746;
     }
-    .ami-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #2e3047;
-      border-radius: 0.9rem;
-      padding: 0.9em 1.2em;
-      box-shadow: 0 3px 12px #0002;
-      min-height: 52px;
+    header .title { font-weight: 700; font-size: 1.15rem; letter-spacing:.02em; }
+    main { padding: 18px 16px 28px; max-width: 900px; margin: 0 auto; }
+    .card {
+      background: #16192a; border: 1px solid #262a47; border-radius: 14px;
+      padding: 14px 14px 16px; margin-bottom: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.25);
     }
-    .ami-nom {
-      font-weight: 600;
-      font-size: 1.14em;
-      color: #ffe04a;
-      letter-spacing: .2px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 180px;
+    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    input[type="text"] {
+      background:#0f1324; color:#fff; border:1px solid #2a3056;
+      border-radius:10px; padding:10px 12px; outline:none; min-width:220px;
     }
-    .btn-duel-ami {
-      background: #ffe04a;
-      color: #2b2b2b;
-      font-weight: bold;
-      border: none;
-      border-radius: 8px;
-      padding: 7px 16px;
-      font-size: 1.03em;
-      box-shadow: 0 2px 8px #0002;
-      cursor: pointer;
-      transition: background .14s;
-      margin-left: 14px;
+    button {
+      background:#5a63ff; color:#fff; border: none; border-radius: 10px;
+      padding: 10px 14px; cursor: pointer; font-weight:600;
     }
-    .btn-duel-ami:active { background: #ffd900; }
-    .section-titre {
-      color: #e8eaf6;
-      font-size: 1.15em;
-      font-weight: 600;
-      margin: 1.7em 0 0.7em 0;
-      letter-spacing: .2px;
-      text-align: center;
+    button[disabled] { opacity:.55; cursor:not-allowed; }
+    .list { display:grid; gap:10px; }
+    .invite {
+      display:flex; align-items:center; justify-content:space-between;
+      background:#12162a; border:1px solid #242a4a; border-radius:12px; padding:10px 12px;
     }
-    .duel-demandes-list {
-      background: #24263b;
-      border-radius: 0.9rem;
-      padding: 1em 1em 0.6em 1em;
-      min-height: 45px;
-      margin-bottom: 1.1rem;
-      box-shadow: 0 2px 8px #0001;
+    .invite b { color:#ffe04a; }
+    .chip {
+      font-size:.86rem; background:#23306b; padding:4px 8px; border-radius:999px; color:#d1d8ff;
+      border:1px solid #2e3b86;
     }
-    .demande-card {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 0.6em;
-      gap: 0.6em;
+    .actions { display:flex; gap:8px; }
+    .btn-outline {
+      background:transparent; border:1px solid #3b4273; color:#dfe3ff;
     }
-    .demande-nom {
-      font-weight: 500;
-      color: #ffe04a;
-      font-size: 1.03em;
-      max-width: 160px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .badge-nouveau {
-      background: #ffe04a;
-      color: #2a2a23;
-      font-size: 0.97em;
-      border-radius: 6px;
-      padding: 1px 7px;
-      margin-left: 5px;
-      font-weight: bold;
-      letter-spacing: .4px;
-      box-shadow: 0 1px 4px #0001;
-    }
-    .btn-accepter, .btn-refuser {
-      border: none;
-      border-radius: 8px;
-      padding: 6px 14px;
-      font-weight: bold;
-      font-size: 0.97em;
-      margin-left: 5px;
-      cursor: pointer;
-      transition: background .13s;
-    }
-    .btn-accepter {
-      background: #65e965;
-      color: #253a25;
-    }
-    .btn-refuser {
-      background: #f36d6d;
-      color: #232323;
-    }
-    .btn-accepter:active { background: #32d132; }
-    .btn-refuser:active { background: #de3a3a; }
-    .aucune-demande {
-      color: #bdbdc8;
-      text-align: center;
-      font-size: 1.01em;
-      margin: 0.3em 0 0.8em 0;
-    }
-    @media (max-width: 600px) {
-      .duel-main { max-width: 98vw; padding: 1.1em 0.5em; }
-      .ami-nom { max-width: 110px; }
-      .demande-nom { max-width: 90px; }
-    }
+    .hint { color:#aab2e6; font-size:.92rem; }
+    .empty { color:#9aa1c8; font-style: italic; }
+    .sep { height: 1px; background:#232746; margin: 14px 0; }
+    a.link { color:#9fb3ff; text-decoration:none; }
   </style>
 </head>
-
-
-      <h1 data-i18n="header.title.duelprive">Duel privé</h1>
-
-  <!-- HEADER STYLE SOLO/DUEL -->
-      <header class="header-solo">
-    <div class="header-row">
-      <a href="profil.html" class="back-btn" title="Retour" data-i18n-title="header.back">
-        <img src="assets/icons/arrow_back.svg" alt="Retour" data-i18n-alt="header.back"/>
-      </a>
-<body class="duel-container">
-      <div class="top-buttons">
-        <a href="index.html" class="btn-icon">
-          <img src="assets/icons/user.svg" alt="Profil" />
-        </a>
-        <a href="parametres.html" class="btn-icon">
-          <img src="assets/icons/settings.svg" alt="Paramètres" data-i18n-alt="button.settings" />
-        </a>
-      </div>
-    </div>
-  </header>
-    </div>
-    <!-- AFFICHAGE SOLDE DANS LE HEADER -->
-    <div class="solde-container solde-solo" id="solde-container">
-      <div class="solde-item">
-        <div class="solde-ligne">
-          <img src="assets/img/vcoin.webp" class="icon-solo-piece" alt="Pièces" />
-          <span id="points"></span>
-        </div>
-      </div>
-      <div class="solde-item">
-        <div class="solde-ligne">
-          <img src="assets/img/jeton_p.webp" class="icon-solo-jeton" alt="Jetons" />
-          <span id="jetons"></span>
-        </div>
-      </div>
-    </div>
+<body>
+  <header>
+    <div class="title">Duel privé</div>
+    <div class="hint" id="me-label">—</div>
   </header>
 
   <main>
-    <div class="duel-main">
-      <div class="section-titre" data-i18n="duel.friends">Mes amis</div>
-      <div id="liste-amis" class="amis-list"></div>
+    <!-- Créer / envoyer une invitation -->
+    <section class="card">
+      <h2 style="margin: 0 0 10px 0; font-size:1.05rem;">Inviter un ami par pseudo</h2>
+      <div class="row">
+        <input type="text" id="pseudo-cible" placeholder="Pseudo de ton ami" />
+        <button id="btn-inviter">Envoyer l’invitation</button>
+      </div>
+      <div class="hint" style="margin-top:8px;">L’invitation crée une salle en <b>attente</b>. Ton ami la verra dans “Invitations reçues”.</div>
+    </section>
 
-      <div class="section-titre" style="margin-top:2.4em;" data-i18n="duel.requests.received">Demandes de duel reçues</div>
-      <div id="demandes-recue" class="duel-demandes-list"></div>
+    <!-- Invitations reçues -->
+    <section class="card">
+      <h2 style="margin: 0 0 10px 0; font-size:1.05rem;">Invitations reçues</h2>
+      <div id="list-recues" class="list"></div>
+    </section>
 
-      <div class="section-titre" style="margin-top:2.4em;" data-i18n="duel.requests.sent">Demandes de duel envoyées</div>
-      <div id="demandes-envoyees" class="duel-demandes-list"></div>
+    <!-- Invitations envoyées -->
+    <section class="card">
+      <h2 style="margin: 0 0 10px 0; font-size:1.05rem;">Invitations envoyées</h2>
+      <div id="list-envoyees" class="list"></div>
+    </section>
+
+    <div class="sep"></div>
+    <div class="hint">
+      Astuce : lorsque l’invitation est acceptée, la partie démarre (24h).<br/>
+      Tu seras redirigé vers <code>duel_game.html</code>.
     </div>
   </main>
-  <footer>
-    <p data-i18n="footer">&copy; 2025 VFindz</p>
-  </footer>
 
-  <!-- 1. Supabase global -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <!-- 2. Fonctions utilisateurs -->
-  <script src="js/userData.js"></script>
-  <script src="js/i18n.js"></script>
-  <!-- 3. Script logique DUEL PRIVE, version globale -->
+  <!-- Dépendances (assure-toi que ces fichiers existent déjà dans ton projet) -->
   <script>
+    // Supabase est initialisé dans userData.js (via window.supabase)
+  </script>
+  <script src="js/userData.js"></script>
+  <script src="js/duel.js"></script>
 
-    if (!window.supabase) {
-      window.supabase = supabase.createClient(
-        'https://swmdepiukfginzhbeccz.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN3bWRlcGl1a2ZnaW56aGJlY2N6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDg0MjEyNTksImV4cCI6MjA2Mzk5NzI1OX0.--VONIyPdx1tTi45nd4e-F-ZuKNgbDSY1pP0rXHyJgI'
-      );
-    }
-    let pseudoPublic = null;
-    let profil = null;
+  <script>
+    // ========= Logic Duel Privé (sécurisé côté client) =========
+    // Règle importante : on NE fait AUCUN update sur la table `users` ici.
+    // On ne manipule QUE la table `duels` (insert / update status), ce qui est couvert par vos RLS.
+    // Bonus : on s'aligne sur la logique "random" (status waiting/playing/cancelled/finished).
 
-    // Charge le profil utilisateur + points/jetons
-    async function loadProfil() {
-      await window.loadUserData();
-      pseudoPublic = await window.getPseudo();
-      const { data } = await window.supabase.from('users').select('*').eq('pseudo', pseudoPublic).single();
-      profil = data;
-    }
+    const $ = (id) => document.getElementById(id);
 
-    document.addEventListener("DOMContentLoaded", async () => {
-      // MAJ du solde points/jetons si la fonction est dispo
-      if (typeof window.afficherSolde === "function") await window.afficherSolde();
-      await loadProfil();
-      afficherAmis();
-      afficherDemandesDuel();
+    let ME = { id: null, pseudo: null };
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Auth anonyme si besoin + chargement profil
+        await (window.ensureAuth ? window.ensureAuth() : null);
+        const data = await (window.getUserDataCloud ? window.getUserDataCloud() : null);
+        ME.id = data?.id || null;
+        ME.pseudo = data?.pseudo || "Moi";
+        $('me-label').textContent = `Connecté en tant que ${ME.pseudo}`;
+      } catch (e) {
+        console.warn('Auth/profil non dispo:', e);
+      }
+
+      // Bouton inviter
+      $('btn-inviter').onclick = envoyerInvitation;
+
+      // Abonnements & premiers chargements
+      await initialLoad();
+      subscribeRealtime();
     });
 
-    async function afficherAmis() {
-      const amis = profil && profil.amis ? profil.amis : [];
-      const ul = document.getElementById("liste-amis");
-      ul.innerHTML = "";
-      if (!amis.length) {
-        ul.innerHTML = `<div class='aucune-demande' data-i18n="duel.friends.empty">${window.i18n ? window.i18n("duel.friends.empty") : "Aucun ami enregistré."}</div>`;
-        return;
-      }
-      amis.forEach(ami => {
-        const card = document.createElement("div");
-        card.className = "ami-card";
-        card.innerHTML = `
-          <span class="ami-nom">${ami}</span>
-          <button class="btn-duel-ami" data-ami="${ami}" data-i18n="duel.friends.invite">${window.i18n ? window.i18n("duel.friends.invite") : "Duel ⚡"}</button>
-        `;
-        card.querySelector(".btn-duel-ami").onclick = () => inviterDuel(ami);
-        ul.appendChild(card);
-      });
+    async function initialLoad() {
+      await Promise.all([chargerInvitationsRecues(), chargerInvitationsEnvoyees()]);
     }
 
-    async function afficherDemandesDuel() {
-      // RECUES
-      const ulRecue = document.getElementById("demandes-recue");
-      ulRecue.innerHTML = "";
-      const recues = (profil && profil.demandesDuelRecues) ? profil.demandesDuelRecues : [];
-      if (!recues.length) ulRecue.innerHTML = `<div class='aucune-demande' data-i18n="duel.requests.empty">${window.i18n ? window.i18n("duel.requests.empty") : "Aucune demande reçue."}</div>`;
-      recues.forEach(ami => {
-        const card = document.createElement("div");
-        card.className = "demande-card";
-        card.innerHTML = `
-          <span class="demande-nom">${ami}<span class="badge-nouveau" data-i18n="duel.requests.badge">${window.i18n ? window.i18n("duel.requests.badge") : "Nouveau"}</span></span>
+    function subscribeRealtime() {
+      try {
+        const ch = window.supabase
+          .channel('duels_prive_'+(ME.id || 'x'))
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'duels' }, async (payload) => {
+            // Filtre simple : si la ligne me concerne (en tant que p1/p2), on rafraîchit
+            const d = payload.new;
+            if (!d) return;
+            if (d.player1_id === ME.id || d.player2_id === ME.id) {
+              await Promise.all([chargerInvitationsRecues(), chargerInvitationsEnvoyees()]);
+              // Si la room passe en playing et me concerne, redirige vers la partie
+              if (d.status === 'playing' && (d.player1_id === ME.id || d.player2_id === ME.id)) {
+                // petit délai pour laisser l'UI se mettre à jour
+                setTimeout(() => { window.location.href = `duel_game.html?room=${d.id}`; }, 250);
+              }
+            }
+          })
+          .subscribe();
+      } catch (e) {
+        console.warn('Realtime non dispo:', e);
+      }
+    }
+
+    async function envoyerInvitation() {
+      const pseudoCible = $('pseudo-cible').value.trim();
+      if (!pseudoCible) {
+        alert("Entre le pseudo de ton ami.");
+        return;
+      }
+      if (!ME.id) {
+        alert("Utilisateur non connecté.");
+        return;
+      }
+
+      try {
+        // 1) Retrouver l'utilisateur cible par pseudo (LECTURE SEULE)
+        const { data: cible, error: err1 } = await window.supabase
+          .from('users')
+          .select('id, pseudo, premium')
+          .eq('pseudo', pseudoCible)
+          .maybeSingle();
+
+        if (err1) throw err1;
+        if (!cible || !cible.id) {
+          alert("Pseudo introuvable.");
+          return;
+        }
+        if (cible.id === ME.id) {
+          alert("Tu ne peux pas t’inviter toi-même 😅");
+          return;
+        }
+
+        // 2) Déjà une invitation en attente (dans un sens ou l’autre) ?
+        const { data: exist, error: err2 } = await window.supabase
+          .from('duels')
+          .select('id, status')
+          .in('status', ['waiting','playing'])
+          .or(`and(player1_id.eq.${ME.id},player2_id.eq.${cible.id}),and(player1_id.eq.${cible.id},player2_id.eq.${ME.id})`);
+
+        if (err2) throw err2;
+        if (Array.isArray(exist) && exist.length) {
+          alert("Une salle existe déjà entre vous (en attente ou en cours).");
+          return;
+        }
+
+        // 3) Générer 3 défis (cloud d’abord, sinon local) — même logique que duel.js
+        let defis = [];
+        try {
+          if (typeof window.getDefisDuelFromSupabase === 'function') {
+            defis = await window.getDefisDuelFromSupabase(3);
+          }
+        } catch(_) {}
+        if (!defis || !defis.length) {
+          if (typeof window.getDefisLocal === 'function') defis = await window.getDefisLocal(3);
+          else defis = ["Prends une photo d’un objet rond", "Quelque chose de rouge", "Ta boisson du moment"];
+        }
+
+        // 4) Créer la room (INSERT DANS `duels` UNIQUEMENT)
+        //    RLS doit empêcher d’usurper un autre user_id. Évite d’écrire des champs sensibles (points/jetons) ici.
+        const room = {
+          player1_id: ME.id,
+          player1_pseudo: ME.pseudo,
+          player2_id: cible.id,
+          player2_pseudo: cible.pseudo,
+          score1: 0,
+          score2: 0,
+          status: 'waiting',       // en attente de l’acceptation
+          createdat: Date.now(),
+          defis: defis,
+          starttime: null,
+          photosa: {},
+          photosb: {},
+          type: 'amis'             // duel privé
+        };
+        const { data: inserted, error: err3 } = await window.supabase
+          .from('duels')
+          .insert([room])
+          .select();
+
+        if (err3) throw err3;
+        if (!inserted || !inserted[0]) {
+          alert("Erreur lors de la création de la salle.");
+          return;
+        }
+
+        $('pseudo-cible').value = "";
+        await chargerInvitationsEnvoyees();
+        alert(`Invitation envoyée à ${cible.pseudo} !`);
+
+      } catch (e) {
+        console.error(e);
+        alert("Impossible d’envoyer l’invitation : " + (e?.message || e));
+      }
+    }
+
+    async function chargerInvitationsRecues() {
+      if (!ME.id) return;
+      const wrap = $('list-recues');
+      wrap.innerHTML = '<div class="hint">Chargement…</div>';
+
+      const { data, error } = await window.supabase
+        .from('duels')
+        .select('id, player1_id, player1_pseudo, createdat, type, status')
+        .eq('player2_id', ME.id)
+        .eq('status', 'waiting')
+        .order('createdat', { ascending: false });
+
+      if (error) {
+        wrap.innerHTML = `<div class="empty">Erreur : ${error.message}</div>`;
+        return;
+      }
+      if (!data || !data.length) {
+        wrap.innerHTML = '<div class="empty">Aucune invitation reçue.</div>';
+        return;
+      }
+
+      wrap.innerHTML = '';
+      data.forEach(inv => {
+        const el = document.createElement('div');
+        el.className = 'invite';
+        el.innerHTML = `
           <div>
-            <button class="btn-accepter" data-ami="${ami}" data-i18n="duel.requests.accept">${window.i18n ? window.i18n("duel.requests.accept") : "Accepter"}</button>
-            <button class="btn-refuser" data-ami="${ami}" data-i18n="duel.requests.refuse">${window.i18n ? window.i18n("duel.requests.refuse") : "Refuser"}</button>
+            <div><b>${inv.player1_pseudo || "?"}</b> t’invite à jouer</div>
+            <div class="chip" title="${new Date(inv.createdat).toLocaleString()}">créée ${timeAgo(inv.createdat)}</div>
+          </div>
+          <div class="actions">
+            <button class="btn-outline" data-act="refuse" data-id="${inv.id}">Refuser</button>
+            <button data-act="accept" data-id="${inv.id}">Accepter</button>
           </div>
         `;
-        card.querySelector(".btn-accepter").onclick = () => accepterDuel(ami);
-        card.querySelector(".btn-refuser").onclick = () => refuserDuel(ami);
-        ulRecue.appendChild(card);
+        wrap.appendChild(el);
       });
 
-      // ENVOYÉES
-      const ulEnv = document.getElementById("demandes-envoyees");
-      ulEnv.innerHTML = "";
-      const envoyees = (profil && profil.demandesDuelEnvoyees) ? profil.demandesDuelEnvoyees : [];
-      if (!envoyees.length) ulEnv.innerHTML = `<div class='aucune-demande' data-i18n="duel.sent.empty">${window.i18n ? window.i18n("duel.sent.empty") : "Aucune demande envoyée."}</div>`;
-      envoyees.forEach(ami => {
-        const card = document.createElement("div");
-        card.className = "demande-card";
-        card.innerHTML = `
-          <span class="demande-nom">${ami}</span>
-          <span class="badge-nouveau" style="background:#b3e2ff;color:#20435a;" data-i18n="duel.requests.waiting">${window.i18n ? window.i18n("duel.requests.waiting") : "En attente"}</span>
-        `;
-        ulEnv.appendChild(card);
+      wrap.querySelectorAll('button').forEach(btn => {
+        btn.onclick = async () => {
+          const id = btn.dataset.id;
+          if (btn.dataset.act === 'accept') await accepterInvitation(id);
+          else await refuserInvitation(id);
+        };
       });
     }
 
-    async function inviterDuel(amiPseudo) {
-      const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
-      if (!ami) {
-        alert(window.i18n ? window.i18n("duel.alert.friendnotfound") : "Ami introuvable.");
+    async function chargerInvitationsEnvoyees() {
+      if (!ME.id) return;
+      const wrap = $('list-envoyees');
+      wrap.innerHTML = '<div class="hint">Chargement…</div>';
+
+      const { data, error } = await window.supabase
+        .from('duels')
+        .select('id, player2_pseudo, createdat, type, status')
+        .eq('player1_id', ME.id)
+        .eq('status', 'waiting')
+        .order('createdat', { ascending: false });
+
+      if (error) {
+        wrap.innerHTML = `<div class="empty">Erreur : ${error.message}</div>`;
         return;
       }
-      const demandesRecues = new Set([...(ami.demandesDuelRecues || []), pseudoPublic]);
-      await window.supabase.from("users").update({
-        demandesDuelRecues: Array.from(demandesRecues)
-      }).eq("pseudo", amiPseudo);
+      if (!data || !data.length) {
+        wrap.innerHTML = '<div class="empty">Aucune invitation envoyée.</div>';
+        return;
+      }
 
-      const demandesEnvoyees = new Set([...(profil.demandesDuelEnvoyees || []), amiPseudo]);
-      await window.supabase.from("users").update({
-        demandesDuelEnvoyees: Array.from(demandesEnvoyees)
-      }).eq("pseudo", pseudoPublic);
+      wrap.innerHTML = '';
+      data.forEach(inv => {
+        const el = document.createElement('div');
+        el.className = 'invite';
+        el.innerHTML = `
+          <div>
+            <div>En attente de <b>${inv.player2_pseudo || "?"}</b></div>
+            <div class="chip" title="${new Date(inv.createdat).toLocaleString()}">créée ${timeAgo(inv.createdat)}</div>
+          </div>
+          <div class="actions">
+            <button class="btn-outline" data-act="cancel" data-id="${inv.id}">Annuler</button>
+          </div>
+        `;
+        wrap.appendChild(el);
+      });
 
-      await loadProfil();
-      afficherAmis();
-      afficherDemandesDuel();
+      wrap.querySelectorAll('button').forEach(btn => {
+        btn.onclick = async () => {
+          const id = btn.dataset.id;
+          if (btn.dataset.act === 'cancel') await annulerInvitation(id);
+        };
+      });
     }
 
-    async function accepterDuel(amiPseudo) {
-      const defis = await getRandomDefis();
-      const { data } = await window.supabase.from('duels').insert([{
-        player1_pseudo: amiPseudo, // ADAPTE le nom de colonne si besoin
-        player2_pseudo: pseudoPublic,
-        status: 'playing',
-        createdat: Date.now(),
-        defis,
-        starttime: Date.now(),
-        photosa: {},
-        photosb: {}
-      }]).select();
+    async function accepterInvitation(duelId) {
+      try {
+        // Passe la salle en "playing" et démarre le timer 24h
+        const { data, error } = await window.supabase
+          .from('duels')
+          .update({ status: 'playing', starttime: Date.now() })
+          .eq('id', duelId)
+          .eq('player2_id', ME.id) // sécurité côté client ; RLS doit valider côté serveur
+          .select();
 
-      await window.supabase.from("users").update({
-        demandesDuelRecues: (profil.demandesDuelRecues || []).filter(p => p !== amiPseudo)
-      }).eq("pseudo", pseudoPublic);
-
-      const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
-      await window.supabase.from("users").update({
-        demandesDuelEnvoyees: (ami.demandesDuelEnvoyees || []).filter(p => p !== pseudoPublic)
-      }).eq("pseudo", amiPseudo);
-
-      await loadProfil();
-      afficherDemandesDuel();
-
-      if (data && data.length) {
-        window.location.href = `duel_game.html?room=${data[0].id}`;
+        if (error) throw error;
+        if (!data || !data[0]) {
+          alert("Impossible d’accepter l’invitation.");
+          return;
+        }
+        // Redirige vers la game
+        setTimeout(() => { window.location.href = `duel_game.html?room=${duelId}`; }, 150);
+      } catch (e) {
+        console.error(e);
+        alert("Erreur : " + (e?.message || e));
       }
     }
 
-    async function refuserDuel(amiPseudo) {
-      await window.supabase.from("users").update({
-        demandesDuelRecues: (profil.demandesDuelRecues || []).filter(p => p !== amiPseudo)
-      }).eq("pseudo", pseudoPublic);
+    async function refuserInvitation(duelId) {
+      try {
+        const { error } = await window.supabase
+          .from('duels')
+          .update({ status: 'cancelled' })
+          .eq('id', duelId)
+          .eq('player2_id', ME.id);
 
-      const { data: ami } = await window.supabase.from("users").select("*").eq("pseudo", amiPseudo).single();
-      await window.supabase.from("users").update({
-        demandesDuelEnvoyees: (ami.demandesDuelEnvoyees || []).filter(p => p !== pseudoPublic)
-      }).eq("pseudo", amiPseudo);
-
-      await loadProfil();
-      afficherDemandesDuel();
+        if (error) throw error;
+        await chargerInvitationsRecues();
+      } catch (e) {
+        console.error(e);
+        alert("Erreur : " + (e?.message || e));
+      }
     }
 
-    async function getRandomDefis(count = 3) {
-      const { data } = await window.supabase
-        .from('defis')
-        .select('intitule')
-        .eq('actif', true);
+    async function annulerInvitation(duelId) {
+      try {
+        const { error } = await window.supabase
+          .from('duels')
+          .update({ status: 'cancelled' })
+          .eq('id', duelId)
+          .eq('player1_id', ME.id);
 
-      if (!data || data.length < count) {
-        return (data || []).map(d => d.intitule);
+        if (error) throw error;
+        await chargerInvitationsEnvoyees();
+      } catch (e) {
+        console.error(e);
+        alert("Erreur : " + (e?.message || e));
       }
-      const shuffled = data.sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, count).map(d => d.intitule);
+    }
+
+    function timeAgo(ts) {
+      const d = typeof ts === 'number' ? ts : (parseInt(ts,10) || Date.now());
+      const diff = Date.now() - d;
+      const s = Math.floor(diff/1000);
+      if (s < 60) return "à l’instant";
+      const m = Math.floor(s/60);
+      if (m < 60) return `il y a ${m} min`;
+      const h = Math.floor(m/60);
+      if (h < 24) return `il y a ${h} h`;
+      const j = Math.floor(h/24);
+      return `il y a ${j} j`;
     }
   </script>
 </body>

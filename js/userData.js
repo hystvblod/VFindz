@@ -646,10 +646,12 @@ window.getJetons = getJetonsCloud;
 // Fonction cloud SÉCURISÉE de retrait de jeton pour les duels
 window.removeJeton = async function() {
   await loadUserData();
-  // Sécurité anti-négatif
-  const jetonsActuels = Number(userDataCache.jetons || 0);
-  if (jetonsActuels <= 0) throw new Error("Plus de jetons disponibles.");
-  userDataCache.jetons = jetonsActuels - 1;
-  await supabase.from('users').update({ jetons: userDataCache.jetons }).eq('id', userIdCache);
-  return userDataCache.jetons;
+  // Appel d'une RPC côté serveur (SECURITY DEFINER) qui décrémente de 1
+  const { data, error } = await supabase.rpc('secure_remove_jeton', { nb: 1 });
+  if (error || !data || data.success !== true) {
+    throw new Error("Erreur lors de la consommation d'un jeton.");
+  }
+  // Rafraîchir le cache depuis la base pour rester cohérent
+  const refreshed = await loadUserData(true);
+  return refreshed.jetons || 0;
 };

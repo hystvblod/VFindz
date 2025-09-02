@@ -584,12 +584,16 @@ window.ouvrirPopupJeton = async function(index) {
   const jetons = await window.getJetons();
   if (jetons > 0) {
     if (confirm("Valider ce défi avec 1 jeton ?")) {
+      // ⚠️ SÉCURISÉ : décrémente via RPC server-side
       const { data, error } = await window.supabase.rpc('secure_remove_jeton', { nb: 1 });
       if (error || !data || data.success !== true) {
         alert("Erreur lors de la soustraction du jeton ou plus de jetons dispo !");
         return;
       }
+      // Marque le défi comme validé
       await validerDefiAvecJeton(index);
+      // Recharge le profil pour afficher le solde à jour
+      await chargerUserData(true);
       majSolde?.();
       window.location.reload();
     }
@@ -602,9 +606,13 @@ window.ouvrirPopupJeton = async function(index) {
       const ok = await window.showRewardedAd(); // bloquée automatiquement si Premium
       if (ok !== false) {
         try {
-          await window.addJetonsSupabase?.(1);
-          alert("1 jeton crédité !");
+          // ⚠️ SÉCURISÉ : crédite via RPC server-side
+          const { data, error } = await window.supabase.rpc('secure_add_jetons', { nb: 1 });
+          if (error || !data || data.success !== true) throw error || new Error('secure_add_jetons a échoué');
+          // refresh profil + UI
+          await chargerUserData(true);
           majSolde?.();
+          alert("1 jeton crédité !");
         } catch (e) {
           alert("Erreur lors du crédit de jeton: " + (e?.message || e));
         }
@@ -628,17 +636,33 @@ window.endGameAuto = async function() {
   let gain = nbFaits * perDefi;
   if (nbFaits === 3) gain += 10; // bonus final inchangé
 
+  // -------- SECURE CREDIT POINTS --------
   await chargerUserData(true);
-  const oldPoints = userData.points || 0;
-  const newPoints = oldPoints + gain;
-  const date = new Date().toISOString().slice(0, 10);
-  let historique = userData.historique || [];
-  historique.push({ date, defi: defis.map(d => d.id) });
-  await window.updateUserData({ points: newPoints, historique });
+  try {
+    const { data, error } = await window.supabase.rpc('secure_add_points', { nb: gain });
+    if (error || !data || data.success !== true) {
+      console.error("[SOLO] secure_add_points KO:", error || data);
+      // on continue sans throw pour au moins nettoyer la partie et afficher la popup
+    }
+  } catch (e) {
+    console.error("[SOLO] secure_add_points exception:", e);
+  }
 
+  // Historique uniquement (pas d'écriture directe sur points/jetons)
+  const date = new Date().toISOString().slice(0, 10);
+  let historique = Array.isArray(userData?.historique) ? [...userData.historique] : [];
+  historique.push({ date, defi: defis.map(d => d.id) });
+  try {
+    await window.updateUserData({ historique });
+  } catch (e) {
+    console.warn("[SOLO] updateUserData(historique) KO:", e?.message || e);
+  }
+
+  // Nettoyage partie locale
   localStorage.removeItem(SOLO_DEFIS_KEY);
   localStorage.removeItem(SOLO_TIMER_KEY);
 
+  // UI popup fin de partie
   const endMsg = document.getElementById("end-message");
   if (endMsg) endMsg.textContent = `Partie terminée ! Tu as validé ${nbFaits}/3 défis.`;
 
@@ -652,6 +676,8 @@ window.endGameAuto = async function() {
   }
   console.log(`[SOLO] Fin de partie auto. nb faits: ${nbFaits} / gain: ${gain}`);
 
+  // Refresh solde affiché
+  await chargerUserData(true);
   majSolde();
 
   const replayBtnEnd = document.getElementById("replayBtnEnd");
@@ -661,7 +687,7 @@ window.endGameAuto = async function() {
       popupEnd.classList.remove("show");
       await startGame();
     };
-    }
+  }
 
   const returnBtnEnd = document.getElementById("returnBtnEnd");
   if (returnBtnEnd) {

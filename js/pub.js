@@ -1,5 +1,5 @@
-// --- js/pub.js ---
-// AUCUN await global ici.
+// --- js/pub.js (AdMob / Capacitor) ---
+// AUCUN await global ici. Charger APRES l'init Supabase/userData.js.
 
 // Plateforme
 function getPlatformLower() {
@@ -15,17 +15,23 @@ function getPlatformLower() {
 const PLATFORM = getPlatformLower();
 const IS_IOS = PLATFORM === 'ios';
 
-// IDs AppLovin MAX — REMPLACE ICI par tes vraies clés (iOS ≠ Android)
-const SDK_KEY               = IS_IOS ? 'TA_CLE_SDK_IOS'          : 'TA_CLE_SDK_ANDROID';
-const AD_UNIT_ID_REWARDED   = IS_IOS ? 'IOS_REWARDED_ADUNIT'     : 'ANDROID_REWARDED_ADUNIT';
-const AD_UNIT_ID_INTERSTIT  = IS_IOS ? 'IOS_INTERSTITIAL_ADUNIT' : 'ANDROID_INTERSTITIAL_ADUNIT';
+// === CONFIG IDS ADMOB ===
+// REMPLACE par tes vrais Ad Unit IDs (iOS ≠ Android).
+// Rewarded
+const AD_UNIT_ID_REWARDED = IS_IOS
+  ? 'ca-app-pub-xxxxxxxxxxxxxxxx/yyyyyyyyyy'   // iOS rewarded
+  : 'ca-app-pub-6837328794080297/2149453246';  // Android rewarded
+// Interstitial
+const AD_UNIT_ID_INTERSTIT = IS_IOS
+  ? 'ca-app-pub-xxxxxxxxxxxxxxxx/aaaaaaaaaa'   // iOS interstitial
+  : 'ca-app-pub-6837328794080297/3462534911';  // Android interstitial
 
 // Récompenses
-const REWARD_JETONS = 1;     // 1 pub = +1 jeton
-const REWARD_VCOINS = 100;   // 1 pub = +100 pièces
+const REWARD_JETONS = 1;   // 1 pub = +1 jeton
+const REWARD_VCOINS = 100; // 1 pub = +100 pièces
 const REWARD_REVIVE = true;
 
-// Helper: check premium / nopub
+// --- Helper: check premium / nopub (stocké en DB)
 async function hasNoAds() {
   try {
     const uid = window.getUserId?.();
@@ -44,20 +50,28 @@ async function hasNoAds() {
 }
 window.hasNoAds = hasNoAds;
 
-// ATT (iOS) avant init MAX
+// --- AdMob plugin (Capacitor Community)
+function getAdMob() {
+  const P = window.Capacitor?.Plugins;
+  // @capacitor-community/admob expose AdMob, RewardAd, InterstitialAd
+  return {
+    AdMob: P?.AdMob || window.AdMob || null,
+    RewardAd: P?.RewardAd || window.RewardAd || null,
+    InterstitialAd: P?.InterstitialAd || window.InterstitialAd || null,
+  };
+}
+
+// iOS ATT (suivi)
 async function requestATTIfNeeded() {
   if (!IS_IOS) return;
   try {
+    // Certains wrappers AdMob gèrent eux-mêmes l’ATT via initialize({ requestTrackingAuthorization:true })
+    // Si tu utilises un plugin séparé :
     const att = window.Capacitor?.Plugins?.AppTrackingTransparency;
     if (att?.requestPermission) await att.requestPermission();
   } catch (e) {
-    console.warn('ATT error:', e);
+    console.warn('[Ads] ATT error:', e);
   }
-}
-
-// Récup plugin MAX (Capacitor)
-function getMAX() {
-  return window.AppLovinMAX || window.Capacitor?.Plugins?.AppLovinPlugin || null;
 }
 
 // Init + preload ads (idempotent)
@@ -70,41 +84,70 @@ async function _initAdsOnce() {
     return;
   }
 
-  const MAX = getMAX();
-  if (!MAX) {
-    console.warn('[Ads] AppLovin MAX plugin indisponible.');
+  const { AdMob, RewardAd, InterstitialAd } = getAdMob();
+  if (!AdMob) {
+    console.warn('[Ads] Capacitor AdMob plugin indisponible.');
     return;
   }
 
   await requestATTIfNeeded();
 
   try {
-    await MAX.initialize({ sdkKey: SDK_KEY });
+    // Initialisation AdMob
+    // Beaucoup d’exemples: AdMob.initialize({ requestTrackingAuthorization: true });
+    await AdMob.initialize({
+      requestTrackingAuthorization: IS_IOS ? true : false,
+      testingDevices: [], // optionnel
+      initializeForTesting: false, // passe à true si besoin
+    });
+    console.log('[Ads] AdMob initialized');
   } catch (e) {
     console.warn('[Ads] initialize error:', e);
   }
 
-  // Écouteurs de lifecycle pour recharger après affichage
+  // Prépare Rewarded
   try {
-    MAX.addListener?.('OnRewardedAdHiddenEvent', () => {
-      // Recharge le rewarded
-      MAX.loadRewardedAd?.(AD_UNIT_ID_REWARDED);
+    if (RewardAd?.prepare) {
+      await RewardAd.prepare({
+        adId: AD_UNIT_ID_REWARDED,
+        // serverSideVerification: { userId: '...', customData: '...' }, // si tu fais du SSV AdMob
+      });
+    }
+  } catch (e) {
+    console.warn('[Ads] RewardAd.prepare error:', e);
+  }
+
+  // Prépare Interstitial
+  try {
+    if (InterstitialAd?.prepare) {
+      await InterstitialAd.prepare({
+        adId: AD_UNIT_ID_INTERSTIT,
+      });
+    }
+  } catch (e) {
+    console.warn('[Ads] InterstitialAd.prepare error:', e);
+  }
+
+  // Listeners (recharge auto après affichage)
+  try {
+    // Rewarded terminé/reçu
+    AdMob.addListener?.('onRewardedAdReward', async () => {
+      // rien ici: le flow showRewarded() résout sur cet event
     });
-    MAX.addListener?.('OnInterstitialHiddenEvent', () => {
-      MAX.loadInterstitialAd?.(AD_UNIT_ID_INTERSTIT);
+    // Rewarded fermé -> reload
+    AdMob.addListener?.('onRewardedAdDismissed', async () => {
+      try { await RewardAd?.prepare?.({ adId: AD_UNIT_ID_REWARDED }); } catch (_e) {}
+    });
+    // Interstitial fermé -> reload
+    AdMob.addListener?.('onInterstitialAdDismissed', async () => {
+      try { await InterstitialAd?.prepare?.({ adId: AD_UNIT_ID_INTERSTIT }); } catch (_e) {}
     });
   } catch (e) {
     console.warn('[Ads] addListener error:', e);
   }
 
-  try {
-    await MAX.loadRewardedAd?.(AD_UNIT_ID_REWARDED);
-    await MAX.loadInterstitialAd?.(AD_UNIT_ID_INTERSTIT);
-    console.log('[Ads] MAX init + preloads OK');
-    __ADS_INITTED__ = true;
-  } catch (e) {
-    console.warn('[Ads] preload error:', e);
-  }
+  __ADS_INITTED__ = true;
+  console.log('[Ads] AdMob init + preloads OK');
 }
 
 // Expose pour déclencher après consentement RGPD
@@ -113,50 +156,49 @@ window.initAds = function() { _initAdsOnce(); };
 // Interstitial
 async function showInterstitial() {
   if (await hasNoAds()) return;
-  const MAX = getMAX();
-  if (!MAX?.showInterstitialAd) {
+  const { InterstitialAd } = getAdMob();
+  if (!InterstitialAd?.show) {
     console.log('[Ads] Interstitiel simulé (dev).');
     return;
   }
   try {
-    await MAX.showInterstitialAd(AD_UNIT_ID_INTERSTIT);
+    await InterstitialAd.show();
   } catch (e) {
     console.warn('[Ads] interstitial error:', e);
+    // Essaye de recharger pour la prochaine fois
+    try { await InterstitialAd.prepare({ adId: AD_UNIT_ID_INTERSTIT }); } catch (_) {}
   }
 }
 
-// Rewarded: renvoie une promesse booléenne “a-t-on réellement été récompensé ?”
+// Rewarded: promesse booléenne “a-t-on réellement été récompensé ?”
 function showRewarded() {
   return new Promise(async (resolve) => {
     if (await hasNoAds()) return resolve(false);
-    const MAX = getMAX();
-    if (!MAX?.showRewardedAd) {
+    const { RewardAd, AdMob } = getAdMob();
+    if (!RewardAd?.show) {
       console.log('[Ads] Rewarded simulée (dev)');
       return setTimeout(() => resolve(true), 1200);
     }
 
     let resolved = false;
-
-    // One-shot listeners
     const onReward = () => {
       if (!resolved) { resolved = true; resolve(true); }
-      MAX.removeAllListeners?.('OnRewardedAdReceivedRewardEvent');
-      MAX.removeAllListeners?.('OnRewardedAdDisplayFailedEvent');
+      AdMob.removeAllListeners?.('onRewardedAdReward');
+      AdMob.removeAllListeners?.('onRewardedAdFailedToShow'); // selon plugin
     };
     const onFail = () => {
       if (!resolved) { resolved = true; resolve(false); }
-      MAX.removeAllListeners?.('OnRewardedAdReceivedRewardEvent');
-      MAX.removeAllListeners?.('OnRewardedAdDisplayFailedEvent');
+      AdMob.removeAllListeners?.('onRewardedAdReward');
+      AdMob.removeAllListeners?.('onRewardedAdFailedToShow');
     };
 
     try {
-      MAX.addListener?.('OnRewardedAdReceivedRewardEvent', onReward);
-      MAX.addListener?.('OnRewardedAdDisplayFailedEvent', onFail);
+      AdMob.addListener?.('onRewardedAdReward', onReward);
+      AdMob.addListener?.('onRewardedAdFailedToShow', onFail);
 
       // S’assure qu’il y a bien un ad chargé
-      try { await MAX.loadRewardedAd?.(AD_UNIT_ID_REWARDED); } catch (_) {}
-
-      await MAX.showRewardedAd(AD_UNIT_ID_REWARDED);
+      try { await RewardAd.prepare({ adId: AD_UNIT_ID_REWARDED }); } catch (_) {}
+      await RewardAd.show();
       // NB: on ne resolve PAS ici. On attend réellement l’event “rewarded”.
     } catch (e) {
       console.warn('[Ads] showRewarded error:', e);
@@ -165,8 +207,7 @@ function showRewarded() {
   });
 }
 
-// Wrappers boutique
-
+// Wrappers boutique (crédits via RPC sécurisées)
 async function showRewardBoutique() {
   const ok = await showRewarded();
   if (!ok) return;

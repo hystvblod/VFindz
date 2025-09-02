@@ -293,10 +293,13 @@ galerie.innerHTML = ''; // vide le conteneur
   if (btnRecharge) {
     btnRecharge.onclick = async () => {
       if (!isRechargeDone()) {
-        await window.showAd();
-        resetVotesCycle();
-        setRechargeDone();
-        window.afficherGalerieConcours(true);
+        // ⬇️ ALIGNE ADMOB: remplacé showAd() par showRewarded()
+        const ok = await window.showRewarded?.();
+        if (ok !== false) {
+          resetVotesCycle();
+          setRechargeDone();
+          window.afficherGalerieConcours(true);
+        }
       }
     }
   }
@@ -530,10 +533,13 @@ async function showConcoursRewardPopup() {
     `;
     document.body.appendChild(popup);
     popup.querySelector("#btnRewardConcours").onclick = async () => {
-      await window.showAd();
-      resetVotesCycle();
-      popup.remove();
-      resolve();
+      // ⬇️ ALIGNE ADMOB: remplacé showAd() par showRewarded()
+      const ok = await window.showRewarded?.();
+      if (ok !== false) {
+        resetVotesCycle();
+        popup.remove();
+        resolve();
+      }
     };
   });
 }

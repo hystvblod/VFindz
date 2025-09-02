@@ -1127,18 +1127,44 @@ window.gererPrisePhotoDuel = async function(idx, cadreId = null) {
   }
 };
 
-// HANDLER : Ajoute un jeton (récompense/pub)
+// HANDLER : Ajoute un jeton (récompense/pub) — SÉCURISÉ
 window.gagnerJeton = async function() {
-  await window.addJetons(1);
-  await window.afficherSolde();
+  try {
+    const { data, error } = await window.supabase.rpc('secure_add_jetons', { nb: 1 });
+    if (error || !data || data.success !== true) throw error || new Error('secure_add_jetons a échoué');
+  } catch (e) {
+    alert("Erreur lors de l'ajout du jeton: " + (e?.message || e));
+    return;
+  }
+  await window.afficherSolde?.();
 };
+
+// Retire des points — SÉCURISÉ
 window.retirerPoints = async function(montant) {
-  await window.removePoints(montant);
-  await window.afficherSolde();
+  try {
+    const nb = parseInt(montant, 10);
+    if (!Number.isFinite(nb) || nb <= 0) throw new Error('Montant invalide');
+    const { data, error } = await window.supabase.rpc('secure_remove_points', { nb });
+    if (error || !data || data.success !== true) throw error || new Error('secure_remove_points a échoué');
+  } catch (e) {
+    alert("Erreur lors du retrait de pièces: " + (e?.message || e));
+    return;
+  }
+  await window.afficherSolde?.();
 };
+
+// Ajoute des points — SÉCURISÉ
 window.gagnerPoints = async function(montant) {
-  await window.addPoints(montant);
-  await window.afficherSolde();
+  try {
+    const nb = parseInt(montant, 10);
+    if (!Number.isFinite(nb) || nb <= 0) throw new Error('Montant invalide');
+    const { data, error } = await window.supabase.rpc('secure_add_points', { nb });
+    if (error || !data || data.success !== true) throw error || new Error('secure_add_points a échoué');
+  } catch (e) {
+    alert("Erreur lors de l'ajout de pièces: " + (e?.message || e));
+    return;
+  }
+  await window.afficherSolde?.();
 };
 
 // Changement de cadre après la photo (popup choix)
