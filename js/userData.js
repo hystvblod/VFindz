@@ -33,19 +33,42 @@ async function callEdgeReward(action, nb) {
 
   }
 
-  supabase.rpc = async (fn, args) => {
-    if (typeof fn === 'string' && fn.startsWith('secure_')) {
-      const nb = args?.nb ?? 0;
-      if (fn === 'secure_add_points')    return callEdgeReward('add_points', nb);
-      if (fn === 'secure_remove_points') return callEdgeReward('remove_points', nb);
-      if (fn === 'secure_add_jetons')    return callEdgeReward('add_jetons', nb);
-      if (fn === 'secure_remove_jeton')  return callEdgeReward('remove_jeton', nb);
-      // Fallback si d’autres secure_* apparaissent plus tard
-      return callEdgeReward(fn, nb);
+supabase.rpc = async (fn, args) => {
+  // On intercepte uniquement les fonctions secure_*
+  if (typeof fn === 'string' && fn.startsWith('secure_')) {
+    const nb = Number(args?.nb ?? 0);
+
+    // normalise l'action venant de fn (tolérant aux variantes)
+    function normalizeSecureAction(name) {
+      const base = name.replace(/^secure_/, '');
+
+      // alias fréquents
+      if (base === 'use_jeton') return 'remove_jeton';
+      if (base === 'remove_jeton' || base === 'remove_jetons') return 'remove_jeton';
+
+      if (base === 'add_jeton' || base === 'add_jetons') return 'add_jetons';
+
+      if (base === 'add_points' || base === 'give_points') return 'add_points';
+      if (base === 'remove_points' || base === 'take_points') return 'remove_points';
+
+      // si déjà une des 4 actions attendues, on laisse passer
+      if (['add_points','remove_points','add_jetons','remove_jeton'].includes(base)) return base;
+
+      return null; // inconnu
     }
-    // Tout le reste continue d’utiliser la RPC Postgres normale
-    return rpcOriginal(fn, args);
-  };
+
+    const action = normalizeSecureAction(fn);
+    if (!action) {
+      throw new Error(`Unknown secure_* RPC: ${fn}`);
+    }
+
+    return callEdgeReward(action, nb);
+  }
+
+  // Tout le reste continue d’utiliser la RPC Postgres normale
+  return rpcOriginal(fn, args);
+};
+
 })();
 /* =================================== FIN MONKEY-PATCH =================================== */
 
