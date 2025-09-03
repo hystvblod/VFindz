@@ -113,24 +113,23 @@ async function chargerUserData(forceRefresh = false) {
 }
 
 // ----------- NETTOYAGE PHOTOS EXPIREES -------------
-function nettoyerPhotosDefis() {
-  const now = Date.now();
-  Object.keys(localStorage).forEach(key => {
-    if (key.startsWith("photo_defi_")) {
-      const dateKey = key + "_date";
-      const time = parseInt(localStorage.getItem(dateKey) || "0");
-      if (time && now - time > DEFIS_CACHE_TTL) {
-        const photosAimees = JSON.parse(localStorage.getItem("photos_aimees") || "[]");
-        const photoId = key.replace("photo_defi_", "");
-        if (!photosAimees.includes(photoId)) {
-          console.log(`[SOLO] Nettoyage photo_defi_ expirée: ${key}`);
-          localStorage.removeItem(key);
-          localStorage.removeItem(dateKey);
-        }
-      }
+document.addEventListener("DOMContentLoaded", () => {
+  const heartBtn = document.getElementById("btn-aimer-photo");
+  const photoAffichee = document.getElementById("photo-affichee");
+  if (!heartBtn || !photoAffichee) return;
+
+  heartBtn.addEventListener("click", () => {
+    let list = [];
+    try { list = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]"); } catch {}
+    // évite les doublons : ici on n’a pas le defiId, donc on déduplique par URL
+    if (!list.some(x => x.imageDataUrl === photoAffichee.src)) {
+      if (list.length >= 30) list.shift();
+      list.push({ imageDataUrl: photoAffichee.src, cadre: "polaroid_01", date: Date.now(), mode: "solo" });
+      localStorage.setItem("photos_aimees_obj", JSON.stringify(list));
     }
   });
-}
+});
+
 
 // ----------- STOCKAGE PHOTO AIMEE -------------
 function aimerPhoto(defiId) {
@@ -520,47 +519,57 @@ window.fermerPopupCadreSolo = function() {
 };
 
 // ----------- ZOOM PHOTO / POPUP -----------
+// ----------- ZOOM PHOTO / POPUP -----------
 window.agrandirPhoto = async function(dataUrl, defiId) {
-  const cadre = document.getElementById("cadre-affiche");
-  const photo = document.getElementById("photo-affichee");
-  if (!cadre || !photo) return;
+  const cadreImg = document.getElementById("cadre-affiche");
+  const photoImg = document.getElementById("photo-affichee");
+  if (!cadreImg || !photoImg) return;
 
-  let photoData = null;
-  try { photoData = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`)); } catch (e) {}
+  let obj = null;
+  try { obj = JSON.parse(localStorage.getItem(`photo_defi_${defiId}`)); } catch {}
+  const cadreActuel = obj?.cadre || (await window.getCadreSelectionne()) || "polaroid_01";
 
-  const cadreActuel = photoData?.cadre || (await window.getCadreSelectionne());
-  cadre.src = getCadreUrl(cadreActuel);
-  photo.src = dataUrl;
+  // l’image stockée est déjà la version "photo + cadre" normalisée
+  photoImg.src = obj?.photo || dataUrl;
+  cadreImg.src = (typeof getCadreUrl === "function") ? getCadreUrl(cadreActuel) : "";
 
   const popup = document.getElementById("popup-photo");
-  if (popup) {
-    popup.classList.remove("hidden");
-    popup.classList.add("show");
-    console.log(`[SOLO] Popup zoom photo ouvert pour defi ${defiId}`);
-  }
+  if (popup) { popup.classList.remove("hidden"); popup.classList.add("show"); }
 
   const btnAimer = document.getElementById("btn-aimer-photo");
-  if (btnAimer) {
-    btnAimer.onclick = () => {
-      let photosAimees = JSON.parse(localStorage.getItem("photos_aimees") || "[]");
-      if (!photosAimees.includes(defiId)) {
-        photosAimees.push(defiId);
-        localStorage.setItem("photos_aimees", JSON.stringify(photosAimees));
-        btnAimer.classList.add("active");
-        console.log(`[SOLO] Photo ${defiId} aimée`);
-      } else {
-        photosAimees = photosAimees.filter(id => id !== defiId);
-        localStorage.setItem("photos_aimees", JSON.stringify(photosAimees));
-        btnAimer.classList.remove("active");
-        console.log(`[SOLO] Photo ${defiId} "dés-aimée"`);
-      }
-    };
+  if (!btnAimer) return;
 
-    let photosAimees = JSON.parse(localStorage.getItem("photos_aimees") || "[]");
-    if (photosAimees.includes(defiId)) btnAimer.classList.add("active");
-    else btnAimer.classList.remove("active");
-  }
+  const isLiked = (list, id) => list.findIndex(x => x.defiId === id) !== -1;
+
+  // état initial
+  let aimes = [];
+  try { aimes = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]"); } catch {}
+  btnAimer.classList.toggle("active", isLiked(aimes, defiId));
+
+  // toggle
+  btnAimer.onclick = () => {
+    let list = [];
+    try { list = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]"); } catch {}
+
+    const i = list.findIndex(x => x.defiId === defiId);
+    if (i === -1) {
+      if (!obj?.photo) return alert("Photo introuvable pour ce défi.");
+      list.push({
+        defiId,
+        imageDataUrl: obj.photo,              // image finale (déjà collée)
+        cadre: obj.cadre || cadreActuel,
+        date: Date.now(),
+        mode: "solo"
+      });
+      btnAimer.classList.add("active");
+    } else {
+      list.splice(i, 1);
+      btnAimer.classList.remove("active");
+    }
+    localStorage.setItem("photos_aimees_obj", JSON.stringify(list));
+  };
 };
+
 
 // ----------- VALIDATION DÉFI AVEC JETON OU PHOTO -----------
 window.validerDefi = async function(index) {

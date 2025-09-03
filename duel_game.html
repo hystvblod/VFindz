@@ -13,16 +13,16 @@
   <div class="popup-inner">
     <!-- Boutons croix + cœur -->
     <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
-      <button id="btn-aimer-photo" style="background: none; border: none; padding: 0;">
-        <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" />
+      <button id="btn-aimer-photo" style="background: none; border: none; padding: 0;" aria-pressed="false" title="Ajouter aux favoris">
+        <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" alt="Aimer"/>
       </button>
       <button id="close-popup" style="background: none; border: none; padding: 0;">
         <img src="assets/icons/croix.svg" alt="Fermer" data-i18n-alt="button.close" style="width: 32px; height: 32px;margin-top:-5px;" />
       </button>
     </div>
     <div class="cadre-preview cadre-popup boutique-style">
-      <img id="cadre-affiche" class="photo-cadre" src="" />
-      <img id="photo-affichee" class="photo-user" src="" />
+      <img id="cadre-affiche" class="photo-cadre" src="" alt="Cadre"/>
+      <img id="photo-affichee" class="photo-user" src="" alt="Photo"/>
     </div>
   </div>
 </div>
@@ -33,7 +33,7 @@
       <div class="premium-badge" data-i18n="popup.valider.badge">VALIDER</div>
       <div class="popup-premium-title" data-i18n="popup.valider.title">Valider ce défi</div>
       <div class="popup-premium-price" style="margin-bottom: 18px;" data-i18n="popup.valider.question">
-        Veux-tu valider ce défi avec un jeton ?
+        Veux-tu valider ce défi avec un jeton&nbsp;?
       </div>
       <div class="premium-list-pro" style="margin-bottom:18px;">
         <button class="btn-premium-pro" id="valider-jeton-btn" data-i18n="popup.valider.btn">✅ Valider</button>
@@ -154,7 +154,7 @@
       <img src="assets/icons/alert.svg" alt="Alerte" width="50" style="margin-bottom:12px;" />
       <h3 data-i18n="popup.signal.titre">Signaler la photo</h3>
       <div style="margin-bottom:18px;" data-i18n="popup.signal.texte">
-        Pourquoi veux-tu signaler cette photo ?
+        Pourquoi veux-tu signaler cette photo ?
       </div>
       <button class="btn-signal-type" data-type="inapproprie" data-i18n="popup.signal.inapproprie">Contenu inapproprié ou interdit</button>
       <button class="btn-signal-type" data-type="triche" style="margin-top:12px;" data-i18n="popup.signal.triche">Triche (faux, triche, hors sujet...)</button>
@@ -192,6 +192,117 @@
     document.addEventListener("DOMContentLoaded", () => {
       if (window.afficherSolde) window.afficherSolde();
     });
+  </script>
+
+  <!-- ❤️ DUEL → PHOTOS AIMÉES : compose (photo + cadre) et stocke localement -->
+  <script>
+  (function(){
+    function getFavList(){ try { return JSON.parse(localStorage.getItem('photos_aimees_obj')||'[]'); } catch(e){ return []; } }
+    function saveFavList(a){ localStorage.setItem('photos_aimees_obj', JSON.stringify(a)); }
+    function favKeyFromPhoto(){
+      const p = document.getElementById('photo-affichee'); if(!p || !p.src) return null;
+      try {
+        return 'duel:' + btoa(unescape(encodeURIComponent(p.src))).replace(/=+$/,'').slice(0,32);
+      } catch(_){
+        return 'duel:' + Date.now();
+      }
+    }
+    async function urlToDataURL(u){
+      if (!u) throw new Error('src vide');
+      if (u.startsWith('data:')) return u;
+      const res = await fetch(u, { mode: 'cors' });
+      if (!res.ok) throw new Error('fetch ' + res.status);
+      const blob = await res.blob();
+      return await new Promise((ok, ko) => {
+        const r = new FileReader();
+        r.onload = () => ok(r.result);
+        r.onerror = ko;
+        r.readAsDataURL(blob);
+      });
+    }
+    function loadImg(src){ return new Promise((ok,ko)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=ko; i.src=src; }); }
+    async function compose(photoSrc, cadreSrc, W=500, H=550){
+      const [pData, cData] = await Promise.all([urlToDataURL(photoSrc), urlToDataURL(cadreSrc)]);
+      const [img, frame] = await Promise.all([loadImg(pData), loadImg(cData)]);
+      const destRatio = W / H;
+      let sx=0, sy=0, sw=img.width, sh=img.height;
+      const srcRatio = img.width / img.height;
+      if (srcRatio > destRatio) { sw = img.height * destRatio; sx = (img.width - sw) / 2; }
+      else { sh = img.width / destRatio; sy = (img.height - sh) / 2; }
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0,0,W,H);
+      ctx.drawImage(img, sx,sy,sw,sh, 0,0,W,H);
+      ctx.drawImage(frame, 0,0,W,H);
+      return canvas.toDataURL('image/webp', 0.93);
+    }
+    function cadreIdFromSrc(src){
+      const m = (src||'').match(/\/([a-z0-9_]+)\.(?:webp|png|jpg|jpeg)$/i);
+      return m ? m[1] : 'polaroid_01';
+    }
+    function refreshHeartState(){
+      const heart = document.getElementById('btn-aimer-photo');
+      if (!heart) return;
+      const key = favKeyFromPhoto();
+      if (!key) { heart.classList.remove('active'); heart.setAttribute('aria-pressed','false'); return; }
+      const a = getFavList();
+      const on = a.some(x => x.defiId === key);
+      heart.classList.toggle('active', on);
+      heart.setAttribute('aria-pressed', on ? 'true' : 'false');
+    }
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      const heart = document.getElementById('btn-aimer-photo');
+      const photo = document.getElementById('photo-affichee');
+      const frame = document.getElementById('cadre-affiche');
+      if (!heart || !photo || !frame) return;
+
+      // État initial
+      refreshHeartState();
+
+      // Toggle favoris
+      heart.addEventListener('click', async ()=>{
+        const key = favKeyFromPhoto();
+        if (!key) return;
+        let a = getFavList();
+        const idx = a.findIndex(x => x.defiId === key);
+
+        // Déjà aimé → on retire
+        if (idx >= 0){
+          a.splice(idx,1);
+          saveFavList(a);
+          refreshHeartState();
+          return;
+        }
+
+        // Ajout → compose + enregistre
+        heart.disabled = true;
+        try{
+          const composed = await compose(photo.src, frame.src, 500, 550);
+          const cid = cadreIdFromSrc(frame.src);
+          if (typeof window.ajouterPhotoAimeeComplete === 'function'){
+            window.ajouterPhotoAimeeComplete(key, composed, cid);
+          } else {
+            if (a.length >= 30) a.shift();
+            a.push({ defiId: key, imageDataUrl: composed, cadreId: cid, date: Date.now(), type: 'duel' });
+            saveFavList(a);
+          }
+        } catch(e){
+          console.error('aimer duel:', e);
+          alert("Impossible d'ajouter en favori (réseau/CORS).");
+        } finally{
+          heart.disabled = false;
+          refreshHeartState();
+        }
+      });
+
+      // Si la popup réaffiche une autre photo, on peut rafraîchir l’état du cœur
+      const obs = new MutationObserver(()=>refreshHeartState());
+      obs.observe(photo, { attributes:true, attributeFilter:['src'] });
+    });
+  })();
   </script>
 
 </body>

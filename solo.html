@@ -12,16 +12,16 @@
 <div id="popup-photo" class="popup hidden">
   <div class="popup-inner">
     <div class="photo-popup-buttons" style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; position: absolute; top: 0; left: 0; right: 0; z-index: 10;">
-      <button id="btn-aimer-photo" style="background: none; border: none; padding: 0;" title="Aimer" data-i18n-title="button.like">
-        <img src="assets/icons/coeur.svg" style="width:32px; height:32px;" alt="Aimer" data-i18n-alt="button.like" />
+      <button id="btn-aimer-photo" style="background: none; border: none; padding: 0;" title="Aimer" data-i18n-title="button.like" aria-pressed="false">
+        <img id="heart-icon" src="assets/icons/coeur.svg" style="width:32px; height:32px;" alt="Aimer" data-i18n-alt="button.like" />
       </button>
       <button id="close-popup" style="background: none; border: none; padding: 0;" title="Fermer" data-i18n-title="button.close">
         <img src="assets/icons/croix.svg" alt="Fermer" data-i18n-alt="button.close" style="width: 32px; height: 32px;margin-top:-5px;" />
       </button>
     </div>
     <div class="cadre-preview cadre-popup boutique-style">
-      <img id="cadre-affiche" class="photo-cadre" src="" />
-      <img id="photo-affichee" class="photo-user" src="" />
+      <img id="cadre-affiche" class="photo-cadre" src="" alt="Cadre"/>
+      <img id="photo-affichee" class="photo-user" src="" alt="Photo"/>
     </div>
   </div>
 </div>
@@ -142,34 +142,154 @@
 <script src="js/pub.js"></script>
 <script src="js/solo.js"></script>
 <script src="js/i18n.js"></script>
+
+<!-- Fermeture de la popup (croix) -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const heartBtn = document.getElementById("btn-aimer-photo");
-    const photoAffichee = document.getElementById("photo-affichee");
-    if (!heartBtn || !photoAffichee) return;
-
-    heartBtn.addEventListener("click", () => {
-      heartBtn.querySelector('img').src = "assets/icons/coeur_rouge.svg";
-      let favoris = JSON.parse(localStorage.getItem("photos_favoris") || "[]");
-      if (favoris.length >= 30) {
-        alert(window.i18nGet ? window.i18nGet("solo.fav.limit") : "Limite de 30 photos atteinte.");
-      } else {
-        if (!favoris.includes(photoAffichee.src)) {
-          favoris.push(photoAffichee.src);
-          localStorage.setItem("photos_favoris", JSON.stringify(favoris));
-          alert(window.i18nGet ? window.i18nGet("solo.fav.added") : "Photo ajoutée aux favoris !");
-        } else {
-          alert(window.i18nGet ? window.i18nGet("solo.fav.already") : "Photo déjà ajoutée aux favoris.");
-        }
-      }
-    });
+    const btnClose = document.getElementById('close-popup');
+    if (btnClose) {
+      btnClose.onclick = () => {
+        const popup = document.getElementById('popup-photo');
+        if (popup) { popup.classList.add('hidden'); popup.classList.remove('show'); }
+      };
+    }
   });
 </script>
+
+<!-- Affichage solde + i18n -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     if (window.afficherSolde) window.afficherSolde();
     if (window.i18nTranslateAll) window.i18nTranslateAll();
   });
+</script>
+
+<!-- ❤️ SOLO → PHOTOS AIMÉES : compose (photo + cadre) en DataURL et stocke localement dans photos_aimees_obj -->
+<script>
+(function(){
+  // --- helpers stockage favoris ---
+  function _favList(){ try { return JSON.parse(localStorage.getItem('photos_aimees_obj')||'[]'); } catch(e){ return []; } }
+  function _saveFavList(arr){ localStorage.setItem('photos_aimees_obj', JSON.stringify(arr)); }
+  function _favKeyFromCurrentPhoto(){
+    const p = document.getElementById('photo-affichee');
+    if (!p || !p.src) return null;
+    try {
+      return 'solo:' + btoa(unescape(encodeURIComponent(p.src))).replace(/=+$/,'').slice(0,32);
+    } catch(_){
+      return 'solo:' + Date.now();
+    }
+  }
+  function _cadreIdFromSrc(src){
+    const m = (src||'').match(/\/([a-z0-9_]+)\.(?:webp|png|jpg|jpeg)$/i);
+    return m ? m[1] : 'polaroid_01';
+  }
+
+  // --- safe fetch → DataURL (évite taint) ---
+  async function _toDataURL(u){
+    if (!u) throw new Error('src vide');
+    if (u.startsWith('data:')) return u;
+    const res = await fetch(u, { mode: 'cors' });
+    if (!res.ok) throw new Error('fetch '+res.status);
+    const blob = await res.blob();
+    return await new Promise((ok, ko) => {
+      const r = new FileReader();
+      r.onload = () => ok(r.result);
+      r.onerror = ko;
+      r.readAsDataURL(blob);
+    });
+  }
+  function _loadImage(src){
+    return new Promise((ok,ko)=>{ const i=new Image(); i.onload=()=>ok(i); i.onerror=ko; i.src=src; });
+  }
+
+  // --- composition canvas 500x550 (même ratio que le reste) ---
+  async function _compose(photoSrc, cadreSrc, W=500, H=550){
+    const [pData, cData] = await Promise.all([
+      _toDataURL(photoSrc),
+      (window.getCadreUrlSafe ? window.getCadreUrlSafe(_cadreIdFromSrc(cadreSrc), { verifyFresh:true }) : _toDataURL(cadreSrc))
+    ]);
+    const [img, frame] = await Promise.all([_loadImage(pData), _loadImage(cData)]);
+    const destRatio = W/H;
+    let sx=0, sy=0, sw=img.width, sh=img.height;
+    const srcRatio = img.width/img.height;
+    if (srcRatio > destRatio) { sw = img.height * destRatio; sx = (img.width - sw)/2; }
+    else { sh = img.width / destRatio; sy = (img.height - sh)/2; }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,H);
+    ctx.drawImage(img, sx, sy, sw, sh, 0,0, W,H);
+    ctx.drawImage(frame, 0,0, W,H);
+    return canvas.toDataURL('image/webp', 0.93);
+  }
+
+  // --- refresh état du cœur ---
+  function _refreshHeart(){
+    const heart = document.getElementById('btn-aimer-photo');
+    const icon = document.getElementById('heart-icon');
+    if (!heart || !icon) return;
+    const key = _favKeyFromCurrentPhoto();
+    if (!key){ heart.classList.remove('active'); heart.setAttribute('aria-pressed','false'); icon.src = 'assets/icons/coeur.svg'; return; }
+    const on = _favList().some(x => x.defiId === key);
+    heart.classList.toggle('active', on);
+    heart.setAttribute('aria-pressed', on ? 'true' : 'false');
+    icon.src = on ? 'assets/icons/coeur_rouge.svg' : 'assets/icons/coeur.svg';
+  }
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const heart = document.getElementById('btn-aimer-photo');
+    const photo = document.getElementById('photo-affichee');
+    const frame = document.getElementById('cadre-affiche');
+    if (!heart || !photo || !frame) return;
+
+    // État initial
+    _refreshHeart();
+
+    // Toggle favoris
+    heart.addEventListener('click', async ()=>{
+      const key = _favKeyFromCurrentPhoto();
+      if (!key) return;
+
+      let a = _favList();
+      const idx = a.findIndex(x => x.defiId === key);
+
+      // Déjà aimé → on retire
+      if (idx >= 0){
+        a.splice(idx,1);
+        _saveFavList(a);
+        _refreshHeart();
+        return;
+      }
+
+      // Ajout → compose + enregistre
+      heart.disabled = true;
+      try{
+        const composed = await _compose(photo.src, frame.src, 500, 550);
+        const cid = _cadreIdFromSrc(frame.src);
+
+        // Si utilitaire global dispo (gère limite 30)
+        if (typeof window.ajouterPhotoAimeeComplete === 'function'){
+          window.ajouterPhotoAimeeComplete(key, composed, cid);
+        } else {
+          if (a.length >= 30) a.shift();
+          a.push({ defiId: key, imageDataUrl: composed, cadreId: cid, date: Date.now(), type: 'solo' });
+          _saveFavList(a);
+        }
+      } catch(e){
+        console.error('aimer solo:', e);
+        alert(window.i18nGet ? window.i18nGet('solo.fav.error') : "Impossible d'ajouter en favori.");
+      } finally{
+        heart.disabled = false;
+        _refreshHeart();
+      }
+    });
+
+    // Si l’image change dans la popup, on recalcule l’état du cœur
+    const obs = new MutationObserver(()=>_refreshHeart());
+    obs.observe(photo, { attributes:true, attributeFilter:['src'] });
+  });
+})();
 </script>
 
 </body>

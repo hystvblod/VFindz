@@ -163,21 +163,59 @@ window.aimerPhoto = aimerPhoto;
 window.retirerPhotoAimee = retirerPhotoAimee;
 
 // === Photos aimées DUEL (clé = `${roomId}_${champ}_${idx}`) ===
+// === Photos aimées DUEL (clé = `${roomId}_${champ}_${idx}`) ===
 window.getPhotosAimeesDuel = function () {
   try { return JSON.parse(localStorage.getItem("photos_aimees_duel") || "[]"); }
   catch { return []; }
 };
-window.aimerPhotoDuel = function (key) {
-  const arr = window.getPhotosAimeesDuel();
-  if (!arr.includes(key)) {
-    arr.push(key);
-    localStorage.setItem("photos_aimees_duel", JSON.stringify(arr));
+
+window.aimerPhotoDuel = async function (key) {
+  // 1) garder la clé (pour l’UI duel si tu en as besoin)
+  const arrRaw = window.getPhotosAimeesDuel();
+  if (!arrRaw.includes(key)) {
+    arrRaw.push(key);
+    localStorage.setItem("photos_aimees_duel", JSON.stringify(arrRaw));
+  }
+
+  // 2) pousser l’image finale dans photos_aimees_obj (si pas déjà présente)
+  let liked = [];
+  try { liked = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]"); } catch {}
+  if (!liked.some(o => o.originKey === key)) {
+    try {
+      // On suppose que tu as un petit KV local (IndexedDB/localStorage) pour retrouver { url, cadre } par key
+      // Sinon, adapte ici pour reconstruire l'URL et le cadre depuis ton état de duel.
+      if (window.VFindDuelDB && typeof window.VFindDuelDB.get === 'function') {
+        const rec = await window.VFindDuelDB.get(key); // { url, cadre }
+        if (rec && rec.url) {
+          if (liked.length >= 30) liked.shift();
+          liked.push({
+            imageDataUrl: rec.url,                // URL publique WebP (déjà "photo + cadre")
+            cadre: rec.cadre || "polaroid_01",
+            date: Date.now(),
+            originKey: key,
+            mode: "duel"
+          });
+          localStorage.setItem("photos_aimees_obj", JSON.stringify(liked));
+        }
+      }
+    } catch(e) {
+      console.warn("aimerPhotoDuel: récupération image échouée pour", key, e);
+    }
   }
 };
+
 window.retirerPhotoAimeeDuel = function (key) {
+  // retirer la clé "aimée duel"
   const arr = window.getPhotosAimeesDuel().filter(k => k !== key);
   localStorage.setItem("photos_aimees_duel", JSON.stringify(arr));
+
+  // retirer aussi l’entrée correspondante côté photos_aimees_obj
+  let liked = [];
+  try { liked = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]"); } catch {}
+  liked = liked.filter(o => o.originKey !== key);
+  localStorage.setItem("photos_aimees_obj", JSON.stringify(liked));
 };
+
 
 // --------- Variables globales ---------
 window.currentRoomId = null;
@@ -1361,24 +1399,22 @@ window.ouvrirPopupValiderJeton = function(idx) {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  const btnValider = document.getElementById("btn-confirm-jeton");
-  if (btnValider) {
-    btnValider.onclick = async function() {
-      await window.validerDefiAvecJeton(window._idxJetonToValidate);
-      window._idxJetonToValidate = null;
-      const pop = document.getElementById("popup-jeton-valider");
-      if (pop) pop.classList.add("hidden");
-    };
-  }
-  const btnCancel = document.getElementById("btn-cancel-jeton");
-  if (btnCancel) {
-    btnCancel.onclick = function() {
-      const pop = document.getElementById("popup-jeton-valider");
-      if (pop) pop.classList.add("hidden");
-      window._idxJetonToValidate = null;
-    };
-  }
+  const heartBtn = document.getElementById("btn-aimer-photo");
+  const photoAffichee = document.getElementById("photo-affichee");
+  if (!heartBtn || !photoAffichee) return;
+
+  heartBtn.addEventListener("click", () => {
+    let list = [];
+    try { list = JSON.parse(localStorage.getItem("photos_aimees_obj") || "[]"); } catch {}
+    // évite les doublons : ici on n’a pas le defiId, donc on déduplique par URL
+    if (!list.some(x => x.imageDataUrl === photoAffichee.src)) {
+      if (list.length >= 30) list.shift();
+      list.push({ imageDataUrl: photoAffichee.src, cadre: "polaroid_01", date: Date.now(), mode: "solo" });
+      localStorage.setItem("photos_aimees_obj", JSON.stringify(list));
+    }
+  });
 });
+
 
 // La logique pour valider le défi avec un jeton
 window.validerDefiAvecJeton = async function(idx) {
